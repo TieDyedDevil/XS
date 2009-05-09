@@ -20,6 +20,9 @@
 #endif
 #endif
 
+#include <sys/types.h>
+#include <sys/stat.h>
+
 PRIM(newpgrp) {
 	int pid;
 	if (list != NULL)
@@ -278,8 +281,7 @@ PRIM(limit) {
 			LIMIT_T n;
 			struct rlimit rlim;
 			getrlimit(lim->flag, &rlim);
-			if ((n = parselimit(lim, getstr(lp->term))) < 0)
-				fail("$&limit", "%s: bad limit value", getstr(lp->term));
+			n = parselimit(lim, getstr(lp->term)));
 			if (hard)
 				rlim.rlim_max = n;
 			else
