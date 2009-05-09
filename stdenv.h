@@ -273,22 +273,3 @@ extern int getgroups(int, int *);
 #if !HAVE_LSTAT
 #define	lstat	stat
 #endif
-
-
-
-/*
- * macros for picking apart statuses
- *	we should be able to use the W* forms from <sys/wait.h> but on
- *	some machines they take a union wait (what a bad idea!) and on
- *	others an integer.  we just renamed the first letter to s and
- *	let things be.  on some systems these could just be defined in
- *	terms of the W* forms.
- */
-
-#define	SIFSIGNALED(status)	(((status) & 0xff) != 0)
-#define	STERMSIG(status)	((status) & 0x7f)
-#define	SCOREDUMP(status)	((status) & 0x80)
-#define	SIFEXITED(status)	(!SIFSIGNALED(status))
-#define	SEXITSTATUS(status)	(((status) >> 8) & 0xff)
-
-
