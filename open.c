@@ -1,8 +1,7 @@
 /* open.c -- to insulate <fcntl.h> from the rest of es ($Revision: 1.1.1.1 $) */
 
-#define	REQUIRE_FCNTL	1
-
 #include "es.h"
+#include <fcntl.h>
 
 #if NeXT
 extern int open(const char *, int, ...);

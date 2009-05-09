@@ -78,10 +78,6 @@ extern Dirent *readdir(DIR *);
 #include <pwd.h>
 #endif
 
-#if REQUIRE_FCNTL
-#include <fcntl.h>
-#endif
-
 #include <sys/wait.h>
 
 /* stdlib */
