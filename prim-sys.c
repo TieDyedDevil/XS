@@ -281,7 +281,7 @@ PRIM(limit) {
 			LIMIT_T n;
 			struct rlimit rlim;
 			getrlimit(lim->flag, &rlim);
-			n = parselimit(lim, getstr(lp->term)));
+			n = parselimit(lim, getstr(lp->term));
 			if (hard)
 				rlim.rlim_max = n;
 			else
