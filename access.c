@@ -15,7 +15,7 @@
 #define	OTHER	0
 
 /* ingroupset -- determine whether gid lies in the user's set of groups */
-static Boolean ingroupset(int gid) {
+static Boolean ingroupset(gidset_t gid) {
 #ifdef NGROUPS
 	int i;
 	static int ngroups;
@@ -34,7 +34,7 @@ static Boolean ingroupset(int gid) {
 
 static int testperm(struct stat *stat, int perm) {
 	int mask;
-	static int uid, gid;
+	static uid_t uid, gid;
 	static Boolean initialized = FALSE;
 	if (perm == 0)
 		return 0;
