@@ -41,7 +41,8 @@ static List *redir(List *(*rop)(int *fd, List *list), List *list, int evalflags)
 
 #define	REDIR(name)	static List *CONCAT(redir_,name)(int *srcfdp, List *list)
 
-static noreturn argcount(const char *s) {
+static void argcount(const char *s) NORETURN;
+static void argcount(const char *s) {
 	fail(caller, "argument count: usage: %s", s);
 }
 

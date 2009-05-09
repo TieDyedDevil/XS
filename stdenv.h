@@ -58,6 +58,12 @@
 #include <sys/stat.h>
 #endif
 
+#if __GNUC__
+#define NORETURN __attribute__ ((noreturn));
+#else
+#define NORETURN
+#endif
+
 #if REQUIRE_DIRENT
 #if HAVE_DIRENT_H
 #include <dirent.h>
@@ -66,6 +72,7 @@ typedef struct dirent Dirent;
 #include <sys/dir.h>
 typedef struct direct Dirent;
 #endif
+
 /* prototypes for XXXdir functions. comment out if necessary */
 #if !HPUX
 extern DIR *opendir(const char *);
@@ -81,17 +88,12 @@ extern Dirent *readdir(DIR *);
 #include <sys/wait.h>
 
 /* stdlib */
-#if __GNUC__
-typedef volatile void noreturn;
-#else
-typedef void noreturn;
-#endif
 
 #if STDC_HEADERS
 # include <stdlib.h>
 #else
-extern noreturn exit(int);
-extern noreturn abort(void);
+extern exit(int) NORETURN;
+extern abort(void) NORETURN;
 extern long strtol(const char *num, char **end, int base);
 extern void *qsort(
 	void *base, size_t nmemb, size_t size,
