@@ -137,22 +137,13 @@ extern void *qsort(
 #define	arraysize(a)		((int) (sizeof (a) / sizeof (*a)))
 #define	memzero(dest, count)	memset(dest, 0, count)
 
-#if SOLARIS
-#define	STMT(stmt)		if (1) { stmt; } else
-#define	NOP			if (1) ; else
-#else
 #define	STMT(stmt)		do { stmt; } while (0)
 #define	NOP			do {} while (0)
-#endif
 
-#if REISER_CPP
-#define CONCAT(a,b)	a/**/b
-#define STRING(s)	"s"
-#else
 #define CONCAT(a,b)	a ## b
-#define STRING(s)	#s
-#endif
 
+/* No macro expansion */
+#define STRING(s)	#s
 
 /*
  * types we use throughout es
