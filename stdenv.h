@@ -113,19 +113,6 @@ extern void *qsort(
 #define	EOF	(-1)
 #endif
 
-/* setjmp */
-
-#if HAVE_SIGSETJMP
-/* Some versions of linux are helpful by providing sigsetjmp as a macro
-   rather than as a function.  *arg* */
-# ifndef sigsetjmp
-
-#  define setjmp(buf) sigsetjmp(buf,1)
-#  define longjmp     siglongjmp
-#  define jmp_buf     sigjmp_buf
-# endif
-#endif
-
 
 /*
  * macros
