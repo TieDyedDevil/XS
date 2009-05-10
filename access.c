@@ -31,23 +31,29 @@ static Boolean ingroupset(gidset_t gid) {
 	return FALSE;
 }
 
-static int testperm(struct stat *stat, int perm) {
+static uid_t tperm_uid;
+static uid_t tperm_gid;
+static int testperm_init(struct stat*, int);
+static int testperm_real(struct stat*, int);
+static int (*testperm)(struct stat*, int) = testperm_init;
+
+static int testperm_init(struct stat *stat, int perm) {
+    tperm_uid = geteuid();
+    tperm_gid = getegid();
+    testperm = testperm_real;
+    return testperm_real(stat, perm);
+}
+
+static int testperm_real(struct stat *stat, int perm) {
 	int mask;
-	static uid_t uid, gid;
-	static Boolean initialized = FALSE;
 	if (perm == 0)
 		return 0;
-	if (!initialized) {
-		initialized = TRUE;
-		uid = geteuid();
-		gid = getegid();
-	}
-	mask = (uid == 0)
+	mask = (tperm_uid == 0)
 		? (perm << USER) | (perm << GROUP) | (perm << OTHER)
 		: (perm <<
-			((uid == stat->st_uid)
+			((tperm_uid == stat->st_uid)
 				? USER
-				: ((gid == stat->st_gid  || ingroupset(stat->st_gid))
+				: ((tperm_gid == stat->st_gid  || ingroupset(stat->st_gid))
 					? GROUP
 					: OTHER)));
 	return (stat->st_mode & mask) ? 0 : EACCES;
