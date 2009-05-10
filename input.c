@@ -217,6 +217,9 @@ static char *callreadline(char *prompt) {
 	return r;
 }
 
+
+#if ABUSED_GETENV
+
 /* getenv -- fake version of getenv for readline (or other libraries) */
 static char *esgetenv(const char *name) {
 	List *value = varlookup(name, NULL);
@@ -248,9 +251,6 @@ static char *esgetenv(const char *name) {
 		RefReturn(string);
 	}
 }
-
-#if ABUSED_GETENV
-
 static char *
 stdgetenv(name)
 	register const char *name;
@@ -305,7 +305,7 @@ static int fdfill(Input *in) {
 				add_history(rlinebuf);
 			nread = strlen(rlinebuf) + 1;
 			if (in->buflen < nread) {
-				while (in->buflen < nread)
+				while (in->buflen < (unsigned) nread)
 					in->buflen *= 2;
 				efree(in->bufbegin);
 				in->bufbegin = erealloc(in->bufbegin, in->buflen);
