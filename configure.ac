@@ -14,11 +14,11 @@ rm -f conftest*
 ])
 
 
-use_readline=no
+use_readline=yes
 use_editline=no
 
 AC_ARG_WITH(readline,
---with-readline		Use GNU Readline, use_readline=yes)
+--without-readline		Use GNU Readline, use_readline=no)
 AC_ARG_WITH(editline,
 --with-editline		Use the Editline library, use_editline=yes)
 
@@ -36,6 +36,8 @@ dnl Checks for programs.
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_YACC
+
+AC_PROG_CC_STDC
 
 dnl CFLAGS="$CFLAGS $saved_CFLAGS"
 
@@ -98,8 +100,7 @@ then
 fi
 
 AC_FUNC_WAIT3
-AC_CHECK_FUNCS(strerror strtol lstat setrlimit sigrelse sighold sigaction \
-sysconf setsid sigsetjmp)
+AC_CHECK_FUNCS(strerror strtol lstat setrlimit sigrelse sighold sigaction sysconf setsid)
 
 AC_CACHE_CHECK(for an abused getenv, es_cv_abused_getenv,
 AC_TRY_RUN(
