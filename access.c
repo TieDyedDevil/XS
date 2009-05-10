@@ -17,7 +17,6 @@
 /* ingroupset -- determine whether gid lies in the user's set of groups */
 static Boolean ingroupset(gidset_t gid) {
 #ifdef NGROUPS
-	int i;
 	static int ngroups;
 	static gidset_t gidset[NGROUPS];
 	static Boolean initialized = FALSE;
@@ -25,7 +24,7 @@ static Boolean ingroupset(gidset_t gid) {
 		initialized = TRUE;
 		ngroups = getgroups(NGROUPS, gidset);
 	}
-	for (i = 0; i < ngroups; i++)
+	for (int i = 0; i < ngroups; i++)
 		if (gid == gidset[i])
 			return TRUE;
 #endif
