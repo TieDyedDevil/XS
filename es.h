@@ -136,7 +136,7 @@ extern List *sortlist(List *list);
 
 /* tree.c */
 
-extern Tree *mk(NodeKind VARARGS);
+extern Tree *mk(NodeKind , ...);
 
 
 /* closure.c */
@@ -243,16 +243,16 @@ extern void initconv(void);
 
 /* print.c -- see print.h for more */
 
-extern int print(const char *fmt VARARGS);
-extern int eprint(const char *fmt VARARGS);
-extern int fprint(int fd, const char *fmt VARARGS);
-extern void panic(const char *fmt VARARGS) NORETURN;
+extern int print(const char *fmt, ...);
+extern int eprint(const char *fmt, ...);
+extern int fprint(int fd, const char *fmt, ...);
+extern void panic(const char *fmt, ...) NORETURN;
 
 
 /* str.c */
 
-extern char *str(const char *fmt VARARGS);	/* create a gc space string by printing */
-extern char *mprint(const char *fmt VARARGS);	/* create an ealloc space string by printing */
+extern char *str(const char *fmt, ...);	/* create a gc space string by printing */
+extern char *mprint(const char *fmt, ...);	/* create an ealloc space string by printing */
 extern StrList *mkstrlist(char *, StrList *);
 
 
@@ -477,7 +477,7 @@ extern Handler *tophandler, *roothandler;
 extern List *exception;
 extern void pophandler(Handler *handler);
 extern void throw(List *exc) NORETURN;
-extern void fail(const char *from, const char *name VARARGS) NORETURN;
+extern void fail(const char *from, const char *name, ...) NORETURN;
 extern void newchildcatcher(void);
 
 #if DEBUG_EXCEPTIONS

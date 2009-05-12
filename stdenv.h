@@ -157,28 +157,6 @@ typedef int Sigresult;
 
 typedef GETGROUPS_T gidset_t;
 
-
-/*
- * variable argument lists
- */
-
-#if HAVE_STDARG_H
-
-#define	VARARGS				, ...
-#define	VARARGS1(t1, v1)		(t1 v1, ...)
-#define	VARARGS2(t1, v1, t2, v2)	(t1 v1, t2 v2, ...)
-#define	VA_START(ap, v)			va_start(ap, v)
-
-#else	/* !HAVE_STDARG_H */
-
-#define	VARARGS
-#define	VARARGS1(t1, v1)		(v1, va_alist) t1 v1; va_dcl
-#define	VARARGS2(t1, v1, t2, v2)	(v1, v2, va_alist) t1 v1; t2 v2; va_dcl
-#define	VA_START(ap, var)		va_start(ap)
-
-#endif
-
-
 /*
  * assertion checking
  */

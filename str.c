@@ -40,10 +40,10 @@ extern char *strv(const char *fmt, va_list args) {
 }
 
 /* str -- create a string (in garbage collection space) by printing to it */
-extern char *str VARARGS1(const char *, fmt) {
+extern char *str (const char * fmt, ...) {
 	char *s;
 	va_list args;
-	VA_START(args, fmt);
+	va_start(args, fmt);
 	s = strv(fmt, args);
 	va_end(args);
 	return s;
@@ -66,10 +66,10 @@ static void mprint_grow(Format *format, size_t more) {
 }
 
 /* mprint -- create a string in ealloc space by printing to it */
-extern char *mprint VARARGS1(const char *, fmt) {
+extern char *mprint (const char * fmt, ...) {
 	Format format;
 	format.u.n = 1;
-	VA_START(format.args, fmt);
+	va_start(format.args, fmt);
 
 	format.buf	= ealloc(PRINT_ALLOCSIZE);
 	format.bufbegin	= format.buf;
