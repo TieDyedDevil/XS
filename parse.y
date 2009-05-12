@@ -66,8 +66,8 @@ cmd	:		%prec LET		{ $$ = NULL; }
 	| EXTRACT word words			{ $$ = mk(nExtract, $2, $3); }
 
 simple	: first				{ $$ = treecons2($1, NULL); }
-	| simple word			{ $$ = treeconsend2($1, $2); }
-	| simple redir			{ $$ = redirappend($1, $2); }
+	| simple { passign = 0; } word	{ passign = 1; $$ = treeconsend2($1, $2); }
+	| simple { passign = 0; } redir	{ passign = 1; $$ = redirappend($1, $2); }
 
 redir	: DUP				{ $$ = $1; }
 	| REDIR word			{ $$ = mkredir($1, $2); }

@@ -5,6 +5,8 @@
 #include "syntax.h"
 #include "token.h"
 
+int passign = 1;
+
 #define	isodigit(c)	('0' <= (c) && (c) < '8')
 
 #define	BUFSIZE	((size_t) 1000)
@@ -26,7 +28,7 @@ static char *tokenbuf = NULL;
  *		\t \n # ; & | ^ $ = ` ' ! { } ( ) < > \
  */
 
-const char nw[] = {
+char nw[] = {
 	1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0,		/*   0 -  15 */
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,		/*  16 -  32 */
 	1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,		/* ' ' - '/' */
@@ -45,7 +47,7 @@ const char nw[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,		/* 240 - 255 */
 };
 
-const char dnw[] = {
+char dnw[] = {
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/*   0 -  15 */
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/*  16 -  32 */
 	1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1,		/* ' ' - '/' */
@@ -144,6 +146,7 @@ static Boolean getfds(int fd[2], int c, int default0, int default1) {
 }
 
 extern int yylex(void) {
+	nw['='] = passign;
 	static Boolean dollar = FALSE;
 	int c;
 	size_t i;			/* The purpose of all these local assignments is to	*/

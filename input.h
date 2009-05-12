@@ -33,10 +33,11 @@ extern void yyerror(char *s);
 
 /* token.c */
 
-extern const char dnw[];
+extern char dnw[];
 extern int yylex(void);
 extern void inityy(void);
 extern void print_prompt2(void);
+extern int passign;
 
 
 /* parse.y */
