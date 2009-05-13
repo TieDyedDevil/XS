@@ -78,10 +78,6 @@ extern Dirent *readdir(DIR *);
 #endif
 #endif
 
-#if REQUIRE_PWD
-#include <pwd.h>
-#endif
-
 #include <sys/wait.h>
 
 /* stdlib */
