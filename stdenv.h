@@ -24,9 +24,6 @@
 #include <unistd.h>
 #endif
 
-#if REQUIRE_PARAM
-#include <sys/param.h>
-#endif
 
 #include <string.h>
 #include <stddef.h>
