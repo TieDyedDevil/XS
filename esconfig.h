@@ -211,15 +211,6 @@
 #endif	/* sgi */
 
 
-/* SunOS 4.x defaults */
-
-#if sun && !SOLARIS
-#ifndef	INITIAL_PATH
-#define	INITIAL_PATH		"/usr/ucb", "/usr/bin", ""
-#endif
-#endif	/* sun */
-
-
 /* HP/UX 9.0.1 -- from rsalz@osf.org (Rich $alz) and haahr*/
 
 #if HPUX
@@ -227,15 +218,6 @@
 #define _INCLUDE_XOPEN_SOURCE	1
 #define _INCLUDE_HPUX_SOURCE	1
 #endif
-
-
-/* SCO Xenix -- from steveo@world.std.com (Steven W Orr) for SCO-ODT-1.1 */
-
-#if sco
-#ifndef	USE_SIG_ATOMIC_T
-#define USE_SIG_ATOMIC_T	1
-#endif
-#endif	/* sco */
 
 
 /* OSF/1 -- this is taken from the DEC Alpha */
