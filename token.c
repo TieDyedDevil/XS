@@ -3,7 +3,7 @@
 #include "es.h"
 #include "input.h"
 #include "syntax.h"
-#include "token.h"
+#include "y.tab.h"
 
 #define	isodigit(c)	('0' <= (c) && (c) < '8')
 

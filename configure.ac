@@ -1,6 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(access.c)
+AC_INIT(xs, 0.1, access.c)
 AC_CONFIG_HEADER(config.h)
+AM_INIT_AUTOMAKE([-Wall])
 
 dnl AC_CMDSTDOUT_CPP(variable, command, headers)
 AC_DEFUN([AC_CMDSTDOUT_CPP],
