@@ -66,7 +66,7 @@ src	:
 	@echo ${OTHER} ${CFILES} ${HFILES}
 
 y.tab.c y.tab.h : parse.y
-	${YACC} -vd $(srcdir)/parse.y
+	${YACC} -b y -vd $(srcdir)/parse.y
 
 initial.c : esdump $(srcdir)/initial.es
 	./esdump < $(srcdir)/initial.es > initial.c
