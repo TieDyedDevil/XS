@@ -1,6 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(access.c)
+AC_INIT(xs, 0.1, access.c)
 AC_CONFIG_HEADER(config.h)
+AM_INIT_AUTOMAKE([-Wall])
 
 dnl AC_CMDSTDOUT_CPP(variable, command, headers)
 AC_DEFUN([AC_CMDSTDOUT_CPP],
@@ -26,7 +27,7 @@ AC_CANONICAL_HOST
 
 case "$host" in
 	*sun5* | *solaris2*)
-		AC_DEFINE(SOLARIS,,"Solaris compatibility")
+		AC_DEFINE(SOLARIS,,Solaris compatibility)
 	;;
 esac
 
@@ -47,13 +48,13 @@ dnl ----------------------------
 AC_CACHE_CHECK(for /dev/fd filesystem, es_cv_sys_dev_fd,
 [test -d /dev/fd && es_cv_sys_dev_fd=yes || es_cv_sys_dev_fd=no])
 if test $es_cv_sys_dev_fd = yes; then
-  AC_DEFINE(HAVE_DEV_FD,,"/dev/fd support for >{} <{}")
+  AC_DEFINE(HAVE_DEV_FD,,/dev/fd support for >{} <{})
 fi
 
 AC_SYS_INTERPRETER
 if test $ac_cv_sys_interpreter = yes
 then
-	AC_DEFINE(KERNEL_POUNDBANG,,"execve has shebang support")
+	AC_DEFINE(KERNEL_POUNDBANG,,execve has shebang support)
 fi
 
 
@@ -96,7 +97,7 @@ AC_TYPE_SIGNAL
 
 if test "$ac_cv_type_signal" = void
 then
-	AC_DEFINE(VOID_SIGNALS,,"Signal handlers have void return type instead of int")
+	AC_DEFINE(VOID_SIGNALS,,Signal handlers have void return type instead of int)
 fi
 
 AC_FUNC_WAIT3
@@ -116,7 +117,7 @@ changequote([,])
 ], 
 es_cv_abused_getenv=no,
 [es_cv_abused_getenv=yes
-AC_DEFINE(ABUSED_GETENV, [], "Getenv called by crt*.o or getopt")]))
+AC_DEFINE(ABUSED_GETENV, [], Getenv called by crt*.o or getopt)]))
 
 if test "$es_cv_abused_getenv" = yes
 then
@@ -136,7 +137,7 @@ choke me
 es_cv_assign_va_list=yes, es_cv_assign_va_list=no))
 if test "$es_cv_assign_va_list" = no
 then
-	AC_DEFINE(NO_VA_LIST_ASSIGN,,"No support for assignment of va_lists")
+	AC_DEFINE(NO_VA_LIST_ASSIGN,,No support for assignment of va_lists)
 fi
 
 dnl check for a u_quad_t or something like that
@@ -159,6 +160,6 @@ changequote([,])],
 SIGFILES=$es_cv_sigfiles
 AC_SUBST(SIGFILES)
 
-AC_DEFINE_UNQUOTED(LIMIT_T, $es_cv_rlimit_t, "Type of data in structure from getrlimit")
+AC_DEFINE_UNQUOTED(LIMIT_T, $es_cv_rlimit_t, Type of data in structure from getrlimit)
 
 AC_OUTPUT(Makefile)

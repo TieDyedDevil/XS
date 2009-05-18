@@ -1,6 +1,7 @@
 /* util.c -- the kitchen sink ($Revision: 1.2 $) */
 
 #include "es.h"
+#include <stdlib.h>
 
 #if !HAVE_STRERROR
 /* strerror -- turn an error code into a string */
@@ -60,7 +61,6 @@ extern Boolean streq2(const char *s, const char *t1, const char *t2) {
 
 /* ealloc -- error checked malloc */
 extern void *ealloc(size_t n) {
-	extern void *malloc(size_t n);
 	void *p = malloc(n);
 	if (p == NULL) {
 		uerror("malloc");
@@ -71,7 +71,6 @@ extern void *ealloc(size_t n) {
 
 /* erealloc -- error checked realloc */
 extern void *erealloc(void *p, size_t n) {
-	extern void *realloc(void *, size_t);
 	if (p == NULL)
 		return ealloc(n);
 	p = realloc(p, n);
@@ -84,7 +83,6 @@ extern void *erealloc(void *p, size_t n) {
 
 /* efree -- error checked free */
 extern void efree(void *p) {
-	extern void free(void *);
 	assert(p != NULL);
 	free(p);
 }

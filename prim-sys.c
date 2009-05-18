@@ -2,6 +2,7 @@
 
 #define	REQUIRE_IOCTL	1
 
+#include <time.h>
 #include "es.h"
 #include "prim.h"
 

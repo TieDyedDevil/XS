@@ -173,9 +173,7 @@ extern Dict *mkdict(void) {
 
 extern void *dictget(Dict *dict, const char *name) {
 	Assoc *ap = get(dict, name);
-	if (ap == NULL)
-		return NULL;
-	return ap->value;
+	return ap == NULL ? NULL : ap->value;
 }
 
 extern Dict *dictput(Dict *dict, char *name, void *value) {

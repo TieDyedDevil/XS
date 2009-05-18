@@ -24,9 +24,6 @@
 #include <unistd.h>
 #endif
 
-#if REQUIRE_PARAM
-#include <sys/param.h>
-#endif
 
 #include <string.h>
 #include <stddef.h>
@@ -79,10 +76,6 @@ extern DIR *opendir(const char *);
 extern Dirent *readdir(DIR *);
 /*extern int closedir(DIR *);*/
 #endif
-#endif
-
-#if REQUIRE_PWD
-#include <pwd.h>
 #endif
 
 #include <sys/wait.h>
