@@ -69,7 +69,7 @@ y.tab.c y.tab.h : parse.y
 	${YACC} -b y -vd $(srcdir)/parse.y
 
 initial.c : esdump $(srcdir)/initial.es
-	./esdump < $(srcdir)/initial.es > initial.c
+	./esdump < $(srcdir)/initial.es > initial.c || (rm initial.c; false)
 
 sigmsgs.c : mksignal $(SIGFILES)
 	sh $(srcdir)/mksignal $(SIGFILES) > sigmsgs.c
