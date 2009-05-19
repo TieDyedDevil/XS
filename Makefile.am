@@ -26,47 +26,39 @@
 # to get definitions of all signals from <sys/signal.h>.
 # _POSIX_SOURCE, _XOPEN_SOURCE are the obvious ones.
 
+AM_YFLAGS = -d
+
 bin_PROGRAMS = es esdump
 
-VPATH = $(srcdir)
-
+VPATH = $(srcdir) 
 HFILES	= config.h es.h gc.h input.h prim.h print.h sigmsgs.h \
 	  stdenv.h syntax.h term.h var.h
-CFILES	= access.c closure.c conv.c dict.c eval.c except.c fd.c gc.c glob.c \
+COMMON_FILES	= access.c closure.c conv.c dict.c eval.c except.c fd.c gc.c glob.c \
 	  glom.c input.c heredoc.c list.c main.c match.c open.c opt.c \
 	  prim-ctl.c prim-etc.c prim-io.c prim-sys.c prim.c print.c proc.c \
-	  sigmsgs.c signal.c split.c status.c str.c term.c \
-	  tree.c util.c var.c vec.c version.c y.tab.c 
+	  sigmsgs.c signal.c split.c syntax.c status.c str.c term.c \
+	  token.c tree.c util.c var.c vec.c version.c parse.y
 OTHER	= Makefile parse.y mksignal
-GEN	= esdump y.tab.c y.tab.h y.output sigmsgs.c initial.c
+GEN	= parse.h parse.c parse.output sigmsgs.c initial.c
 
-es_SOURCES = ${CFILES} initial.c
-es_LDADD = syntax.o token.o
+BUILT_SOURCES = parse.h
+es_SOURCES = $(COMMON_FILES) initial.c
 
-syntax.o : y.tab.h
-	$(COMPILE) -c syntax.c
-token.o : y.tab.h token.c
-	$(COMPILE) -c token.c
-
-esdump_SOURCES = ${CFILES}
-esdump_LDADD = dump.o syntax.o token.o
-
-clean	:
-	rm -f es ${OFILES} ${GEN} dump.o initial.o
+esdump_SOURCES = $(COMMON_FILES) dump.c
 
 MANIFEST:
 	find . -type f | sed s/..// > MANIFEST
 
 test	: trip
 
+mostlyclean-local: 
+	rm $(GEN)
+
 trip	: es $(srcdir)/trip.es
 	./es < $(srcdir)/trip.es
 
 src	:
 	@echo ${OTHER} ${CFILES} ${HFILES}
-
-y.tab.c y.tab.h : parse.y
-	${YACC} -b y -vd $(srcdir)/parse.y
 
 initial.c : esdump $(srcdir)/initial.es
 	./esdump < $(srcdir)/initial.es > initial.c || (rm initial.c; false)

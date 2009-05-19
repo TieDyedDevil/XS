@@ -3,7 +3,7 @@
 #include "es.h"
 #include "input.h"
 #include "syntax.h"
-#include "y.tab.h"
+#include "parse.h"
 
 Tree errornode;
 Tree *parsetree;

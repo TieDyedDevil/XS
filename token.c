@@ -5,7 +5,7 @@
 #include "es.h"
 #include "input.h"
 #include "syntax.h"
-#include "y.tab.h"
+#include "parse.h"
 
 #define	isodigit(c)	('0' <= (c) && (c) < '8')
 
