@@ -45,7 +45,7 @@ es_LDADD = syntax.o token.o
 
 syntax.o : y.tab.h
 	$(COMPILE) -c syntax.c
-token.o : y.tab.h
+token.o : y.tab.h token.c
 	$(COMPILE) -c token.c
 
 esdump_SOURCES = ${CFILES}
