@@ -1,16 +1,20 @@
-/* token.c -- lexical analyzer for es ($Revision: 1.1.1.1 $) */
+/* token.c -- lexical analyzer for es ($Revision: 1.1.1.1 $) 
+ * TODO: try rewriting in flex?
+ * */
 
 #include "es.h"
 #include "input.h"
 #include "syntax.h"
 #include "y.tab.h"
 
-int passign = 1;
-
 #define	isodigit(c)	('0' <= (c) && (c) < '8')
 
 #define	BUFSIZE	((size_t) 1000)
 #define	BUFMAX	(8 * BUFSIZE)
+
+/* yacc sometimes modifies these to help the lexer with parsing '=' */
+int parseeq = 0;
+unsigned int token_number_on_stmt = 0;
 
 typedef enum { NW, RW, KW } State;	/* "nonword", "realword", "keyword" */
 
@@ -25,14 +29,14 @@ static char *tokenbuf = NULL;
 
 /*
  *	Special characters (i.e., "non-word") in es:
- *		\t \n # ; & | ^ $ = ` ' ! { } ( ) < > \
+ *		\t \n # ; & | ^ $ ` ' ! { } ( ) < > \ (sometimes =)
  */
 
 char nw[] = {
 	1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0,		/*   0 -  15 */
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,		/*  16 -  32 */
 	1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,		/* ' ' - '/' */
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0,		/* '0' - '?' */
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0,		/* '0' - '?' */
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,		/* '@' - 'O' */
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0,		/* 'P' - '_' */
 	1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,		/* '`' - 'o' */
@@ -145,8 +149,35 @@ static Boolean getfds(int fd[2], int c, int default0, int default1) {
 	return TRUE;
 }
 
-extern int yylex(void) {
-	nw['='] = passign;
+static int yylex_real(void);
+
+
+/* This wrapper function is just a huge hack
+   to allow = to be treated as a normal character
+   when it has no syntactic meaning */
+int yylex(void) {
+	nw['='] = parseeq;
+	if (token_number_on_stmt < 2) nw['='] = 1;
+
+	int t = yylex_real();
+
+	++token_number_on_stmt;
+
+	/* token_number_on_stmt is reset 
+	   at ; or & in yacc file, so only
+	   other cases are newlines and braces
+	   This code is still pretty horrible.
+	   Alternatives include adding a new yacc rule
+	   called left_brace, or modifying all usages of {,
+           etc. none of which are really better
+	 */
+	if (newline || t == '{') {
+		token_number_on_stmt = 0;
+	}
+	return t;
+}
+
+static int yylex_real(void) {
 	static Boolean dollar = FALSE;
 	int c;
 	size_t i;			/* The purpose of all these local assignments is to	*/

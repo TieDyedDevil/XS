@@ -4,8 +4,11 @@
 #include "es.h"
 #include "input.h"
 #include "syntax.h"
+extern int parseeq;
+extern unsigned int token_number_on_stmt;
 %}
 
+%debug
 %token	WORD QWORD
 %token	LOCAL LET FOR CLOSURE FN
 %token	ANDAND BACKBACK EXTRACT CALL COUNT DUP FLAT OROR PRIM REDIR SUB
@@ -46,18 +49,22 @@ line	: cmd			{ $$ = $1; }
 body	: cmd			{ $$ = $1; }
 	| cmdsan body		{ $$ = mkseq("%seq", $1, $2); }
 
-cmdsa	: cmd ';'		{ $$ = $1; }
-	| cmd '&'		{ $$ = prefix("%background", mk(nList, thunkify($1), NULL)); }
+cmdsa	: cmd ';'		{ token_number_on_stmt = 0; $$ = $1; }
+	| cmd '&'		{ token_number_on_stmt = 0; $$ = prefix("%background", mk(nList, thunkify($1), NULL)); }
 
 cmdsan	: cmdsa			{ $$ = $1; }
 	| cmd NL		{ $$ = $1; if (!readheredocs(FALSE)) YYABORT; }
 
 cmd	:		%prec LET		{ $$ = NULL; }
 	| simple				{ $$ = redirect($1); if ($$ == &errornode) YYABORT; }
-	| redir cmd	%prec '!'		{ $$ = redirect(mk(nRedir, $1, $2)); if ($$ == &errornode) YYABORT; }
+	| redir cmd	%prec '!'		{ $$ = redirect(mk(nRedir, $1, $2)); 
+						  if ($$ == &errornode) YYABORT; }
 	| first assign				{ $$ = mk(nAssign, $1, $2); }
 	| fn					{ $$ = $1; }
-	| binder nl '(' bindings ')' nl cmd	{ $$ = mk($1, $4, $7); }
+	| binder 
+		{ parseeq = 1; } 
+	  nl '(' bindings ')' nl cmd	
+		{ parseeq = 0; $$ = mk($1, $5, $8); }
 	| cmd ANDAND nl cmd			{ $$ = mkseq("%and", $1, $4); }
 	| cmd OROR nl cmd			{ $$ = mkseq("%or", $1, $4); }
  	| cmd PIPE nl cmd			{ $$ = mkpipe($1, $2->u[0].i, $2->u[1].i, $4); }
@@ -66,8 +73,8 @@ cmd	:		%prec LET		{ $$ = NULL; }
 	| EXTRACT word words			{ $$ = mk(nExtract, $2, $3); }
 
 simple	: first				{ $$ = treecons2($1, NULL); }
-	| simple { passign = 0; } word	{ passign = 1; $$ = treeconsend2($1, $2); }
-	| simple { passign = 0; } redir	{ passign = 1; $$ = redirappend($1, $2); }
+	| simple  word	{ $$ = treeconsend2($1, $2); }
+	| simple  redir	{ $$ = redirappend($1, $2); }
 
 redir	: DUP				{ $$ = $1; }
 	| REDIR word			{ $$ = mkredir($1, $2); }
