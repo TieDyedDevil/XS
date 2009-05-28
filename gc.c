@@ -7,16 +7,26 @@
 
 #define	ALIGN(n)	(((n) + sizeof (void *) - 1) &~ (sizeof (void *) - 1))
 
-typedef struct Space Space;
-struct Space {
+typedef struct Space {
 	char *current, *bot, *top;
-	Space *next;
-};
+	struct Space *next;
+} Space;
 
-#define	SPACESIZE(sp)	(((sp)->top - (sp)->bot))
-#define	SPACEFREE(sp)	(((sp)->top - (sp)->current))
-#define	SPACEUSED(sp)	(((sp)->current - (sp)->bot))
-#define	INSPACE(p, sp)	((sp)->bot <= (char *) (p) && (char *) (p) < (sp)->top)
+static inline size_t spacesize(Space *sp) {
+    return sp->top - sp->bot;
+}
+
+static inline size_t spacefree(Space *sp) {
+    return sp->top - sp->current;
+}
+
+static inline size_t spaceused(Space *sp) {
+    return sp->current - sp->bot;
+}
+
+static inline Boolean inspace(char *p, Space *sp) {
+    return sp->bot <= (char *) (p) && (char *) (p) < sp->top;
+}
 
 #define	MIN_minspace	10000
 
@@ -62,7 +72,7 @@ static size_t minspace = MIN_minspace;	/* minimum number of bytes in a new space
  *	to use the GCPROTECT option, you must provide the following functions
  *		initmmu
  *		take
- *		release
+v *		release
  *		invalidate
  *		revalidate
  *	for your operating system
@@ -194,15 +204,15 @@ static Space *mkspace(Space *space, Space *next) {
 		Space *sp;
 		if (space->bot == NULL)
 			sp = NULL;
-		else if (SPACESIZE(space) < minspace)
+		else if (spacesize(space) < minspace)
 			sp = space;
 		else {
 			sp = space->next;
-			revalidate(space->bot, SPACESIZE(space));
+			revalidate(space->bot, spacesize(space));
 		}
 		while (sp != NULL) {
 			Space *tail = sp->next;
-			release(sp->bot, SPACESIZE(sp));
+			release(sp->bot, spacesize(sp));
 			if (&spaces[0] <= space && space < &spaces[NSPACES])
 				sp->bot = NULL;
 			else
@@ -252,7 +262,7 @@ static void deprecate(Space *space) {
 		;
 	assert(&spaces[0] <= base && base < &spaces[NSPACES]);
 	for (;;) {
-		invalidate(space->bot, SPACESIZE(space));
+		invalidate(space->bot, spacesize(space));
 		if (space == base)
 			break;
 		else {
@@ -275,7 +285,7 @@ static void deprecate(Space *space) {
 /* isinspace -- does an object lie inside a given Space? */
 extern Boolean isinspace(Space *space, void *p) {
 	for (; space != NULL; space = space->next)
-		if (INSPACE(p, space)) {
+		if (inspace(p, space)) {
 		 	assert((char *) p < space->current);
 		 	return TRUE;
 		}
@@ -386,7 +396,7 @@ extern void gcdisable(void) {
 
 /* gcreserve -- provoke a collection if there's not a certain amount of space around */
 extern void gcreserve(size_t minfree) {
-	if (SPACEFREE(new) < minfree) {
+	if (spacefree(new) < minfree) {
 		if (minspace < minfree)
 			minspace = minfree;
 		gc();
@@ -451,7 +461,7 @@ extern void gc(void) {
 		old = NULL;
 
 		for (livedata = 0, space = new; space != NULL; space = space->next)
-			livedata += SPACEUSED(space);
+			livedata += spaceused(space);
 
 #if GCINFO
 		if (gcinfo)
