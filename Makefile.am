@@ -29,12 +29,14 @@
 AM_YFLAGS = -d
 
 bin_PROGRAMS = es esdump
+check_PROGRAMS = test_p 
+TESTS = test_p
 
 VPATH = $(srcdir) 
 HFILES	= config.h es.h gc.h input.h prim.h print.h sigmsgs.h \
 	  stdenv.h syntax.h term.h var.h
 COMMON_FILES	= access.c closure.c conv.c dict.c eval.c except.c fd.c gc.c glob.c \
-	  glom.c input.c heredoc.c list.c main.c match.c open.c opt.c \
+	  glom.c input.c heredoc.c list.c match.c open.c opt.c \
 	  prim-ctl.c prim-etc.c prim-io.c prim-sys.c prim.c print.c proc.c \
 	  sigmsgs.c signal.c split.c syntax.c status.c str.c term.c \
 	  token.c tree.c util.c var.c vec.c version.c parse.y
@@ -42,9 +44,12 @@ OTHER	= Makefile parse.y mksignal
 GEN	= parse.h parse.c parse.output sigmsgs.c initial.c
 
 BUILT_SOURCES = parse.h
-es_SOURCES = $(COMMON_FILES) initial.c
+es_SOURCES = $(COMMON_FILES) initial.c main.c
+test_p_SOURCES = tests/test_print.c tests/all_tests.c $(COMMON_FILES)
+test_p_LDADD = -lcgreen -lm
 
-esdump_SOURCES = $(COMMON_FILES) dump.c
+esdump_SOURCES = $(COMMON_FILES) dump.c main.c
+
 
 MANIFEST:
 	find . -type f | sed s/..// > MANIFEST
@@ -52,7 +57,7 @@ MANIFEST:
 test	: trip
 
 mostlyclean-local: 
-	rm $(GEN)
+	rm -f $(GEN)
 
 trip	: es $(srcdir)/trip.es
 	./es < $(srcdir)/trip.es
