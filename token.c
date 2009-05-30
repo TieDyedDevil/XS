@@ -171,7 +171,7 @@ int yylex(void) {
 	   called left_brace, or modifying all usages of {,
            etc. none of which are really better
 	 */
-	if (newline || t == '{') {
+	if (newline || t == '{' || t == ';') {
 		token_number_on_stmt = 0;
 	}
 	return t;
