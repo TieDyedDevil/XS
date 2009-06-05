@@ -19,7 +19,7 @@ static Boolean ingroupset(gidset_t gid) {
 #ifdef NGROUPS
 	static int ngroups = -2;
 	static gidset_t gidset[NGROUPS];
-	if (ngroups == -2) 
+	if (ngroups == -2)
 		ngroups = getgroups(NGROUPS, gidset);
 
 	for (int i = 0; i < ngroups; i++)
