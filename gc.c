@@ -1,4 +1,8 @@
 /* gc.c -- copying garbage collector for es ($Revision: 1.2 $) */
+/* TODO: this is a very simple copying garbage collector, it could use
+	 some improvements cpu-time wise (it takes up way too much time in normal programs).
+	 Right now it's basically a semi-space, copies everything every gc run
+*/
 
 #define	GARBAGE_COLLECTOR	1	/* for es.h */
 
@@ -81,7 +85,10 @@ v *		release
 #if GCPROTECT
 #if __MACH__
 
-/* mach versions of mmu operations */
+/* mach versions of mmu operations.
+   These are more "native" to mac os x, but the other ones should work
+   there to.
+ */
 
 #include <mach.h>
 #include <mach_error.h>
@@ -311,7 +318,10 @@ extern void globalroot(void *addr) {
 }
 
 /* not portable to word addressed machines */
+
+/* must be a macro so it can be used as lvalue */
 #define	TAG(p)		(((Tag **) p)[-1])
+
 #define	FORWARDED(tagp)	(((int) tagp) & 1)
 #define	FOLLOWTO(p)	((Tag *) (((char *) p) + 1))
 #define	FOLLOW(tagp)	((void *) (((char *) tagp) - 1))
@@ -354,13 +364,12 @@ static void scanroots(Root *rootlist) {
 
 /* scanspace -- scan new space until it is up to date */
 static void scanspace(void) {
-	Space *sp, *scanned;
-	for (scanned = NULL;;) {
+	Space *sp, *scanned = NULL;
+	for (;;) {
 		Space *front = new;
 		for (sp = new; sp != scanned; sp = sp->next) {
-			char *scan;
 			assert(sp != NULL);
-			scan = sp->bot;
+			char *scan = sp->bot;
 			while (scan < sp->current) {
 				Tag *tag = *(Tag **) scan;
 				assert(tag->magic == TAGMAGIC);
@@ -384,8 +393,8 @@ static void scanspace(void) {
 extern void gcenable(void) {
 	assert(gcblocked > 0);
 	--gcblocked;
-	if (!gcblocked && new->next != NULL)
-		gc();
+	/* This takes way too much cpu time, should not be caled so often? */
+	if (!gcblocked && new->next != NULL) gc();
 }
 
 /* gcdisable -- disable collections */
@@ -402,8 +411,7 @@ extern void gcreserve(size_t minfree) {
 		gc();
 	}
 #if GCALWAYS
-	else
-		gc();
+	else gc();
 #endif
 }
 
@@ -416,7 +424,6 @@ extern Boolean gcisblocked(void) {
 /* gc -- actually do a garbage collection */
 extern void gc(void) {
 	do {
-		size_t livedata;
 		Space *space;
 
 #if GCINFO
@@ -426,10 +433,8 @@ extern void gc(void) {
 				olddata += SPACEUSED(space);
 #endif
 
-		assert(gcblocked >= 0);
-		if (gcblocked > 0)
-			return;
-		++gcblocked;
+		if (gcisblocked()) return;
+		gcdisable();
 
 		assert(new != NULL);
 		assert(old == NULL);
@@ -460,6 +465,7 @@ extern void gc(void) {
 		deprecate(old);
 		old = NULL;
 
+		size_t livedata;
 		for (livedata = 0, space = new; space != NULL; space = space->next)
 			livedata += spaceused(space);
 
