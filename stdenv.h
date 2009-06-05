@@ -56,7 +56,7 @@
 #endif
 
 #if __GNUC__
-#define NORETURN __attribute__ ((noreturn));
+#define NORETURN __attribute__ ((noreturn))
 #else
 #define NORETURN
 #endif
@@ -231,3 +231,8 @@ extern int getgroups(int, int *);
 #if !HAVE_LSTAT
 #define	lstat	stat
 #endif
+
+#ifndef LISPTREES
+#define LISPTREES 1
+#endif
+
