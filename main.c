@@ -9,14 +9,9 @@ Boolean gcverbose	= FALSE;	/* -G */
 Boolean gcinfo		= FALSE;	/* -I */
 #endif
 
-/* #if 0 && !HPUX && !defined(linux) && !defined(sgi) */
-/* extern int getopt (int argc, char **argv, const char *optstring); */
-/* #endif */
-
 extern int optind;
 extern char *optarg;
 
-/* extern int isatty(int fd); */
 extern char **environ;
 
 
@@ -34,7 +29,7 @@ static void checkfd(int fd, OpenKind r) {
 static void initpath(void) {
 	int i;
 	static const char * const path[] = { INITIAL_PATH };
-	
+
 	Ref(List *, list, NULL);
 	for (i = arraysize(path); i-- > 0;) {
 		Term *t = mkstr((char *) path[i]);
@@ -181,18 +176,18 @@ getopt_done:
 		initinput();
 		initprims();
 		initvars();
-	
+
 		runinitial();
-	
+
 		initpath();
 		initpid();
 		initsignals(runflags & run_interactive, allowquit);
 		hidevariables();
 		initenv(environ, protected);
-	
+
 		if (loginshell)
 			runesrc();
-	
+
 		if (cmd == NULL && !cmd_stdin && optind < ac) {
 			int fd;
 			char *file = av[optind++];
@@ -204,7 +199,7 @@ getopt_done:
 			vardef("0", NULL, mklist(mkstr(file), NULL));
 			return exitstatus(runfd(fd, file, runflags));
 		}
-	
+
 		vardef("*", NULL, listify(ac - optind, av + optind));
 		vardef("0", NULL, mklist(mkstr(av[0]), NULL));
 		if (cmd != NULL)
