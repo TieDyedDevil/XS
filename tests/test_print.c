@@ -22,7 +22,7 @@ void test_utoa() {
     const static int NUM_TESTS = sizeof(TESTS) / sizeof(test);
     const char* digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    char t1[128] = {0,}, t2[128] = {0,};
+    char t1[128] = {0,};
 
     for (int i = 0; i < NUM_TESTS; ++i)
     {
