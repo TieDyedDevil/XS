@@ -3,10 +3,6 @@
 #include "es.h"
 #include <fcntl.h>
 
-#if NeXT
-extern int open(const char *, int, ...);
-#endif
-
 /*
  * Opens a file with the necessary flags.  Assumes the following order:
  *	typedef enum {
