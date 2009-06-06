@@ -108,7 +108,7 @@ extern Tree *mkseq(char *op, Tree *t1, Tree *t2) {
 		if (t2 == NULL)
 			return t1;
 	}
-	
+
 	sametail = firstis(t2, op);
 	tail = sametail ? t2->CDR : treecons(thunkify(t2), NULL);
 	if (firstis(t1, op))
@@ -145,7 +145,7 @@ extern Tree *mkpipe(Tree *t1, int outfd, int infd, Tree *t2) {
  *	tree and then rewriting the tree to include the appropriate commands
  */
 
-static Tree placeholder = { nRedir };
+static Tree placeholder = { nRedir,  };
 
 extern Tree *redirect(Tree *t) {
 	Tree *r, *p;

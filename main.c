@@ -118,7 +118,7 @@ int main(int argc, char **argv) {
 		argv[0] = "es";
 		argv[1] = NULL;
 	}
-	if (*argv[0] == '-')
+	if (argv[0][0] == '-')
 		loginshell = TRUE;
 
 	while ((c = getopt(argc, argv, "eilxvnpodsc:?GIL")) != EOF)
