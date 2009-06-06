@@ -29,8 +29,8 @@
 AM_YFLAGS = -d
 
 bin_PROGRAMS = es esdump
-check_PROGRAMS = test_p 
-TESTS = test_p
+check_PROGRAMS = ctest 
+TESTS = ctest 
 
 VPATH = $(srcdir) 
 HFILES	= config.h es.h gc.h input.h prim.h print.h sigmsgs.h \
@@ -45,8 +45,8 @@ GEN	= parse.h parse.c parse.output sigmsgs.c initial.c
 
 BUILT_SOURCES = parse.h
 es_SOURCES = $(COMMON_FILES) initial.c main.c
-test_p_SOURCES = tests/test_print.c tests/all_tests.c $(COMMON_FILES)
-test_p_LDADD = -lcgreen -lm
+ctest_SOURCES = tests/test_print.c tests/test_util.c tests/all_tests.c $(COMMON_FILES)
+ctest_LDADD = -lcgreen -lm
 
 esdump_SOURCES = $(COMMON_FILES) dump.c main.c
 
@@ -54,11 +54,12 @@ esdump_SOURCES = $(COMMON_FILES) dump.c main.c
 MANIFEST:
 	find . -type f | sed s/..// > MANIFEST
 
-test	: trip
+ctags	:
+	etags --declarations /usr/include/stdlib.h /usr/include/stdio.h /usr/include/unistd.h /usr/include/signal.h  /usr/include/errno.h /usr/include/dirent.h /usr/include/sys/wait.h /usr/include/sys/stat.h *.c *.h
 
 mostlyclean-local: 
 	rm -f $(GEN)
-
+test	: check trip
 trip	: es $(srcdir)/trip.es
 	./es < $(srcdir)/trip.es
 
