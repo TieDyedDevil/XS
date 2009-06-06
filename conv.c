@@ -6,12 +6,11 @@
 
 /* %L -- print a list */
 static Boolean Lconv(Format *f) {
-	List *lp, *next;
-	char *sep;
 	const char *fmt = (f->flags & FMT_altform) ? "%S%s" : "%s%s";
-	
-	lp = va_arg(f->args, List *);
-	sep = va_arg(f->args, char *);
+	List *lp = va_arg(f->args, List *);
+	char *sep = va_arg(f->args, char *);
+	List *next;
+
 	for (; lp != NULL; lp = next) {
 		next = lp->next;
 		fmtprint(f, fmt, getstr(lp->term), next == NULL ? "" : sep);
@@ -30,13 +29,11 @@ static int treecount(Tree *tree) {
 
 /* binding -- print a binding statement */
 static void binding(Format *f, char *keyword, Tree *tree) {
-	Tree *np;
-	char *sep = "";
 	fmtprint(f, "%s(", keyword);
-	for (np = tree->u[0].p; np != NULL; np = np->u[1].p) {
-		Tree *binding;
+	char *sep = "";
+	for (Tree *np = tree->u[0].p; np != NULL; np = np->u[1].p) {
 		assert(np->kind == nList);
-		binding = np->u[0].p;
+		Tree *binding = np->u[0].p;
 		assert(binding != NULL);
 		assert(binding->kind == nAssign);
 		fmtprint(f, "%s%#T=%T", sep, binding->u[0].p, binding->u[1].p);
@@ -183,6 +180,8 @@ static void enclose(Format *f, Binding *binding, const char *sep) {
 	}
 }
 
+/* TODO: investigate/eliminte #if 0'd oode */
+
 #if 0
 typedef struct Chain Chain;
 struct Chain {
@@ -307,11 +306,9 @@ quoteit:
 /* %Z -- print a StrList */
 static Boolean Zconv(Format *f) {
 	StrList *lp, *next;
-	char *sep;
 	
-	lp = va_arg(f->args, StrList *);
-	sep = va_arg(f->args, char *);
-	for (; lp != NULL; lp = next) {
+	char *sep = va_arg(f->args, char *);
+	for (StrList *lp = va_arg(f->args, StrList *); lp != NULL; lp = next) {
 		next = lp->next;
 		fmtprint(f, "%s%s", lp->str, next == NULL ? "" : sep);
 	}
@@ -320,12 +317,10 @@ static Boolean Zconv(Format *f) {
 
 /* %F -- protect an exported name from brain-dead shells */
 static Boolean Fconv(Format *f) {
+	unsigned char *name = va_arg(f->args, unsigned char *);
 	int c;
-	unsigned char *name, *s;
-	
-	name = va_arg(f->args, unsigned char *);
 
-	for (s = name; (c = *s) != '\0'; s++)
+	for (unsigned char *s = name; (c = *s) != '\0'; s++)
 		if ((s == name ? isalpha(c) : isalnum(c))
 		    || (c == '_' && s[1] != '_'))
 			fmtputc(f, c);
@@ -382,79 +377,32 @@ static Boolean Bconv(Format *f) {
 		return FALSE;
 	}
 	switch (n->kind) {
-
-	case nWord:
-		fmtprint(f, "(word \"%s\")", n->u[0].s);
-		break;
-
-	case nQword:
-		fmtprint(f, "(qword \"%s\")", n->u[0].s);
-		break;
-
-	case nPrim:
-		fmtprint(f, "(prim %s)", n->u[0].s);
-		break;
-
-	case nCall:
-		fmtprint(f, "(call %B)", n->u[0].p);
-		break;
-
-	case nThunk:
-		fmtprint(f, "(thunk %B)", n->u[0].p);
-		break;
-
-	case nVar:
-		fmtprint(f, "(var %B)", n->u[0].p);
-		break;
-
-	case nAssign:
-		fmtprint(f, "(assign %B %B)", n->u[0].p, n->u[1].p);
-		break;
-
-	case nConcat:
-		fmtprint(f, "(concat %B %B)", n->u[0].p, n->u[1].p);
-		break;
-
-	case nClosure:
-		fmtprint(f, "(%%closure %B %B)", n->u[0].p, n->u[1].p);
-		break;
-
-	case nFor:
-		fmtprint(f, "(for %B %B)", n->u[0].p, n->u[1].p);
-		break;
-
-	case nLambda:
-		fmtprint(f, "(lambda %B %B)", n->u[0].p, n->u[1].p);
-		break;
-
-	case nLet:
-		fmtprint(f, "(let %B %B)", n->u[0].p, n->u[1].p);
-		break;
-
-	case nLocal:
-		fmtprint(f, "(local %B %B)", n->u[0].p, n->u[1].p);
-		break;
-
-	case nMatch:
-		fmtprint(f, "(match %B %B)", n->u[0].p, n->u[1].p);
-		break;
-
-	case nMatch:
-		fmtprint(f, "(extract %B %B)", n->u[0].p, n->u[1].p);
-		break;
-
-	case nRedir:
-		fmtprint(f, "(redir %B %B)", n->u[0].p, n->u[1].p);
-		break;
-
-	case nVarsub:
-		fmtprint(f, "(varsub %B %B)", n->u[0].p, n->u[1].p);
-		break;
-
-	case nPipe:
-		fmtprint(f, "(pipe %d %d)", n->u[0].i, n->u[1].i);
-		break;
-
+#define SINGLE_CASE(kind, formatString, type)			\
+		case kind: \
+			fmtprint(f, formatString, n->u[0].type); \
+			return FALSE;
+#define DOUBLE_CASE(kind, formatString, type)				\
+		case kind: \
+			fmtprint(f, formatString, n->u[0].type, n->u[1].type); \
+			return FALSE;
+	SINGLE_CASE(nWord, "(word \"%s\")", s);
+	SINGLE_CASE(nQword, "(qword \"%s\")", s);
+	SINGLE_CASE(nPrim, "(prim %s)", s);
+	SINGLE_CASE(nCall, "(call %B)", p);
+	SINGLE_CASE(nThunk, "(thunk %B)", p);
+	SINGLE_CASE(nVar, "(var %B)", p);
+	DOUBLE_CASE(nAssign, "(assign %B %B)", p);
+	DOUBLE_CASE(nConcat, "(concat %B %B)", p);
+	DOUBLE_CASE(nClosure, "(%%closure %B %B)", p);
+	DOUBLE_CASE(nFor, "(for %B $B)", p);
+	DOUBLE_CASE(nLambda, "(lambda %B $B)", p);
+	DOUBLE_CASE(nLet, "(let %B %B)", p);
+	DOUBLE_CASE(nLocal, "(local %B %B)", p);
+	DOUBLE_CASE(nMatch, "(match %B %B)", p);
+	DOUBLE_CASE(nExtract, "(extract %B %B)", p);
+	DOUBLE_CASE(nRedir, "(redir %B %B)", p);
+	DOUBLE_CASE(nVarsub, "(varsub %B %B)", p);
+	DOUBLE_CASE(nPipe, "(pipe %d %d)", i);
 	case nList: {
 		fmtprint(f, "(list");
 		do {
@@ -462,11 +410,11 @@ static Boolean Bconv(Format *f) {
 			fmtprint(f, " %B", n->u[0].p);
 		} while ((n = n->u[1].p) != NULL);
 		fmtprint(f, ")");
-		break;
+		return FALSE;
 	}
 
+	default: NOTREACHED;
 	}
-	return FALSE;
 }
 #endif
 

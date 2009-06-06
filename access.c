@@ -136,13 +136,10 @@ PRIM(access) {
 	list = esoptend();
 
 	for (lp = NULL; list != NULL; list = list->next) {
-		int error;
-		char *name;
-
-		name = getstr(list->term);
+		char *name = getstr(list->term);
 		if (suffix != NULL)
 			name = pathcat(name, suffix);
-		error = testfile(name, perm, type);
+		int error = testfile(name, perm, type);
 
 		if (first) {
 			if (error == 0) {

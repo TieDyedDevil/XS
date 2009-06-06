@@ -83,7 +83,7 @@ static char *dumplist(List *list);
 
 static const char *nodename(NodeKind k) {
 	switch(k) {
-	default:	panic("nodename: bad node kind %d", k);
+
 	case nAssign:	return "Assign";
 	case nCall:	return "Call";
 	case nClosure:	return "Closure";
@@ -100,7 +100,8 @@ static const char *nodename(NodeKind k) {
 	case nThunk:	return "Thunk";
 	case nVar:	return "Var";
 	case nVarsub:	return "Varsub";
-	case nWord:	return "Word";
+     	case nWord:	return "Word";
+	default:	panic("nodename: bad node kind %d", k);
 	}
 }
 
@@ -248,7 +249,7 @@ static void printheader(List *title) {
 
 extern void runinitial(void) {
 	List *title = runfd(0, "initial.es", 0);
-	
+
 	gcdisable();
 
 	cvars = mkdict();

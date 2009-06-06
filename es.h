@@ -64,7 +64,7 @@ struct Tree {
 
 typedef struct StrList StrList;
 struct StrList {
-	char *str;
+	const char *str;
 	StrList *next;
 };
 
@@ -173,7 +173,7 @@ extern List *glom2(Tree *tree, Binding *binding, StrList **quotep);
 
 /* glob.c */
 
-extern char QUOTED[], UNQUOTED[];
+const char *QUOTED, *UNQUOTED;
 extern List *glob(List *list, StrList *quote);
 extern Boolean haswild(const char *pattern, const char *quoting);
 
@@ -253,7 +253,7 @@ extern void panic(const char *fmt, ...) NORETURN;
 
 extern char *str(const char *fmt, ...);	/* create a gc space string by printing */
 extern char *mprint(const char *fmt, ...);	/* create an ealloc space string by printing */
-extern StrList *mkstrlist(char *, StrList *);
+extern StrList *mkstrlist(const char *, StrList *);
 
 
 /* vec.c */
@@ -495,7 +495,7 @@ extern List *raised(List *e);
 		_localhandler.up = tophandler; \
 		tophandler = &_localhandler; \
 		if (!setjmp(_localhandler.label)) {
-	
+
 #define CatchException(e) \
 			pophandler(&_localhandler); \
 		} else { \

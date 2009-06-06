@@ -1,4 +1,4 @@
-/* token.c -- lexical analyzer for es ($Revision: 1.1.1.1 $) 
+/* token.c -- lexical analyzer for es ($Revision: 1.1.1.1 $)
  * TODO: try rewriting in flex?
  * */
 
@@ -163,7 +163,7 @@ int yylex(void) {
 
 	++token_number_on_stmt;
 
-	/* token_number_on_stmt is reset 
+	/* token_number_on_stmt is reset
 	   at ; or & in yacc file, so only
 	   other cases are newlines and braces
 	   This code is still pretty horrible.
@@ -180,8 +180,8 @@ int yylex(void) {
 static int yylex_real(void) {
 	static Boolean dollar = FALSE;
 	int c;
-	size_t i;			/* The purpose of all these local assignments is to	*/
-	const char *meta;		/* allow optimizing compilers like gcc to load these	*/
+	size_t i;			        /* The purpose of all these local assignments is to	*/
+	const char *meta;		    /* allow optimizing compilers like gcc to load these	*/
 	char *buf = tokenbuf;		/* values into registers. On a sparc this is a		*/
 	YYSTYPE *y = &yylval;		/* win, in code size *and* execution time		*/
 

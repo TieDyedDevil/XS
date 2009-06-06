@@ -23,7 +23,7 @@ extern List *concat(List *list1, List *list2) {
 }
 
 /* qcat -- concatenate two quote flag terms */
-static char *qcat(const char *q1, const char *q2, Term *t1, Term *t2) {
+static const char *qcat(const char *q1, const char *q2, Term *t1, Term *t2) {
 	size_t len1, len2;
 	char *result, *s;
 

@@ -101,13 +101,13 @@ static void loghistory(const char *cmd, size_t len) {
 		case ' ': case '\t':	break;
 		default:		goto writeit;
 		}
-	writeit:
-		;
+
 	/*
 	 * Small unix hack: since read() reads only up to a newline
 	 * from a terminal, then presumably this write() will write at
 	 * most only one input line at a time.
 	 */
+writeit:
 	ewrite(historyfd, cmd, len);
 }
 
@@ -225,7 +225,7 @@ static char *esgetenv(const char *name) {
 	List *value = varlookup(name, NULL);
 	if (value == NULL)
 		return NULL;
-	else { 
+	else {
 		char *export;
 		static Dict *envdict;
 		static Boolean initialized = FALSE;
@@ -304,7 +304,7 @@ static int fdfill(Input *in) {
 			if (*rlinebuf != '\0')
 				add_history(rlinebuf);
 			nread = strlen(rlinebuf) + 1;
-			if (in->buflen < nread) {
+			if (in->buflen < (unsigned long) nread) {
 				while (in->buflen < (unsigned) nread)
 					in->buflen *= 2;
 				efree(in->bufbegin);
@@ -414,7 +414,7 @@ extern List *runinput(Input *in, int runflags) {
 		if (flags & eval_exitonfalse)
 			dispatch = mklist(mkstr("%exit-on-false"), dispatch);
 		varpush(&push, "fn-%dispatch", dispatch);
-	
+
 		repl = varlookup((flags & run_interactive)
 				   ? "fn-%interactive-loop"
 				   : "fn-%batch-loop",
@@ -422,7 +422,7 @@ extern List *runinput(Input *in, int runflags) {
 		result = (repl == NULL)
 				? prim("batchloop", NULL, NULL, flags)
 				: eval(repl, NULL, flags);
-	
+
 		varpop(&push);
 
 	CatchException (e)

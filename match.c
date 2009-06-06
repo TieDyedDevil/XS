@@ -121,7 +121,7 @@ extern Boolean listmatch(List *subject, List *pattern, StrList *quote) {
 		Ref(StrList *, q, quote);
 		for (; p != NULL; p = p->next, q = q->next) {
 			/* one or more stars match null */
-			char *pw = getstr(p->term), *qw = q->str;
+			const char *pw = getstr(p->term), *qw = q->str;
 			if (*pw != '\0' && qw != QUOTED) {
 				int i;
 				Boolean matched = TRUE;
@@ -149,8 +149,8 @@ extern Boolean listmatch(List *subject, List *pattern, StrList *quote) {
 		assert(q != NULL);
 		assert(p->term != NULL);
 		assert(q->str != NULL);
-		Ref(char *, pw, getstr(p->term));
-		Ref(char *, qw, q->str);
+		Ref(const char *, pw, getstr(p->term));
+		Ref(const char *, qw, q->str);
 		Ref(List *, t, s);
 		for (; t != NULL; t = t->next) {
 			char *tw = getstr(t->term);

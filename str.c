@@ -91,7 +91,7 @@ extern char *mprint (const char * fmt, ...) {
 
 DefineTag(StrList, static);
 
-extern StrList *mkstrlist(char *str, StrList *next) {
+extern StrList *mkstrlist(const char *str, StrList *next) {
 	gcdisable();
 	assert(str != NULL);
 	Ref(StrList *, list, gcnew(StrList));
@@ -109,7 +109,7 @@ static void *StrListCopy(void *op) {
 
 static size_t StrListScan(void *p) {
 	StrList *list = p;
-	list->str = forward(list->str);
+	list->str = forward((void *) list->str);
 	list->next = forward(list->next);
 	return sizeof (StrList);
 }

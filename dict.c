@@ -103,9 +103,8 @@ static size_t DictScan(void *p) {
 static char DEAD[] = "DEAD";
 
 static Assoc *get(Dict *dict, const char *name) {
-	Assoc *ap;
 	unsigned long n = strhash(name), mask = dict->size - 1;
-	for (; (ap = &dict->table[n & mask])->name != NULL; n++)
+	for (Assoc *ap; (ap = &dict->table[n & mask])->name != NULL; n++)
 		if (ap->name != DEAD && streq(name, ap->name))
 			return ap;
 	return NULL;

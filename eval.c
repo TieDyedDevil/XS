@@ -4,7 +4,7 @@
 
 unsigned long evaldepth = 0, maxevaldepth = MAXmaxevaldepth;
 
-static void failexec(char *file, List *args) NORETURN; 
+static void failexec(char *file, List *args) NORETURN;
 static void failexec(char *file, List *args) {
 	List *fn;
 	assert(gcisblocked());
@@ -25,17 +25,15 @@ static void failexec(char *file, List *args) {
 
 /* forkexec -- fork (if necessary) and exec */
 extern List *forkexec(char *file, List *list, Boolean inchild) {
-	int pid, status;
-	Vector *env;
 	gcdisable();
-	env = mkenv();
-	pid = efork(!inchild, FALSE);
+	Vector *env = mkenv();
+	int pid = efork(!inchild, FALSE);
 	if (pid == 0) {
 		execve(file, vectorize(list)->vector, env->vector);
 		failexec(file, list);
 	}
 	gcenable();
-	status = ewaitfor(pid);
+	int status = ewaitfor(pid);
 	if ((status & 0xff) == 0) {
 		sigint_newline = FALSE;
 		SIGCHK();
@@ -143,7 +141,7 @@ static List *localbind(Binding *dynamic0, Binding *lexical0,
 		RefReturn(result);
 	}
 }
-	
+
 /* local -- build, recursively, one layer of local assignment */
 static List *local(Tree *defn, Tree *body0,
 		   Binding *bindings0, int evalflags) {
@@ -302,7 +300,7 @@ top:
 
 	    case nFor:
 		return forloop(tree->u[0].p, tree->u[1].p, binding, flags);
-	
+
 	    case nMatch:
 		return matchpattern(tree->u[0].p, tree->u[1].p, binding);
 
@@ -403,7 +401,7 @@ restart:
 				if (funcname != NULL)
 					varpop(&p);
 				RefEnd2(context, tree);
-	
+
 			CatchException (e)
 
 				if (termeq(e->term, "return")) {

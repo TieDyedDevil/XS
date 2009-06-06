@@ -63,7 +63,7 @@ static Boolean sconv(Format *format) {
 	return FALSE;
 }
 
-static char *utoa(unsigned long u, char *t, unsigned int radix, char *digit) {
+char *utoa(unsigned long u, char *t, unsigned int radix, char *digit) {
 	if (u >= radix) {
 		t = utoa(u / radix, t, radix, digit);
 		u %= radix;
@@ -163,7 +163,7 @@ static Boolean pctconv(Format *format) {
 
 static Boolean badconv(Format *format) {
 	panic("bad conversion character in printfmt: %%%c", format->invoker);
-	return FALSE; /* hush up gcc -Wall */
+	NOTREACHED;
 }
 
 
