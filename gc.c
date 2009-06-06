@@ -1,8 +1,4 @@
 /* gc.c -- copying garbage collector for es ($Revision: 1.2 $) */
-/* TODO: this is a very simple copying garbage collector, it could use
-	 some improvements cpu-time wise (it takes up way too much time in normal programs).
-	 Right now it's basically a semi-space, copies everything every gc run
-*/
 
 #define	GARBAGE_COLLECTOR	1	/* for es.h */
 
@@ -11,25 +7,23 @@
 
 #define	ALIGN(n)	(((n) + sizeof (void *) - 1) &~ (sizeof (void *) - 1))
 
-typedef struct Space {
+typedef struct Space Space;
+struct Space {
 	char *current, *bot, *top;
-	struct Space *next;
-} Space;
+	Space *next;
+};
 
-static inline size_t spacesize(Space *sp) {
-    return sp->top - sp->bot;
+inline static size_t space_size(const Space *sp) {
+	return sp->top - sp->bot;
 }
-
-static inline size_t spacefree(Space *sp) {
-    return sp->top - sp->current;
+inline static size_t space_free(const Space *sp) {
+	return sp->top - sp->current;
 }
-
-static inline size_t spaceused(Space *sp) {
-    return sp->current - sp->bot;
+inline static size_t space_used(const Space *sp) {
+		return sp->current - sp->bot;
 }
-
-static inline Boolean inspace(char *p, Space *sp) {
-    return sp->bot <= (char *) (p) && (char *) (p) < sp->top;
+inline static Boolean in_space(const char *p, Space *sp)	{
+	return sp->bot <= p && p < sp->top;
 }
 
 #define	MIN_minspace	10000
@@ -76,7 +70,7 @@ static size_t minspace = MIN_minspace;	/* minimum number of bytes in a new space
  *	to use the GCPROTECT option, you must provide the following functions
  *		initmmu
  *		take
-v *		release
+ *		release
  *		invalidate
  *		revalidate
  *	for your operating system
@@ -85,10 +79,8 @@ v *		release
 #if GCPROTECT
 #if __MACH__
 
-/* mach versions of mmu operations.
-   These are more "native" to mac os x, but the other ones should work
-   there to.
- */
+/* mach versions of mmu operations
+ * More "native" to OSX, perhaps, but OSX supports the other version too */
 
 #include <mach.h>
 #include <mach_error.h>
@@ -211,15 +203,15 @@ static Space *mkspace(Space *space, Space *next) {
 		Space *sp;
 		if (space->bot == NULL)
 			sp = NULL;
-		else if (spacesize(space) < minspace)
+		else if (space_size(space) < minspace)
 			sp = space;
 		else {
 			sp = space->next;
-			revalidate(space->bot, spacesize(space));
+			revalidate(space->bot, space_size(space));
 		}
 		while (sp != NULL) {
 			Space *tail = sp->next;
-			release(sp->bot, spacesize(sp));
+			release(sp->bot, space_size(sp));
 			if (&spaces[0] <= space && space < &spaces[NSPACES])
 				sp->bot = NULL;
 			else
@@ -269,7 +261,7 @@ static void deprecate(Space *space) {
 		;
 	assert(&spaces[0] <= base && base < &spaces[NSPACES]);
 	for (;;) {
-		invalidate(space->bot, spacesize(space));
+		invalidate(space->bot, space_size(space));
 		if (space == base)
 			break;
 		else {
@@ -292,7 +284,7 @@ static void deprecate(Space *space) {
 /* isinspace -- does an object lie inside a given Space? */
 extern Boolean isinspace(Space *space, const void *p) {
 	for (; space != NULL; space = space->next)
-		if (inspace(p, space)) {
+		if (in_space(p, space)) {
 		 	assert((char *) p < space->current);
 		 	return TRUE;
 		}
@@ -318,13 +310,17 @@ extern void globalroot(void *addr) {
 }
 
 /* not portable to word addressed machines */
-
-/* must be a macro so it can be used as lvalue */
+/* Must be macro to be used as lvalue */
 #define	TAG(p)		(((Tag **) p)[-1])
-
-#define	FORWARDED(tagp)	(((int) tagp) & 1)
-#define	FOLLOWTO(p)	((Tag *) (((char *) p) + 1))
-#define	FOLLOW(tagp)	((void *) (((char *) tagp) - 1))
+static inline Boolean forwarded(int tagp) {
+	return tagp & 1;
+}
+static inline Tag *follow_to(char *p) {
+	return p + 1;
+}
+static inline void *follow(char *tagp) {
+	return tagp - 1;
+}
 
 /* forward -- forward an individual pointer from old space */
 extern void *forward(void *p) {
@@ -340,15 +336,15 @@ extern void *forward(void *p) {
 
 	tag = TAG(p);
 	assert(tag != NULL);
-	if (FORWARDED(tag)) {
-		np = FOLLOW(tag);
+	if (forwarded(tag)) {
+		np = follow(tag);
 		assert(TAG(np)->magic == TAGMAGIC);
 		VERBOSE(("%s	-> %8ux (followed)\n", TAG(np)->typename, np));
 	} else {
 		assert(tag->magic == TAGMAGIC);
 		np = (*tag->copy)(p);
 		VERBOSE(("%s	-> %8ux (forwarded)\n", tag->typename, np));
-		TAG(p) = FOLLOWTO(np);
+		TAG(p) = follow_to(np);
 	}
 	return np;
 }
@@ -364,8 +360,8 @@ static void scanroots(Root *rootlist) {
 
 /* scanspace -- scan new space until it is up to date */
 static void scanspace(void) {
-	Space *sp, *scanned = NULL;
-	for (;;) {
+	Space *sp, *scanned;
+	for (scanned = NULL;;) {
 		Space *front = new;
 		for (sp = new; sp != scanned; sp = sp->next) {
 			assert(sp != NULL);
@@ -394,7 +390,9 @@ extern void gcenable(void) {
 	assert(gcblocked > 0);
 	--gcblocked;
 	/* This takes way too much cpu time, should not be caled so often? */
-	if (!gcblocked && new->next != NULL) gc();
+
+	if (!gcblocked && new->next != NULL)
+		gc();
 }
 
 /* gcdisable -- disable collections */
@@ -405,13 +403,14 @@ extern void gcdisable(void) {
 
 /* gcreserve -- provoke a collection if there's not a certain amount of space around */
 extern void gcreserve(size_t minfree) {
-	if (spacefree(new) < minfree) {
+	if (space_free(new) < minfree) {
 		if (minspace < minfree)
 			minspace = minfree;
 		gc();
 	}
 #if GCALWAYS
-	else gc();
+	else
+		gc();
 #endif
 }
 
@@ -430,7 +429,7 @@ extern void gc(void) {
 		size_t olddata = 0;
 		if (gcinfo)
 			for (space = new; space != NULL; space = space->next)
-				olddata += SPACEUSED(space);
+				olddata += space_used(space);
 #endif
 
 		if (gcisblocked()) return;
@@ -467,7 +466,7 @@ extern void gc(void) {
 
 		size_t livedata;
 		for (livedata = 0, space = new; space != NULL; space = space->next)
-			livedata += spaceused(space);
+			livedata += space_used(space);
 
 #if GCINFO
 		if (gcinfo)
