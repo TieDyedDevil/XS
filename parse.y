@@ -49,8 +49,8 @@ line	: cmd			{ $$ = $1; }
 body	: cmd			{ $$ = $1; }
 	| cmdsan body		{ $$ = mkseq("%seq", $1, $2); }
 
-cmdsa	: cmd ';'		{ token_number_on_stmt = 0; $$ = $1; }
-	| cmd '&'		{ token_number_on_stmt = 0; $$ = prefix("%background", mk(nList, thunkify($1), NULL)); }
+cmdsa	: cmd ';'		{ $$ = $1; }
+	| cmd '&'		{ $$ = prefix("%background", mk(nList, thunkify($1), NULL)); }
 
 cmdsan	: cmdsa			{ $$ = $1; }
 	| cmd NL		{ $$ = $1; if (!readheredocs(FALSE)) YYABORT; }
