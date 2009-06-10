@@ -36,7 +36,7 @@ VPATH = $(srcdir)
 HFILES	= config.h es.h gc.h input.h prim.h print.h sigmsgs.h \
 	  stdenv.h syntax.h term.h var.h
 COMMON_FILES	= access.c closure.c conv.c dict.c eval.c except.c fd.c gc.c glob.c \
-	  glom.c input.c heredoc.c list.c match.c open.c opt.c \
+	  glom.c input.c heredoc.c list.c match.c opt.c \
 	  prim-ctl.c prim-etc.c prim-io.c prim-sys.c prim.c print.c proc.c \
 	  sigmsgs.c signal.c split.c syntax.c status.c str.c term.c \
 	  token.c tree.c util.c var.c vec.c version.c parse.y
