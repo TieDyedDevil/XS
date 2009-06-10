@@ -2,6 +2,7 @@
 
 #include "es.h"
 #include <stdlib.h>
+#include <fcntl.h>
 
 #if !HAVE_STRERROR
 /* strerror -- turn an error code into a string */
@@ -129,4 +130,25 @@ extern long eread(int fd, char *buf, size_t n) {
 	}
 	SIGCHK();
 	return r;
+}
+
+/*
+ * Opens a file with the necessary flags.  Assumes the following order:
+ *	typedef enum {
+ *		oOpen, oCreate, oAppend, oReadCreate, oReadTrunc oReadAppend
+ *	} OpenKind;
+ */
+
+static int mode_masks[] = {
+	O_RDONLY,			/* rOpen */
+	O_WRONLY | O_CREAT | O_TRUNC,	/* rCreate */
+	O_WRONLY | O_CREAT | O_APPEND,	/* rAppend */
+	O_RDWR   | O_CREAT,		/* oReadWrite */
+	O_RDWR   | O_CREAT | O_TRUNC,	/* oReadCreate */
+	O_RDWR   | O_CREAT | O_APPEND,	/* oReadAppend */
+};
+
+extern int eopen(char *name, OpenKind k) {
+	assert((unsigned) k < arraysize(mode_masks));
+	return open(name, mode_masks[k], 0666);
 }
