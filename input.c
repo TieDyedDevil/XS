@@ -1,7 +1,9 @@
+
 /* input.c -- read input from files or strings ($Revision: 1.2 $) */
 /* stdgetenv is based on the FreeBSD getenv */
 
 #include "es.h"
+#include "term.h"
 #include "input.h"
 
 
@@ -32,12 +34,19 @@ static char *history;
 static int historyfd = -1;
 
 #if READLINE
+#include <stdio.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 int rl_meta_chars;	/* for editline; ignored for gnu readline */
+
+#if 0 /* Add support for using this when header is unavailable? */
 extern char *readline(char *);
 extern void add_history(char *);
 extern void rl_reset_terminal(char *);
 extern char *rl_basic_word_break_characters;
 extern char *rl_completer_quote_characters;
+#endif
+
 
 #if ABUSED_GETENV
 static char *stdgetenv(const char *);
@@ -217,6 +226,25 @@ static char *callreadline(char *prompt) {
 	return r;
 }
 
+static rl_quote_func_t * default_quote_function ;
+static char * quote_func(char *text, int match_Type, char *quote_pointer) {
+	char *pos;
+	char *newHome = NULL;
+	if ((pos = strstr(text, "~"))) {
+		// Expand ~, otherwise quoting will make the filename invalid
+		const char *home = varlookup("HOME", NULL)->term->str;
+		int hLen = strlen(home);
+		int len = strlen(text) + hLen +1;
+		// consider gc usage here?
+		newHome = ealloc(len);
+		strcpy(newHome, home);
+		strcpy(newHome + hLen, pos + 1);
+		text = newHome;
+	}
+        char *result = default_quote_function(text, match_Type, quote_pointer);
+	efree(newHome);
+	return result;
+}
 
 #if ABUSED_GETENV
 
@@ -591,7 +619,10 @@ extern void initinput(void) {
 
 #if READLINE
 	rl_meta_chars = 0;
-	rl_basic_word_break_characters=" \t\n\\'`$><=;|&{()}";
-		rl_completer_quote_characters="'";
+	rl_basic_word_break_characters = " \t\n\\'`$><=;|&{()}";
+	rl_completer_quote_characters = "'";
+	rl_filename_quote_characters = " \t\n\\\'`$><;|&{()}";
+	default_quote_function = rl_filename_quoting_function;
+	rl_filename_quoting_function = quote_func;
 #endif
 }
