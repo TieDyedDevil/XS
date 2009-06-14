@@ -57,7 +57,7 @@ static int testperm_real(struct stat *stat, int perm) {
 	return (stat->st_mode & mask) ? 0 : EACCES;
 }
 
-static int testfile(char *path, int perm, int type) {
+static int testfile(char *path, int perm, mode_t type) {
 	struct stat st;
 #ifdef S_IFLNK
 	if (type == S_IFLNK) {

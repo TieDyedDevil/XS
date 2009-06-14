@@ -312,14 +312,14 @@ extern void globalroot(void *addr) {
 /* not portable to word addressed machines */
 /* Must be macro to be used as lvalue */
 #define	TAG(p)		(((Tag **) p)[-1])
-static inline Boolean forwarded(int tagp) {
-	return tagp & 1;
+static inline Boolean forwarded(Tag *tagp) {
+	return (int) (tagp) & 1;
 }
 static inline Tag *follow_to(char *p) {
-	return p + 1;
+	return (Tag *) (p + 1);
 }
-static inline void *follow(char *tagp) {
-	return tagp - 1;
+static inline void *follow(Tag *tagp) {
+	return (void *) ((int) (tagp) - 1);
 }
 
 /* forward -- forward an individual pointer from old space */

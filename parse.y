@@ -8,7 +8,6 @@ extern int parseeq;
 extern unsigned int token_number_on_stmt;
 %}
 
-%debug
 %token	WORD QWORD
 %token	LOCAL LET FOR CLOSURE FN
 %token	ANDAND BACKBACK EXTRACT CALL COUNT DUP FLAT OROR PRIM REDIR SUB

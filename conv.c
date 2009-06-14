@@ -305,10 +305,8 @@ quoteit:
 
 /* %Z -- print a StrList */
 static Boolean Zconv(Format *f) {
-	StrList *lp, *next;
-	
 	char *sep = va_arg(f->args, char *);
-	for (StrList *lp = va_arg(f->args, StrList *); lp != NULL; lp = next) {
+	for (StrList *lp = va_arg(f->args, StrList *), *next; lp != NULL; lp = next) {
 		next = lp->next;
 		fmtprint(f, "%s%s", lp->str, next == NULL ? "" : sep);
 	}
