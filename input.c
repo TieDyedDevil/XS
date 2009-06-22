@@ -231,18 +231,18 @@ static char * quote_func(char *text, int match_Type, char *quote_pointer) {
 	char *pos;
 	char *newHome = NULL;
 	if ((pos = strstr(text, "~"))) {
-		// Expand ~, otherwise quoting will make the filename invalid
+		/* Expand ~, otherwise quoting will make the filename invalid */
 		const char *home = varlookup("HOME", NULL)->term->str;
 		int hLen = strlen(home);
 		int len = strlen(text) + hLen +1;
-		// consider gc usage here?
+		/* consider gc usage here? */
 		newHome = ealloc(len);
 		strcpy(newHome, home);
 		strcpy(newHome + hLen, pos + 1);
 		text = newHome;
 	}
         char *result = default_quote_function(text, match_Type, quote_pointer);
-	efree(newHome);
+	if (newHome) efree(newHome);
 	return result;
 }
 
