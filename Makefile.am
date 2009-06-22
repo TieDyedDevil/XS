@@ -28,7 +28,8 @@
 
 AM_YFLAGS = -d
 
-bin_PROGRAMS = es esdump
+bin_PROGRAMS = es
+noinst_PROGRAMS = esdump
 check_PROGRAMS = ctest 
 TESTS = ctest 
 
