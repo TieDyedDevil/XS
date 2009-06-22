@@ -181,11 +181,16 @@ static List *glob0(List *list, StrList *quote) {
 		if (
 			quote->str == QUOTED
 			|| !haswild(str = getstr(list->term), quote->str)
-			|| (expand1 = glob1(str, quote->str)) == NULL
 		) {
 			*prevp = list;
 			prevp = &list->next;
-		} else {
+		} else if ((expand1 = glob1(str, quote->str)) == NULL) {
+			/* effectively sets string to "", represents failed glob */
+			*getstr(list->term) = '\0'; 
+			*prevp = list;
+			prevp = &list->next;			
+		}
+		else {
 			*prevp = sortlist(expand1);
 			while (*prevp != NULL)
 				prevp = &(*prevp)->next;
@@ -274,7 +279,7 @@ extern List *glob(List *list, StrList *quote) {
 				Ref(List *, lr, lp);
 				Ref(StrList *, q0, quote);
 				Ref(StrList *, qr, qp);
-				str = expandhome(str, qp);
+				str = expandhome(str, qr);
 				lr->term = mkstr(str);
 				lp = lr;
 				qp = qr;
