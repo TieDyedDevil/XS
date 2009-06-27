@@ -69,13 +69,6 @@ typedef struct dirent Dirent;
 #include <sys/dir.h>
 typedef struct direct Dirent;
 #endif
-
-/* prototypes for XXXdir functions. comment out if necessary */
-#if !HPUX
-extern DIR *opendir(const char *);
-extern Dirent *readdir(DIR *);
-/*extern int closedir(DIR *);*/
-#endif
 #endif
 
 #include <sys/wait.h>
