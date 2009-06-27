@@ -20,7 +20,7 @@ inline static size_t space_free(const Space *sp) {
 	return sp->top - sp->current;
 }
 inline static size_t space_used(const Space *sp) {
-		return sp->current - sp->bot;
+	return sp->current - sp->bot;
 }
 inline static Boolean in_space(const char *p, Space *sp)	{
 	return sp->bot <= p && p < sp->top;
