@@ -246,39 +246,65 @@ static char * quote_func(char *text, int match_Type, char *quote_pointer) {
 	return result;
 }
 
+static inline char *strclone(const char *str) {
+	char *clone = ealloc(sizeof(char) * (strlen(str) + 1));
+	strcpy(clone, str);
+	return clone;
+}
+
+static inline char * basename(char *str) {
+	return rindex(str, '/') + 1;
+}
 
 static char ** command_completion(char *text, int start, int end) {
-	assert(gcisblocked());
-	/* Must be declared before Refs to avoid scoping issues */
-	char **results;
-	if (start != 0) return NULL; /* Only for first word on line */
-	List * paths = varlookup("path", NULL);
-	/* TODO: FIX LOOP OVER ALL! */
-	int l_path = strlen(paths->term->str);
-	char *path = ealloc(l_path + 2);
-	strcpy(path, paths->term->str);
-	path[l_path] = '/';
-	path[l_path + 1] = '\0';
-	
-	char * glob_string = malloc(sizeof(char) * (end - start + 2));
-	memcpy(glob_string, text, (end - start) * sizeof(char));
-	*(glob_string + end - start) = '*';
-	*(glob_string + end - start + 1) = '\0';	
+	if (start != 0) return NULL; /* Only for first word on line */	
 
-	List* glob_result = dirmatch(path, path, glob_string, UNQUOTED);
-	int l = length(glob_result);
-	if (l == 0) return NULL;
-	results = ealloc(sizeof(char*) * (l + 1));
-	char **t = results;
-	for (List *i = glob_result; i != NULL; i = i->next, ++t) {
-		/* Can't directly use gc_string, because readline
-		 * needs to free() the result 
-		 */
-		char *gc_string = i->term->str;
-		*t = ealloc(sizeof(char) * (strlen(gc_string) + 1));
-		strcpy(*t, gc_string);
+	char **results = NULL;
+	
+	/* Leave room for \0, and special first element */
+	int result_p = 1;
+	int results_size = 2;
+
+	gcdisable();	
+	for (List *paths = varlookup("path", NULL);
+	     paths != NULL;
+	     paths = paths->next)
+	{
+		int l_path = strlen(paths->term->str);
+		char *path = ealloc(l_path + 2);
+		strcpy(path, paths->term->str);
+		path[l_path] = '/';
+		path[l_path + 1] = '\0';
+	
+		char * glob_string = malloc(sizeof(char) * (end - start + 2));
+		memcpy(glob_string, text, (end - start) * sizeof(char));
+		*(glob_string + end - start) = '*';
+		*(glob_string + end - start + 1) = '\0';	
+
+		List* glob_result = dirmatch(path, path, glob_string, UNQUOTED);
+		efree(path);
+
+		int l = length(glob_result);
+		if (l == 0) continue;
+		
+		results_size += l;
+		results = erealloc(results, results_size * sizeof(char*));
+		for (List *i = glob_result; i != NULL; i = i->next, ++result_p) {
+			/* Can't directly use gc_string, because readline
+			 * needs to free() the result 
+			 */
+			results[result_p] = strclone(basename(i->term->str));
+		}
 	}
-	*t = NULL;
+	gcenable();
+
+	assert (result_p == results_size - 1);
+	int num_results = results_size - 2;
+	
+	if (num_results > 0) {
+		results[results_size - 1] = NULL;
+		results[0] = strclone(num_results == 1 ? results[1] : text) ;
+	} else assert (results == NULL);
 	return results;
 }
 
