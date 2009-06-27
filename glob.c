@@ -45,7 +45,8 @@ static int ishiddenfile(const char *s) {
 }
 
 /* dirmatch -- match a pattern against the contents of directory */
-static List *dirmatch(const char *prefix, const char *dirname, const char *pattern, const char *quote) {
+List *dirmatch(const char *prefix, const char *dirname,
+	       const char *pattern, const char *quote) {
 	List *list, **prevp;
 	static DIR *dirp;
 	static Dirent *dp;

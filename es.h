@@ -174,8 +174,12 @@ extern List *glom2(Tree *tree, Binding *binding, StrList **quotep);
 /* glob.c */
 
 const char *QUOTED, *UNQUOTED;
+
 extern List *glob(List *list, StrList *quote);
 extern Boolean haswild(const char *pattern, const char *quoting);
+/* Needed for some of the readline tab-completion */
+extern List *dirmatch(const char *prefix, const char *dirname,
+		      const char *pattern, const char *quote);
 
 
 /* match.c */
