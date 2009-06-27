@@ -246,6 +246,42 @@ static char * quote_func(char *text, int match_Type, char *quote_pointer) {
 	return result;
 }
 
+
+static char ** command_completion(char *text, int start, int end) {
+	assert(gcisblocked());
+	/* Must be declared before Refs to avoid scoping issues */
+	char **results;
+	if (start != 0) return NULL; /* Only for first word on line */
+	List * paths = varlookup("path", NULL);
+	/* TODO: FIX LOOP OVER ALL! */
+	int l_path = strlen(paths->term->str);
+	char *path = ealloc(l_path + 2);
+	strcpy(path, paths->term->str);
+	path[l_path] = '/';
+	path[l_path + 1] = '\0';
+	
+	char * glob_string = malloc(sizeof(char) * (end - start + 2));
+	memcpy(glob_string, text, (end - start) * sizeof(char));
+	*(glob_string + end - start) = '*';
+	*(glob_string + end - start + 1) = '\0';	
+
+	List* glob_result = dirmatch(path, path, glob_string, UNQUOTED);
+	int l = length(glob_result);
+	if (l == 0) return NULL;
+	results = ealloc(sizeof(char*) * (l + 1));
+	char **t = results;
+	for (List *i = glob_result; i != NULL; i = i->next, ++t) {
+		/* Can't directly use gc_string, because readline
+		 * needs to free() the result 
+		 */
+		char *gc_string = i->term->str;
+		*t = ealloc(sizeof(char) * (strlen(gc_string) + 1));
+		strcpy(*t, gc_string);
+	}
+	*t = NULL;
+	return results;
+}
+
 #if ABUSED_GETENV
 
 /* getenv -- fake version of getenv for readline (or other libraries) */
@@ -624,5 +660,6 @@ extern void initinput(void) {
 	rl_filename_quote_characters = " \t\n\\\'`$><;|&{()}";
 	default_quote_function = rl_filename_quoting_function;
 	rl_filename_quoting_function = quote_func;
+	rl_attempted_completion_function = command_completion;
 #endif
 }
