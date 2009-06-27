@@ -28,8 +28,8 @@
 
 AM_YFLAGS = -d
 
-bin_PROGRAMS = es
-noinst_PROGRAMS = esdump
+bin_PROGRAMS = xs
+noinst_PROGRAMS = xsdump
 check_PROGRAMS = ctest 
 TESTS = ctest 
 
@@ -45,11 +45,11 @@ OTHER	= Makefile parse.y mksignal
 GEN	= parse.h parse.c parse.output sigmsgs.c initial.c
 
 BUILT_SOURCES = parse.h
-es_SOURCES = $(COMMON_FILES) initial.c main.c
+xs_SOURCES = $(COMMON_FILES) initial.c main.c
 ctest_SOURCES = tests/test_print.c tests/test_util.c tests/all_tests.c $(COMMON_FILES)
 ctest_LDADD = -lcgreen -lm
 
-esdump_SOURCES = $(COMMON_FILES) dump.c main.c
+xsdump_SOURCES = $(COMMON_FILES) dump.c main.c
 
 
 MANIFEST:
@@ -61,14 +61,14 @@ ctags	:
 mostlyclean-local: 
 	rm -f $(GEN)
 test	: check trip
-trip	: es $(srcdir)/trip.es
-	./es < $(srcdir)/trip.es
+trip	: xs $(srcdir)/trip.xs
+	./xs < $(srcdir)/trip.xs
 
 src	:
 	@echo ${OTHER} ${CFILES} ${HFILES}
 
-initial.c : esdump $(srcdir)/initial.es
-	./esdump < $(srcdir)/initial.es > initial.c || (rm initial.c; false)
+initial.c : xsdump $(srcdir)/initial.xs
+	./xsdump < $(srcdir)/initial.xs > initial.c || (rm initial.c; false)
 
 sigmsgs.c : mksignal $(SIGFILES)
 	sh $(srcdir)/mksignal $(SIGFILES) > sigmsgs.c
