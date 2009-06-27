@@ -117,7 +117,7 @@ changequote([,])
 ], 
 es_cv_abused_getenv=no,
 [es_cv_abused_getenv=yes
-AC_DEFINE(ABUSED_GETENV, [], Getenv called by crt*.o or getopt)]))
+AC_DEFINE(ABUSED_GETENV,, Getenv called by crt*.o or getopt)]))
 
 if test "$es_cv_abused_getenv" = yes
 then
