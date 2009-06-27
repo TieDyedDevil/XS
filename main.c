@@ -69,7 +69,7 @@ static void runesrc(void) {
 static void usage(void) NORETURN;
 static void usage(void) {
 	eprint(
-		"usage: es [-c command] [-silevxnpo] [file [args ...]]\n"
+		"usage: xs [-c command] [-silevxnpo] [file [args ...]]\n"
 		"	-c cmd	execute argument\n"
 		"	-s	read commands from standard input; stop option parsing\n"
 		"	-i	interactive shell\n"
