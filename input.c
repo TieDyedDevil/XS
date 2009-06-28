@@ -246,12 +246,6 @@ static char * quote_func(char *text, int match_Type, char *quote_pointer) {
 	return result;
 }
 
-static inline char *strclone(const char *str) {
-	char *clone = ealloc(sizeof(char) * (strlen(str) + 1));
-	strcpy(clone, str);
-	return clone;
-}
-
 static inline char * basename(char *str) {
 	return rindex(str, '/') + 1;
 }
@@ -293,7 +287,7 @@ static char ** command_completion(char *text, int start, int end) {
 			/* Can't directly use gc_string, because readline
 			 * needs to free() the result 
 			 */
-			results[result_p] = strclone(basename(i->term->str));
+			results[result_p] = strdup(basename(i->term->str));
 		}
 	}
 	gcenable();
@@ -303,7 +297,7 @@ static char ** command_completion(char *text, int start, int end) {
 	
 	if (num_results > 0) {
 		results[results_size - 1] = NULL;
-		results[0] = strclone(num_results == 1 ? results[1] : text) ;
+		results[0] = strdup(num_results == 1 ? results[1] : text) ;
 	} else assert (results == NULL);
 	return results;
 }
