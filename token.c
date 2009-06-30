@@ -1,5 +1,4 @@
 /* token.c -- lexical analyzer for es ($Revision: 1.1.1.1 $)
- * TODO: try rewriting in flex?
  * */
 
 #include "es.h"
@@ -12,10 +11,6 @@
 #define	BUFSIZE	((size_t) 1000)
 #define	BUFMAX	(8 * BUFSIZE)
 
-/* yacc sometimes modifies these to help the lexer with parsing '=' */
-int parseeq = 0;
-
-unsigned int token_number_on_stmt = 0;
 typedef enum { NW, RW, KW } State;	/* "nonword", "realword", "keyword" */
 
 static State w = NW;
@@ -29,14 +24,14 @@ static char *tokenbuf = NULL;
 
 /*
  *	Special characters (i.e., "non-word") in es:
- *		\t \n # ; & | ^ $ ` ' ! { } ( ) < > \ (sometimes =)
+ *		\t \n # : ; & | ^ $ ` ' ! { } ( ) < > \ 
  */
 
 char nw[] = {
 	1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0,		/*   0 -  15 */
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,		/*  16 -  32 */
 	1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,		/* ' ' - '/' */
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0,		/* '0' - '?' */
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0,		/* '0' - '?' */
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,		/* '@' - 'O' */
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0,		/* 'P' - '_' */
 	1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,		/* '`' - 'o' */
@@ -149,39 +144,15 @@ static Boolean getfds(int fd[2], int c, int default0, int default1) {
 	return TRUE;
 }
 
-static int yylex_real(void);
 
 
-/* This wrapper function is just a huge hack
-   to allow = to be treated as a normal character
-   when it has no syntactic meaning */
 int yylex(void) {
-	nw['='] = parseeq;
-	if (token_number_on_stmt < 2) nw['='] = 1;
-
-	int t = yylex_real();
-
-	++token_number_on_stmt;
-
-	 /*Statements always end on these tokens  
-           This code is still pretty horrible.
-	   Alternatives include adding a new yacc rule
-	   called left_brace, or modifying all usages of {,
-           etc. none of which are really better
-	 */
-	if (t == NL || t == '{' || t == ';' || t == '&') {
-		token_number_on_stmt = 0;
-	}
-	return t;
-}
-
-static int yylex_real(void) {
 	static Boolean dollar = FALSE;
 	int c;
 	size_t i;			        /* The purpose of all these local assignments is to	*/
-	const char *meta;		    /* allow optimizing compilers like gcc to load these	*/
-	char *buf = tokenbuf;		/* values into registers. On a sparc this is a		*/
-	YYSTYPE *y = &yylval;		/* win, in code size *and* execution time		*/
+	const char *meta;		        /* allow optimizing compilers like gcc to load these	*/
+	char *buf = tokenbuf;		        /* values into registers. On a sparc this is a		*/
+	YYSTYPE *y = &yylval;		        /* win, in code size *and* execution time		*/
 
 	if (goterror) {
 		goterror = FALSE;
@@ -343,6 +314,22 @@ top:	while ((c = GETC()) == ' ' || c == '\t')
 		newline = TRUE;
 		w = NW;
 		return NL;
+	case ':':
+		c = GETC();
+		if (c == '=') {
+			w = NW;
+			return ASSIGN;
+		}
+		else {
+			/* Treat : as if normal char
+			   Code similar to \\ */
+			UNGETC(c);
+			w = RW;
+			*buf = ':';
+			buf[1] = 0;
+			y->str = gcdup(buf);
+			return QWORD;
+		}
 	case '(':
 		if (w == RW)	/* not keywords, so let & friends work */
 			c = SUB;
@@ -350,7 +337,6 @@ top:	while ((c = GETC()) == ' ' || c == '\t')
 	case ';':
 	case '^':
 	case ')':
-	case '=':
 	case '{': case '}':
 		w = NW;
 		return c;
@@ -437,7 +423,6 @@ top:	while ((c = GETC()) == ' ' || c == '\t')
 
 extern void inityy(void) {
 	newline = FALSE;
-	token_number_on_stmt = 0;
 	w = NW;
 	if (bufsize > BUFMAX) {		/* return memory to the system if the buffer got too large */
 		efree(tokenbuf);

@@ -43,7 +43,7 @@
 #	an appropriately named fn- variable exists.  If it does, then the
 #	value of that variable is substituted for the function name and
 #	evaluation starts over again.  Thus, for example, the assignment
-#		fn-echo = $&echo
+#		fn-echo := $&echo
 #	means that the command
 #		echo foo bar
 #	is internally translated to
@@ -63,22 +63,22 @@
 #	These builtin functions are straightforward calls to primitives.
 #	See the manual page for details on what they do.
 
-fn-.		= $&dot
-fn-access	= $&access
-fn-break	= $&break
-fn-catch	= $&catch
-fn-echo		= $&echo
-fn-exec		= $&exec
-fn-forever	= $&forever
-fn-fork		= $&fork
-fn-if		= $&if
-fn-newpgrp	= $&newpgrp
-fn-result	= $&result
-fn-throw	= $&throw
-fn-umask	= $&umask
-fn-wait		= $&wait
+fn-.		:= $&dot
+fn-access	:= $&access
+fn-break	:= $&break
+fn-catch	:= $&catch
+fn-echo		:= $&echo
+fn-exec		:= $&exec
+fn-forever	:= $&forever
+fn-fork		:= $&fork
+fn-if		:= $&if
+fn-newpgrp	:= $&newpgrp
+fn-result	:= $&result
+fn-throw	:= $&throw
+fn-umask	:= $&umask
+fn-wait		:= $&wait
 
-fn-%read	= $&read
+fn-%read	:= $&read
 
 #	eval runs its arguments by turning them into a code fragment
 #	(in string form) and running that fragment.
@@ -89,8 +89,8 @@ fn eval { '{' ^ $^* ^ '}' }
 #	but, as many pointed out, they don't need to be.  These
 #	values are not very clear, but unix demands them.
 
-fn-true		= result 0
-fn-false	= result 1
+fn-true		:= result 0
+fn-false	:= result 1
 
 #	These functions just generate exceptions for control-flow
 #	constructions.  The for command and the while builtin both
@@ -98,24 +98,24 @@ fn-false	= result 1
 #	return.  The interpreter main() routine (and nothing else)
 #	catches the exit exception.
 
-fn-break	= throw break
-fn-exit		= throw exit
-fn-return	= throw return
+fn-break	:= throw break
+fn-exit		:= throw exit
+fn-return	:= throw return
 
 #	unwind-protect is a simple wrapper around catch that is used
 #	to ensure that some cleanup code is run after running a code
 #	fragment.  This function must be written with care to make
 #	sure that the return value is correct.
 
-fn-unwind-protect = $&noreturn @ body cleanup {
+fn-unwind-protect := $&noreturn @ body cleanup {
 	if {!~ $#cleanup 1} {
 		throw error unwind-protect 'unwind-protect body cleanup'
 	}
-	let (exception = ) {
+	let (exception := ) {
 		let (
-			result = <={
+			result := <={
 				catch @ e {
-					exception = caught $e
+					exception := caught $e
 				} {
 					$body
 				}
@@ -135,38 +135,38 @@ fn-unwind-protect = $&noreturn @ body cleanup {
 #	the builtins.  Otherwise, we'll just not have a limit command
 #	and get time from /bin or wherever.
 
-if {~ <=$&primitives limit} {fn-limit = $&limit}
-if {~ <=$&primitives time}  {fn-time  = $&time}
+if {~ <=$&primitives limit} {fn-limit := $&limit}
+if {~ <=$&primitives time}  {fn-time  := $&time}
 
 #	These builtins are mainly useful for internal functions, but
 #	they're there to be called if you want to use them.
 
-fn-%apids	= $&apids
-fn-%fsplit      = $&fsplit
-fn-%newfd	= $&newfd
-fn-%run         = $&run
-fn-%split       = $&split
-fn-%var		= $&var
-fn-%whatis	= $&whatis
+fn-%apids	:= $&apids
+fn-%fsplit      := $&fsplit
+fn-%newfd	:= $&newfd
+fn-%run         := $&run
+fn-%split       := $&split
+fn-%var		:= $&var
+fn-%whatis	:= $&whatis
 
 #	These builtins are only around as a matter of convenience, so
 #	users don't have to type the infamous <= (nee <>) operator.
 #	Whatis also protects the used from exceptions raised by %whatis.
 
-fn var		{ for (i = $*) echo <={%var $i} }
+fn var		{ for (i := $*) echo <={%var $i} }
 
 fn whatis {
-	let (result = ) {
-		for (i = $*) {
+	let (result := ) {
+		for (i := $*) {
 			catch @ e from message {
 				if {!~ $e error} {
 					throw $e $from $message
 				}
 				echo >[1=2] $message
-				result = $result 1
+				result := $result 1
 			} {
 				echo <={%whatis $i}
-				result = $result 0
+				result := $result 0
 			}
 		}
 		result $result
@@ -177,19 +177,19 @@ fn whatis {
 #	While uses $&noreturn to indicate that, while it is a lambda, it
 #	does not catch the return exception.  It does, however, catch break.
 
-fn-while = $&noreturn @ cond body {
+fn-while := $&noreturn @ cond body {
 	catch @ e value {
 		if {!~ $e break} {
 			throw $e $value
 		}
 		result $value
 	} {
-		let (result = <=true)
+		let (result := <=true)
 			forever {
 				if {!$cond} {
 					throw break $result
 				} {
-					result = <=$body
+					result := <=$body
 				}
 			}
 	}
@@ -239,35 +239,35 @@ fn cd dir {
 fn vars {
 	# choose default options
 	if {~ $* -a} {
-		* = -v -f -s -e -p -i
+		* := -v -f -s -e -p -i
 	} {
-		if {!~ $* -[vfs]}	{ * = $* -v }
-		if {!~ $* -[epi]}	{ * = $* -e }
+		if {!~ $* -[vfs]}	{ * := $* -v }
+		if {!~ $* -[epi]}	{ * := $* -e }
 	}
 	# check args
-	for (i = $*)
+	for (i := $*)
 		if {!~ $i -[vfsepi]} {
 			throw error vars illegal option: $i -- usage: vars '-[vfsepia]'
 		}
 	let (
-		vars	= false
-		fns	= false
-		sets	= false
-		export	= false
-		priv	= false
-		intern	= false
+		vars	:= false
+		fns	:= false
+		sets	:= false
+		export	:= false
+		priv	:= false
+		intern	:= false
 	) {
-		for (i = $*) if (
-			{~ $i -v}	{vars	= true}
-			{~ $i -f}	{fns	= true}
-			{~ $i -s}	{sets	= true}
-			{~ $i -e}	{export	= true}
-			{~ $i -p}	{priv	= true}
-			{~ $i -i}	{intern = true}
+		for (i := $*) if (
+			{~ $i -v}	{vars	:= true}
+			{~ $i -f}	{fns	:= true}
+			{~ $i -s}	{sets	:= true}
+			{~ $i -e}	{export	:= true}
+			{~ $i -p}	{priv	:= true}
+			{~ $i -i}	{intern := true}
 			{throw error vars vars: bad option: $i}
 		)
 		let (
-			dovar = @ var {
+			dovar := @ var {
 				# print functions and/or settor vars
 				if {if {~ $var fn-*} $fns {~ $var set-*} $sets $vars} {
 					echo <={%var $var}
@@ -275,14 +275,14 @@ fn vars {
 			}
 		) {
 			if {$export || $priv} {
-				for (var = <= $&vars)
+				for (var := <= $&vars)
 					# if not exported but in priv
 					if {if {~ $var $noexport} $priv $export} {
 						$dovar $var
 					}
 			}
 			if {$intern} {
-				for (var = <= $&internals)
+				for (var := <= $&internals)
 					$dovar $var
 			}
 		}
@@ -311,16 +311,16 @@ fn vars {
 #		`{cmd args}            <={%backquote <={%flatten '' $ifs} {cmd args}}
 #		``ifs {cmd args}       <={%backquote <={%flatten '' ifs} {cmd args}}
 
-fn-%count	= $&count
-fn-%flatten	= $&flatten
+fn-%count	:= $&count
+fn-%flatten	:= $&flatten
 
 #	Note that $&backquote returns the status of the child process
 #	as the first value of its result list.  The default %backquote
 #	puts that value in $bqstatus.
 
 fn %backquote {
-	let ((status output) = <={ $&backquote $* }) {
-		bqstatus = $status
+	let ((status output) := <={ $&backquote $* }) {
+		bqstatus := $status
 		result $output
 	}
 }
@@ -341,14 +341,14 @@ fn %backquote {
 #	-- but that can be fixed and it's still better to write more of
 #	the shell in es itself.
 
-fn-%seq		= $&seq
+fn-%seq		:= $&seq
 
-fn-%not = $&noreturn @ cmd {
+fn-%not := $&noreturn @ cmd {
 	if {$cmd} {false} {true}
 }
 
-fn-%and = $&noreturn @ first rest {
-	let (result = <={$first}) {
+fn-%and := $&noreturn @ first rest {
+	let (result := <={$first}) {
 		if {~ $#rest 0} {
 			result $result
 		} {result $result} {
@@ -359,11 +359,11 @@ fn-%and = $&noreturn @ first rest {
 	}
 }
 
-fn-%or = $&noreturn @ first rest {
+fn-%or := $&noreturn @ first rest {
 	if {~ $#first 0} {
 		false
 	} {
-		let (result = <={$first}) {
+		let (result := <={$first}) {
 			if {~ $#rest 0} {
 				result $result
 			} {!result $result} {
@@ -382,11 +382,11 @@ fn-%or = $&noreturn @ first rest {
 #		cmd &			%background {cmd}
 
 fn %background cmd {
-	let (pid = <={$&background $cmd}) {
+	let (pid := <={$&background $cmd}) {
 		if {%is-interactive} {
 			echo >[1=2] $pid
 		}
-		apid = $pid
+		apid := $pid
 	}
 }
 
@@ -409,13 +409,13 @@ fn %background cmd {
 #	The %one function is used to make sure that exactly one file is
 #	used as the argument of a redirection.
 
-fn-%openfile	= $&openfile
-fn-%open	= %openfile r		# < file
-fn-%create	= %openfile w		# > file
-fn-%append	= %openfile a		# >> file
-fn-%open-write	= %openfile r+		# <> file
-fn-%open-create	= %openfile w+		# >< file
-fn-%open-append	= %openfile a+		# >>< file, <>> file
+fn-%openfile	:= $&openfile
+fn-%open	:= %openfile r		# < file
+fn-%create	:= %openfile w		# > file
+fn-%append	:= %openfile a		# >> file
+fn-%open-write	:= %openfile r+		# <> file
+fn-%open-create	:= %openfile w+		# >< file
+fn-%open-append	:= %openfile a+		# >>< file, <>> file
 
 fn %one {
 	if {!~ $#* 1} {
@@ -436,7 +436,7 @@ fn %one {
 #		cmd << tag input tag	%here 0 input {cmd}
 #		cmd <<< string		%here 0 string {cmd}
 
-fn-%here	= $&here
+fn-%here	:= $&here
 
 #	These operations are like redirections, except they don't include
 #	explicitly named files.  They do not reduce to the %openfile hook.
@@ -446,9 +446,9 @@ fn-%here	= $&here
 #		cmd1 | cmd2		%pipe {cmd1} 1 0 {cmd2}
 #		cmd1 |[m=n] cmd2	%pipe {cmd1} m n {cmd2}
 
-fn-%close	= $&close
-fn-%dup		= $&dup
-fn-%pipe	= $&pipe
+fn-%close	:= $&close
+fn-%dup		:= $&dup
+fn-%pipe	:= $&pipe
 
 #	Input/Output substitution (i.e., the >{} and <{} forms) provide an
 #	interesting case.  If es is compiled for use with /dev/fd, these
@@ -491,10 +491,10 @@ fn-%pipe	= $&pipe
 #		cmd >{output}		%writeto var {output} {cmd $var}
 
 if {~ <=$&primitives readfrom} {
-	fn-%readfrom = $&readfrom
+	fn-%readfrom := $&readfrom
 } {
 	fn %readfrom var input cmd {
-		local ($var = /tmp/es.$var.$pid) {
+		local ($var := /tmp/es.$var.$pid) {
 			unwind-protect {
 				$input > $$var
 				# text of $cmd is   command file
@@ -507,10 +507,10 @@ if {~ <=$&primitives readfrom} {
 }
 
 if {~ <=$&primitives writeto} {
-	fn-%writeto = $&writeto
+	fn-%writeto := $&writeto
 } {
 	fn %writeto var output cmd {
-		local ($var = /tmp/es.$var.$pid) {
+		local ($var := /tmp/es.$var.$pid) {
 			unwind-protect {
 				> $$var
 				$cmd
@@ -528,7 +528,7 @@ if {~ <=$&primitives writeto} {
 #	recommend using files in /tmp rather than named pipes.
 
 #fn %readfrom var cmd body {
-#	local ($var = /tmp/es.$var.$pid) {
+#	local ($var := /tmp/es.$var.$pid) {
 #		unwind-protect {
 #			/etc/mknod $$var p
 #			$&background {$cmd > $$var; exit}
@@ -540,7 +540,7 @@ if {~ <=$&primitives writeto} {
 #}
 
 #fn %writeto var cmd body {
-#	local ($var = /tmp/es.$var.$pid) {
+#	local ($var := /tmp/es.$var.$pid) {
 #		unwind-protect {
 #			/etc/mknod $$var p
 #			$&background {$cmd < $$var; exit}
@@ -563,7 +563,7 @@ if {~ <=$&primitives writeto} {
 #	to %home without arguments;  ~user and ~user/path generate calls
 #	to %home with one argument, the user name.
 
-fn-%home	= $&home
+fn-%home	:= $&home
 
 #	Path searching used to be a primitive, but the access function
 #	means that it can be written easier in es.  Is is not called for
@@ -575,7 +575,7 @@ fn %pathsearch name { access -n $name -1e -xf $path }
 #	A default version is provided (under conditional compilation) for
 #	systems that don't do #! interpretation themselves.
 
-if {~ <=$&primitives execfailure} {fn-%exec-failure = $&execfailure}
+if {~ <=$&primitives execfailure} {fn-%exec-failure := $&execfailure}
 
 
 #
@@ -624,12 +624,12 @@ if {~ <=$&primitives execfailure} {fn-%exec-failure = $&execfailure}
 #	The parsed code is executed only if it is non-empty, because otherwise
 #	result gets set to zero when it should not be.
 
-fn-%parse	= $&parse
-fn-%batch-loop	= $&batchloop
-fn-%is-interactive = $&isinteractive
+fn-%parse	:= $&parse
+fn-%batch-loop	:= $&batchloop
+fn-%is-interactive := $&isinteractive
 
 fn %interactive-loop {
-	let (result = <=true) {
+	let (result := <=true) {
 		catch @ e type msg {
 			if {~ $e eof} {
 				return $result
@@ -651,9 +651,9 @@ fn %interactive-loop {
 				if {!~ $#fn-%prompt 0} {
 					%prompt
 				}
-				let (code = <={%parse $prompt}) {
+				let (code := <={%parse $prompt}) {
 					if {!~ $#code 0} {
-						result = <={$fn-%dispatch $code}
+						result := <={$fn-%dispatch $code}
 					}
 				}
 			}
@@ -669,7 +669,7 @@ fn %eval-noprint				# <default>
 fn %eval-print		{ echo $* >[1=2]; $* }	# -x
 fn %noeval-noprint	{ }			# -n
 fn %noeval-print	{ echo $* >[1=2] }	# -n -x
-fn-%exit-on-false = $&exitonfalse		# -e
+fn-%exit-on-false := $&exitonfalse		# -e
 
 
 #
@@ -695,27 +695,27 @@ fn-%exit-on-false = $&exitonfalse		# -e
 #	because otherwise there would be an infinite recursion.  So too for
 #	all the other shadowing variables.
 
-set-home = @ { local (set-HOME = ) HOME = $*; result $* }
-set-HOME = @ { local (set-home = ) home = $*; result $* }
+set-home := @ { local (set-HOME := ) HOME := $*; result $* }
+set-HOME := @ { local (set-home := ) home := $*; result $* }
 
-set-path = @ { local (set-PATH = ) PATH = <={%flatten : $*}; result $* }
-set-PATH = @ { local (set-path = ) path = <={%fsplit  : $*}; result $* }
+set-path := @ { local (set-PATH := ) PATH := <={%flatten : $*}; result $* }
+set-PATH := @ { local (set-path := ) path := <={%fsplit  : $*}; result $* }
 
 #	These settor functions call primitives to set data structures used
 #	inside of es.
 
-set-history		= $&sethistory
-set-signals		= $&setsignals
-set-noexport		= $&setnoexport
-set-max-eval-depth	= $&setmaxevaldepth
+set-history		:= $&sethistory
+set-signals		:= $&setsignals
+set-noexport		:= $&setnoexport
+set-max-eval-depth	:= $&setmaxevaldepth
 
 #	If the primitive $&resetterminal is defined (meaning that readline
 #	or editline is being used), setting the variables $TERM or $TERMCAP
 #	should notify the line editor library.
 
 if {~ <=$&primitives restterminal} {
-	set-TERM	= @ { $&resetterminal; result $* }
-	set-TERMCAP	= @ { $&resetterminal; result $* }
+	set-TERM	:= @ { $&resetterminal; result $* }
+	set-TERMCAP	:= @ { $&resetterminal; result $* }
 }
 
 #
@@ -726,10 +726,10 @@ if {~ <=$&primitives restterminal} {
 #	can run without problems even if the environment is not set up
 #	correctly.
 
-home		= /
-ifs		= ' ' \t \n
-prompt		= '; ' ''
-max-eval-depth	= 640
+home		:= /
+ifs		:= ' ' \t \n
+prompt		:= '; ' ''
+max-eval-depth	:= 640
 
 #	noexport lists the variables that are not exported.  It is not
 #	exported, because none of the variables that it refers to are
@@ -742,7 +742,7 @@ max-eval-depth	= 640
 #	is does.  fn-%dispatch is really only important to the current
 #	interpreter loop.
 
-noexport = noexport pid signals apid bqstatus fn-%dispatch path home
+noexport := noexport pid signals apid bqstatus fn-%dispatch path home
 
 
 #

@@ -4,13 +4,11 @@
 #include "es.h"
 #include "input.h"
 #include "syntax.h"
-extern int parseeq;
-extern unsigned int token_number_on_stmt;
 %}
 
 %token	WORD QWORD
 %token	LOCAL LET FOR CLOSURE FN
-%token	ANDAND BACKBACK EXTRACT CALL COUNT DUP FLAT OROR PRIM REDIR SUB
+%token	ANDAND BACKBACK EXTRACT CALL COUNT DUP FLAT OROR PRIM REDIR SUB ASSIGN
 %token	NL ENDFILE ERROR
 
 %left	LOCAL LET FOR CLOSURE ')'
@@ -60,10 +58,7 @@ cmd	:		%prec LET		{ $$ = NULL; }
 						  if ($$ == &errornode) YYABORT; }
 	| first assign				{ $$ = mk(nAssign, $1, $2); }
 	| fn					{ $$ = $1; }
-	| binder 
-		{ parseeq = 1; } 
-	  nl '(' bindings ')' nl cmd	
-		{ parseeq = 0; $$ = mk($1, $5, $8); }
+	| binder nl '(' bindings ')' nl cmd	{ $$ = mk($1, $4, $7); }
 	| cmd ANDAND nl cmd			{ $$ = mkseq("%and", $1, $4); }
 	| cmd OROR nl cmd			{ $$ = mkseq("%or", $1, $4); }
  	| cmd PIPE nl cmd			{ $$ = mkpipe($1, $2->u[0].i, $2->u[1].i, $4); }
@@ -86,7 +81,7 @@ binding	:				{ $$ = NULL; }
 	| fn				{ $$ = $1; }
 	| word assign			{ $$ = mk(nAssign, $1, $2); }
 
-assign	: caret '=' caret words		{ $$ = $4; }
+assign	: caret ASSIGN caret words	{ $$ = $4; }
 
 fn	: FN word params '{' body '}'	{ $$ = fnassign($2, mklambda($3, $5)); }
 	| FN word			{ $$ = fnassign($2, NULL); }
