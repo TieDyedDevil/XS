@@ -46,7 +46,7 @@ GEN	= parse.h parse.c parse.output sigmsgs.c initial.c
 
 BUILT_SOURCES = parse.h
 xs_SOURCES = $(COMMON_FILES) initial.c main.c
-ctest_SOURCES = tests/test_print.c tests/test_util.c tests/all_tests.c $(COMMON_FILES)
+ctest_SOURCES = tests/test_print.c tests/test_util.c tests/test_glob.c tests/all_tests.c $(COMMON_FILES)
 ctest_LDADD = -lcgreen -lm
 
 xsdump_SOURCES = $(COMMON_FILES) dump.c main.c
