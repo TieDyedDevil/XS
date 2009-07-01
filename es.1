@@ -1,4 +1,4 @@
-.\" es.1 -- es manual page ($Revision: 1.1.1.1 $)
+.\" xs.1 -- xs manual page ($Revision: 1.1.1.1 $)
 .\" macros stolen from rc.1
 .\"-------
 .\" Man page portability notes
@@ -179,11 +179,11 @@
 .nr )P +.5v
 .sp .4v \}
 ..
-.TH ES 1 "5 March 1992"
+.TH XS 1 "5 March 1992"
 .SH NAME
-es \- extensible shell
+xs \- extensible shell
 .SH SYNOPSIS
-.B es
+.B xs
 .RB [ \-silevxnpo ]
 .RB [ \-c
 .IR command
@@ -191,17 +191,20 @@ es \- extensible shell
 .IR file ]
 .RI [ arguments ]
 .SH DESCRIPTION
-.I Es
+.I Xs
 is a command interpreter and programming language which combines
 the features of other Unix shells and the features of a functional
 programming language such as Scheme.
 The syntax is derived from
 .IR rc (1).
-.I Es
+The xs shell is simply an extension of the 
+.IR es (1)
+shell in this goal.
+.I Xs
 is intended for use both as an interactive shell and a programming
 language for scripts.
 .PP
-.I Es
+.I Xs
 is an extremely customizable language.
 The semantics can be altered radically by redefining functions that
 are called to implement internal operations.
@@ -211,10 +214,10 @@ See the section entitled
 for details on entry points which can be redefined to give
 the shell extended semantics.
 .SH LANGUAGE
-.I Es
+.I Xs
 is an interpreter which reads commands and executes them.
 The simplest form of command in
-.I es
+.I xs
 is a sequence of words separated by white space (space and tab) characters.
 A word is either a string or a program fragment (see below).
 The first word is the command to be executed; the remaining
@@ -231,7 +234,7 @@ or
 .Cr ../ ,
 then it is used as the absolute path name of a file;
 if not,
-.I es
+.I xs
 looks for an executable file in the directories named by
 .Cr $path .
 .PP
@@ -246,12 +249,12 @@ Background processes have an implicit redirection of
 .Cr /dev/null
 as their standard input that may be overridden by an explicit redirection.
 .SS Quoting
-.IR Es
+.IR Xs
 gives several characters special meaning;
 special characters automatically terminate words.
 The following characters, along with space, tab, and newline, are special:
 .Ds
-.Cr "# $ & \' ( ) ; < = > \e ^ \` { | }"
+.Cr "# $ & \' ( ) ; < : = > \e ^ \` { | }"
 .De
 .PP
 The single quote
@@ -279,7 +282,7 @@ The backslash
 quotes the immediately following character, if it is
 one of the special characters, except for newline.
 In addition,
-.IR es
+.IR xs
 recognizes backslash sequences similar to those used in C strings:
 .IS
 .TP
@@ -316,7 +319,7 @@ octal character
 The number sign
 .Rc ( # )
 begins a comment in
-.IR es .
+.IR xs .
 All characters up to but not including the next newline are ignored.
 .SS "Line continuation"
 A long logical line may be continued over several physical lines by
@@ -328,7 +331,7 @@ treated as part of the comment, and inside quoted strings, where the backslash
 and newline are quoted.
 .SS Lists
 The primary data structure in
-.IR es
+.IR xs
 is the list, which is a sequence of words.
 Parentheses are used to group lists.
 The empty list is represented by
@@ -378,12 +381,12 @@ produces the output
 .SS "Variables"
 A list may be assigned to a variable, using the notation:
 .Ds
-.Ic var " = " list
+.Ic var " := " list
 .De
 .PP
 Any sequence of non-special characters, except a sequence including
 only digits, may be used as a variable name.
-.I Es
+.I Xs
 exports all user-defined variables into the environment unless
 it is explicitly told not to.
 .PP
@@ -396,8 +399,8 @@ Any variable which has not been assigned a value returns the empty list
 when referenced.
 In addition, multiple references are allowed:
 .Ds
-.Cr "a = foo"
-.Cr "b = a"
+.Cr "a := foo"
+.Cr "b := a"
 .Cr "echo $$b"
 .De
 .PP
@@ -409,7 +412,7 @@ prints
 A variable's definition may also be removed by
 assigning the empty list to a variable:
 .Ds
-.Ic var =
+.Ic var :=
 .De
 .PP
 Multiple variables may be assigned with a single assignment statment.
@@ -422,35 +425,35 @@ variable is bound to all the remaining list values.
 .PP
 For example,
 .Ds
-.Cr "(a b) = 1 2 3"
+.Cr "(a b) := 1 2 3"
 .De
 .PP
 has the same effect as
 .Ds
-.Cr "a = 1"
-.Cr "b = 2 3"
+.Cr "a := 1"
+.Cr "b := 2 3"
 .Ds
 .PP
 and
 .Ds
-.Cr "(a b c) = 1 2"
+.Cr "(a b c) := 1 2"
 .De
 .PP
 is the same as
 .Ds
-.Cr "a = 1"
-.Cr "b = 2"
-.Cr "c ="
+.Cr "a := 1"
+.Cr "b := 2"
+.Cr "c :="
 .Ds
 .PP
 Note that when assigning values to more than one variable,
 the list of variables must be enclosed in parentheses.
 .PP
 For ``free careting'' (see below) to work correctly,
-.I es
+.I xs
 must make certain assumptions
 about what characters may appear in a variable name.
-.I Es
+.I Xs
 assumes that a variable name consists only of alphanumeric characters,
 percent
 .Rc ( % ),
@@ -475,9 +478,9 @@ such as concatenation, should be enclosed in parentheses:
 .PP
 Thus:
 .Ds
-.Cr "Good\-Morning = Bonjour"
-.Cr "Guten = Good"
-.Cr "Morgen = Morning"
+.Cr "Good\-Morning := Bonjour"
+.Cr "Guten := Good"
+.Cr "Morgen := Morning"
 .Cr "echo $($Guten^\-^$Morgen)"
 .De
 .PP
@@ -519,7 +522,7 @@ The list of subscripts need
 not be in order or even unique.
 Thus, if
 .Ds
-.Cr "a = one two three"
+.Cr "a := one two three"
 .De
 .PP
 then
@@ -558,7 +561,7 @@ is used as a default value; if
 is omitted, the length of the list is used.
 Thus
 .Ds
-.Cr "* = $*(2 ...)"
+.Cr "* := $*(2 ...)"
 .De
 .PP
 removes the first element of
@@ -577,14 +580,14 @@ where
 is an integer, is a shorthand for
 .Ci $*( n )\fR.
 Thus,
-.IR es 's
+.IR xs 's
 arguments may be referred to as
 .Cr "$1" ,
 .Cr "$2" ,
 and so on.
 .PP
 Note that the list of subscripts may be given by any
-.IR es
+.IR xs
 expression, so
 .Ds
 .Cr "$var(\`{awk 'BEGIN{for(i=1;i<=10;i++)print i;exit }'})"
@@ -593,17 +596,17 @@ expression, so
 returns the first 10 elements of
 .Cr $var .
 .SS "Free Carets"
-.I Es
+.I Xs
 inserts carets (concatenation operators) for free in certain situations,
 in order to save some typing on the user's behalf.
 For example, the following are all equivalent:
 .Ds
 .Cr "cc \-O \-g \-c malloc.c alloca.c"
 .Cr "cc \-^(O g c) (malloc alloca)^.c"
-.Cr "opts=O g c; files=malloc alloca; cc \-$opts $files.c"
+.Cr "opts:=O g c; files:=malloc alloca; cc \-$opts $files.c"
 .De
 .PP
-.I Es
+.I Xs
 inserts a free-caret between the
 .Rc `` \- ''
 and
@@ -617,7 +620,7 @@ The rule for free carets is as follows:
 if a word or keyword is immediately
 followed by another word, keyword, dollar-sign or
 backquote without any intervening spaces, then
-.I es
+.I xs
 inserts a caret between them.
 .SS "Flattened Lists"
 To create a single-element list from a multi-element list,
@@ -635,7 +638,7 @@ use:
 .Cr "echo $^path."
 .De
 .SS "Wildcard Expansion"
-.I Es
+.I Xs
 expands wildcards in filenames if possible.
 When the characters
 .Cr "*" ,
@@ -643,16 +646,16 @@ When the characters
 or
 .Cr ?
 occur in an argument or command,
-.I es
+.I xs
 looks at the
 argument as a pattern for matching against files.
 (Contrary to the behavior some other shells exhibit,
-.I es
+.I xs
 will only perform pattern matching if a metacharacter occurs unquoted and
 literally in the input.
 Thus,
 .Ds
-.Cr "foo = '*'"
+.Cr "foo := '*'"
 .Cr "echo $foo"
 .De
 .PP
@@ -683,7 +686,7 @@ not the caret
 .Rc ( ^ ),
 since the caret already means
 something else in
-.IR es .
+.IR xs .
 The filename component separator, slash
 .Rc ( / ),
 must appear explicitly in patterns.
@@ -709,7 +712,7 @@ of that user, according to
 The tilde
 .Rc ( ~ )
 operator is used in
-.I es
+.I xs
 for matching strings against wildcard patterns.
 The command
 .Ds
@@ -751,7 +754,7 @@ by the test
 Note that inside a
 .Cr ~
 command
-.I es
+.I xs
 does not match patterns against file
 names, so it is not necessary to quote the characters
 .Cr "*" ,
@@ -759,7 +762,7 @@ names, so it is not necessary to quote the characters
 and
 .Cr "?" .
 However,
-.I es
+.I xs
 does expand the subject against filenames if it contains
 metacharacters.
 Thus, the command
@@ -786,7 +789,7 @@ is true.
 The double-tilde
 .Rc ( ~~ )
 operator is used in
-.I es
+.I xs
 for extracting the parts of strings that match patterns.
 The command
 .Ds
@@ -889,7 +892,7 @@ might produce the output
 .PP
 along with any output or error messages from the programs.
 .PP
-.I Es
+.I Xs
 functions and primitives can produce ``rich return values,''
 that is, arbitrary lists as return values.
 .PP
@@ -902,7 +905,7 @@ If any element of a list is not equal to
 The return value of an assignment operation is the assigned value.
 .SS "Logical Operators"
 There are a number of operators in
-.I es
+.I Xs
 which depend on the exit status of a command.
 .Ds
 .Ic command1 " && " command2
@@ -1004,7 +1007,7 @@ in a here document created with an unquoted end-of-file marker, use
 .Cr $$ .
 .PP
 Additionally,
-.I es
+.I xs
 supports ``here strings'', which are like here documents,
 except that input is taken directly from a string on the command line.
 Its use is illustrated here:
@@ -1013,7 +1016,7 @@ Its use is illustrated here:
 .De
 .PP
 (This feature enables
-.I es
+.I xs
 to export functions that use here documents.)
 .SS Pipes
 Two or more commands may be combined in a pipeline by placing the
@@ -1054,7 +1057,7 @@ It is convenient sometimes to build nonlinear
 pipelines so that a command like
 .I cmp
 can read the output of two commands at once.
-.I Es
+.I Xs
 does it like this:
 .Ds
 .Cr "cmp <{command1} <{command2}"
@@ -1079,7 +1082,7 @@ and the output version of this notation:
 .Cr "echo hi there | tee >{sed 's/^/p1 /'} >{sed 's/^/p2 /'}"
 .De
 .SS "Program Fragments"
-.I Es
+.I Xs
 allows the intermixing of code with strings.
 A program fragment, which is a group of commands enclosed in braces
 .Rc ( { " and " } ),
@@ -1093,10 +1096,10 @@ Thus the following all produce the same output:
 .Ds
 .Cr "{ echo hello, world }"
 .Cr "{ echo hello, world } foo bar"
-.Cr "es -c { echo hello, world }"
-.Cr "x = { echo hello, world }; $x"
-.Cr "echo { echo hello, world } | es"
-.Cr "echo { echo hello, world } > foo; es < foo"
+.Cr "xs -c { echo hello, world }"
+.Cr "x := { echo hello, world }; $x"
+.Cr "echo { echo hello, world } | xs"
+.Cr "echo { echo hello, world } > foo; xs < foo"
 .De
 .PP
 Since program fragments in the first position in a command are executed,
@@ -1143,7 +1146,7 @@ is assigned all the arguments of the lambda.
 Note that
 .Cr @
 is a keyword and not a special character in
-.IR es ,
+.IR xs ,
 so it must be separated by whitespace from other words.
 .PP
 As a small example,
@@ -1185,7 +1188,7 @@ produce this output:
 .De
 .SS Functions
 A function in
-.I es
+.I xs
 is introduced with the syntax
 .Ds
 .Ci fn " name parameters " { " commands " } "
@@ -1197,7 +1200,7 @@ arguments to the function.
 .PP
 The similarity between functions and lambdas is not coincidental.
 A function in
-.I es
+.I xs
 is a variable of the form
 .Ci fn\- name\fR.
 If name for which the appropriate
@@ -1207,7 +1210,7 @@ the value of the variable is substituted for the first word.
 The above syntax for creating functions is equivalent to the
 variable assignment
 .Ds
-.Ci fn\- name " = @" " parameters " "{ \fIcommands\fP }"
+.Ci fn\- name " := @" " parameters " "{ \fIcommands\fP }"
 .De
 .PP
 Functions may be deleted with the syntax
@@ -1217,7 +1220,7 @@ Functions may be deleted with the syntax
 .PP
 which is equivalent to the assignment
 .Ds
-.Ci fn\- name =
+.Ci fn\- name :=
 .De
 .PP
 If, as the most common case, a function variable is bound to a lambda,
@@ -1234,12 +1237,12 @@ Variable assignments may be made local to a set of commands with the
 .Cr local
 construct:
 .Ds
-.Cr "local (\fIvar\fP = \fIvalue\fP; \fIvar\fP = \fIvalue ...\fP) \fIcommand\fP"
+.Cr "local (\fIvar\fP := \fIvalue\fP; \fIvar\fP := \fIvalue ...\fP) \fIcommand\fP"
 .De
 .PP
 The command may be a program fragment, so for example:
 .Ds
-.Cr "local (path = /bin /usr/bin; ifs = ) {"
+.Cr "local (path := /bin /usr/bin; ifs := ) {"
 .Cr "     " ...
 .Cr "}"
 .De
@@ -1254,7 +1257,7 @@ Local-bound variables are exported into the environment,
 and will invoke appropriately named settor functions (see below).
 .SS "Lexically Scoped Variables"
 In addition to local variables,
-.I es
+.I xs
 supports a different form of temporary variable binding,
 using let-bound, or ``lexically scoped,'' variables.
 (Lexical scoping is the form of binding used by most compiled
@@ -1263,7 +1266,7 @@ A lexically scoped variable is introduced with a
 .Cr let
 statement:
 .Ds
-.Cr "let (\fIvar\fP = \fIvalue\fP; \fIvar\fP = \fIvalue ...\fP) \fIcommand\fP"
+.Cr "let (\fIvar\fP := \fIvalue\fP; \fIvar\fP := \fIvalue ...\fP) \fIcommand\fP"
 .De
 .PP
 All references to any of the variables defined in a
@@ -1285,16 +1288,16 @@ and
 (also known as ``dynamic'') binding: (note that
 .Rc `` "; " ''
 is
-.IR es 's
+.IR xs 's
 default prompt.)
 .Ds
-.Cr "; x = foo"
-.Cr "; let (x = bar) {"
+.Cr "; x := foo"
+.Cr "; let (x := bar) {"
 .Cr "     echo $x"
 .Cr "     fn lexical { echo $x }"
 .Cr "}"
 .Cr "bar"
-.Cr "; local (x = baz) {"
+.Cr "; local (x := baz) {"
 .Cr "     echo $x"
 .Cr "     fn dynamic { echo $x }"
 .Cr "}"
@@ -1312,7 +1315,7 @@ Function (lambda) parameters are lexically bound to their values.
 .SS "For loops"
 The command
 .Ds
-.Cr "for (\fIvar\fP = \fIlist\fP) \fIcommand\fP
+.Cr "for (\fIvar\fP := \fIlist\fP) \fIcommand\fP
 .De
 .PP
 Runs the
@@ -1331,7 +1334,7 @@ the corresponding variable is bound to the empty list
 for the remaining iterations.
 Thus the loop
 .Ds
-.Cr "for (i = a b c; j = x y) echo $#i $i $#j $j"
+.Cr "for (i := a b c; j := x y) echo $#i $i $#j $j"
 .De
 .PP
 produces the output
@@ -1360,9 +1363,9 @@ and
 .Cr HOME
 synchronized.
 .Ds
-.Cr "set-HOME = @ {"
-.Cr "    local (set-home = )"
-.Cr "        home = $*"
+.Cr "set-HOME := @ {"
+.Cr "    local (set-home := )"
+.Cr "        home := $*"
 .Cr "    result $*"
 .Cr "}"
 .De
@@ -1380,11 +1383,11 @@ Then it returns its argument unchanged for use in the actual assignment to
 Settor functions do not apply to lexically bound variables.
 .SS Primitives
 Primitives are internal
-.I es
+.I xs
 operations that cannot or should not (for reasons of performance) be
 written in the interpreter's language.
 The set of primitives makes up the run-time library for
-.IR es .
+.IR xs .
 .PP
 Primitives can be used with the syntax
 .Ds
@@ -1401,7 +1404,7 @@ For details on specific primitives, see the section entitled
 below.
 .SS Exceptions
 Exceptions in
-.I es
+.I xs
 are used for many forms of non-structured control flow,
 notably error reporting, signals, and flow of control
 constructs such as
@@ -1465,7 +1468,7 @@ and
 for details on how to manipulate exceptions.
 .SH "SPECIAL VARIABLES"
 Several variables are known to
-.I es
+.I xs
 and are treated specially.
 Redefining these variables can change interpreter semantics.
 Note that only dynamically bound (top-level or
@@ -1475,7 +1478,7 @@ the names of lexically bound variables are unimportant.
 .TP
 .Cr *
 The argument list of
-.IR es .
+.IR xs .
 .Cr "$1, $2,"
 etc. are the same as
 .Cr $*(1) ,
@@ -1486,7 +1489,7 @@ etc.
 Holds the value of
 .Cr argv[0]
 with which
-.I es
+.I xs
 was invoked.
 Additionally,
 .Cr $0
@@ -1502,18 +1505,18 @@ The process ID of the last process started in the background.
 .TP
 .Cr history
 The name of a file to which commands are appended as
-.I es
+.I xs
 reads them.
 This facilitates the use of a stand-alone history program
 (such as
 .IR history (1))
 which parses the contents of the history file and presents them to
-.I es
+.I xs
 for reinterpretation.
 If
 .Cr history
 is not set, then
-.I es
+.I xs
 does not append commands to any file.
 .TP
 .Cr home
@@ -1522,11 +1525,11 @@ The current user's home directory, used in tilde
 expansion, as the default directory for the builtin
 .Cr cd
 command, and as the directory in which
-.I es
+.I xs
 looks to find its initialization file,
 .Cr .esrc ,
 if
-.I es
+.I xs
 has been started up as a login shell.
 Like
 .Cr path
@@ -1546,7 +1549,7 @@ is space-tab-newline.
 .TP
 .Cr noexport
 A list of variables which
-.I es
+.I xs
 will not export.
 All variables except for the ones on this list and lexically bound variables
 are exported.
@@ -1571,11 +1574,11 @@ This is typically
 .TP
 .Cr pid
 The process ID of the currently running
-.IR es .
+.IR xs .
 .TP
 .Cr prompt
 This variable holds the two prompts (in list form) that
-.I es
+.I xs
 prints.
 .Cr $prompt(1)
 is printed before each command is read, and
@@ -1584,25 +1587,25 @@ is printed when input is expected to continue on the next
 line.  (See
 .Cr %parse
 for details.)
-.I es
+.I xs
 sets
 .Cr $prompt
 to
 .Cr "('; ' '')"
 by default.
 The reason for this is that it enables an
-.I es
+.I xs
 user to grab commands from previous lines using a
 mouse, and to present them to
-.I es
+.I xs
 for re-interpretation; the semicolon
 prompt is simply ignored by
-.IR es .
+.IR xs .
 The null
 .Cr $prompt(2)
 also has its
 justification:  an
-.I es
+.I xs
 script, when typed interactively, will not leave
 .Cr $prompt(2) 's
 on the screen,
@@ -1612,17 +1615,17 @@ being necessary.
 .TP
 .Cr signals
 Contains a list of the signals which
-.I es
+.I xs
 traps.
 Any signal name which is added to this list causes that signal
 to raise an
-.I es
+.I xs
 exception.
 For example, to run some commands and make sure some cleanup routine
 is called even if the user interrupts or disconnects during the script,
 one can use the form:
 .Ds
-.Cr "local (signals = $signals sighup sigint) {"
+.Cr "local (signals := $signals sighup sigint) {"
 .Cr "     catch @ e {"
 .Cr "          cleanup"
 .Cr "          throw $e"
@@ -1636,7 +1639,7 @@ one can use the form:
 A signal name prefixed by a hyphen
 .Rc ( - )
 causes that signal to be ignored by
-.I es
+.I xs
 and all of its child processes, unless one of them resets its handler.
 A signal prefixed by a slash
 .Rc ( / )
@@ -1650,7 +1653,7 @@ to indicate that normal shell interrupt processing
 (i.e., the printing of an extra newline)
 occurs.
 By default
-.I es
+.I xs
 starts up with the values
 .Ds
 .Cr ".sigint /sigquit /sigterm"
@@ -1676,11 +1679,11 @@ This is for compatibility with other Unix programs, such as
 .Cr $PATH
 is assumed to be a colon-separated list.
 .SH "SYNTACTIC SUGAR"
-.I Es
+.I xs
 internally rewrites much of the syntax presented thus far
 in terms of calls to shell functions.
 Most features of
-.I es
+.I xs
 that resemble traditional shell features are included in this category.
 This rewriting occurs at parse time, as commands are recognized
 by the interpreter.
@@ -1688,14 +1691,14 @@ The shell functions that are the results of rewriting are some
 of the hook functions documented below.
 .PP
 The following tables list all of the major rewriting which
-.I es
+.I xs
 does, with the forms typically entered by the user on the left
 and their internal form on the right.
 There is no reason for the user to avoid using the right-hand side forms,
 except that they are usually less convenient.
 To see the internal form of a specific command,
 a user can run
-.I es
+.I xs
 with the
 .Cr \-n
 and
@@ -1712,7 +1715,7 @@ rather than executing them.
 \fIcmd1\fP ; \fIcmd2\fP	%seq {\fIcmd1\fP} {\fIcmd2\fP}
 \fIcmd1\fP && \fIcmd2\fP	%and {\fIcmd1\fP} {\fIcmd2\fP}
 \fIcmd1\fP || \fIcmd2\fP	%or {\fIcmd1\fP} {\fIcmd2\fP}
-fn \fIname\fP \fIargs\fP { \fIcmd\fP }	fn-^\fIname\fP = @ \fIargs\fP {\fIcmd\fP}
+fn \fIname\fP \fIargs\fP { \fIcmd\fP }	fn-^\fIname\fP := @ \fIargs\fP {\fIcmd\fP}
 .ft R
 .De
 .SS "Input/Output Commands"
@@ -1767,7 +1770,7 @@ All builtins can be redefined and extended by the user.
 Reads
 .I file
 as input to
-.I es
+.I xs
 and executes its contents.
 The options are a subset of the invocation options for the shell (see below).
 .TP
@@ -1874,7 +1877,7 @@ the interpreter for rescanning and execution.
 .TP
 .Cr "exec \fIcmd\fP"
 Replaces
-.I es
+.I xs
 with the given command.
 If the
 .Cr exec
@@ -1890,7 +1893,7 @@ For example,
 places further output to standard error in the file
 .IR err.out .
 Unlike some other shells,
-.I es
+.I xs
 requires that redirections in an
 .Cr exec
 be enclosed in a program fragment.
@@ -2015,10 +2018,10 @@ for details on resource limit semantics.
 .TP
 .Cr "newpgrp"
 Puts
-.I es
+.I xs
 into a new process group.
 This builtin is useful for making
-.I es
+.I xs
 behave like a job-control shell in a hostile environment.
 One example is the NeXT Terminal program, which implicitly assumes
 that each shell it forks will put itself into a new process group.
@@ -2028,7 +2031,7 @@ Note that the controlling tty for the process must be on standard error
 .Cr "result \fIvalue ...\fP"
 Returns its arguments.
 This is
-.IR es 's
+.IR xs 's
 identity function.
 .TP
 .Cr "return \fIvalue\fP"
@@ -2116,7 +2119,7 @@ is used.
 Waits for the specified
 .IR pid ,
 which must have been started by
-.IR es .
+.IR xs .
 If no
 .I pid
 is specified, waits for any child process to exit.
@@ -2248,7 +2251,7 @@ array; in some cases the two will be identical, but in
 others the former will be a full pathname and the latter
 will just be the basename.
 Some versions of
-.I es
+.I xs
 may provide a builtin version of this function to handle
 .Cr #! -style
 shell scripts if the kernel does not.
@@ -2510,11 +2513,11 @@ Backquote substitution splits with the same rules.
 .Cr "%var \fIvar ...\fP"
 For each named variable,
 returns a string which, if interpreted by
-.I es
+.I xs
 would assign to the variable its current value.
 .SH PRIMITIVES
 Primitives exist in
-.I es
+.I xs
 so that, in the presence of spoofing and redefinitions,
 there is a way to refer to built-in behaviors.
 This ability is necessary for the shell to be able to unambiguously refer to itself,
@@ -2532,7 +2535,7 @@ In this section, the
 prefixes will be omitted when primitive names are mentioned.
 Note that, by convention, primitive names follow C identifier
 names where
-.I es
+.I xs
 variable and function names often contain
 .Rc `` % ''
 and
@@ -2624,7 +2627,7 @@ sethistory	setnoexport	setsignals
 .De
 .PP
 Some primitives are included in
-.I es
+.I xs
 conditionally, based on compile-time configuration options.
 Those primitives, and the functions to which they are bound, are
 .ta 2i
@@ -2641,7 +2644,7 @@ writeto	%writeto
 The primitive
 .Cr resetterminal
 is if
-.I es
+.I xs
 is compiled with support for the
 .I readline
 or
@@ -2660,7 +2663,7 @@ They are:
 .Cr "$&collect"
 Invokes the garbage collector.
 The garbage collector in
-.I es
+.I xs
 runs rather frequently;
 there should be no reason for a user to issue this command.
 .TP
@@ -2672,7 +2675,7 @@ but in such a way that it does not catch the
 exception.
 This primitive exists in order that some control-flow
 operations in
-.I es
+.I xs
 (e.g.,
 .Cr while
 and
@@ -2680,18 +2683,18 @@ and
 can be implemented as lambdas rather than primitives.
 .TP
 .Cr "$&primitives"
-Returns a list of the names of es primitives.
+Returns a list of the names of xs primitives.
 .TP
 .Cr "$&version"
 Returns the current version number and release date for
-.IR es .
+.IR xs .
 .SH OPTIONS
 .TP
 .Cr \-c
 Run the given
 .IR command ,
 placing the rest of the arguments to
-.I es
+.I xs
 in
 .Cr $* .
 .TP
@@ -2699,17 +2702,17 @@ in
 Read commands from standard input;
 i.e., put the first argument
 to
-.I es
+.I xs
 in
 .Cr $*
 rather than using it as the name of a file to source.
 .TP
 .Cr \-i
 Force
-.I es
+.I xs
 to be an interactive shell.
 Normally
-.I es
+.I xs
 is only interactive if it
 is run with commands coming from standard input and
 standard input is connected to a terminal.
@@ -2739,7 +2742,7 @@ Turn off execution of commands.
 This can be used for checking the syntax of scripts.
 When combined with
 .Cr \-x ,
-.I es
+.I xs
 prints the entered command based on the internal (parsed) representation.
 .TP
 .Cr \-p
@@ -2783,16 +2786,16 @@ followed by control-a or control-b.
 is not nearly as useful as it should be.
 .PP
 Line numbers in error messages refer to the last line parsed,
-rather than something more useful.
+rather than something more useful. In addition, error messages
+are basically meaningless except for the line number.
 .PP
 Too many creatures have fept in.
 .PP
 Please send bug reports to
-.Cr "haahr@adobe.com"
-and
-.Cr "byron@netapp.com" .
+.Cr "fkfire@gmail.com" .
 .SH "SEE ALSO"
 .IR history (1),
+.IR es (1),
 .IR rc (1),
 .IR sh (1),
 .IR execve (2),
