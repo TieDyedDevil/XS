@@ -28,6 +28,8 @@
 
 AM_YFLAGS = -d
 
+dist_man_MANS = xs.1
+
 bin_PROGRAMS = xs
 noinst_PROGRAMS = xsdump
 check_PROGRAMS = ctest 
