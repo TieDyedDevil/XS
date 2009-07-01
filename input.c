@@ -675,8 +675,10 @@ extern void initinput(void) {
 
 #if READLINE
 	rl_meta_chars = 0;
+	/* = basically works here for := */
 	rl_basic_word_break_characters = " \t\n\\'`$><=;|&{()}";
 	rl_completer_quote_characters = "'";
+	/* Either = or : has to be here to safeguard := */
 	rl_filename_quote_characters = " \t\n\\\'`$><;|&{()}";
 	default_quote_function = rl_filename_quoting_function;
 	rl_filename_quoting_function = quote_func;
