@@ -322,8 +322,10 @@ top:	while ((c = GETC()) == ' ' || c == '\t')
 		}
 		else {
 			/* Treat : as if normal char
-			   Code similar to \\ */
+			   Code similar to \: */
 			UNGETC(c);
+			c = ':';
+			InsertFreeCaret();
 			w = RW;
 			*buf = ':';
 			buf[1] = 0;
