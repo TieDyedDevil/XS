@@ -44,13 +44,13 @@ static void initpid(void) {
 	vardef("pid", NULL, mklist(mkstr(str("%d", getpid())), NULL));
 }
 
-/* runesrc -- run the user's profile, if it exists */
-static void runesrc(void) {
-	char *esrc = str("%L/.esrc", varlookup("home", NULL), "\001");
-	int fd = eopen(esrc, oOpen);
+/* runxsrc -- run the user's profile, if it exists */
+static void runxsrc(void) {
+	char *xsrc = str("%L/.xsrc", varlookup("home", NULL), "\001");
+	int fd = eopen(xsrc, oOpen);
 	if (fd != -1) {
 		ExceptionHandler
-			runfd(fd, esrc, 0);
+			runfd(fd, xsrc, 0);
 		CatchException (e)
 			if (termeq(e->term, "exit"))
 				exit(exitstatus(e->next));
@@ -186,7 +186,7 @@ getopt_done:
 		initenv(environ, protected);
 
 		if (loginshell)
-			runesrc();
+			runxsrc();
 
 		if (cmd == NULL && !cmd_stdin && optind < ac) {
 			int fd;

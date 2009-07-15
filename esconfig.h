@@ -104,10 +104,6 @@
  *		will be checked at run-time.  this is only useful if you're
  *		modifying es source, and makes the binary much larger.
  *
- *	REISER_CPP
- *		true if es is being compiled with a reiser-style preprocessor.
- *		if you have an ansi preprocessor, use it and turn this off.
- *
  *	SHOW_DOT_FILES
  *		if this option is off (the default), wildcard patterns do not
  *		match files that being with a ``.'' character;  this behavior
@@ -142,14 +138,6 @@
  *	USE_MEMORY
  *		if on, <memory.h> is used; if off, it's assumed that
  *		<string.h> does the job.
- *
- *	USE_SIGACTION
- *		turn this on if your system understands the POSIX.1
- *		sigaction(2) call.  it's probably better to use this
- *		version if you have it.  if sigaction() is used, es
- *		assumes that signals have POSIX semantics, so the
- *		SPECIAL_SIGCLD and SYSV_SIGNALS options are turned
- *		off.
  *
  *	USE_SIG_ATOMIC_T
  *		define this on a system which has its own typedef for
@@ -313,10 +301,6 @@
 #define	REF_ASSERTIONS		0
 #endif
 
-#ifndef	REISER_CPP
-#define	REISER_CPP		0
-#endif
-
 #ifndef	SHOW_DOT_FILES
 #define	SHOW_DOT_FILES		0
 #endif
@@ -332,6 +316,7 @@
 #ifndef	USE_SIG_ATOMIC_T
 #define	USE_SIG_ATOMIC_T	0
 #endif
+
 
 /*
  * enforcing choices that must be made

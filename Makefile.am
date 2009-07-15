@@ -1,32 +1,8 @@
-# Makefile for es ($Revision: 1.4 $)
-
-# Some of the advice here is rather old and out of date.  The
-# configuration of es will be improved by 0.9beta, but I didn't
-# want to hunt out machines from now til eternity.
-
-# comment out the CFLAGS -Wall if you're not using gcc,
-# but i'd encourage you to compile with full warnings on.
-# let us know what warnings you get, though we don't promise
-# to shut them all up.  if you're using sun's SPARCcompiler
-# we recommend -Xa mode.  if you're using the native alpha
-# compile, we recommend -g3 -O -Olimit 1000.  on recent
-# SGI Irix releases using the native compiler, you will
-# probably need -xansi.
-
-# see config.h for command-line -D flags you may want to use.
-# if you're using SunOS 5 (Solaris 2), be sure to include
-# -DSOLARIS in the CFLAGS, since sun made it difficult to
-# detect which system you're running.  also, since sun really
-# seems to have screwed up and removed both getrusage() and
-# wait3() in Solaris 2, you should probably add -DBUILTIN_TIME=0
-# to the cflags.  if you're running an OSF1 derivative, try -DOSF1.
-# if you're using HP/UX do a -DHPUX.
-
-# also, please use whatever -D flags you need to in order
-# to get definitions of all signals from <sys/signal.h>.
-# _POSIX_SOURCE, _XOPEN_SOURCE are the obvious ones.
+# Makefile for xs
 
 AM_YFLAGS = -d
+AUTOMAKE_OPTIONS = dejagnu
+RUNTESTDEFAULTFLAGS = --tool xs XS=`pwd`/xs --srcdir $$srcdir/testsuite 
 
 dist_man_MANS = xs.1
 

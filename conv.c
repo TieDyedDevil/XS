@@ -36,7 +36,7 @@ static void binding(Format *f, char *keyword, Tree *tree) {
 		Tree *binding = np->u[0].p;
 		assert(binding != NULL);
 		assert(binding->kind == nAssign);
-		fmtprint(f, "%s%#T=%T", sep, binding->u[0].p, binding->u[1].p);
+		fmtprint(f, "%s%#T:=%T", sep, binding->u[0].p, binding->u[1].p);
 		sep = ";";
 	}
 	fmtprint(f, ")");
@@ -73,7 +73,7 @@ top:
 		return FALSE;
 
 	case nAssign:
-		fmtprint(f, "%#T=", n->u[0].p);
+		fmtprint(f, "%#T:=", n->u[0].p);
 		tailcall(n->u[1].p, FALSE);
 
 	case nConcat:
