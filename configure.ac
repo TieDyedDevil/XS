@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(xs, 0.1, access.c)
+AC_INIT(xs, 0.1)
 AC_CONFIG_HEADER(config.h)
 AM_INIT_AUTOMAKE([-Wall])
 
@@ -18,10 +18,23 @@ rm -f conftest*
 use_readline=yes
 use_editline=no
 
-AC_ARG_WITH(readline,
---without-readline		Use GNU Readline, use_readline=no)
-AC_ARG_WITH(editline,
---with-editline		Use the Editline library, use_editline=yes)
+AC_ARG_WITH(readline,  AS_HELP_STRING(--without-readline, use GNU Readline), 
+	use_readline=no)
+AC_ARG_WITH(editline, AS_HELP_STRING(--with-editline, use the Editline library),
+	use_editline=yes)
+
+AC_ARG_ENABLE(debug, AS_HELP_STRING(--enable-debug, debug mode for xs developers), debug_build=yes) 
+
+
+dnl enable debug stuff
+if test $debug_build = yes; then
+	AC_DEFINE(GC_ALWAYS,,1)
+	AC_DEFINE(REF_ASSERTIONS,,1)
+	AC_DEFINE(GC_PROTECT,,1)
+	CFLAGS=-Wall -Wextra -O0 -ggdb3
+fi
+
+dnl Old solaris compatibility stuff
 
 AC_CANONICAL_HOST
 
@@ -31,7 +44,6 @@ case "$host" in
 	;;
 esac
 
-dnl saved_CFLAGS="$CFLAGS"
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -39,8 +51,6 @@ AC_PROG_INSTALL
 AC_PROG_YACC
 
 AC_PROG_CC_STDC
-
-dnl CFLAGS="$CFLAGS $saved_CFLAGS"
 
 dnl ----------------------------
 dnl CHECK FOR /dev/fd FILESYSTEM
@@ -156,6 +166,8 @@ egrep '^#[ 	]+1[	 ]+' | sed 's/.*"\(.*\)".*/\1/' |sort -u |
 grep '^/' |tr '\012' ' ' 
 changequote([,])],
 [#include <signal.h>], /usr/include/signal.h))
+
+
 
 SIGFILES=$es_cv_sigfiles
 AC_SUBST(SIGFILES)
