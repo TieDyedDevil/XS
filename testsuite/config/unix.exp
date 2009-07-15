@@ -1,0 +1,23 @@
+
+proc xs_exit {} {
+	send "exit\n"
+}
+proc xs_version {} {}
+proc xs_load {arg} {}
+
+proc xs_start {} {
+	global XS
+	global spawn_id
+	send_user "Starting $XS!\n"
+	stty -echo
+	spawn $XS
+	expect {
+		-re ".*; " { }
+		-re "No such file.*" { perror "Can't start $XS"; exit 1 }
+		timeout { perror "Failed to spawn xs (timeout)"; exit 1 }
+	}
+	send "stty -echo\r" 
+	expect "; "
+}
+
+xs_start
