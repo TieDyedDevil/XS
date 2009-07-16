@@ -37,6 +37,7 @@ extern void startsplit(const char *sep, Boolean coalescef) {
 }
 
 extern void splitstring(char *in, size_t len, Boolean endword) {
+	gcdisable(); /* char *s can't be made gc-safe */
 	Buffer *buf = buffer;
 	unsigned char *s = (unsigned char *) in, *inend = s + len;
 
@@ -46,6 +47,7 @@ extern void splitstring(char *in, size_t len, Boolean endword) {
 			Term *term = mkstr(gcndup((char *) s++, 1));
 			value = mklist(term, value);
 		}
+		gcenable();
 		return;
 	}
 
@@ -71,6 +73,7 @@ extern void splitstring(char *in, size_t len, Boolean endword) {
 		buf = NULL;
 	}
 	buffer = buf;
+	gcenable();
 }
 
 extern List *endsplit(void) {
@@ -90,6 +93,8 @@ extern List *fsplit(const char *sep, List *list, Boolean coalesce) {
 	Ref(List *, lp, list);
 	startsplit(sep, coalesce);
 	for (; lp != NULL; lp = lp->next) {
+		/* No need for Ref because gc cannot run
+		 * between these two statements         */
 		char *s = getstr(lp->term);
 		splitstring(s, strlen(s), TRUE);
 	}
