@@ -1,6 +1,0 @@
-set timeout 3
-set test "Hello World"
-send "echo Hello World\r"
-expect {
-    -re "Hello World" { pass "$test" }
-}
