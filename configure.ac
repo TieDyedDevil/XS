@@ -25,14 +25,14 @@ AC_ARG_WITH(editline, AS_HELP_STRING(--with-editline, use the Editline library),
 
 AC_ARG_ENABLE(debug, AS_HELP_STRING(--enable-debug, debug mode for xs developers), debug_build=yes) 
 
-
 dnl enable debug stuff
 if test $debug_build = yes; then
-	AC_DEFINE(GC_ALWAYS,,1)
-	AC_DEFINE(REF_ASSERTIONS,,1)
-	AC_DEFINE(GC_PROTECT,,1)
-	CFLAGS=-Wall -Wextra -O0 -ggdb3
+	AC_DEFINE(REF_ASSERTIONS,1,"Enable assertions for GC Refs")
+	AC_DEFINE(GCDEBUG,1,"Enable GC debug mode")
+	CFLAGS="-Wall -Wextra -O0 -ggdb3"
 fi
+
+
 
 dnl Old solaris compatibility stuff
 
@@ -74,8 +74,10 @@ AC_CHECK_LIB(sun, getpwuid)
 
 if test "$use_readline" = yes || test "$use_editline" = yes
 then
-	AC_CHECK_LIB(terminfo, main)
-	AC_CHECK_LIB(termcap, main)
+    dnl Are these really wanted/can they even work?
+	dnl AC_CHECK_LIB(terminfo, main)
+	dnl AC_CHECK_LIB(termcap, main)
+    AC_CHECK_LIB(ncurses, initscr)
 	if test "$use_readline" = yes
 	then
 		AC_CHECK_LIB(readline, readline)
@@ -166,7 +168,6 @@ egrep '^#[ 	]+1[	 ]+' | sed 's/.*"\(.*\)".*/\1/' |sort -u |
 grep '^/' |tr '\012' ' ' 
 changequote([,])],
 [#include <signal.h>], /usr/include/signal.h))
-
 
 
 SIGFILES=$es_cv_sigfiles
