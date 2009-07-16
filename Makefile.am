@@ -2,7 +2,7 @@
 
 AM_YFLAGS = -d
 AUTOMAKE_OPTIONS = dejagnu
-RUNTESTDEFAULTFLAGS = --tool xs XS=`pwd`/xs --srcdir $$srcdir/testsuite 
+RUNTESTDEFAULTFLAGS = --tool xs XS=`pwd`/xs --srcdir $$srcdir/testsuite --debug
 
 dist_man_MANS = xs.1
 
