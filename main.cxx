@@ -17,12 +17,12 @@ extern char **environ;
 
 /* checkfd -- open /dev/null on an fd if it is closed */
 static void checkfd(int fd, OpenKind r) {
-	int new;
-	new = dup(fd);
-	if (new != -1)
-		close(new);
-	else if (errno == EBADF && (new = eopen("/dev/null", r)) != -1)
-		mvfd(new, fd);
+	int newFD;
+	newFD = dup(fd);
+	if (newFD != -1)
+		close(newFD);
+	else if (errno == EBADF && (newFD = eopen("/dev/null", r)) != -1)
+		mvfd(newFD, fd);
 }
 
 /* initpath -- set $path based on the configuration default */
@@ -102,7 +102,7 @@ int main(int argc, char **argv) {
 	char **volatile av;
 
 	volatile int runflags = 0;		/* -[einvxL] */
-	volatile bool protected = false;	/* -p */
+	volatile bool isprotected = false;	/* -p */
 	volatile bool allowquit = false;	/* -d */
 	volatile bool cmd_stdin = false;		/* -s */
 	volatile bool loginshell = false;	/* -l or $0[0] == '-' */
@@ -114,7 +114,7 @@ int main(int argc, char **argv) {
 
 	if (argc == 0) {
 		argc = 1;
-		argv = ealloc(2 * sizeof (char *));
+		argv = reinterpret_cast<char**>(ealloc(2 * sizeof (char *)));
 		argv[0] = "es";
 		argv[1] = NULL;
 	}
@@ -133,7 +133,7 @@ int main(int argc, char **argv) {
 		case 'L':	runflags |= run_lisptrees;	break;
 #endif
 		case 'l':	loginshell = true;		break;
-		case 'p':	protected = true;		break;
+		case 'p':	isprotected = true;		break;
 		case 'o':	keepclosed = true;		break;
 		case 'd':	allowquit = true;		break;
 		case 's':	cmd_stdin = true;			goto getopt_done;
@@ -183,7 +183,7 @@ getopt_done:
 		initpid();
 		initsignals(runflags & run_interactive, allowquit);
 		hidevariables();
-		initenv(environ, protected);
+		initenv(environ, isprotected);
 
 		if (loginshell)
 			runxsrc();

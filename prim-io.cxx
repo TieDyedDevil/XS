@@ -48,7 +48,6 @@ static void argcount(const char *s) {
 
 REDIR(openfile) {
 	int i, fd;
-	char *mode, *name;
 	OpenKind kind;
 	static const struct {
 		const char *name;
@@ -60,13 +59,13 @@ REDIR(openfile) {
 		{ "r+",	oReadWrite },
 		{ "w+",	oReadCreate },
 		{ "a+",	oReadAppend },
-		{ NULL, 0 }
+		{ NULL, }
 	};
 
 	assert(length(list) == 3);
 	Ref(List *, lp, list);
 
-	mode = getstr(lp->term);
+	const char *mode = getstr(lp->term);
 	lp = lp->next;
 	for (i = 0;; i++) {
 		if (modes[i].name == NULL)
@@ -77,7 +76,7 @@ REDIR(openfile) {
 		}
 	}
 
-	name = getstr(lp->term);
+	const char *name = getstr(lp->term);
 	lp = lp->next;
 	fd = eopen(name, kind);
 	if (fd == -1)
@@ -196,7 +195,7 @@ PRIM(pipe) {
 		fail("$&pipe", "usage: pipe cmd [ outfd infd cmd ] ...");
 	n = (n + 2) / 3;
 	if (n > pidmax) {
-		pids = erealloc(pids, n * sizeof *pids);
+		pids = reinterpret_cast<int*>(erealloc(pids, n * sizeof *pids));
 		pidmax = n;
 	}
 	n = 0;
@@ -254,7 +253,7 @@ PRIM(readfrom) {
 	if (length(list) != 3)
 		argcount("%readfrom var input cmd");
 	Ref(List *, lp, list);
-	Ref(char *, var, getstr(lp->term));
+	Ref(const char *, var, getstr(lp->term));
 	lp = lp->next;
 	Ref(Term *, input, lp->term);
 	lp = lp->next;
@@ -294,7 +293,7 @@ PRIM(writeto) {
 	if (length(list) != 3)
 		argcount("%writeto var output cmd");
 	Ref(List *, lp, list);
-	Ref(char *, var, getstr(lp->term));
+	Ref(const char *, var, getstr(lp->term));
 	lp = lp->next;
 	Ref(Term *, output, lp->term);
 	lp = lp->next;
@@ -355,7 +354,7 @@ PRIM(backquote) {
 		fail(caller, "usage: backquote separator command [args ...]");
 
 	Ref(List *, lp, list);
-	Ref(char *, sep, getstr(lp->term));
+	Ref(const char *, sep, getstr(lp->term));
 	lp = lp->next;
 
 	if ((pid = pipefork(p, NULL)) == 0) {

@@ -176,7 +176,7 @@ static Conv *fmttab;
 static void inittab(void) {
 	int i;
 
-	fmttab = ealloc(MAXCONV * sizeof (Conv));
+	fmttab = reinterpret_cast<Conv*>(ealloc(MAXCONV * sizeof (Conv)));
 	for (i = 0; i < MAXCONV; i++)
 		fmttab[i] = badconv;
 

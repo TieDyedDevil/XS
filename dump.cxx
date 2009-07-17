@@ -1,8 +1,8 @@
 /* dump.c -- dump es's internal state as a c program ($Revision: 1.1.1.1 $) */
 
 #include "es.hxx"
-#include "var.h"
-#include "term.h"
+#include "var.hxx"
+#include "term.hxx"
 
 #define	MAXVARNAME 20
 
@@ -42,11 +42,11 @@ static bool allprintable(const char *s) {
 	return true;
 }
 
-static char *dumpstring(char *string) {
+static char *dumpstring(const char *string) {
 	char *name;
 	if (string == NULL)
 		return "NULL";
-	name = dictget(strings, string);
+	name = reinterpret_cast<char*>(dictget(strings, string));
 	if (name == NULL) {
 		name = str("S_%F", string);
 		if (strlen(name) > MAXVARNAME)
@@ -56,7 +56,7 @@ static char *dumpstring(char *string) {
 			print("\"%s\";\n", string);
 		else {
 			int c;
-			char *s;
+			const char *s;
 			print("{ ");
 			for (s = string; (c = *(unsigned char *) s) != '\0'; s++) {
 				switch (c) {
@@ -202,29 +202,27 @@ static char *dumplist(List *list) {
 	return name;
 }
 
-static void dumpvar(void *ignore, char *key, void *value) {
-	Var *var = value;
+static void dumpvar(void *ignore, const char *key, void *value) {
+	Var *var = reinterpret_cast<Var*>(value);
 	dumpstring(key);
 	dumplist(var->defn);
 }
 
-static void dumpdef(char *name, Var *var) {
+static void dumpdef(const char *name, Var *var) {
 	print("\t{ %s, (const List *) %s },\n", dumpstring(name), dumplist(var->defn));
 }
 
-static void dumpfunctions(void *ignore, char *key, void *value) {
-	if (hasprefix(key, "fn-"))
-		dumpdef(key, value);
+static void dumpfunctions(void *ignore, const char *key, void *value) {
+	if (hasprefix(key, "fn-")) dumpdef(key, reinterpret_cast<Var*>(value));
 }
 
-static void dumpsettors(void *ignore, char *key, void *value) {
-	if (hasprefix(key, "set-"))
-		dumpdef(key, value);
+static void dumpsettors(void *ignore, const char *key, void *value) {
+	if (hasprefix(key, "set-")) dumpdef(key, reinterpret_cast<Var*>(value));
 }
 
-static void dumpvariables(void *ignore, char *key, void *value) {
+static void dumpvariables(void *ignore, const char *key, void *value) {
 	if (!hasprefix(key, "fn-") && !hasprefix(key, "set-"))
-		dumpdef(key, value);
+		dumpdef(key, reinterpret_cast<Var*>(value));
 }
 
 #define TreeTypes \
@@ -243,7 +241,7 @@ static void printheader(List *title) {
 	)
 		panic("dumpstate: Tree union sizes do not match struct sizes");
 
-	print("/* %L */\n\n#include \"es.hxx\"\n#include \"term.h\"\n\n", title, " ");
+	print("/* %L */\n\n#include \"es.hxx\"\n#include \"term.hxx\"\n\n", title, " ");
 	print("%s\n\n", PPSTRING(TreeTypes));
 }
 

@@ -52,4 +52,4 @@ extern char *sealbuffer(Buffer *buf);
 extern char *sealcountedbuffer(Buffer *buf);
 extern void freebuffer(Buffer *buf);
 
-extern void *forward(void *p);
+extern void *forward( void *p);

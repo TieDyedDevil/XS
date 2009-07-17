@@ -18,13 +18,13 @@ COMMON_FILES	= access.cxx closure.cxx conv.cxx dict.cxx eval.cxx except.cxx fd.c
 	  glom.cxx input.cxx heredoc.cxx list.cxx match.cxx opt.cxx \
 	  prim-ctl.cxx prim-etc.cxx prim-io.cxx prim-sys.cxx prim.cxx print.cxx proc.cxx \
 	  sigmsgs.cxx signal.cxx split.cxx syntax.cxx status.cxx str.cxx term.cxx \
-	  token.cxx tree.cxx util.cxx var.cxx vec.cxx version.cxx parse.y
-OTHER	= Makefile parse.y mksignal
+	  token.cxx tree.cxx util.cxx var.cxx vec.cxx version.cxx parse.yxx
+OTHER	= Makefile parse.yxx mksignal
 GEN	= parse.h parse.cxx parse.output sigmsgs.cxx initial.cxx
 
 BUILT_SOURCES = parse.h
 xs_SOURCES = $(COMMON_FILES) initial.cxx main.cxx
-ctest_SOURCES = tests/test_print.cxx tests/test_util.cxx tests/test_glob.cxx tests/all_tests.cxx $(COMMON_FILES)
+ctest_SOURCES = tests/test_print.c tests/test_util.c tests/test_glob.c tests/all_tests.c $(COMMON_FILES)
 ctest_LDADD = -lcgreen -lm
 
 xsdump_SOURCES = $(COMMON_FILES) dump.cxx main.cxx

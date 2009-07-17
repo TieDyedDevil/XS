@@ -21,7 +21,7 @@
 #endif
 #endif
 
-#include <sys/types.hxx>
+#include <sys/types.h>
 #include <sys/stat.h>
 
 PRIM(newpgrp) {
@@ -69,11 +69,10 @@ PRIM(fork) {
 }
 
 PRIM(run) {
-	char *file;
 	if (list == NULL)
 		fail("$&run", "usage: %%run file argv0 argv1 ...");
 	Ref(List *, lp, list);
-	file = getstr(lp->term);
+	const char *file = getstr(lp->term);
 	lp = forkexec(file, lp->next, (evalflags & eval_inchild) != 0);
 	RefReturn(lp);
 }
@@ -87,8 +86,8 @@ PRIM(umask) {
 	}
 	if (list->next == NULL) {
 		int mask;
-		char *s, *t;
-		s = getstr(list->term);
+		char *t;
+		const char *s = getstr(list->term);
 		mask = strtol(s, &t, 8);
 		if ((t != NULL && *t != '\0') || ((unsigned) mask) > 07777)
 			fail("$&umask", "bad umask: %s", s);
@@ -101,10 +100,9 @@ PRIM(umask) {
 }
 
 PRIM(cd) {
-	char *dir;
 	if (list == NULL || list->next != NULL)
 		fail("$&cd", "usage: $&cd directory");
-	dir = getstr(list->term);
+	const char *dir = getstr(list->term);
 	if (chdir(dir) == -1)
 		fail("$&cd", "chdir %s: %s", dir, esstrerror(errno));
 	return ltrue;
@@ -221,7 +219,7 @@ static void printlimit(const Limit *limit, bool hard) {
 	}
 }
 
-static LIMIT_T parselimit(const Limit *limit, char *s) {
+static LIMIT_T parselimit(const Limit *limit, const char *s) {
 	LIMIT_T lim;
 	char *t;
 	const Suffix *suf = limit->suffix;
@@ -268,7 +266,7 @@ PRIM(limit) {
 		for (; lim->name != NULL; lim++)
 			printlimit(lim, hard);
 	else {
-		char *name = getstr(lp->term);
+		const char *name = getstr(lp->term);
 		for (;; lim++) {
 			if (lim->name == NULL)
 				fail("$&limit", "%s: no such limit", name);

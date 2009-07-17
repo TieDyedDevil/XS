@@ -2,8 +2,8 @@
 
 #include "es.hxx"
 #include "gc.hxx"
-#include "input.h"
-#include "syntax.h"
+#include "input.hxx"
+#include "syntax.hxx"
 
 typedef struct Here Here;
 struct Here {
@@ -129,7 +129,7 @@ extern bool queueheredoc(Tree *t) {
 		return false;
 	}
 
-	here = gcalloc(sizeof (Here), NULL);
+	here = reinterpret_cast<Here*>(gcalloc(sizeof(Here), NULL));
 	here->next = hereq;
 	here->marker = eof;
 	hereq = here;

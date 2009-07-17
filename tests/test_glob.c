@@ -1,6 +1,6 @@
 #include "cgreen/cgreen.h"
 #include <string.h>
-#include "es.h"
+#include "es.hxx"
 
 void *test_glob() {
 	const char **dirnames = {

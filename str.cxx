@@ -6,7 +6,7 @@
 
 /* grow -- buffer grow function for str() */
 static void str_grow(Format *f, size_t more) {
-	Buffer *buf = expandbuffer(f->u.p, more);
+	Buffer *buf = expandbuffer(reinterpret_cast<Buffer*>(f->u.p), more);
 	f->u.p		= buf;
 	f->buf		= buf->str + (f->buf - f->bufbegin);
 	f->bufbegin	= buf->str;
@@ -36,7 +36,7 @@ extern char *strv(const char *fmt, va_list args) {
 	fmtputc(&format, '\0');
 	gcenable();
 
-	return sealbuffer(format.u.p);
+	return sealbuffer(reinterpret_cast<Buffer*>(format.u.p));
 }
 
 /* str -- create a string (in garbage collection space) by printing to it */
@@ -59,7 +59,7 @@ static void mprint_grow(Format *format, size_t more) {
 	len = (len >= more)
 		? len * 2
 		: ((len + more) + PRINT_ALLOCSIZE) &~ (PRINT_ALLOCSIZE - 1);
-	buf = erealloc(format->bufbegin, len);
+	buf = reinterpret_cast<char*>(erealloc(format->bufbegin, len));
 	format->buf	 = buf + (format->buf - format->bufbegin);
 	format->bufbegin = buf;
 	format->bufend	 = buf + len - 1;
@@ -71,7 +71,7 @@ extern char *mprint (const char * fmt, ...) {
 	format.u.n = 1;
 	va_start(format.args, fmt);
 
-	format.buf	= ealloc(PRINT_ALLOCSIZE);
+	format.buf	= reinterpret_cast<char*>(ealloc(PRINT_ALLOCSIZE));
 	format.bufbegin	= format.buf;
 	format.bufend	= format.buf + PRINT_ALLOCSIZE - 1;
 	format.grow	= mprint_grow;
@@ -108,9 +108,9 @@ static void *StrListCopy(void *op) {
 }
 
 static size_t StrListScan(void *p) {
-	StrList *list = p;
-	list->str = forward((void *) list->str);
-	list->next = forward(list->next);
+	StrList *list = reinterpret_cast<StrList*>(p);
+	list->str = reinterpret_cast<char*>(forward((void *) list->str));
+	list->next = reinterpret_cast<StrList*>(forward(list->next));
 	return sizeof (StrList);
 }
 

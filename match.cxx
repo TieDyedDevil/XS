@@ -153,7 +153,7 @@ extern bool listmatch(List *subject, List *pattern, StrList *quote) {
 		Ref(const char *, qw, q->str);
 		Ref(List *, t, s);
 		for (; t != NULL; t = t->next) {
-			char *tw = getstr(t->term);
+			const char *tw = getstr(t->term);
 			if (match(tw, pw, qw)) {
 				RefPop3(t, qw, pw);
 				RefPop3(q, p, s);
@@ -246,7 +246,7 @@ extern List *extractmatches(List *subjects, List *patterns, StrList *quotes) {
 		     pattern != NULL;
 		     pattern = pattern->next, quote = quote->next) {
 			List *match;
-			char *pat = getstr(pattern->term);
+			const char *pat = getstr(pattern->term);
 			match = extractsinglematch(getstr(subject->term),
 						   pat, quote->str, NULL);
 			if (match != NULL) {

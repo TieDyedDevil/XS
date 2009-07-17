@@ -57,7 +57,7 @@ static int testperm_real(struct stat *stat, int perm) {
 	return (stat->st_mode & mask) ? 0 : EACCES;
 }
 
-static int testfile(char *path, int perm, mode_t type) {
+static int testfile(const char *path, int perm, mode_t type) {
 	struct stat st;
 #ifdef S_IFLNK
 	if (type == S_IFLNK) {
@@ -72,7 +72,7 @@ static int testfile(char *path, int perm, mode_t type) {
 	return testperm(&st, perm);
 }
 
-static char *pathcat(char *prefix, char *suffix) {
+static const char *pathcat(const char *prefix, const char *suffix) {
 	char *s;
 	size_t plen, slen, len;
 	static char *pathbuf = NULL;
@@ -88,7 +88,7 @@ static char *pathcat(char *prefix, char *suffix) {
 	len = plen + slen + 2;		/* one for '/', one for '\0' */
 	if (pathlen < len) {
 		pathlen = len;
-		pathbuf = (char*) erealloc(pathbuf, pathlen);
+		pathbuf = reinterpret_cast<char*>(erealloc(pathbuf, pathlen));
 	}
 
 	memcpy(pathbuf, prefix, plen);
@@ -102,7 +102,7 @@ static char *pathcat(char *prefix, char *suffix) {
 PRIM(access) {
 	int c, perm = 0, type = 0, estatus = ENOENT;
 	bool first = false, exception = false;
-	char *suffix = NULL;
+	const char *suffix = NULL;
 	List *lp;
 	const char * const usage = "access [-n name] [-1e] [-rwx] [-fdcblsp] path ...";
 
@@ -136,7 +136,7 @@ PRIM(access) {
 	list = esoptend();
 
 	for (lp = NULL; list != NULL; list = list->next) {
-		char *name = getstr(list->term);
+		const char *name = strdup(getstr(list->term));
 		if (suffix != NULL)
 			name = pathcat(name, suffix);
 		int error = testfile(name, perm, type);
@@ -175,7 +175,7 @@ extern Dict *initprims_access(Dict *primdict) {
 	return primdict;
 }
 
-extern char *checkexecutable(char *file) {
+extern char *checkexecutable(const char *file) {
 	int err = testfile(file, EXEC, S_IFREG);
 	return err == 0 ? NULL : esstrerror(err);
 }

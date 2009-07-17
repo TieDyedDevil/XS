@@ -1,7 +1,7 @@
 /* status.c -- status manipulations ($Revision: 1.1.1.1 $) */
 
 #include "es.hxx"
-#include "term.h"
+#include "term.hxx"
 
 static const Term
 	trueterm	= { "0", NULL },
@@ -32,7 +32,7 @@ extern bool istrue(List *status) {
 /* exitstatus -- turn a status list into an exit(2) value */
 extern int exitstatus(List *status) {
 	Term *term;
-	char *s;
+	const char *s;
 	unsigned long n;
 
 	if (status == NULL)
@@ -46,8 +46,9 @@ extern int exitstatus(List *status) {
 	s = term->str;
 	if (*s == '\0')
 		return 0;
-	n = strtol(s, &s, 0);
-	if (*s != '\0' || n > 255)
+	char *endptr;
+	n = strtol(s, &endptr, 0);
+	if (*endptr != '\0' || n > 255)
 		return 1;
 	return n;
 }

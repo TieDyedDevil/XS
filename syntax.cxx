@@ -1,8 +1,8 @@
 /* syntax.c -- abstract syntax tree re-writing rules ($Revision: 1.1.1.1 $) */
 
 #include "es.hxx"
-#include "input.h"
-#include "syntax.h"
+#include "input.hxx"
+#include "syntax.hxx"
 #include "parse.h"
 
 Tree errornode;

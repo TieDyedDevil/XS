@@ -5,9 +5,9 @@
 
 #include "es.hxx"
 #include "gc.hxx"
+#include "term.hxx"
 
-const char *QUOTED = "QUOTED",
-           *UNQUOTED = "RAW";
+const char *QUOTED = "QUOTED", *UNQUOTED = "RAW";
 
 /* hastilde -- true iff the first character is a ~ and it is not quoted */
 static bool hastilde(const char *s, const char *q) {
@@ -100,7 +100,7 @@ static List *listglob(List *list, char *pattern, char *quote, size_t slashcount)
 		size_t dirlen = strlen(dir);
 		if (dirlen + slashcount + 1 >= prefixlen) {
 			prefixlen = dirlen + slashcount + 1;
-			prefix = erealloc(prefix, prefixlen);
+			prefix = reinterpret_cast<char*>(erealloc(prefix, prefixlen));
 		}
 		memcpy(prefix, dir, dirlen);
 		memset(prefix + dirlen, '/', slashcount);
@@ -126,11 +126,11 @@ static List *glob1(const char *pattern, const char *quote) {
 	assert(quote != QUOTED);
 
 	if ((psize = strlen(pattern) + 1) > dsize || pat == NULL) {
-		pat = erealloc(pat, psize);
-		raw = erealloc(raw, psize);
-		dir = erealloc(dir, psize);
-		qpat = erealloc(qpat, psize);
-		qdir = erealloc(qdir, psize);
+		pat = reinterpret_cast<char*>(erealloc(pat, psize));
+		raw = reinterpret_cast<char*>(erealloc(raw, psize));
+		dir = reinterpret_cast<char*>(erealloc(dir, psize));
+		qpat = reinterpret_cast<char*>(erealloc(qpat, psize));
+		qdir = reinterpret_cast<char*>(erealloc(qdir, psize));
 		dsize = psize;
 		memset(raw, 'r', psize);
 	}
@@ -178,7 +178,7 @@ static List *glob0(List *list, StrList *quote) {
 
 	for (result = NULL, prevp = &result; list != NULL;
 	     list = list->next, quote = quote->next) {
-		char *str;
+		const char *str;
 		if (
 			quote->str == QUOTED
 			|| !haswild(str = getstr(list->term), quote->str)
@@ -186,8 +186,7 @@ static List *glob0(List *list, StrList *quote) {
 			*prevp = list;
 			prevp = &list->next;
 		} else if ((expand1 = glob1(str, quote->str)) == NULL) {
-			/* effectively sets string to "", represents failed glob */
-			*getstr(list->term) = '\0'; 
+			list->term->str = ""; 
 			*prevp = list;
 			prevp = &list->next;			
 		}
@@ -228,7 +227,7 @@ static char *expandhome(char *s, StrList *qp) {
 	if (list != NULL) {
 		if (list->next != NULL)
 			fail("es:expandhome", "%%home returned more than one value");
-		Ref(char *, home, getstr(list->term));
+		Ref(char *, home, gcdup(getstr(list->term)));
 		if (c == '\0') {
 			string = home;
 			quote->str = QUOTED;
@@ -236,13 +235,13 @@ static char *expandhome(char *s, StrList *qp) {
 			size_t pathlen = strlen(string);
 			size_t homelen = strlen(home);
 			size_t len = pathlen - slash + homelen;
-			s = gcalloc(len + 1, &StringTag);
+			s = reinterpret_cast<char*>(gcalloc(len + 1, &StringTag));
 			memcpy(s, home, homelen);
 			memcpy(&s[homelen], &string[slash], pathlen - slash);
 			s[len] = '\0';
 			string = s;
 			if (quote->str == UNQUOTED) {
-				char *q = gcalloc(len + 1, &StringTag);
+				char *q = reinterpret_cast<char*>(gcalloc(len + 1, &StringTag));
 				memset(q, 'q', homelen);
 				memset(&q[homelen], 'r', pathlen - slash);
 				q[len] = '\0';
@@ -250,7 +249,7 @@ static char *expandhome(char *s, StrList *qp) {
 			} else if (strchr(quote->str, 'r') == NULL)
 				quote->str = QUOTED;
 			else {
-				char *q = gcalloc(len + 1, &StringTag);
+				char *q = reinterpret_cast<char*>(gcalloc(len + 1, &StringTag));
 				memset(q, 'q', homelen);
 				memcpy(&q[homelen], &quote->str[slash], pathlen - slash);
 				q[len] = '\0';
@@ -273,7 +272,7 @@ extern List *glob(List *list, StrList *quote) {
 		if (qp->str != QUOTED) {
 			assert(lp->term != NULL);
 			assert(!isclosure(lp->term));
-			Ref(char *, str, getstr(lp->term));
+			Ref(char *,str, gcdup(getstr(lp->term)));
 			assert(qp->str == UNQUOTED || strlen(qp->str) == strlen(str));
 			if (hastilde(str, qp->str)) {
 				Ref(List *, l0, list);
@@ -290,6 +289,7 @@ extern List *glob(List *list, StrList *quote) {
 			}
 			if (haswild(str, qp->str))
 				doglobbing = true;
+			lp->term->str = str;
 			RefEnd(str);
 		}
 

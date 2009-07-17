@@ -60,7 +60,7 @@ PRIM(dot) {
 	if (lp == NULL)
 		fail("$&dot", "usage: %s", usage);
 
-	Ref(char *, file, getstr(lp->term));
+	Ref(const char *, file, getstr(lp->term));
 	lp = lp->next;
 	fd = eopen(file, oOpen);
 	if (fd == -1)
@@ -78,11 +78,10 @@ PRIM(dot) {
 }
 
 PRIM(flatten) {
-	char *sep;
 	if (list == NULL)
 		fail("$&flatten", "usage: %%flatten separator [args ...]");
 	Ref(List *, lp, list);
-	sep = getstr(lp->term);
+	const char *sep = getstr(lp->term);
 	lp = mklist(mkstr(str("%L", lp->next, sep)), NULL);
 	RefReturn(lp);
 }
@@ -94,7 +93,7 @@ PRIM(whatis) {
 	Ref(Term *, term, list->term);
 	if (getclosure(term) == NULL) {
 		List *fn;
-		Ref(char *, prog, getstr(term));
+		Ref(const char *, prog, getstr(term));
 		assert(prog != NULL);
 		fn = varlookup2("fn-", prog, binding);
 		if (fn != NULL)
@@ -114,21 +113,19 @@ PRIM(whatis) {
 }
 
 PRIM(split) {
-	char *sep;
 	if (list == NULL)
 		fail("$&split", "usage: %%split separator [args ...]");
 	Ref(List *, lp, list);
-	sep = getstr(lp->term);
+	const char *sep = getstr(lp->term);
 	lp = fsplit(sep, lp->next, true);
 	RefReturn(lp);
 }
 
 PRIM(fsplit) {
-	char *sep;
 	if (list == NULL)
 		fail("$&fsplit", "usage: %%fsplit separator [args ...]");
 	Ref(List *, lp, list);
-	sep = getstr(lp->term);
+	const char *sep = getstr(lp->term);
 	lp = fsplit(sep, lp->next, false);
 	RefReturn(lp);
 }
@@ -138,7 +135,7 @@ PRIM(var) {
 	if (list == NULL)
 		return NULL;
 	Ref(List *, rest, list->next);
-	Ref(char *, name, getstr(list->term));
+	Ref(const char *, name, getstr(list->term));
 	Ref(List *, defn, varlookup(name, NULL));
 	rest = prim_var(rest, NULL, evalflags);
 	term = mkstr(str("%S = %#L", name, defn, " "));
@@ -160,8 +157,8 @@ PRIM(sethistory) {
 PRIM(parse) {
 	List *result;
 	Tree *tree;
-	Ref(char *, prompt1, NULL);
-	Ref(char *, prompt2, NULL);
+	Ref(const char *, prompt1, NULL);
+	Ref(const char *, prompt2, NULL);
 	Ref(List *, lp, list);
 	if (lp != NULL) {
 		prompt1 = getstr(lp->term);

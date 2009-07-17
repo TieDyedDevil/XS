@@ -1,9 +1,9 @@
 /* parse.y -- grammar for es ($Revision: 1.2 $) */
 
 %{
-#include "es.h"
-#include "input.h"
-#include "syntax.h"
+#include "es.hxx"
+#include "input.hxx"
+#include "syntax.hxx"
 %}
 
 %token	WORD QWORD
@@ -37,8 +37,8 @@
 es	: line end		{ parsetree = $1; YYACCEPT; }
 	| error end		{ yyerrok; parsetree = NULL; YYABORT; }
 
-end	: NL			{ if (!readheredocs(FALSE)) YYABORT; }
-	| ENDFILE		{ if (!readheredocs(TRUE)) YYABORT; }
+end	: NL			{ if (!readheredocs(false)) YYABORT; }
+	| ENDFILE		{ if (!readheredocs(true)) YYABORT; }
 
 line	: cmd			{ $$ = $1; }
 	| cmdsa line		{ $$ = mkseq("%seq", $1, $2); }
@@ -50,7 +50,7 @@ cmdsa	: cmd ';'		{ $$ = $1; }
 	| cmd '&'		{ $$ = prefix("%background", mk(nList, thunkify($1), NULL)); }
 
 cmdsan	: cmdsa			{ $$ = $1; }
-	| cmd NL		{ $$ = $1; if (!readheredocs(FALSE)) YYABORT; }
+	| cmd NL		{ $$ = $1; if (!readheredocs(false)) YYABORT; }
 
 cmd	:		%prec LET		{ $$ = NULL; }
 	| simple				{ $$ = redirect($1); if ($$ == &errornode) YYABORT; }

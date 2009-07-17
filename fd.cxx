@@ -4,12 +4,12 @@
 
 
 /* mvfd -- duplicate a fd and close the old */
-extern void mvfd(int old, int new) {
-	if (old != new) {
-		int fd = dup2(old, new);
+extern void mvfd(int old, int newFd) {
+	if (old != newFd) {
+		int fd = dup2(old, newFd);
 		if (fd == -1)
 			fail("es:mvfd", "dup2: %s", esstrerror(errno));
-		assert(fd == new);
+		assert(fd == newFd);
 		close(old);
 	}
 }
@@ -50,7 +50,7 @@ static int pushdefer(bool parent, int realfd, int userfd) {
 			for (i = 0; i < defcount; i++)
 				unregisterfd(&deftab[i].realfd);
 			defmax += 10;
-			deftab = erealloc(deftab, defmax * sizeof (Defer));
+			deftab = reinterpret_cast<Defer*>(erealloc(deftab, defmax * sizeof (Defer)));
 			for (i = 0; i < defcount; i++)
 				registerfd(&deftab[i].realfd, true);
 		}
@@ -65,10 +65,10 @@ static int pushdefer(bool parent, int realfd, int userfd) {
 	}
 }
 
-extern int defer_mvfd(bool parent, int old, int new) {
+extern int defer_mvfd(bool parent, int old, int newFd) {
 	assert(old >= 0);
-	assert(new >= 0);
-	return pushdefer(parent, old, new);
+	assert(newFd >= 0);
+	return pushdefer(parent, old, newFd);
 }
 
 extern int defer_close(bool parent, int fd) {
@@ -140,7 +140,7 @@ extern void registerfd(int *fdp, bool closeonfork) {
 #endif
 	if (rescount >= resmax) {
 		resmax += 10;
-		reserved = erealloc(reserved, resmax * sizeof (Reserve));
+		reserved = reinterpret_cast<Reserve*>(erealloc(reserved, resmax * sizeof (Reserve)));
 	}
 	reserved[rescount].fdp = fdp;
 	reserved[rescount].closeonfork = closeonfork;

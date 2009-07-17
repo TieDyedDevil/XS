@@ -57,7 +57,7 @@ static unsigned long strhash(const char *str) {
 DefineTag(Dict, static);
 
 typedef struct {
-	char *name;
+	const char *name;
 	void *value;
 } Assoc;
 
@@ -68,8 +68,8 @@ struct Dict {
 
 
 static Dict *mkdict0(int size) {
-	size_t len = offsetof(Dict, table[size]);
-	Dict *dict = gcalloc(len, &DictTag);
+	size_t len = offsetof(Dict, table[0]) + size * sizeof(Assoc);
+	Dict *dict = reinterpret_cast<Dict*>(gcalloc(len, &DictTag));
 	memzero(dict, len);
 	dict->size = size;
 	dict->remain = REMAIN(size);
@@ -77,22 +77,23 @@ static Dict *mkdict0(int size) {
 }
 
 static void *DictCopy(void *op) {
-	Dict *dict = op;
-	size_t len = offsetof(Dict, table[dict->size]);
+	Dict *dict = reinterpret_cast<Dict*>(op);
+	size_t len = offsetof(Dict, table[0]) + dict->size * sizeof(Assoc);
 	void *np = gcalloc(len, &DictTag);
 	memcpy(np, op, len);
 	return np;
 }
 
 static size_t DictScan(void *p) {
-	Dict *dict = p;
+	Dict *dict = reinterpret_cast<Dict*>(p);
 	int i;
 	for (i = 0; i < dict->size; i++) {
 		Assoc *ap = &dict->table[i];
-		ap->name  = forward(ap->name);
-		ap->value = forward(ap->value);
+		ap->name  = reinterpret_cast<const char*>(
+				   forward(const_cast<char*>(ap->name)));
+		ap->value = reinterpret_cast<void*>(forward(ap->value));
 	}
-	return offsetof(Dict, table[dict->size]);
+	return offsetof(Dict, table[0]) + sizeof(Assoc) * dict->size;
 }
 
 
@@ -110,20 +111,25 @@ static Assoc *get(Dict *dict, const char *name) {
 	return NULL;
 }
 
-static Dict *put(Dict *dict, char *name, void *value) {
+static Dict *put(Dict *dict, const char *name, void *value);
+static void putForAll(void *dict, const char *name, void *value) {
+	put(reinterpret_cast<Dict*>(dict), name, value);
+}
+
+static Dict *put(Dict *dict, const char *name, void *value) {
 	unsigned long n, mask;
 	Assoc *ap;
 	assert(get(dict, name) == NULL);
 	assert(value != NULL);
 
 	if (dict->remain <= 1) {
-		Dict *new;
+		Dict *newDict;
 		Ref(Dict *, old, dict);
-		Ref(char *, np, name);
+		Ref(const char *, np, name);
 		Ref(void *, vp, value);
-		new = mkdict0(GROW(old->size));
-		dictforall(old, (void (*)(void *, char *, void *)) put, new);
-		dict = new;
+		newDict = mkdict0(GROW(old->size));
+		dictforall(old, putForAll, newDict);
+		dict = newDict;
 		name = np;
 		value = vp;
 		RefEnd3(vp, np, old);
@@ -175,7 +181,7 @@ extern void *dictget(Dict *dict, const char *name) {
 	return ap == NULL ? NULL : ap->value;
 }
 
-extern Dict *dictput(Dict *dict, char *name, void *value) {
+extern Dict *dictput(Dict *dict, const char *name, void *value) {
 	Assoc *ap = get(dict, name);
 	if (value != NULL)
 		if (ap == NULL)
@@ -187,7 +193,7 @@ extern Dict *dictput(Dict *dict, char *name, void *value) {
 	return dict;
 }
 
-extern void dictforall(Dict *dp, void (*proc)(void *, char *, void *), void *arg) {
+extern void dictforall(Dict *dp, void (*proc)(void *, const char *, void *), void *arg) {
 	int i;
 	Ref(Dict *, dict, dp);
 	Ref(void *, argp, arg);

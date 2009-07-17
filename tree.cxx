@@ -6,6 +6,10 @@
 DefineTag(Tree1, static);
 DefineTag(Tree2, static);
 
+static Tree* tgcalloc(size_t s, Tag *t) {
+	return reinterpret_cast<Tree*>(gcalloc(s,t));
+}
+
 /* mk -- make a new node; used to generate the parse tree */
 extern Tree *mk (NodeKind  t, ...) {
 	va_list ap;
@@ -17,27 +21,27 @@ extern Tree *mk (NodeKind  t, ...) {
 	    default:
 		panic("mk: bad node kind %d", t);
 	    case nWord: case nQword: case nPrim:
-		n = gcalloc(offsetof(Tree, u[1]), &Tree1Tag);
+		n = tgcalloc(offsetof(Tree, u[1]), &Tree1Tag);
 		n->u[0].s = va_arg(ap, char *);
 		break;
 	    case nCall: case nThunk: case nVar:
-		n = gcalloc(offsetof(Tree, u[1]), &Tree1Tag);
+		n = tgcalloc(offsetof(Tree, u[1]), &Tree1Tag);
 		n->u[0].p = va_arg(ap, Tree *);
 		break;
 	    case nAssign:  case nConcat: case nClosure: case nFor:
 	    case nLambda: case nLet: case nList:  case nLocal:
 	    case nVarsub: case nMatch: case nExtract:
-		n = gcalloc(offsetof(Tree, u[2]), &Tree2Tag);
+		n = tgcalloc(offsetof(Tree, u[2]), &Tree2Tag);
 		n->u[0].p = va_arg(ap, Tree *);
 		n->u[1].p = va_arg(ap, Tree *);
 		break;
 	    case nRedir:
-		n = gcalloc(offsetof(Tree, u[2]), NULL);
+		n = tgcalloc(offsetof(Tree, u[2]), NULL);
 		n->u[0].p = va_arg(ap, Tree *);
 		n->u[1].p = va_arg(ap, Tree *);
 		break;
 	    case nPipe:
-		n = gcalloc(offsetof(Tree, u[2]), NULL);
+		n = tgcalloc(offsetof(Tree, u[2]), NULL);
 		n->u[0].i = va_arg(ap, int);
 		n->u[1].i = va_arg(ap, int);
 		break;
@@ -70,28 +74,28 @@ static void *Tree2Copy(void *op) {
 }
 
 static size_t Tree1Scan(void *p) {
-	Tree *n = p;
+	Tree *n = reinterpret_cast<Tree*>(p);
 	switch (n->kind) {
 	    default:
 		panic("Tree1Scan: bad node kind %d", n->kind);
 	    case nPrim: case nWord: case nQword:
-		n->u[0].s = forward(n->u[0].s);
+	    	n->u[0].s = reinterpret_cast<char*>(forward(n->u[0].s));
 		break;
 	    case nCall: case nThunk: case nVar:
-		n->u[0].p = forward(n->u[0].p);
+	    	n->u[0].p = reinterpret_cast<Tree*>(forward(n->u[0].p));
 		break;
 	} 
 	return offsetof(Tree, u[1]);
 }
 
 static size_t Tree2Scan(void *p) {
-	Tree *n = p;
+	Tree *n = reinterpret_cast<Tree*>(p);
 	switch (n->kind) {
 	    case nAssign:  case nConcat: case nClosure: case nFor:
 	    case nLambda: case nLet: case nList:  case nLocal:
 	    case nVarsub: case nMatch: case nExtract:
-		n->u[0].p = forward(n->u[0].p);
-		n->u[1].p = forward(n->u[1].p);
+	    	n->u[0].p = reinterpret_cast<Tree*>(forward(n->u[0].p));
+		n->u[1].p = reinterpret_cast<Tree*>(forward(n->u[1].p));
 		break;
 	    default:
 		panic("Tree2Scan: bad node kind %d", n->kind);

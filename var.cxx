@@ -2,8 +2,8 @@
 
 #include "es.hxx"
 #include "gc.hxx"
-#include "var.h"
-#include "term.h"
+#include "var.hxx"
+#include "term.hxx"
 
 #if PROTECT_ENV
 #define	ENV_FORMAT	"%F=%W"
@@ -56,9 +56,9 @@ static void *VarCopy(void *op) {
 }
 
 static size_t VarScan(void *p) {
-	Var *var = p;
-	var->defn = forward(var->defn);
-	var->env = ((var->flags & var_hasbindings) && rebound) ? NULL : forward(var->env);
+	Var *var = reinterpret_cast<Var*>(p);
+	var->defn = reinterpret_cast<List*>(forward(var->defn));
+	var->env = reinterpret_cast<char*>(((var->flags & var_hasbindings) && rebound) ? NULL : forward(var->env));
 	return sizeof (Var);
 }
 
@@ -129,26 +129,26 @@ extern List *varlookup(const char *name, Binding *bp) {
 		if (streq(name, bp->name))
 			return bp->defn;
 
-	var = dictget(vars, name);
+	var = reinterpret_cast<Var*>(dictget(vars, name));
 	if (var == NULL)
 		return NULL;
 	return var->defn;
 }
 
-extern List *varlookup2(char *name1, char *name2, Binding *bp) {
+extern List *varlookup2(const char *name1, const char *name2, Binding *bp) {
 	Var *var;
 	
 	for (; bp != NULL; bp = bp->next)
 		if (streq2(bp->name, name1, name2))
 			return bp->defn;
 
-	var = dictget2(vars, name1, name2);
+	var = reinterpret_cast<Var*>(dictget2(vars, name1, name2));
 	if (var == NULL)
 		return NULL;
 	return var->defn;
 }
 
-static List *callsettor(char *name, List *defn) {
+static List *callsettor(const char *name, List *defn) {
 	Push p;
 	List *settor;
 
@@ -166,7 +166,7 @@ static List *callsettor(char *name, List *defn) {
 	RefReturn(lp);
 }
 
-extern void vardef(char *name, Binding *binding, List *defn) {
+extern void vardef(const char *name, Binding *binding, List *defn) {
 	Var *var;
 
 	validatevar(name);
@@ -182,7 +182,7 @@ extern void vardef(char *name, Binding *binding, List *defn) {
 	if (isexported(name))
 		isdirty = true;
 
-	var = dictget(vars, name);
+	var = reinterpret_cast<Var*>(dictget(vars, name));
 	if (var != NULL)
 		if (defn != NULL) {
 			var->defn = defn;
@@ -197,7 +197,7 @@ extern void vardef(char *name, Binding *binding, List *defn) {
 	RefRemove(name);
 }
 
-extern void varpush(Push *push, char *name, List *defn) {
+extern void varpush(Push *push, const char *name, List *defn) {
 	Var *var;
 
 	validatevar(name);
@@ -210,7 +210,7 @@ extern void varpush(Push *push, char *name, List *defn) {
 		isdirty = true;
 	defn = callsettor(name, defn);
 
-	var = dictget(vars, push->name);
+	var = reinterpret_cast<Var*>(dictget(vars, push->name));
 	if (var == NULL) {
 		push->defn	= NULL;
 		push->flags	= 0;
@@ -242,7 +242,7 @@ extern void varpop(Push *push) {
 	if (isexported(push->name))
 		isdirty = true;
 	push->defn = callsettor(push->name, push->defn);
-	var = dictget(vars, push->name);
+	var = reinterpret_cast<Var*>(dictget(vars, push->name));
 
 	if (var != NULL)
 		if (push->defn != NULL) {
@@ -262,8 +262,8 @@ extern void varpop(Push *push) {
 	rootlist = rootlist->next->next;
 }
 
-static void mkenv0(void *dummy, char *key, void *value) {
-	Var *var = value;
+static void mkenv0(void *dummy, const char *key, void *value) {
+	Var *var = reinterpret_cast<Var*>(value);
 	assert(gcisblocked());
 	if (
 		   var == NULL
@@ -305,18 +305,18 @@ extern Vector *mkenv(void) {
 }
 
 /* addtolist -- dictforall procedure to create a list */
-extern void addtolist(void *arg, char *key, void *value) {
-	List **listp = arg;
+extern void addtolist(void *arg, const char *key, void *value) {
+	List **listp = reinterpret_cast<List**>(arg);
 	Term *term = mkstr(key);
 	*listp = mklist(term, *listp);
 }
 
-static void listexternal(void *arg, char *key, void *value) {
+static void listexternal(void *arg, const char *key, void *value) {
 	if ((((Var *) value)->flags & var_isinternal) == 0 && !specialvar(key))
 		addtolist(arg, key, value);
 }
 
-static void listinternal(void *arg, char *key, void *value) {
+static void listinternal(void *arg, const char *key, void *value) {
 	if (((Var *) value)->flags & var_isinternal)
 		addtolist(arg, key, value);
 }
@@ -330,7 +330,7 @@ extern List *listvars(bool internal) {
 }
 
 /* hide -- worker function for dictforall to hide initial state */
-static void hide(void *dummy, char *key, void *value) {
+static void hide(void *dummy, const char *key, void *value) {
 	((Var *) value)->flags |= var_isinternal;
 }
 
@@ -378,10 +378,11 @@ static void importvar(char *name0, char *value) {
 					if (list->next != NULL) {
 						const char *str2
 						  = list->next->term->str;
-						char *str
-						  = gcalloc(offset
+						char *str =
+						  reinterpret_cast<char*>(
+						  gcalloc(offset
 							    + strlen(str2) + 1,
-							    &StringTag);
+							  &StringTag));
 						memcpy(str, word, offset - 1);
 						str[offset - 1]
 						  = ENV_SEPARATOR;
@@ -391,8 +392,9 @@ static void importvar(char *name0, char *value) {
 					}
 					break;
 				    case ENV_ESCAPE: {
-					char *str
-					  = gcalloc(strlen(word), &StringTag);
+				    	char *str = reinterpret_cast<char*>(
+						gcalloc(strlen(word),
+							&StringTag));
 					memcpy(str, word, offset);
 					strcpy(str + offset, escape + 2);
 					list->term->str = str;
@@ -410,10 +412,10 @@ static void importvar(char *name0, char *value) {
 
 
 /* initenv -- load variables from the environment */
-extern void initenv(char **envp, bool protected) {
+extern void initenv(char **envp, bool isprotected) {
 	char *envstr;
 	size_t bufsize = 1024;
-	char *buf = ealloc(bufsize);
+	char *buf = reinterpret_cast<char*>(ealloc(bufsize));
 
 	for (; (envstr = *envp) != NULL; envp++) {
 		size_t nlen;
@@ -431,11 +433,11 @@ extern void initenv(char **envp, bool protected) {
 			continue;
 		}
 		for (nlen = eq - envstr; nlen >= bufsize; bufsize *= 2)
-			buf = erealloc(buf, bufsize);
+			buf = reinterpret_cast<char*>(erealloc(buf, bufsize));
 		memcpy(buf, envstr, nlen);
 		buf[nlen] = '\0';
 		name = str(ENV_DECODE, buf);
-		if (!protected
+		if (!isprotected
 		    || (!hasprefix(name, "fn-") && !hasprefix(name, "set-")))
 			importvar(name, eq);
 	}

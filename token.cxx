@@ -2,8 +2,8 @@
  * */
 
 #include "es.hxx"
-#include "input.h"
-#include "syntax.h"
+#include "input.hxx"
+#include "syntax.hxx"
 #include "parse.h"
 
 #define	isodigit(c)	('0' <= (c) && (c) < '8')
@@ -178,7 +178,8 @@ top:	while ((c = GETC()) == ' ' || c == '\t')
 		do {
 			buf[i++] = c;
 			if (i >= bufsize)
-				buf = tokenbuf = erealloc(buf, bufsize *= 2);
+				buf = tokenbuf = reinterpret_cast<char*>(
+					erealloc(buf, bufsize *= 2));
 		} while ((c = GETC()) != EOF && !meta[(unsigned char) c]);
 		UNGETC(c);
 		buf[i] = '\0';
@@ -236,7 +237,8 @@ top:	while ((c = GETC()) == ' ' || c == '\t')
 				return ERROR;
 			}
 			if (i >= bufsize)
-				buf = tokenbuf = erealloc(buf, bufsize *= 2);
+				buf = tokenbuf = reinterpret_cast<char*>(
+					erealloc(buf, bufsize *= 2));
 		}
 		UNGETC(c);
 		buf[i] = '\0';
@@ -432,6 +434,6 @@ extern void inityy(void) {
 	}
 	if (tokenbuf == NULL) {
 		bufsize = BUFSIZE;
-		tokenbuf = ealloc(bufsize);
+		tokenbuf = reinterpret_cast<char*>(ealloc(bufsize));
 	}
 }

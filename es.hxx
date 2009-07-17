@@ -27,7 +27,7 @@ struct List {
 };
 
 struct Binding {
-	char *name;
+	const char *name;
 	List *defn;
 	Binding *next;
 };
@@ -113,9 +113,9 @@ extern void undefer(int ticket);
 
 /* term.c */
 
-extern Term *mkterm(char *str, Closure *closure);
+extern Term *mkterm(const char *str, Closure *closure);
 extern Term *mkstr(const char *str);
-extern char *getstr(Term *term);
+extern const char *getstr(Term *term);
 extern Closure *getclosure(Term *term);
 extern Term *termcat(Term *t1, Term *t2);
 extern bool termeq(Term *term, const char *s);
@@ -143,14 +143,14 @@ extern Tree *mk(NodeKind , ...);
 
 extern Closure *mkclosure(Tree *tree, Binding *binding);
 extern Closure *extractbindings(Tree *tree);
-extern Binding *mkbinding(char *name, List *defn, Binding *next);
+extern Binding *mkbinding(const char *name, List *defn, Binding *next);
 extern Binding *reversebindings(Binding *binding);
 
 
 /* eval.c */
 
 extern Binding *bindargs(Tree *params, List *args, Binding *binding);
-extern List *forkexec(char *file, List *list, bool inchild);
+extern List *forkexec(const char *file, List *list, bool inchild);
 extern List *walk(Tree *tree, Binding *binding, int flags);
 extern List *eval(List *list, Binding *binding, int flags);
 extern List *eval1(Term *term, int flags);
@@ -173,7 +173,7 @@ extern List *glom2(Tree *tree, Binding *binding, StrList **quotep);
 
 /* glob.c */
 
-const char *QUOTED, *UNQUOTED;
+extern const char *QUOTED, *UNQUOTED;
 
 extern List *glob(List *list, StrList *quote);
 extern bool haswild(const char *pattern, const char *quoting);
@@ -195,16 +195,16 @@ extern void initenv(char **envp, bool isprotected);
 extern void hidevariables(void);
 extern void validatevar(const char *var);
 extern List *varlookup(const char *name, Binding *binding);
-extern List *varlookup2(char *name1, char *name2, Binding *binding);
-extern void vardef(char *, Binding *, List *);
+extern List *varlookup2(const char *name1, const char *name2, Binding *binding);
+extern void vardef(const char *, Binding *, List *);
 extern Vector *mkenv(void);
 extern void setnoexport(List *list);
-extern void addtolist(void *arg, char *key, void *value);
+extern void addtolist(void *arg, const char *key, void *value);
 extern List *listvars(bool internal);
 
 typedef struct Push Push;
 extern Push *pushlist;
-extern void varpush(Push *, char *, List *);
+extern void varpush(Push *, const char *, List *);
 extern void varpop(Push *);
 
 
@@ -219,7 +219,7 @@ extern void printstatus(int pid, int status);
 
 /* access.c */
 
-extern char *checkexecutable(char *file);
+extern char *checkexecutable(const char *file);
 
 
 /* proc.c */
@@ -234,9 +234,9 @@ extern int ewait(int pid, bool interruptible, void *rusage);
 
 typedef struct Dict Dict;
 extern Dict *mkdict(void);
-extern void dictforall(Dict *dict, void (*proc)(void *, char *, void *), void *arg);
+extern void dictforall(Dict *dict, void (*proc)(void *, const char *, void *), void *arg);
 extern void *dictget(Dict *dict, const char *name);
-extern Dict *dictput(Dict *dict, char *name, void *value);
+extern Dict *dictput(Dict *dict, const char *name, void *value);
 extern void *dictget2(Dict *dict, const char *name1, const char *name2);
 
 
@@ -276,16 +276,16 @@ extern void *erealloc(void *p, size_t n);
 extern void efree(void *p);
 extern void ewrite(int fd, const char *s, size_t n);
 extern long eread(int fd, char *buf, size_t n);
-extern bool isabsolute(char *path);
+extern bool isabsolute(const char *path);
 extern bool streq2(const char *s, const char *t1, const char *t2);
 
 
 /* input.c */
 
-extern char *prompt, *prompt2;
-extern Tree *parse(char *esprompt1, char *esprompt2);
+extern const char *prompt, *prompt2;
+extern Tree *parse(const char *esprompt1, const char *esprompt2);
 extern Tree *parsestring(const char *str);
-extern void sethistory(char *file);
+extern void sethistory(const char *file);
 extern bool isinteractive(void);
 extern void initinput(void);
 extern void resetparser(void);
@@ -322,7 +322,7 @@ extern void initprims(void);
 /* split.c */
 
 extern void startsplit(const char *sep, bool coalesce);
-extern void splitstring(char *in, size_t len, bool endword);
+extern void splitstring(const char *in, size_t len, bool endword);
 extern List *endsplit(void);
 extern List *fsplit(const char *sep, List *list, bool coalesce);
 
@@ -354,8 +354,8 @@ extern void unblocksignals(void);
 
 /* open.c */
 
-typedef enum { oOpen, oCreate, oAppend, oReadWrite, oReadCreate, oReadAppend } OpenKind;
-extern int eopen(char *name, OpenKind k);
+enum OpenKind { oOpen, oCreate, oAppend, oReadWrite, oReadCreate, oReadAppend };
+extern int eopen(const char *name, OpenKind k);
 
 
 /* version.c */
@@ -366,7 +366,7 @@ extern const char * const version;
 /* gc.c -- see gc.hxx for more */
 
 typedef struct Tag Tag;
-#define	gcnew(type)	((type *) gcalloc(sizeof (type), &(CONCAT(type,Tag))))
+#define	gcnew(type)	(reinterpret_cast<type *>(gcalloc(sizeof (type), &(CONCAT(type,Tag)))))
 
 extern void *gcalloc(size_t n, Tag *t);		/* allocate n with collection tag t */
 extern char *gcdup(const char *s);		/* copy a 0-terminated string into gc space */
@@ -450,7 +450,7 @@ extern void globalroot(void *addr);
 
 struct Push {
 	Push *next;
-	char *name;
+	const char *name;
 	List *defn;
 	int flags;
 	Root nameroot, defnroot;

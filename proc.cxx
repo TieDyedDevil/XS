@@ -33,7 +33,7 @@ extern Proc *mkproc(int pid, bool background) {
 			break;
 		}
 	if (proc == NULL) {
-		proc = ealloc(sizeof (Proc));
+		proc = reinterpret_cast<Proc*>(ealloc(sizeof (Proc)));
 		proc->next = proclist;
 	}
 	proc->pid = pid;

@@ -153,7 +153,7 @@ extern Closure *extractbindings(Tree *tree0) {
 
 DefineTag(Binding, static);
 
-extern Binding *mkbinding(char *name, List *defn, Binding *next) {
+extern Binding *mkbinding(const char *name, List *defn, Binding *next) {
 	assert(next == NULL || next->name != NULL);
 	validatevar(name);
 	gcdisable();
@@ -188,7 +188,10 @@ static void *BindingCopy(void *op) {
 
 static size_t BindingScan(void *p) {
 	Binding *binding = reinterpret_cast<Binding*>(p);
-	binding->name = reinterpret_cast<char*>(forward(binding->name));
+	/* const_cast needed because forward doesn't know that
+	   what it returns will be kept const */
+	binding->name = reinterpret_cast<const char*>(
+			    forward(const_cast<char*>(binding->name)));
 	binding->defn = reinterpret_cast<List*>(forward(binding->defn));
 	binding->next = reinterpret_cast<Binding*>(forward(binding->next));
 	return sizeof (Binding);

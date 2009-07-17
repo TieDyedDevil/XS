@@ -3,8 +3,8 @@
 /* stdgetenv is based on the FreeBSD getenv */
 
 #include "es.hxx"
-#include "term.h"
-#include "input.h"
+#include "term.hxx"
+#include "input.hxx"
 
 
 /*
@@ -26,11 +26,11 @@
  */
 
 Input *input;
-char *prompt, *prompt2;
+const char *prompt, *prompt2;
 
 bool disablehistory = false;
 bool resetterminal = false;
-static char *history;
+static const char *history;
 static int historyfd = -1;
 
 #if READLINE
@@ -121,7 +121,7 @@ writeit:
 }
 
 /* sethistory -- change the file for the history log */
-extern void sethistory(char *file) {
+extern void sethistory(const char *file) {
 	if (historyfd != -1) {
 		close(historyfd);
 		historyfd = -1;
@@ -205,7 +205,7 @@ static int eoffill(Input *in) {
 
 #if READLINE
 /* callreadline -- readline wrapper */
-static char *callreadline(char *prompt) {
+static char *callreadline(const char *prompt) {
 	char *r;
 	if (prompt == NULL)
 		prompt = ""; /* bug fix for readline 2.0 */
@@ -236,7 +236,7 @@ static char * quote_func(char *text, int match_Type, char *quote_pointer) {
 		int hLen = strlen(home);
 		int len = strlen(text) + hLen +1;
 		/* consider gc usage here? */
-		newHome = ealloc(len);
+		newHome = reinterpret_cast<char*>(ealloc(len));
 		strcpy(newHome, home);
 		strcpy(newHome + hLen, pos + 1);
 		text = newHome;
@@ -250,7 +250,7 @@ static inline char * basename(char *str) {
 	return rindex(str, '/') + 1;
 }
 
-static char ** command_completion(char *text, int start, int end) {
+static char ** command_completion(const char *text, int start, int end) {
 	if (start != 0) return NULL; /* Only for first word on line */	
 
 	char **results = NULL;
@@ -265,12 +265,12 @@ static char ** command_completion(char *text, int start, int end) {
 	     paths = paths->next)
 	{
 		int l_path = strlen(paths->term->str);
-		char *path = ealloc(l_path + 2);
+		char *path = reinterpret_cast<char*>(ealloc(l_path + 2));
 		strcpy(path, paths->term->str);
 		path[l_path] = '/';
 		path[l_path + 1] = '\0';
 	
-		char * glob_string = malloc(sizeof(char) * (end - start + 2));
+		char * glob_string = reinterpret_cast<char*>(malloc(sizeof(char) * (end - start + 2)));
 		memcpy(glob_string, text, (end - start) * sizeof(char));
 		*(glob_string + end - start) = '*';
 		*(glob_string + end - start + 1) = '\0';	
@@ -282,7 +282,7 @@ static char ** command_completion(char *text, int start, int end) {
 		if (l == 0) continue;
 		
 		results_size += l;
-		results = erealloc(results, results_size * sizeof(char*));
+		results = reinterpret_cast<char**>(erealloc(results, results_size * sizeof(char*)));
 		for (List *i = glob_result; i != NULL; i = i->next, ++result_p) {
 			/* Can't directly use gc_string, because readline
 			 * needs to free() the result 
@@ -392,7 +392,7 @@ static int fdfill(Input *in) {
 				while (in->buflen < (unsigned) nread)
 					in->buflen *= 2;
 				efree(in->bufbegin);
-				in->bufbegin = erealloc(in->bufbegin, in->buflen);
+				in->bufbegin = reinterpret_cast<unsigned char*>(erealloc(in->bufbegin, in->buflen));
 			}
 			memcpy(in->bufbegin, rlinebuf, nread - 1);
 			in->bufbegin[nread - 1] = '\n';
@@ -428,7 +428,7 @@ static int fdfill(Input *in) {
  */
 
 /* parse -- call yyparse(), but disable garbage collection and catch errors */
-extern Tree *parse(char *pr1, char *pr2) {
+extern Tree *parse(const char *pr1, const char *pr2) {
 	int result;
 	assert(error == NULL);
 
@@ -547,7 +547,7 @@ extern List *runfd(int fd, const char *name, int flags) {
 	in.fd = fd;
 	registerfd(&in.fd, true);
 	in.buflen = BUFSIZE;
-	in.bufbegin = in.buf = ealloc(in.buflen);
+	in.bufbegin = in.buf = reinterpret_cast<unsigned char*>(ealloc(in.buflen));
 	in.bufend = in.bufbegin;
 	in.name = (name == NULL) ? str("fd %d", fd) : name;
 
@@ -583,7 +583,7 @@ extern List *runstring(const char *str, const char *name, int flags) {
 	in.name = (name == NULL) ? str : name;
 	in.fill = stringfill;
 	in.buflen = strlen(str);
-	buf = ealloc(in.buflen + 1);
+	buf = reinterpret_cast<unsigned char*>(ealloc(in.buflen + 1));
 	memcpy(buf, str, in.buflen);
 	in.bufbegin = in.buf = buf;
 	in.bufend = in.buf + in.buflen;
@@ -635,7 +635,7 @@ extern Tree *parsestring(const char *str) {
 	in.name = str;
 	in.fill = stringfill;
 	in.buflen = strlen(str);
-	buf = ealloc(in.buflen + 1);
+	buf = reinterpret_cast<unsigned char*>(ealloc(in.buflen + 1));
 	memcpy(buf, str, in.buflen);
 	in.bufbegin = in.buf = buf;
 	in.bufend = in.buf + in.buflen;

@@ -36,7 +36,7 @@ static const char *qcat(const char *q1, const char *q2, Term *t1, Term *t2) {
 
 	len1 = (q1 == QUOTED || q1 == UNQUOTED) ? strlen(getstr(t1)) : strlen(q1);
 	len2 = (q2 == QUOTED || q2 == UNQUOTED) ? strlen(getstr(t2)) : strlen(q2);
-	result = s = gcalloc(len1 + len2 + 1, &StringTag);
+	result = s = reinterpret_cast<char*>(gcalloc(len1 + len2 + 1, &StringTag));
 
 	if (q1 == QUOTED)
 		memset(s, 'q', len1);
@@ -104,7 +104,7 @@ static List *subscript(List *list, List *subs) {
 	while (subs != NULL) {
 		lo = atoi(getstr(subs->term));
 		if (lo < 1) {
-			Ref(char *, bad, getstr(subs->term));
+			Ref(const char *, bad, getstr(subs->term));
 			gcenable();
 			fail("es:subscript", "bad subscript: %s", bad);
 			RefEnd(bad);
@@ -118,7 +118,7 @@ static List *subscript(List *list, List *subs) {
 			else {
 				hi = atoi(getstr(subs->term));
 				if (hi < 1) {
-					Ref(char *, bad, getstr(subs->term));
+					Ref(const char *, bad, getstr(subs->term));
 					gcenable();
 					fail("es:subscript", "bad subscript: %s", bad);
 					RefEnd(bad);
@@ -201,7 +201,7 @@ static List *glom1(Tree *tree, Binding *binding) {
 				fail("es:glom", "null variable name in subscript");
 			if (list->next != NULL)
 				fail("es:glom", "multi-word variable name in subscript");
-			Ref(char *, name, getstr(list->term));
+			Ref(const char *, name, getstr(list->term));
 			list = varlookup(name, bp);
 			Ref(List *, sub, glom1(tp->u[1].p, bp));
 			tp = NULL;

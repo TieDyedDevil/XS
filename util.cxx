@@ -36,7 +36,7 @@ extern void uerror(char *s) {
 }
 
 /* isabsolute -- test to see if pathname begins with "/", "./", or "../" */
-extern bool isabsolute(char *path) {
+extern bool isabsolute(const char *path) {
 	return path[0] == '/'
 	       || (path[0] == '.' && (path[1] == '/'
 				      || (path[1] == '.' && path[2] == '/')));
@@ -148,7 +148,7 @@ static int mode_masks[] = {
 	O_RDWR   | O_CREAT | O_APPEND,	/* oReadAppend */
 };
 
-extern int eopen(char *name, OpenKind k) {
+extern int eopen(const char *name, OpenKind k) {
 	assert((unsigned) k < arraysize(mode_masks));
 	return open(name, mode_masks[k], 0666);
 }

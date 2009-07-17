@@ -2,13 +2,13 @@
 
 #include "es.hxx"
 #include "gc.hxx"
-#include "term.h"
+#include "term.hxx"
 
 DefineTag(Term, static);
 
-extern Term *mkterm(char *str, Closure *closure) {
+extern Term *mkterm(const char *str, Closure *closure) {
 	gcdisable();
-	Ref(Term *, term, gcnew(Term));
+	Ref(Term *, term, reinterpret_cast<Term*>(gcnew(Term)));
 	term->str = str;
 	term->closure = closure;
 	gcenable();
@@ -27,7 +27,7 @@ extern Term *mkstr(const char *str) {
 
 extern Closure *getclosure(Term *term) {
 	if (term->closure == NULL) {
-		char *s = term->str;
+		const char *s = term->str;
 		assert(s != NULL);
 		if (
 			((*s == '{' || *s == '@') && s[strlen(s) - 1] == '}')
@@ -49,8 +49,8 @@ extern Closure *getclosure(Term *term) {
 	return term->closure;
 }
 
-extern char *getstr(Term *term) {
-	char *s = term->str;
+extern const char *getstr(Term *term) {
+	const char *s = term->str;
 	Closure *closure = term->closure;
 	assert((s == NULL) != (closure == NULL));
 	if (s != NULL)
@@ -75,8 +75,8 @@ extern Term *termcat(Term *t1, Term *t2) {
 		return t1;
 
 	Ref(Term *, term, mkstr(NULL));
-	Ref(char *, str1, getstr(t1));
-	Ref(char *, str2, getstr(t2));
+	Ref(const char *, str1, getstr(t1));
+	Ref(const char *, str2, getstr(t2));
 	term->str = str("%s%s", str1, str2);
 	RefEnd2(str2, str1);
 	RefReturn(term);
@@ -90,9 +90,9 @@ static void *TermCopy(void *op) {
 }
 
 static size_t TermScan(void *p) {
-	Term *term = p;
-	term->closure = forward(term->closure);
-	term->str = forward(term->str);
+	Term *term = reinterpret_cast<Term*>(p);
+	term->closure = reinterpret_cast<Closure*>(forward(term->closure));
+	term->str = reinterpret_cast<const char*>(forward(const_cast<char*>(term->str)));
 	return sizeof (Term);
 }
 

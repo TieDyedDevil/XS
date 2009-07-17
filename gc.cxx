@@ -22,8 +22,9 @@ inline static size_t space_free(const Space *sp) {
 inline static size_t space_used(const Space *sp) {
 	return sp->current - sp->bot;
 }
-inline static bool in_space(const char *p, Space *sp)	{
-	return sp->bot <= p && p < sp->top;
+inline static bool in_space(const void *p, Space *sp)	{
+	const char *s = reinterpret_cast<const char*>(p);
+	return sp->bot <= s && s < sp->top;
 }
 
 #define	MIN_minspace	10000
@@ -43,10 +44,10 @@ inline static bool in_space(const char *p, Space *sp)	{
 /* globals */
 Root *rootlist;
 int gcblocked = 0;
-Tag StringTag;
+extern Tag StringTag;
 
 /* own variables */
-static Space *new, *old;
+static Space *newSpace, *oldSpace;
 #if GCPROTECT
 static Space *spaces;
 #endif
@@ -221,7 +222,7 @@ static Space *mkspace(Space *space, Space *next) {
 	}
 
 	if (space == NULL) {
-		space = ealloc(sizeof (Space));
+		space = ealloc(sizeof(Space));
 		memzero(space, sizeof (Space));
 	}
 	if (space->bot == NULL) {
@@ -242,9 +243,9 @@ static Space *mkspace(Space *space, Space *next) {
 /* newspace -- create a new ``half'' space */
 static Space *newspace(Space *next) {
 	size_t n = ALIGN(minspace);
-	Space *space = ealloc(sizeof (Space) + n);
-	space->bot = (void *) &space[1];
-	space->top = (void *) (((char *) space->bot) + n);
+	Space *space = reinterpret_cast<Space*>(ealloc(sizeof (Space) + n));
+	space->bot = reinterpret_cast<char *>(&space[1]);
+	space->top = space->bot + n;
 	space->current = space->bot;
 	space->next = next;
 	return space;
@@ -303,8 +304,8 @@ extern void globalroot(void *addr) {
 	for (root = globalrootlist; root != NULL; root = root->next)
 		assert(root->p != addr);
 #endif
-	root = ealloc(sizeof (Root));
-	root->p = addr;
+	root = reinterpret_cast<Root*>(ealloc(sizeof (Root)));
+	root->p = reinterpret_cast<void**>(addr);
 	root->next = globalrootlist;
 	globalrootlist = root;
 }
@@ -327,7 +328,7 @@ extern void *forward(void *p) {
 	Tag *tag;
 	void *np;
 
-	if (!isinspace(old, p)) {
+	if (!isinspace(oldSpace, p)) {
 		VERBOSE(("GC %8ux : <<not in old space>>\n", p));
 		return p;
 	}
@@ -344,7 +345,7 @@ extern void *forward(void *p) {
 		assert(tag->magic == TAGMAGIC);
 		np = (*tag->copy)(p);
 		VERBOSE(("%s	-> %8ux (forwarded)\n", tag->typename, np));
-		TAG(p) = follow_to(np);
+		TAG(p) = follow_to(reinterpret_cast<char*>(np));
 	}
 	return np;
 }
@@ -362,8 +363,8 @@ static void scanroots(Root *rootlist) {
 static void scanspace(void) {
 	Space *sp, *scanned;
 	for (scanned = NULL;;) {
-		Space *front = new;
-		for (sp = new; sp != scanned; sp = sp->next) {
+		Space *front = newSpace;
+		for (sp = newSpace; sp != scanned; sp = sp->next) {
 			assert(sp != NULL);
 			char *scan = sp->bot;
 			while (scan < sp->current) {
@@ -374,7 +375,7 @@ static void scanspace(void) {
 				scan += ALIGN((*tag->scan)(scan));
 			}
 		}
-		if (new == front)
+		if (newSpace == front)
 			break;
 		scanned = front;
 	}
@@ -391,7 +392,7 @@ extern void gcenable(void) {
 	--gcblocked;
 	/* This takes way too much cpu time, should not be caled so often? */
 
-	if (!gcblocked && new->next != NULL)
+	if (!gcblocked && newSpace->next != NULL)
 		gc();
 }
 
@@ -403,7 +404,7 @@ extern void gcdisable(void) {
 
 /* gcreserve -- provoke a collection if there's not a certain amount of space around */
 extern void gcreserve(size_t minfree) {
-	if (space_free(new) < minfree) {
+	if (space_free(newSpace) < minfree) {
 		if (minspace < minfree)
 			minspace = minfree;
 		gc();
@@ -428,31 +429,31 @@ extern void gc(void) {
 #if GCINFO
 		size_t olddata = 0;
 		if (gcinfo)
-			for (space = new; space != NULL; space = space->next)
+			for (space = newSpace; space != NULL; space = space->next)
 				olddata += space_used(space);
 #endif
 
 		if (gcisblocked()) return;
 		gcdisable();
 
-		assert(new != NULL);
-		assert(old == NULL);
-		old = new;
+		assert(newSpace != NULL);
+		assert(oldSpace == NULL);
+		oldSpace = newSpace;
 #if GCPROTECT
-		for (; new->next != NULL; new = new->next)
+		for (; newSpace->next != NULL; newSpace = newSpace->next)
 			;
-		if (++new >= &spaces[NSPACES])
-			new = &spaces[0];
-		new = mkspace(new, NULL);
+		if (++newSpace >= &spaces[NSPACES])
+			newSpace = &spaces[0];
+		newSpace = mkspace(newSpace, NULL);
 #else
-		new = newspace(NULL);
+		newSpace = newspace(NULL);
 #endif
 		VERBOSE(("\nGC collection starting\n"));
 #if GCVERBOSE
-		for (space = old; space != NULL; space = space->next)
+		for (space = oldSpace; space != NULL; space = space->next)
 			VERBOSE(("GC old space = %ux ... %ux\n", space->bot, space->current));
 #endif
-		VERBOSE(("GC new space = %ux ... %ux\n", new->bot, new->top));
+		VERBOSE(("GC new space = %ux ... %ux\n", newSpace->bot, newSpace->top));
 		VERBOSE(("GC scanning root list\n"));
 		scanroots(rootlist);
 		VERBOSE(("GC scanning global root list\n"));
@@ -461,11 +462,11 @@ extern void gc(void) {
 		scanspace();
 		VERBOSE(("GC collection done\n\n"));
 
-		deprecate(old);
-		old = NULL;
+		deprecate(oldSpace);
+		oldSpace = NULL;
 
 		size_t livedata;
-		for (livedata = 0, space = new; space != NULL; space = space->next)
+		for (livedata = 0, space = newSpace; space != NULL; space = space->next)
 			livedata += space_used(space);
 
 #if GCINFO
@@ -482,7 +483,7 @@ extern void gc(void) {
 			minspace /= 2;
 
 		--gcblocked;
-	} while (new->next != NULL);
+	} while (newSpace->next != NULL);
 }
 
 /* initgc -- initialize the garbage collector */
@@ -491,11 +492,11 @@ extern void initgc(void) {
 	initmmu();
 	spaces = ealloc(NSPACES * sizeof (Space));
 	memzero(spaces, NSPACES * sizeof (Space));
-	new = mkspace(&spaces[0], NULL);
+	newSpace = mkspace(&spaces[0], NULL);
 #else
-	new = newspace(NULL);
+	newSpace = newspace(NULL);
 #endif
-	old = NULL;
+	oldSpace = NULL;
 }
 
 
@@ -511,17 +512,17 @@ extern void *gcalloc(size_t nbytes, Tag *tag) {
 #endif
 	assert(tag == NULL || tag->magic == TAGMAGIC);
 	for (;;) {
-		Tag **p = (void *) new->current;
+		Tag **p = reinterpret_cast<Tag **>(newSpace->current);
 		char *q = ((char *) p) + n;
-		if (q <= new->top) {
-			new->current = q;
+		if (q <= newSpace->top) {
+			newSpace->current = q;
 			*p++ = tag;
 			return p;
 		}
 		if (minspace < nbytes)
 			minspace = nbytes + sizeof (Tag *);
 		if (gcblocked)
-			new = newspace(new);
+			newSpace = newspace(newSpace);
 		else
 			gc();
 	}
@@ -539,7 +540,7 @@ extern char *gcndup(const char *s, size_t n) {
 	char *ns;
 
 	gcdisable();
-	ns = gcalloc((n + 1) * sizeof (char), &StringTag);
+	ns = reinterpret_cast<char*>(gcalloc((n + 1) * sizeof (char), &StringTag));
 	memcpy(ns, s, n);
 	ns[n] = '\0';
 	assert(strlen(ns) == n);
@@ -553,15 +554,15 @@ extern char *gcdup(const char *s) {
 	return gcndup(s, strlen(s));
 }
 
-static void *StringCopy(void *op) {
-	size_t n = strlen(op) + 1;
-	char *np = gcalloc(n, &StringTag);
+void *StringCopy(void *op) {
+	size_t n = strlen(reinterpret_cast<const char*>(op)) + 1;
+	char *np = reinterpret_cast<char*>(gcalloc(n, &StringTag));
 	memcpy(np, op, n);
 	return np;
 }
 
-static size_t StringScan(void *p) {
-	return strlen(p) + 1;
+size_t StringScan(void *p) {
+	return strlen(reinterpret_cast<const char*>(p)) + 1;
 }
 
 
@@ -575,7 +576,7 @@ extern Buffer *openbuffer(size_t minsize) {
 	Buffer *buf;
 	if (minsize < 500)
 		minsize = 500;
-	buf = ealloc(offsetof(Buffer, str[minsize]));
+	buf = reinterpret_cast<Buffer*>(ealloc(offsetof(Buffer, str[0]) + minsize));
 	buf->len = minsize;
 	buf->current = 0;
 	return buf;
@@ -583,7 +584,7 @@ extern Buffer *openbuffer(size_t minsize) {
 
 extern Buffer *expandbuffer(Buffer *buf, size_t minsize) {
 	buf->len += (minsize > buf->len) ? minsize : buf->len;
-	buf = erealloc(buf, offsetof(Buffer, str[buf->len]));
+	buf = reinterpret_cast<Buffer*>(erealloc(buf, offsetof(Buffer, str[0]) + buf->len));
 	return buf;
 }
 
@@ -753,7 +754,7 @@ static size_t dump(Tag *t, void *p) {
 
 extern void memdump(void) {
 	Space *sp;
-	for (sp = new; sp != NULL; sp = sp->next) {
+	for (sp = newSpace; sp != NULL; sp = sp->next) {
 		char *scan = sp->bot;
 		while (scan < sp->current) {
 			Tag *tag = *(Tag **) scan;

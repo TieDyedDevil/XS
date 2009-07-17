@@ -4,8 +4,8 @@
 
 unsigned long evaldepth = 0, maxevaldepth = MAXmaxevaldepth;
 
-static void failexec(char *file, List *args) NORETURN;
-static void failexec(char *file, List *args) {
+static void failexec(const char *file, List *args) NORETURN;
+static void failexec(const char *file, List *args) {
 	List *fn;
 	assert(gcisblocked());
 	fn = varlookup("fn-%exec-failure", NULL);
@@ -24,7 +24,7 @@ static void failexec(char *file, List *args) {
 }
 
 /* forkexec -- fork (if necessary) and exec */
-extern List *forkexec(char *file, List *list, bool inchild) {
+extern List *forkexec(const char *file, List *list, bool inchild) {
 	gcdisable();
 	Vector *env = mkenv();
 	int pid = efork(!inchild, false);
@@ -60,7 +60,7 @@ static List *assign(Tree *varform, Tree *valueform0, Binding *binding0) {
 
 	for (; vars != NULL; vars = vars->next) {
 		List *value;
-		Ref(char *, name, getstr(vars->term));
+		Ref(const char *, name, getstr(vars->term));
 		if (values == NULL)
 			value = NULL;
 		else if (vars->next == NULL || values->next == NULL) {
@@ -100,7 +100,7 @@ static Binding *letbindings(Tree *defn0, Binding *outer0,
 
 		for (; vars != NULL; vars = vars->next) {
 			List *value;
-			Ref(char *, name, getstr(vars->term));
+			Ref(const char *, name, getstr(vars->term));
 			if (values == NULL)
 				value = NULL;
 			else if (vars->next == NULL || values->next == NULL) {
@@ -179,7 +179,7 @@ static List *forloop(Tree *defn0, Tree *body0,
 		if (vars == NULL)
 			fail("es:for", "null variable name");
 		for (; vars != NULL; vars = vars->next) {
-			char *var = getstr(vars->term);
+			const char *var = getstr(vars->term);
 			looping = mkbinding(var, list, looping);
 			list = &MULTIPLE;
 		}
@@ -364,7 +364,7 @@ extern List *eval(List *list0, Binding *binding0, int flags) {
 
 	Ref(List *, list, list0);
 	Ref(Binding *, binding, binding0);
-	Ref(char *, funcname, NULL);
+	Ref(const char *, funcname, NULL);
 
 restart:
 	if (list == NULL) {
@@ -426,7 +426,7 @@ restart:
 
 	/* the logic here is duplicated in $&whatis */
 
-	Ref(char *, name, getstr(list->term));
+	Ref(const char *, name, getstr(list->term));
 	fn = varlookup2("fn-", name, binding);
 	if (fn != NULL) {
 		funcname = name;
@@ -435,7 +435,7 @@ restart:
 		goto restart;
 	}
 	if (isabsolute(name)) {
-		char *error = checkexecutable(name);
+		const char *error = checkexecutable(name);
 		if (error != NULL)
 			fail("$&whatis", "%s: %s", name, error);
 		list = forkexec(name, list, flags & eval_inchild);
@@ -447,7 +447,7 @@ restart:
 	fn = pathsearch(list->term);
 	if (fn != NULL && fn->next == NULL
 	    && (cp = getclosure(fn->term)) == NULL) {
-		char *name = getstr(fn->term);
+		const char *name = getstr(fn->term);
 		list = forkexec(name, list, flags & eval_inchild);
 		goto done;
 	}

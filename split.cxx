@@ -36,7 +36,7 @@ extern void startsplit(const char *sep, bool coalescef) {
 	}
 }
 
-extern void splitstring(char *in, size_t len, bool endword) {
+extern void splitstring(const char *in, size_t len, bool endword) {
 	gcdisable(); /* char *s can't be made gc-safe */
 	Buffer *buf = buffer;
 	unsigned char *s = (unsigned char *) in, *inend = s + len;
@@ -95,7 +95,7 @@ extern List *fsplit(const char *sep, List *list, bool coalesce) {
 	for (; lp != NULL; lp = lp->next) {
 		/* No need for Ref because gc cannot run
 		 * between these two statements         */
-		char *s = getstr(lp->term);
+		const char *s = getstr(lp->term);
 		splitstring(s, strlen(s), true);
 	}
 	RefEnd(lp);
