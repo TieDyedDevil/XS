@@ -1,8 +1,8 @@
 #! /bin/sh
 # mksignal -- generate es's internal signal table from signal.h ($Revision: 1.1.1.1 $)
 
-echo '#include "es.h"'
-echo '#include "sigmsgs.h"'
+echo '#include "es.hxx"'
+echo '#include "sigmsgs.hxx"'
 echo
 echo 'const Sigmsgs signals[] = {'
 
