@@ -12,29 +12,29 @@ check_PROGRAMS = ctest
 TESTS = ctest 
 
 VPATH = $(srcdir) 
-HFILES	= config.h es.h gc.h input.h prim.h print.h sigmsgs.h \
-	  stdenv.h syntax.h term.h var.h
-COMMON_FILES	= access.c closure.c conv.c dict.c eval.c except.c fd.c gc.c glob.c \
-	  glom.c input.c heredoc.c list.c match.c opt.c \
-	  prim-ctl.c prim-etc.c prim-io.c prim-sys.c prim.c print.c proc.c \
-	  sigmsgs.c signal.c split.c syntax.c status.c str.c term.c \
-	  token.c tree.c util.c var.c vec.c version.c parse.y
+HFILES	= config.hxx es.hxx gc.hxx input.hxx prim.hxx print.hxx sigmsgs.hxx \
+	  stdenv.hxx syntax.hxx term.hxx var.hxx
+COMMON_FILES	= access.cxx closure.cxx conv.cxx dict.cxx eval.cxx except.cxx fd.cxx gc.cxx glob.cxx \
+	  glom.cxx input.cxx heredoc.cxx list.cxx match.cxx opt.cxx \
+	  prim-ctl.cxx prim-etc.cxx prim-io.cxx prim-sys.cxx prim.cxx print.cxx proc.cxx \
+	  sigmsgs.cxx signal.cxx split.cxx syntax.cxx status.cxx str.cxx term.cxx \
+	  token.cxx tree.cxx util.cxx var.cxx vec.cxx version.cxx parse.y
 OTHER	= Makefile parse.y mksignal
-GEN	= parse.h parse.c parse.output sigmsgs.c initial.c
+GEN	= parse.h parse.cxx parse.output sigmsgs.cxx initial.cxx
 
 BUILT_SOURCES = parse.h
-xs_SOURCES = $(COMMON_FILES) initial.c main.c
-ctest_SOURCES = tests/test_print.c tests/test_util.c tests/test_glob.c tests/all_tests.c $(COMMON_FILES)
+xs_SOURCES = $(COMMON_FILES) initial.cxx main.cxx
+ctest_SOURCES = tests/test_print.cxx tests/test_util.cxx tests/test_glob.cxx tests/all_tests.cxx $(COMMON_FILES)
 ctest_LDADD = -lcgreen -lm
 
-xsdump_SOURCES = $(COMMON_FILES) dump.c main.c
+xsdump_SOURCES = $(COMMON_FILES) dump.cxx main.cxx
 
 
 MANIFEST:
 	find . -type f | sed s/..// > MANIFEST
 
 ctags	:
-	etags --declarations /usr/include/stdlib.h /usr/include/stdio.h /usr/include/unistd.h /usr/include/signal.h  /usr/include/errno.h /usr/include/dirent.h /usr/include/sys/wait.h /usr/include/sys/stat.h *.c *.h
+	etags --declarations /usr/include/stdlib.h /usr/include/stdio.h /usr/include/unistd.h /usr/include/signal.h  /usr/include/errno.h /usr/include/dirent.h /usr/include/sys/wait.h /usr/include/sys/stat.h *.cxx *.hxx
 
 mostlyclean-local: 
 	rm -f $(GEN)
@@ -45,8 +45,8 @@ trip	: xs $(srcdir)/trip.xs
 src	:
 	@echo ${OTHER} ${CFILES} ${HFILES}
 
-initial.c : xsdump $(srcdir)/initial.xs
-	./xsdump < $(srcdir)/initial.xs > initial.c || (rm initial.c; false)
+initial.cxx : xsdump $(srcdir)/initial.xs
+	./xsdump < $(srcdir)/initial.xs > initial.cxx || (rm initial.cxx; false)
 
-sigmsgs.c : mksignal $(SIGFILES)
-	sh $(srcdir)/mksignal $(SIGFILES) > sigmsgs.c
+sigmsgs.cxx : mksignal $(SIGFILES)
+	sh $(srcdir)/mksignal $(SIGFILES) > sigmsgs.cxx
