@@ -8,8 +8,8 @@ dist_man_MANS = xs.1
 
 bin_PROGRAMS = xs
 noinst_PROGRAMS = xsdump
-check_PROGRAMS = ctest 
-TESTS = ctest 
+#check_PROGRAMS = ctest 
+#TESTS = ctest 
 
 VPATH = $(srcdir) 
 HFILES	= config.hxx es.hxx gc.hxx input.hxx prim.hxx print.hxx sigmsgs.hxx \
@@ -24,8 +24,8 @@ GEN	= parse.h parse.cxx parse.output sigmsgs.cxx initial.cxx
 
 BUILT_SOURCES = parse.h
 xs_SOURCES = $(COMMON_FILES) initial.cxx main.cxx
-ctest_SOURCES = tests/test_print.c tests/test_util.c tests/test_glob.c tests/all_tests.c $(COMMON_FILES)
-ctest_LDADD = -lcgreen -lm
+#ctest_SOURCES = tests/test_print.cxx tests/test_util.cxx tests/all_tests.cxx $(COMMON_FILES)
+#ctest_LDADD = -lcgreen -lm
 
 xsdump_SOURCES = $(COMMON_FILES) dump.cxx main.cxx
 
