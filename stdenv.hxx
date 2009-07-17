@@ -148,7 +148,7 @@ typedef GETGROUPS_T gidset_t;
 		if (!(expr)) { \
 			eprint("%s:%d: assertion failed (%s)\n", \
 				__FILE__, __LINE__, STRING(expr)); \
-			abort(); \
+			abort(); /* Use this for better backtraces: if (*((char*)NULL)) errno = 0*/ \
 		} \
 	)
 #else
