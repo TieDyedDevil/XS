@@ -136,13 +136,13 @@ static int pipefork(int p[2], int *extra) {
 	if (pipe(p) == -1)
 		fail(caller, "pipe: %s", esstrerror(errno));
 
-	registerfd(&p[0], FALSE);
-	registerfd(&p[1], FALSE);
+	registerfd(&p[0], false);
+	registerfd(&p[1], false);
 	if (extra != NULL)
-		registerfd(extra, FALSE);
+		registerfd(extra, false);
 
 	ExceptionHandler
-		pid = efork(TRUE, FALSE);
+		pid = efork(true, false);
 	CatchExceptionIf (pid != 0, e)
 		unregisterfd(&p[0]);
 		unregisterfd(&p[1]);
@@ -206,7 +206,7 @@ PRIM(pipe) {
 	for (;; list = list->next) {
 		int p[2], pid;
 		
-		pid = (list->next == NULL) ? efork(TRUE, FALSE) : pipefork(p, &inpipe);
+		pid = (list->next == NULL) ? efork(true, false) : pipefork(p, &inpipe);
 
 		if (pid == 0) {		/* child */
 			if (inpipe != -1) {
@@ -332,11 +332,11 @@ PRIM(writeto) {
 static List *bqinput(const char *sep, int fd) {
 	long n;
 	char in[BUFSIZE];
-	startsplit(sep, TRUE);
+	startsplit(sep, true);
 
 restart:
 	while ((n = eread(fd, in, sizeof in)) > 0)
-		splitstring(in, n, FALSE);
+		splitstring(in, n, false);
 	SIGCHK();
 	if (n == -1) {
 		if (errno == EINTR)

@@ -36,22 +36,22 @@ extern void uerror(char *s) {
 }
 
 /* isabsolute -- test to see if pathname begins with "/", "./", or "../" */
-extern Boolean isabsolute(char *path) {
+extern bool isabsolute(char *path) {
 	return path[0] == '/'
 	       || (path[0] == '.' && (path[1] == '/'
 				      || (path[1] == '.' && path[2] == '/')));
 }
 
 /* streq2 -- is a string equal to the concatenation of two strings? */
-extern Boolean streq2(const char *s, const char *t1, const char *t2) {
+extern bool streq2(const char *s, const char *t1, const char *t2) {
 	int c;
 	assert(s != NULL && t1 != NULL && t2 != NULL);
 	while ((c = *t1++) != '\0')
 		if (c != *s++)
-			return FALSE;
+			return false;
 	while ((c = *t2++) != '\0')
 		if (c != *s++)
-			return FALSE;
+			return false;
 	return *s == '\0';
 }
 
@@ -97,33 +97,33 @@ extern void ewrite(int fd, const char *buf, size_t n) {
 	volatile long i, remain;
 	const char *volatile bufp = buf;
 	for (i = 0, remain = n; remain > 0; bufp += i, remain -= i) {
-		interrupted = FALSE;
+		interrupted = false;
 		if (!setjmp(slowlabel)) {
-			slow = TRUE;
+			slow = true;
 			if (interrupted)
 				break;
 			else if ((i = write(fd, bufp, remain)) <= 0)
 				break; /* abort silently on errors in write() */
 		} else
 			break;
-		slow = FALSE;
+		slow = false;
 	}
-	slow = FALSE;
+	slow = false;
 	SIGCHK();
 }
 
 extern long eread(int fd, char *buf, size_t n) {
 	long r;
-	interrupted = FALSE;
+	interrupted = false;
 	if (!setjmp(slowlabel)) {
-		slow = TRUE;
+		slow = true;
 		if (!interrupted)
 			r = read(fd, buf, n);
 		else
 			r = -2;
 	} else
 		r = -2;
-	slow = FALSE;
+	slow = false;
 	if (r == -2) {
 		errno = EINTR;
 		r = -1;

@@ -119,7 +119,7 @@ PRIM(split) {
 		fail("$&split", "usage: %%split separator [args ...]");
 	Ref(List *, lp, list);
 	sep = getstr(lp->term);
-	lp = fsplit(sep, lp->next, TRUE);
+	lp = fsplit(sep, lp->next, true);
 	RefReturn(lp);
 }
 
@@ -129,7 +129,7 @@ PRIM(fsplit) {
 		fail("$&fsplit", "usage: %%fsplit separator [args ...]");
 	Ref(List *, lp, list);
 	sep = getstr(lp->term);
-	lp = fsplit(sep, lp->next, FALSE);
+	lp = fsplit(sep, lp->next, false);
 	RefReturn(lp);
 }
 
@@ -234,11 +234,11 @@ PRIM(home) {
 }
 
 PRIM(vars) {
-	return listvars(FALSE);
+	return listvars(false);
 }
 
 PRIM(internals) {
-	return listvars(TRUE);
+	return listvars(true);
 }
 
 PRIM(isinteractive) {
@@ -280,7 +280,7 @@ PRIM(setmaxevaldepth) {
 
 #if READLINE
 PRIM(resetterminal) {
-	resetterminal = TRUE;
+	resetterminal = true;
 	return ltrue;
 }
 #endif

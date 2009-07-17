@@ -5,7 +5,7 @@
 
 
 /* %L -- print a list */
-static Boolean Lconv(Format *f) {
+static bool Lconv(Format *f) {
 	const char *fmt = (f->flags & FMT_altform) ? "%S%s" : "%s%s";
 	List *lp = va_arg(f->args, List *);
 	char *sep = va_arg(f->args, char *);
@@ -15,7 +15,7 @@ static Boolean Lconv(Format *f) {
 		next = lp->next;
 		fmtprint(f, fmt, getstr(lp->term), next == NULL ? "" : sep);
 	}
-	return FALSE;
+	return false;
 }
 
 /* treecount -- count the number of nodes in a flattened tree list */
@@ -43,9 +43,9 @@ static void binding(Format *f, char *keyword, Tree *tree) {
 }
 
 /* %T -- print a tree */
-static Boolean Tconv(Format *f) {
+static bool Tconv(Format *f) {
 	Tree *n = va_arg(f->args, Tree *);
-	Boolean group = (f->flags & FMT_altform) != 0;
+	bool group = (f->flags & FMT_altform) != 0;
 
 
 #define	tailcall(tree, altform) \
@@ -55,72 +55,72 @@ top:
 	if (n == NULL) {
 		if (group)
 			fmtcat(f, "()");
-		return FALSE;
+		return false;
 	}
 
 	switch (n->kind) {
 
 	case nWord:
 		fmtprint(f, "%s", n->u[0].s);
-		return FALSE;
+		return false;
 
 	case nQword:
 		fmtprint(f, "%#S", n->u[0].s);
-		return FALSE;
+		return false;
 
 	case nPrim:
 		fmtprint(f, "$&%s", n->u[0].s);
-		return FALSE;
+		return false;
 
 	case nAssign:
 		fmtprint(f, "%#T:=", n->u[0].p);
-		tailcall(n->u[1].p, FALSE);
+		tailcall(n->u[1].p, false);
 
 	case nConcat:
 		fmtprint(f, "%#T^", n->u[0].p);
-		tailcall(n->u[1].p, TRUE);
+		tailcall(n->u[1].p, true);
 
 	case nMatch:
 		fmtprint(f, "~ %#T ", n->u[0].p);
-		tailcall(n->u[1].p, FALSE);
+		tailcall(n->u[1].p, false);
 
 	case nExtract:
 		fmtprint(f, "~~ %#T ", n->u[0].p);
-		tailcall(n->u[1].p, FALSE);
+		tailcall(n->u[1].p, false);
 
 	case nThunk:
 		fmtprint(f, "{%T}", n->u[0].p);
-		return FALSE;
+		return false;
 
 	case nVarsub:
 		fmtprint(f, "$%#T(%T)", n->u[0].p, n->u[1].p);
-		return FALSE;
+		return false;
 
 
 	case nLocal:
 		binding(f, "local", n);
-		tailcall(n->u[1].p, FALSE);
+		tailcall(n->u[1].p, false);
 
 	case nLet:
 		binding(f, "let", n);
-		tailcall(n->u[1].p, FALSE);
+		tailcall(n->u[1].p, false);
 
 	case nFor:
 		binding(f, "for", n);
-		tailcall(n->u[1].p, FALSE);
+		tailcall(n->u[1].p, false);
 
 	case nClosure:
 		binding(f, "%closure", n);
-		tailcall(n->u[1].p, FALSE);
+		tailcall(n->u[1].p, false);
 
 
 	case nCall: {
 		Tree *t = n->u[0].p;
 		fmtprint(f, "<=");
 		if (t != NULL && (t->kind == nThunk || t->kind == nPrim))
-			tailcall(t, FALSE);
+			tailcall(t, false);
 		fmtprint(f, "{%T}", t);
-		return FALSE;
+		return false;
 	}
 
 	case nVar:
@@ -129,7 +129,7 @@ top:
 		if (n == NULL || n->kind == nWord || n->kind == nQword)
 			goto top;
 		fmtprint(f, "(%#T)", n);
-		return FALSE;
+		return false;
 
 	case nLambda:
 		fmtprint(f, "@ ");
@@ -138,7 +138,7 @@ top:
 		else
 			fmtprint(f, "%T", n->u[0].p);
 		fmtprint(f, "{%T}", n->u[1].p);
-		return FALSE;
+		return false;
 
 	case nList:
 		if (!group) {
@@ -162,7 +162,7 @@ top:
 			}
 			fmtputc(f, ')');
 		}
-		return FALSE;
+		return false;
 
 	default:
 		panic("bad node kind: %d", n->kind);
@@ -192,11 +192,11 @@ static Chain *chain = NULL;
 #endif
 
 /* %C -- print a closure */
-static Boolean Cconv(Format *f) {
+static bool Cconv(Format *f) {
 	Closure *closure = va_arg(f->args, Closure *);
 	Tree *tree = closure->tree;
 	Binding *binding = closure->binding;
-	Boolean altform = (f->flags & FMT_altform) != 0;
+	bool altform = (f->flags & FMT_altform) != 0;
 
 #if 0
 	int i;
@@ -207,7 +207,7 @@ static Boolean Cconv(Format *f) {
 	for (cp = chain, i = 0; cp != NULL; cp = cp->next, i++)
 		if (cp->closure == closure) {
 			fmtprint(f, "%d $&nestedbinding", i);
-			return FALSE;
+			return false;
 		}
 	me.closure = closure;
 	me.next = chain;
@@ -228,11 +228,11 @@ static Boolean Cconv(Format *f) {
 #if 0
 	chain = chain->next;	/* TODO: exception unwinding? */
 #endif
-	return FALSE;
+	return false;
 }
 
 /* %E -- print a term */
-static Boolean Econv(Format *f) {
+static bool Econv(Format *f) {
 	Term *term = va_arg(f->args, Term *);
 	Closure *closure = getclosure(term);
 
@@ -240,11 +240,11 @@ static Boolean Econv(Format *f) {
 		fmtprint(f, (f->flags & FMT_altform) ? "%#C" : "%C", closure);
 	else
 		fmtprint(f, (f->flags & FMT_altform) ? "%S" : "%s", getstr(term));
-	return FALSE;
+	return false;
 }
 
 /* %S -- print a string with conservative quoting rules */
-static Boolean Sconv(Format *f) {
+static bool Sconv(Format *f) {
 	int c;
 	enum { Begin, Quoted, Unquoted } state = Begin;
 	const unsigned char *s, *t;
@@ -257,7 +257,7 @@ static Boolean Sconv(Format *f) {
 		if (nw[c] || c == '@')
 			goto quoteit;
 	fmtprint(f, "%s", s);
-	return FALSE;
+	return false;
 
 quoteit:
 
@@ -300,21 +300,21 @@ quoteit:
 		break;
 	}
 
-	return FALSE;
+	return false;
 }
 
 /* %Z -- print a StrList */
-static Boolean Zconv(Format *f) {
+static bool Zconv(Format *f) {
 	char *sep = va_arg(f->args, char *);
 	for (StrList *lp = va_arg(f->args, StrList *), *next; lp != NULL; lp = next) {
 		next = lp->next;
 		fmtprint(f, "%s%s", lp->str, next == NULL ? "" : sep);
 	}
-	return FALSE;
+	return false;
 }
 
 /* %F -- protect an exported name from brain-dead shells */
-static Boolean Fconv(Format *f) {
+static bool Fconv(Format *f) {
 	unsigned char *name = va_arg(f->args, unsigned char *);
 	int c;
 
@@ -324,11 +324,11 @@ static Boolean Fconv(Format *f) {
 			fmtputc(f, c);
 		else
 			fmtprint(f, "__%02x", c);
-	return FALSE;
+	return false;
 }
 
 /* %N -- undo %F */
-static Boolean Nconv(Format *f) {
+static bool Nconv(Format *f) {
 	int c;
 	unsigned char *s = va_arg(f->args, unsigned char *);
 
@@ -344,11 +344,11 @@ static Boolean Nconv(Format *f) {
 		}
 		fmtputc(f, c);
 	}
-	return FALSE;
+	return false;
 }
 
 /* %W -- print a list for exporting to the environment, merging and quoting */
-static Boolean Wconv(Format *f) {
+static bool Wconv(Format *f) {
 	List *lp, *next;
 
 	for (lp = va_arg(f->args, List *); lp != NULL; lp = next) {
@@ -363,26 +363,26 @@ static Boolean Wconv(Format *f) {
 		if (next != NULL)
 			fmtputc(f, ENV_SEPARATOR);
 	}
-	return FALSE;
+	return false;
 }
 
 
 #if LISPTREES
-static Boolean Bconv(Format *f) {
+static bool Bconv(Format *f) {
 	Tree *n = va_arg(f->args, Tree *);
 	if (n == NULL) {
 		fmtprint(f, "nil");
-		return FALSE;
+		return false;
 	}
 	switch (n->kind) {
 #define SINGLE_CASE(kind, formatString, type)			\
 		case kind: \
 			fmtprint(f, formatString, n->u[0].type); \
-			return FALSE;
+			return false;
 #define DOUBLE_CASE(kind, formatString, type)				\
 		case kind: \
 			fmtprint(f, formatString, n->u[0].type, n->u[1].type); \
-			return FALSE;
+			return false;
 	SINGLE_CASE(nWord, "(word \"%s\")", s);
 	SINGLE_CASE(nQword, "(qword \"%s\")", s);
 	SINGLE_CASE(nPrim, "(prim %s)", s);
@@ -408,7 +408,7 @@ static Boolean Bconv(Format *f) {
 			fmtprint(f, " %B", n->u[0].p);
 		} while ((n = n->u[1].p) != NULL);
 		fmtprint(f, ")");
-		return FALSE;
+		return false;
 	}
 
 	default: NOTREACHED;

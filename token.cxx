@@ -14,8 +14,8 @@
 typedef enum { NW, RW, KW } State;	/* "nonword", "realword", "keyword" */
 
 static State w = NW;
-static Boolean newline = FALSE;
-static Boolean goterror = FALSE;
+static bool newline = false;
+static bool goterror = false;
 static size_t bufsize = 0;
 static char *tokenbuf = NULL;
 
@@ -83,7 +83,7 @@ static void scanerror(char *s) {
 	/* TODO: check previous character? rc's last hack? */
 	while ((c = GETC()) != '\n' && c != EOF)
 		;
-	goterror = TRUE;
+	goterror = true;
 	yyerror(s);
 }
 
@@ -99,18 +99,18 @@ static void scanerror(char *s) {
 #define	CLOSED	-1
 #define	DEFAULT	-2
 
-static Boolean getfds(int fd[2], int c, int default0, int default1) {
+static bool getfds(int fd[2], int c, int default0, int default1) {
 	int n;
 	fd[0] = default0;
 	fd[1] = default1;
 
 	if (c != '[') {
 		UNGETC(c);
-		return TRUE;
+		return true;
 	}
 	if ((unsigned int) (n = GETC() - '0') > 9) {
 		scanerror("expected digit after '['");
-		return FALSE;
+		return false;
 	}
 
 	while ((unsigned int) (c = GETC() - '0') <= 9)
@@ -122,7 +122,7 @@ static Boolean getfds(int fd[2], int c, int default0, int default1) {
 		if ((unsigned int) (n = GETC() - '0') > 9) {
 			if (n != ']' - '0') {
 				scanerror("expected digit or ']' after '='");
-				return FALSE;
+				return false;
 			}
 			fd[1] = CLOSED;
 		} else {
@@ -130,7 +130,7 @@ static Boolean getfds(int fd[2], int c, int default0, int default1) {
 				n = n * 10 + c;
 			if (c != ']' - '0') {
 				scanerror("expected ']' after digit");
-				return FALSE;
+				return false;
 			}
 			fd[1] = n;
 		}
@@ -139,15 +139,15 @@ static Boolean getfds(int fd[2], int c, int default0, int default1) {
 		break;
 	default:
 		scanerror("expected '=' or ']' after digit");
-		return FALSE;
+		return false;
 	}
-	return TRUE;
+	return true;
 }
 
 
 
 int yylex(void) {
-	static Boolean dollar = FALSE;
+	static bool dollar = false;
 	int c;
 	size_t i;			        /* The purpose of all these local assignments is to	*/
 	const char *meta;		        /* allow optimizing compilers like gcc to load these	*/
@@ -155,17 +155,17 @@ int yylex(void) {
 	YYSTYPE *y = &yylval;		        /* win, in code size *and* execution time		*/
 
 	if (goterror) {
-		goterror = FALSE;
+		goterror = false;
 		return NL;
 	}
 
 	/* rc variable-names may contain only alnum, '*' and '_', so use dnw if we are scanning one. */
 	meta = (dollar ? dnw : nw);
-	dollar = FALSE;
+	dollar = false;
 	if (newline) {
 		--input->lineno; /* slight space optimization; print_prompt2() always increments lineno */
 		print_prompt2();
-		newline = FALSE;
+		newline = false;
 	}
 top:	while ((c = GETC()) == ' ' || c == '\t')
 		w = NW;
@@ -216,7 +216,7 @@ top:	while ((c = GETC()) == ' ' || c == '\t')
 		UNGETC(c);
 		return '`';
 	case '$':
-		dollar = TRUE;
+		dollar = true;
 		switch (c = GETC()) {
 		case '#':	return COUNT;
 		case '^':	return FLAT;
@@ -311,7 +311,7 @@ top:	while ((c = GETC()) == ' ' || c == '\t')
 		/* FALLTHROUGH */
 	case '\n':
 		input->lineno++;
-		newline = TRUE;
+		newline = true;
 		w = NW;
 		return NL;
 	case ':':
@@ -424,7 +424,7 @@ top:	while ((c = GETC()) == ' ' || c == '\t')
 }
 
 extern void inityy(void) {
-	newline = FALSE;
+	newline = false;
 	w = NW;
 	if (bufsize > BUFMAX) {		/* return memory to the system if the buffer got too large */
 		efree(tokenbuf);

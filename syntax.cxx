@@ -59,12 +59,12 @@ extern Tree *thunkify(Tree *tree) {
 }
 
 /* firstis -- check if the first word of a literal command matches a known string */
-static Boolean firstis(Tree *t, const char *s) {
+static bool firstis(Tree *t, const char *s) {
 	if (t == NULL || t->kind != nList)
-		return FALSE;
+		return false;
 	t = t->CAR;
 	if (t == NULL || t->kind != nWord)
-		return FALSE;
+		return false;
 	assert(t->u[0].s != NULL);
 	return streq(t->u[0].s, s);
 }
@@ -100,7 +100,7 @@ extern Tree *mklambda(Tree *params, Tree *body) {
 /* mkseq -- destructively add to a sequence of nList/nThink operations */
 extern Tree *mkseq(char *op, Tree *t1, Tree *t2) {
 	Tree *tail;
-	Boolean sametail;
+	bool sametail;
 
 	if (streq(op, "%seq")) {
 		if (t1 == NULL)
@@ -124,7 +124,7 @@ extern Tree *mkseq(char *op, Tree *t1, Tree *t2) {
 /* mkpipe -- assemble a pipe from the commands that make it up (destructive) */
 extern Tree *mkpipe(Tree *t1, int outfd, int infd, Tree *t2) {
 	Tree *tail;
-	Boolean pipetail;
+	bool pipetail;
 
 	pipetail = firstis(t2, "%pipe");
 	tail = prefix(str("%d", outfd),

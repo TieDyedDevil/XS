@@ -8,9 +8,9 @@ static Term *termarg;
 static int nextchar;
 
 extern void esoptbegin(List *list, const char *caller, const char *usagemsg) {
-	static Boolean initialized = FALSE;
+	static bool initialized = false;
 	if (!initialized) {
-		initialized = TRUE;
+		initialized = true;
 		globalroot(&usage);
 		globalroot(&invoker);
 		globalroot(&args);

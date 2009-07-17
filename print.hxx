@@ -26,7 +26,7 @@ enum {
 	FMT_f2set	= 128		/* %.<n> */
 };
 
-typedef Boolean (*Conv)(Format *);
+typedef bool (*Conv)(Format *);
 
 extern Conv fmtinstall(int, Conv);
 extern int printfmt(Format *, const char *);

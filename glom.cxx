@@ -316,7 +316,7 @@ extern List *glom2(Tree *tree, Binding *binding, StrList **quotep) {
 }
 
 /* glom -- top level glom dispatching */
-extern List *glom(Tree *tree, Binding *binding, Boolean globit) {
+extern List *glom(Tree *tree, Binding *binding, bool globit) {
 	if (globit) {
 		Ref(List *, list, NULL);
 		Ref(StrList *, quote, NULL);

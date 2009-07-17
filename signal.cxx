@@ -5,11 +5,11 @@
 
 typedef Sigresult (*Sighandler)(int);
 
-Boolean sigint_newline = TRUE;
+bool sigint_newline = true;
 
 jmp_buf slowlabel;
-Atomic slow = FALSE;
-Atomic interrupted = FALSE;
+Atomic slow = false;
+Atomic interrupted = false;
 static Atomic sigcount;
 static Atomic caught[NSIG];
 static Sigeffect sigeffect[NSIG];
@@ -75,10 +75,10 @@ static void catcher(int sig) {
 		/* exit unconditionally on a signal in a child process */
 		exit(1);
 	if (caught[sig] == 0) {
-		caught[sig] = TRUE;
+		caught[sig] = true;
 		++sigcount;
 	}
-	interrupted = TRUE;
+	interrupted = true;
 	if (slow)
 		longjmp(slowlabel, 1);
 }
@@ -156,7 +156,7 @@ extern void getsigeffects(Sigeffect effects[]) {
  * initialization
  */
 
-extern void initsignals(Boolean interactive, Boolean allowdumps) {
+extern void initsignals(bool interactive, bool allowdumps) {
 	int sig;
 	Push settor;
 
@@ -223,7 +223,7 @@ extern void setsigdefaults(void) {
  * utility functions
  */
 
-extern Boolean issilentsignal(List *e) {
+extern bool issilentsignal(List *e) {
 	return (termeq(e->term, "signal"))
 		&& e->next != NULL
 		&& termeq(e->next->term, "sigint");
@@ -309,7 +309,7 @@ extern void sigchk(void) {
 		/* this is the newline you see when you hit ^C while typing a command */
 		if (sigint_newline)
 			eprint("\n");
-		sigint_newline = TRUE;
+		sigint_newline = true;
 		while (gcisblocked())
 			gcenable();
 		throwE(e);

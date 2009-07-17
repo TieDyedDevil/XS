@@ -34,12 +34,12 @@
 
 static Dict *cvars, *strings;
 
-static Boolean allprintable(const char *s) {
+static bool allprintable(const char *s) {
 	int c;
 	for (; (c = *(unsigned char *) s) != '\0'; s++)
 		if (!isprint(c) || c == '"' || c == '\\')
-			return FALSE;
-	return TRUE;
+			return false;
+	return true;
 }
 
 static char *dumpstring(char *string) {

@@ -96,14 +96,14 @@ static size_t TermScan(void *p) {
 	return sizeof (Term);
 }
 
-extern Boolean termeq(Term *term, const char *s) {
+extern bool termeq(Term *term, const char *s) {
 	assert(term != NULL);
 	if (term->str == NULL)
-		return FALSE;
+		return false;
 	return streq(term->str, s);
 }
 
-extern Boolean isclosure(Term *term) {
+extern bool isclosure(Term *term) {
 	assert(term != NULL);
 	return term->closure != NULL;
 }

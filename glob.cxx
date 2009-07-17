@@ -10,28 +10,28 @@ const char *QUOTED = "QUOTED",
            *UNQUOTED = "RAW";
 
 /* hastilde -- true iff the first character is a ~ and it is not quoted */
-static Boolean hastilde(const char *s, const char *q) {
+static bool hastilde(const char *s, const char *q) {
 	return *s == '~' && (q == UNQUOTED || *q == 'r');
 }
 
 /* haswild -- true iff some unquoted character is a wildcard character */
-extern Boolean haswild(const char *s, const char *q) {
+extern bool haswild(const char *s, const char *q) {
 	if (q == QUOTED)
-		return FALSE;
+		return false;
 	if (q == UNQUOTED)
 		for (;;) {
 			int c = *s++;
 			if (c == '\0')
-				return FALSE;
+				return false;
 			if (c == '*' || c == '?' || c == '[')
-				return TRUE;
+				return true;
 		}
 	for (;;) {
 		int c = *s++, r = *q++;
 		if (c == '\0')
-			return FALSE;
+			return false;
 		if ((c == '*' || c == '?' || c == '[') && (r == 'r'))
-			return TRUE;
+			return true;
 	}
 }
 
@@ -267,7 +267,7 @@ static char *expandhome(char *s, StrList *qp) {
 extern List *glob(List *list, StrList *quote) {
 	List *lp;
 	StrList *qp;
-	Boolean doglobbing = FALSE;
+	bool doglobbing = false;
 
 	for (lp = list, qp = quote; lp != NULL; lp = lp->next, qp = qp->next)
 		if (qp->str != QUOTED) {
@@ -289,7 +289,7 @@ extern List *glob(List *list, StrList *quote) {
 				RefEnd4(qr, q0, lr, l0);
 			}
 			if (haswild(str, qp->str))
-				doglobbing = TRUE;
+				doglobbing = true;
 			RefEnd(str);
 		}
 

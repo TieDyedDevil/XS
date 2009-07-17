@@ -31,7 +31,7 @@ extern Tree *getherevar(void) {
 }
 
 /* snarfheredoc -- read a heredoc until the eof marker */
-extern Tree *snarfheredoc(const char *eof, Boolean quoted) {
+extern Tree *snarfheredoc(const char *eof, bool quoted) {
 	Tree *tree, **tailp;
 	Buffer *buf;
 	unsigned char *s;
@@ -41,7 +41,7 @@ extern Tree *snarfheredoc(const char *eof, Boolean quoted) {
 		yyerror("here document eof-marker contains a newline");
 		return NULL;
 	}
-	disablehistory = TRUE;
+	disablehistory = true;
 
 	for (tree = NULL, tailp = &tree, buf = openbuffer(0);;) {
 		int c;
@@ -61,7 +61,7 @@ extern Tree *snarfheredoc(const char *eof, Boolean quoted) {
 			if (c == EOF) {
 				yyerror("incomplete here document");
 				freebuffer(buf);
-				disablehistory = FALSE;
+				disablehistory = false;
 				return NULL;
 			}
 			if (c == '$' && !quoted && (c = GETC()) != '$') {
@@ -76,7 +76,7 @@ extern Tree *snarfheredoc(const char *eof, Boolean quoted) {
 				var = getherevar();
 				if (var == NULL) {
 					freebuffer(buf);
-					disablehistory = FALSE;
+					disablehistory = false;
 					return NULL;
 				}
 				*tailp = treecons(var, NULL);
@@ -90,29 +90,29 @@ extern Tree *snarfheredoc(const char *eof, Boolean quoted) {
 		}
 	}
 
-	disablehistory = FALSE;
+	disablehistory = false;
 	return tree->CDR == NULL ? tree->CAR : tree;
 }
 
 /* readheredocs -- read all the heredocs at the end of a line (or fail if at end of file) */
-extern Boolean readheredocs(Boolean endfile) {
+extern bool readheredocs(bool endfile) {
 	for (; hereq != NULL; hereq = hereq->next) {
 		Tree *marker, *eof;
 		if (endfile) {
 			yyerror("end of file with pending here documents");
-			return FALSE;
+			return false;
 		}
 		marker = hereq->marker;
 		eof = marker->CAR;
 		marker->CAR = snarfheredoc(eof->u[0].s, eof->kind == nQword);
 		if (marker->CAR == NULL)
-			return FALSE;
+			return false;
 	}
-	return TRUE;
+	return true;
 }
 
 /* queueheredoc -- add a heredoc to the queue to process at the end of the line */
-extern Boolean queueheredoc(Tree *t) {
+extern bool queueheredoc(Tree *t) {
 	Tree *eof;
 	Here *here;
 
@@ -126,17 +126,17 @@ extern Boolean queueheredoc(Tree *t) {
 	assert(eof->kind == nList);
 	if (eof->CAR->kind != nWord && eof->CAR->kind != nQword) {
 		yyerror("here document eof-marker not a single literal word");
-		return FALSE;
+		return false;
 	}
 
 	here = gcalloc(sizeof (Here), NULL);
 	here->next = hereq;
 	here->marker = eof;
 	hereq = here;
-	return TRUE;
+	return true;
 }
 
 extern void emptyherequeue(void) {
 	hereq = NULL;
-	disablehistory = FALSE;
+	disablehistory = false;
 }

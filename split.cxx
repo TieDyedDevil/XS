@@ -3,18 +3,18 @@
 #include "es.hxx"
 #include "gc.hxx"
 
-static Boolean coalesce;
-static Boolean splitchars;
+static bool coalesce;
+static bool splitchars;
 static Buffer *buffer;
 static List *value;
 
-static Boolean ifsvalid = FALSE;
+static bool ifsvalid = false;
 static char ifs[10], isifs[256];
 
-extern void startsplit(const char *sep, Boolean coalescef) {
-	static Boolean initialized = FALSE;
+extern void startsplit(const char *sep, bool coalescef) {
+	static bool initialized = false;
 	if (!initialized) {
-		initialized = TRUE;
+		initialized = true;
 		globalroot(&value);
 	}
 
@@ -27,16 +27,16 @@ extern void startsplit(const char *sep, Boolean coalescef) {
 		int c;
 		if (strlen(sep) + 1 < sizeof ifs) {
 			strcpy(ifs, sep);
-			ifsvalid = TRUE;
+			ifsvalid = true;
 		} else
-			ifsvalid = FALSE;
+			ifsvalid = false;
 		memzero(isifs, sizeof isifs);
-		for (isifs['\0'] = TRUE; (c = (*(unsigned const char *)sep)) != '\0'; sep++)
-			isifs[c] = TRUE;
+		for (isifs['\0'] = true; (c = (*(unsigned const char *)sep)) != '\0'; sep++)
+			isifs[c] = true;
 	}
 }
 
-extern void splitstring(char *in, size_t len, Boolean endword) {
+extern void splitstring(char *in, size_t len, bool endword) {
 	gcdisable(); /* char *s can't be made gc-safe */
 	Buffer *buf = buffer;
 	unsigned char *s = (unsigned char *) in, *inend = s + len;
@@ -89,14 +89,14 @@ extern List *endsplit(void) {
 	return result;
 }
 
-extern List *fsplit(const char *sep, List *list, Boolean coalesce) {
+extern List *fsplit(const char *sep, List *list, bool coalesce) {
 	Ref(List *, lp, list);
 	startsplit(sep, coalesce);
 	for (; lp != NULL; lp = lp->next) {
 		/* No need for Ref because gc cannot run
 		 * between these two statements         */
 		char *s = getstr(lp->term);
-		splitstring(s, strlen(s), TRUE);
+		splitstring(s, strlen(s), true);
 	}
 	RefEnd(lp);
 	return endsplit();

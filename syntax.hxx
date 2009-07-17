@@ -33,5 +33,5 @@ extern Tree *redirappend(Tree *t, Tree *r);
 
 /* heredoc.c */
 
-extern Boolean readheredocs(Boolean endfile);
-extern Boolean queueheredoc(Tree *t);
+extern bool readheredocs(bool endfile);
+extern bool queueheredoc(Tree *t);

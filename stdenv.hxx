@@ -122,11 +122,6 @@ extern void *qsort(
  * types we use throughout es
  */
 
-#undef FALSE
-#undef TRUE
-typedef enum { FALSE, TRUE } Boolean;
-
-
 #if USE_SIG_ATOMIC_T
 typedef volatile sig_atomic_t Atomic;
 #else

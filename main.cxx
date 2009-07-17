@@ -3,10 +3,10 @@
 #include "es.hxx"
 
 #if GCVERBOSE
-Boolean gcverbose	= FALSE;	/* -G */
+bool gcverbose	= false;	/* -G */
 #endif
 #if GCINFO
-Boolean gcinfo		= FALSE;	/* -I */
+bool gcinfo		= false;	/* -I */
 #endif
 
 extern int optind;
@@ -102,11 +102,11 @@ int main(int argc, char **argv) {
 	char **volatile av;
 
 	volatile int runflags = 0;		/* -[einvxL] */
-	volatile Boolean protected = FALSE;	/* -p */
-	volatile Boolean allowquit = FALSE;	/* -d */
-	volatile Boolean cmd_stdin = FALSE;		/* -s */
-	volatile Boolean loginshell = FALSE;	/* -l or $0[0] == '-' */
-	Boolean keepclosed = FALSE;		/* -o */
+	volatile bool protected = false;	/* -p */
+	volatile bool allowquit = false;	/* -d */
+	volatile bool cmd_stdin = false;		/* -s */
+	volatile bool loginshell = false;	/* -l or $0[0] == '-' */
+	bool keepclosed = false;		/* -o */
 	const char *volatile cmd = NULL;	/* -c */
 
 	initgc();
@@ -119,7 +119,7 @@ int main(int argc, char **argv) {
 		argv[1] = NULL;
 	}
 	if (argv[0][0] == '-')
-		loginshell = TRUE;
+		loginshell = true;
 
 	while ((c = getopt(argc, argv, "eilxvnpodsc:?GIL")) != EOF)
 		switch (c) {
@@ -132,16 +132,16 @@ int main(int argc, char **argv) {
 #if LISPTREES
 		case 'L':	runflags |= run_lisptrees;	break;
 #endif
-		case 'l':	loginshell = TRUE;		break;
-		case 'p':	protected = TRUE;		break;
-		case 'o':	keepclosed = TRUE;		break;
-		case 'd':	allowquit = TRUE;		break;
-		case 's':	cmd_stdin = TRUE;			goto getopt_done;
+		case 'l':	loginshell = true;		break;
+		case 'p':	protected = true;		break;
+		case 'o':	keepclosed = true;		break;
+		case 'd':	allowquit = true;		break;
+		case 's':	cmd_stdin = true;			goto getopt_done;
 #if GCVERBOSE
-		case 'G':	gcverbose = TRUE;		break;
+		case 'G':	gcverbose = true;		break;
 #endif
 #if GCINFO
-		case 'I':	gcinfo = TRUE;			break;
+		case 'I':	gcinfo = true;			break;
 #endif
 		default:
 			usage();

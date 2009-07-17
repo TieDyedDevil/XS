@@ -42,7 +42,7 @@ static void dodeferred(int realfd, int userfd) {
 	}
 }
 
-static int pushdefer(Boolean parent, int realfd, int userfd) {
+static int pushdefer(bool parent, int realfd, int userfd) {
 	if (parent) {
 		Defer *defer;
 		if (defcount >= defmax) {
@@ -52,12 +52,12 @@ static int pushdefer(Boolean parent, int realfd, int userfd) {
 			defmax += 10;
 			deftab = erealloc(deftab, defmax * sizeof (Defer));
 			for (i = 0; i < defcount; i++)
-				registerfd(&deftab[i].realfd, TRUE);
+				registerfd(&deftab[i].realfd, true);
 		}
 		defer = &deftab[defcount++];
 		defer->realfd = realfd;
 		defer->userfd = userfd;
-		registerfd(&defer->realfd, TRUE);
+		registerfd(&defer->realfd, true);
 		return defcount - 1;
 	} else {
 		dodeferred(realfd, userfd);
@@ -65,13 +65,13 @@ static int pushdefer(Boolean parent, int realfd, int userfd) {
 	}
 }
 
-extern int defer_mvfd(Boolean parent, int old, int new) {
+extern int defer_mvfd(bool parent, int old, int new) {
 	assert(old >= 0);
 	assert(new >= 0);
 	return pushdefer(parent, old, new);
 }
 
-extern int defer_close(Boolean parent, int fd) {
+extern int defer_close(bool parent, int fd) {
 	assert(fd >= 0);
 	return pushdefer(parent, -1, fd);
 }
@@ -125,14 +125,14 @@ static void remapfds(void) {
 
 typedef struct {
 	int *fdp;
-	Boolean closeonfork;
+	bool closeonfork;
 } Reserve;
 
 static Reserve *reserved = NULL;
 static int rescount = 0, resmax = 0;
 
 /* registerfd -- reserve a file descriptor for es */
-extern void registerfd(int *fdp, Boolean closeonfork) {
+extern void registerfd(int *fdp, bool closeonfork) {
 #if ASSERTIONS
 	int i;
 	for (i = 0; i < rescount; i++)
@@ -194,12 +194,12 @@ extern void releasefd(int n) {
 }
 
 /* isdeferred -- is this file descriptor on the deferral list */
-static Boolean isdeferred(int fd) {
+static bool isdeferred(int fd) {
 	Defer *defer, *defend = &deftab[defcount];
 	for (defer = deftab; defer < defend; defer++)
 		if (defer->userfd == fd)
-			return TRUE;
-	return FALSE;
+			return true;
+	return false;
 }
 
 /* newfd -- return a new, free file descriptor */

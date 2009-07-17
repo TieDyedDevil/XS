@@ -25,13 +25,13 @@ enum { RANGE_FAIL = -1, RANGE_ERROR = -2 };
 /* rangematch -- match a character against a character class */
 static int rangematch(const char *p, const char *q, char c) {
 	const char *orig = p;
-	Boolean neg;
-	Boolean matched = FALSE;
+	bool neg;
+	bool matched = false;
 	if (*p == '~' && !ISQUOTED(q, 0)) {
 		p++, q++;
-	    	neg = TRUE;
+	    	neg = true;
 	} else
-		neg = FALSE;
+		neg = false;
 	if (*p == ']' && !ISQUOTED(q, 0)) {
 		p++, q++;
 		matched = (c == ']');
@@ -42,11 +42,11 @@ static int rangematch(const char *p, const char *q, char c) {
 		if (p[1] == '-' && !ISQUOTED(q, 1) && ((p[2] != ']' && p[2] != '\0') || ISQUOTED(q, 2))) {
 			/* check for [..-..] but ignore [..-] */
 			if (c >= *p && c <= p[2])
-				matched = TRUE;
+				matched = true;
 			p += 2;
 			q += 2;
 		} else if (*p == c)
-			matched = TRUE;
+			matched = true;
 	}
 	if (matched ^ neg)
 		return p - orig + 1; /* skip the right-bracket */
@@ -55,7 +55,7 @@ static int rangematch(const char *p, const char *q, char c) {
 }
 
 /* match -- match a single pattern against a single string. */
-extern Boolean match(const char *s, const char *p, const char *q) {
+extern bool match(const char *s, const char *p, const char *q) {
 	int i;
 	if (q == QUOTED)
 		return streq(s, p);
@@ -67,40 +67,40 @@ extern Boolean match(const char *s, const char *p, const char *q) {
 			switch (c) {
 			case '?':
 				if (*s++ == '\0')
-					return FALSE;
+					return false;
 				break;
 			case '*':
 				while (p[i] == '*' && (q == UNQUOTED || q[i] == 'r'))	/* collapse multiple stars */
 					i++;
 				if (p[i] == '\0') 	/* star at end of pattern? */
-					return TRUE;
+					return true;
 				while (*s != '\0')
 					if (match(s++, p + i, TAILQUOTE(q, i)))
-						return TRUE;
-				return FALSE;
+						return true;
+				return false;
 			case '[': {
 				int j;
 				if (*s == '\0')
-					return FALSE;
+					return false;
 				switch (j = rangematch(p + i, TAILQUOTE(q, i), *s)) {
 				default:
 					i += j;
 					break;
 				case RANGE_FAIL:
-					return FALSE;
+					return false;
 				case RANGE_ERROR:
 					if (*s != '[')
-						return FALSE;
+						return false;
 				}
 				s++;
 				break;
 			}
 			default:
 				if (c != *s++)
-					return FALSE;
+					return false;
 			}
 		} else if (c != *s++)
-			return FALSE;
+			return false;
 	}
 }
 
@@ -113,10 +113,10 @@ extern Boolean match(const char *s, const char *p, const char *q) {
  *	() matches (), but otherwise null patterns match nothing.
  */
 
-extern Boolean listmatch(List *subject, List *pattern, StrList *quote) {
+extern bool listmatch(List *subject, List *pattern, StrList *quote) {
 	if (subject == NULL) {
 		if (pattern == NULL)
-			return TRUE;
+			return true;
 		Ref(List *, p, pattern);
 		Ref(StrList *, q, quote);
 		for (; p != NULL; p = p->next, q = q->next) {
@@ -124,21 +124,21 @@ extern Boolean listmatch(List *subject, List *pattern, StrList *quote) {
 			const char *pw = getstr(p->term), *qw = q->str;
 			if (*pw != '\0' && qw != QUOTED) {
 				int i;
-				Boolean matched = TRUE;
+				bool matched = true;
 				for (i = 0; pw[i] != '\0'; i++)
 					if (pw[i] != '*'
 					    || (qw != UNQUOTED && qw[i] != 'r')) {
-						matched = FALSE;
+						matched = false;
 						break;
 					}
 				if (matched) {
 					RefPop2(q, p);
-					return TRUE;
+					return true;
 				}
 			}
 		}
 		RefEnd2(q, p);
-		return FALSE;
+		return false;
 	}
 
 	Ref(List *, s, subject);
@@ -157,13 +157,13 @@ extern Boolean listmatch(List *subject, List *pattern, StrList *quote) {
 			if (match(tw, pw, qw)) {
 				RefPop3(t, qw, pw);
 				RefPop3(q, p, s);
-				return TRUE;
+				return true;
 			}
 		}
 		RefEnd3(t, qw, pw);
 	}
 	RefEnd3(q, p, s);
-	return FALSE;
+	return false;
 }
 
 /*

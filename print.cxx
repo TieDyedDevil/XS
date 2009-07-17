@@ -11,9 +11,9 @@
  */
 
 #define	Flag(name, flag) \
-static Boolean name(Format *format) { \
+static bool name(Format *format) { \
 	format->flags |= flag; \
-	return TRUE; \
+	return true; \
 }
 
 Flag(uconv,	FMT_unsigned)
@@ -23,7 +23,7 @@ Flag(altconv,	FMT_altform)
 Flag(leftconv,	FMT_leftside)
 Flag(dotconv,	FMT_f2set)
 
-static Boolean digitconv(Format *format) {
+static bool digitconv(Format *format) {
 	int c = format->invoker;
 	if (format->flags & FMT_f2set)
 		format->f2 = 10 * format->f2 + c - '0';
@@ -31,14 +31,14 @@ static Boolean digitconv(Format *format) {
 		format->flags |= FMT_f1set;
 		format->f1 = 10 * format->f1 + c - '0';
 	}
-	return TRUE;
+	return true;
 }
 
-static Boolean zeroconv(Format *format) {
+static bool zeroconv(Format *format) {
 	if (format->flags & (FMT_f1set | FMT_f2set))
 		return digitconv(format);
 	format->flags |= FMT_zeropad;
-	return TRUE;
+	return true;
 }
 
 static void pad(Format *format, long len, int c) {
@@ -46,7 +46,7 @@ static void pad(Format *format, long len, int c) {
 		fmtputc(format, c);
 }
 
-static Boolean sconv(Format *format) {
+static bool sconv(Format *format) {
 	char *s = va_arg(format->args, char *);
 	if ((format->flags & FMT_f1set) == 0)
 		fmtcat(format, s);
@@ -60,7 +60,7 @@ static Boolean sconv(Format *format) {
 			fmtappend(format, s, len);
 		}
 	}
-	return FALSE;
+	return false;
 }
 
 char *utoa(unsigned long u, char *t, unsigned int radix, char *digit) {
@@ -136,32 +136,32 @@ static void intconv(Format *format, unsigned int radix, int upper, char *altform
 		pad(format, padding, padchar);
 }
 
-static Boolean cconv(Format *format) {
+static bool cconv(Format *format) {
 	fmtputc(format, va_arg(format->args, int));
-	return FALSE;
+	return false;
 }
 
-static Boolean dconv(Format *format) {
+static bool dconv(Format *format) {
 	intconv(format, 10, 0, "");
-	return FALSE;
+	return false;
 }
 
-static Boolean oconv(Format *format) {
+static bool oconv(Format *format) {
 	intconv(format, 8, 0, "0");
-	return FALSE;
+	return false;
 }
 
-static Boolean xconv(Format *format) {
+static bool xconv(Format *format) {
 	intconv(format, 16, 0, "0x");
-	return FALSE;
+	return false;
 }
 
-static Boolean pctconv(Format *format) {
+static bool pctconv(Format *format) {
 	fmtputc(format, '%');
-	return FALSE;
+	return false;
 }
 
-static Boolean badconv(Format *format) {
+static bool badconv(Format *format) {
 	panic("bad conversion character in printfmt: %%%c", format->invoker);
 	NOTREACHED;
 }
