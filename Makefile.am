@@ -48,5 +48,5 @@ src	:
 initial.cxx : xsdump $(srcdir)/initial.xs
 	./xsdump < $(srcdir)/initial.xs > initial.cxx || (rm initial.cxx; false)
 
-sigmsgs.cxx : mksignal $(SIGFILES)
+sigmsgs.cxx : mksignal $(SIGFILES) es.hxx 
 	sh $(srcdir)/mksignal $(SIGFILES) > sigmsgs.cxx
