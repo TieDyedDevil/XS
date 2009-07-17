@@ -146,7 +146,7 @@ static int pagesize;
 static void *take(size_t n) {
 	caddr_t addr;
 #ifdef MAP_ANONYMOUS
-	addr = mmap(0, n, PROT_READ|PROT_WRITE,	MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+	addr = reinterpret_cast<caddr_t>(mmap(0, n, PROT_READ|PROT_WRITE,	MAP_PRIVATE|MAP_ANONYMOUS, -1, 0));
 #else
 	static int devzero = -1;
 	if (devzero == -1)
@@ -222,12 +222,12 @@ static Space *mkspace(Space *space, Space *next) {
 	}
 
 	if (space == NULL) {
-		space = ealloc(sizeof(Space));
+		space = reinterpret_cast<Space*>(ealloc(sizeof(Space)));
 		memzero(space, sizeof (Space));
 	}
 	if (space->bot == NULL) {
 		size_t n = PAGEROUND(minspace);
-		space->bot = take(n);
+		space->bot = reinterpret_cast<char*>(take(n));
 		space->top = space->bot + n / (sizeof (*space->bot));
 	}
 
@@ -286,7 +286,7 @@ static void deprecate(Space *space) {
 extern bool isinspace(Space *space, const void *p) {
 	for (; space != NULL; space = space->next)
 		if (in_space(p, space)) {
-		 	assert((char *) p < space->current);
+		 	assert(reinterpret_cast<const char*>(p) < space->current);
 		 	return true;
 		}
 	return false;
@@ -323,7 +323,9 @@ static inline void *follow(Tag *tagp) {
 	return (void *) ((int) (tagp) - 1);
 }
 
-/* forward -- forward an individual pointer from old space */
+/* forward -- forward an individual pointer from old space
+ * forward will NEVER modify the contents of p.
+ */
 extern void *forward(void *p) {
 	Tag *tag;
 	void *np;
@@ -340,11 +342,11 @@ extern void *forward(void *p) {
 	if (forwarded(tag)) {
 		np = follow(tag);
 		assert(TAG(np)->magic == TAGMAGIC);
-		VERBOSE(("%s	-> %8ux (followed)\n", TAG(np)->typename, np));
+		VERBOSE(("%s	-> %8ux (followed)\n", TAG(np)->tname, np));
 	} else {
 		assert(tag->magic == TAGMAGIC);
 		np = (*tag->copy)(p);
-		VERBOSE(("%s	-> %8ux (forwarded)\n", tag->typename, np));
+		VERBOSE(("%s	-> %8ux (forwarded)\n", tag->tname, np));
 		TAG(p) = follow_to(reinterpret_cast<char*>(np));
 	}
 	return np;
@@ -371,7 +373,7 @@ static void scanspace(void) {
 				Tag *tag = *(Tag **) scan;
 				assert(tag->magic == TAGMAGIC);
 				scan += sizeof (Tag *);
-				VERBOSE(("GC %8ux : %s	scan\n", scan, tag->typename));
+				VERBOSE(("GC %8ux : %s	scan\n", scan, tag->tname));
 				scan += ALIGN((*tag->scan)(scan));
 			}
 		}
@@ -490,7 +492,7 @@ extern void gc(void) {
 extern void initgc(void) {
 #if GCPROTECT
 	initmmu();
-	spaces = ealloc(NSPACES * sizeof (Space));
+	spaces = reinterpret_cast<Space*>(ealloc(NSPACES * sizeof (Space)));
 	memzero(spaces, NSPACES * sizeof (Space));
 	newSpace = mkspace(&spaces[0], NULL);
 #else
@@ -666,86 +668,86 @@ static char *tree2name(NodeKind k) {
 		Assoc table[1];		/* variable length */
 	};
 
-#include "var.h"
-#include "term.h"
+#include "var.hxx"
+#include "term.hxx"
 
 
 static size_t dump(Tag *t, void *p) {
-	char *s = t->typename;
+	char *s = t->tname;
 	print("%8ux %s\t", p, s);
 
 	if (streq(s, "String")) {
 		print("%s\n", p);
-		return strlen(p) + 1;
+		return strlen(reinterpret_cast<char*>(p)) + 1;
 	}
 
 	if (streq(s, "Term")) {
-		Term *t = p;
+		Term *t = reinterpret_cast<Term*>(p);
 		print("str = %ux  closure = %ux\n", t->str, t->closure);
 		return sizeof (Term);
 	}
 
 	if (streq(s, "List")) {
-		List *l = p;
+		List *l = reinterpret_cast<List*>(p);
 		print("term = %ux  next = %ux\n", l->term, l->next);
 		return sizeof (List);
 	}
 
 	if (streq(s, "StrList")) {
-		StrList *l = p;
+		StrList *l =reinterpret_cast<StrList*>(p);
 		print("str = %ux  next = %ux\n", l->str, l->next);
 		return sizeof (StrList);
 	}
 
 	if (streq(s, "Closure")) {
-		Closure *c = p;
+		Closure *c = reinterpret_cast<Closure*>(p);
 		print("tree = %ux  binding = %ux\n", c->tree, c->binding);
 		return sizeof (Closure);
 	}
 
 	if (streq(s, "Binding")) {
-		Binding *b = p;
+		Binding *b = reinterpret_cast<Binding*>(p);
 		print("name = %ux  defn = %ux  next = %ux\n", b->name, b->defn, b->next);
 		return sizeof (Binding);
 	}
 
 	if (streq(s, "Var")) {
-		Var *v = p;
+		Var *v = reinterpret_cast<Var*>(p);
 		print("defn = %ux  env = %ux  flags = %d\n",
 		      v->defn, v->env, v->flags);
 		return sizeof (Var);
 	}
 
 	if (streq(s, "Tree1")) {
-		Tree *t = p;
+		Tree *t = reinterpret_cast<Tree*>(p);
 		print("%s	%ux\n", tree1name(t->kind), t->u[0].p);
 		return offsetof(Tree, u[1]);
 	}
 
 	if (streq(s, "Tree2")) {
-		Tree *t = p;
+		Tree *t = reinterpret_cast<Tree*>(p);
 		print("%s	%ux  %ux\n", tree2name(t->kind), t->u[0].p, t->u[1].p);
 		return offsetof(Tree, u[2]);
 	}
 
 	if (streq(s, "Vector")) {
-		Vector *v = p;
+		Vector *v = reinterpret_cast<Vector*>(p);
 		int i;
 		print("alloclen = %d  count = %d [", v->alloclen, v->count);
 		for (i = 0; i <= v->alloclen; i++)
 			print("%s%ux", i == 0 ? "" : " ", v->vector[i]);
 		print("]\n");
-		return offsetof(Vector, vector[v->alloclen + 1]);
+		return offsetof(Vector, vector[0]) + sizeof(char*) * (v->alloclen + 1);
 	}
 
 	if (streq(s, "Dict")) {
-		Dict *d = p;
+		Dict *d = reinterpret_cast<Dict*>(p);
 		int i;
 		print("size = %d  remain = %d\n", d->size, d->remain);
 		for (i = 0; i < d->size; i++)
 			print("\tname = %ux  value = %ux\n",
 			      d->table[i].name, d->table[i].value);
-		return offsetof(Dict, table[d->size]);
+		return offsetof(Dict, table[0]) + sizeof(char*) * (d->size);
 	}
 
 	print("<<unknown>>\n");
