@@ -1,9 +1,13 @@
-#include "es.hxx"
+/* Reference on Stack */
 template <class T>
 class SRef {
 	public:
-		SRef(const SRef& orig) {
-			ref = orig.ref;
+		SRef(const SRef<T>& orig) : ref(orig.ref) {
+			root.p = &ref;
+			root.next = rootlist;
+			rootlist = root;
+		}
+		SRef(T* x) : ref(x) {
 			root.p = &ref;
 			root.next = rootlist;
 			rootlist = root;
