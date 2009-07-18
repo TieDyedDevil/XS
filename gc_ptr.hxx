@@ -2,43 +2,49 @@
 template <class T>
 class SRef {
 	public: 
-		SRef() : ref(NULL) {}
+		SRef() : ref(NULL) {
+			addroot();
+		}
 		SRef(const SRef<T>& orig) : ref(orig.ref) {
 			addroot();
 		}
 		SRef(T* x) : ref(x) {
 			addroot();
 		}
-		SRef& operator=(const SRef& orig) {
-			unroot();
-			ref = orig.ref;
-			addroot();
+		SRef& operator=(const SRef<T>& x) {
+			ref = x.ref;
+		};
+		SRef& operator=(T* p) {
+			ref = p;
 		}
-		SRef& operator=(T* x) {
-			unroot();
-			ref = x;
-			addroot();
+		SRef& operator=(void* p) {
+			ref = p;
 		}
-		operator bool() {
+		operator bool() const {
 			return ref != NULL;
 		}
-		bool operator==(T *x) {
+		bool operator==(T *x) const {
 			return ref == x;
 		}
-		bool operator==(SRef<T> x) {
+		bool operator==(void *x) const {
+			return ref == x;
+		}
+		bool operator==(SRef<T> x) const {
 			return ref == x.ref;
 		}
-		bool operator!=(T *x) {
+		bool operator!=(T *x) const {
 			return ref != x;
 		}
-		bool operator!=(SRef<T> x) {
+		bool operator!=(SRef<T> x) const {
 			return ref != x.ref;
 		}
 
 		~SRef() {
-			unroot();
+			refassert(rootlist == &root); \
+			refassert(rootlist->p == reinterpret_cast<void **>(&ref)); \
+			rootlist = rootlist->next;
 		}
-		T* get() {
+		T* get() const {
 			assert(gcisblocked());
 			return ref;
 		}
@@ -46,19 +52,22 @@ class SRef {
 		 * that the gc would be enabled, for example if assigning
 		 * into a scanned type
 		 */
-		T* uget() {
+		T* uget() const {
 			return ref;
 		}
+		/* Object should NOT be used after a release() without reassignment - this will
+		 * probably lead to a NULL pointer dereference
+		 */
 		T* release() {
-			T *t = ref;
-			unroot();
+			T* t = ref;
+			ref = NULL;
 			return t;
 		}
-		T& operator*() {
+		T& operator*() const {
 			assert (ref != NULL);
 			return *ref;
 		}
-		T* operator->() {
+		T* operator->() const {
 			assert (ref != NULL);
 			return ref;
 		}
@@ -67,13 +76,6 @@ class SRef {
 			root.p = reinterpret_cast<void**>(&ref);
 			root.next = rootlist;
 			rootlist = &root;
-		}
-		void unroot() {
-			if (ref == NULL) return;
-			refassert(rootlist == &root); \
-			refassert(rootlist->p == reinterpret_cast<void **>(&ref)); \
-			rootlist = rootlist->next;
-			ref = NULL;
 		}
 		Root root;
 		T *ref;
