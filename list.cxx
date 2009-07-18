@@ -12,11 +12,11 @@ DefineTag(List, static);
 extern List *mklist(Term *term, List *next) {
 	gcdisable();
 	assert(term != NULL);
-	Ref(List *, list, gcnew(List));
+	SRef<List> list = gcnew(List);
 	list->term = term;
 	list->next = next;
 	gcenable();
-	RefReturn(list);
+	return list.release();
 }
 
 static void *ListCopy(void *op) {
