@@ -34,8 +34,9 @@ class SRef {
 			return ref;
 		}
 		T* release() {
+			T *t = ref;
 			unroot();
-			return ref;
+			return t;
 		}
 		T& operator*() {
 			assert (ref != NULL);
