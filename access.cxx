@@ -143,13 +143,13 @@ PRIM(access) {
 
 		if (first) {
 			if (error == 0) {
-				Ref(List *, result,
+				SRef<List> result = 
 					mklist(mkstr(suffix == NULL
 							? name
 							: gcdup(name)),
-					       NULL));
+					       NULL);
 				gcenable();
-				RefReturn(result);
+				return result.release();
 			} else if (error != ENOENT)
 				estatus = error;
 		} else
