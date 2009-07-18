@@ -19,6 +19,22 @@ class SRef {
 			ref = x;
 			addroot();
 		}
+		operator bool() {
+			return ref != NULL;
+		}
+		bool operator==(T *x) {
+			return ref == x;
+		}
+		bool operator==(SRef<T> x) {
+			return ref == x;
+		}
+		bool operator!=(T *x) {
+			return ref != x;
+		}
+		bool operator!=(SRef<T> x) {
+			return ref != x;
+		}
+
 		~SRef() {
 			unroot();
 		}
