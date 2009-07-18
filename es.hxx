@@ -220,8 +220,7 @@ extern bool isclosure(Term *term);
 
 extern List *mklist(Term *term, List *next);
 extern List *reverse(List *list);
-extern List *append(List *head, List *tail);
-/*extern List *append(SRef<List> head, SRef<List> tail);*/
+extern List *append(SRef<List> head, SRef<List> tail);
 extern List *listcopy(List *list);
 extern int length(List *list);
 extern List *listify(int argc, char **argv);

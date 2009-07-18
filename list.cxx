@@ -52,26 +52,21 @@ extern List *reverse(List *list) {
 }
 
 /* append -- merge two lists, non-destructively */
-extern List *append(List *head, List *tail) {
+extern List *append(SRef<List> head, SRef<List> tail) {
 	List *lp, **prevp;
-	Ref(List *, hp, head);
-	Ref(List *, tp, tail);
 	gcreserve(40 * sizeof (List));
 	gcdisable();
-	head = hp;
-	tail = tp;
-	RefEnd2(tp, hp);
 
-	for (prevp = &lp; head != NULL; head = head->next) {
+	for (prevp = &lp; head; head = head->next) {
 		List *np = mklist(head->term, NULL);
 		*prevp = np;
 		prevp = &np->next;
 	}
-	*prevp = tail;
+	*prevp = tail.release();
 
-	Ref(List *, result, lp);
+	SRef<List> result = lp;
 	gcenable();
-	RefReturn(result);
+	return result.release();
 }
 
 /* listcopy -- make a copy of a list */
