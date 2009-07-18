@@ -40,8 +40,8 @@ class SRef {
 		}
 
 		~SRef() {
-			refassert(rootlist == &root); \
-			refassert(rootlist->p == reinterpret_cast<void **>(&ref)); \
+			refassert(rootlist == &root);
+			refassert(rootlist->p == reinterpret_cast<void **>(&ref));
 			rootlist = rootlist->next;
 		}
 		T* get() const {
