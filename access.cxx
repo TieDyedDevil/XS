@@ -165,9 +165,9 @@ PRIM(access) {
 			fail("$&access", "%s", esstrerror(estatus));
 	}
 
-	Ref(List *, result, reverse(lp));
+	SRef<List> result = reverse(lp);
 	gcenable();
-	RefReturn(result);
+	return result.release();
 }
 
 extern Dict *initprims_access(Dict *primdict) {
