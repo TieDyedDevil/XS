@@ -78,6 +78,100 @@ typedef struct {
  * our programming environment
  */
 
+/* print.c -- see print.hxx for more */
+
+extern int print(const char *fmt, ...);
+extern int eprint(const char *fmt, ...);
+extern int fprint(int fd, const char *fmt, ...);
+extern void panic(const char *fmt, ...) NORETURN;
+
+
+
+/* gc.cxx -- see gc.hxx for more */
+
+typedef struct Tag Tag;
+#define	gcnew(type)	(reinterpret_cast<type *>(gcalloc(sizeof (type), &(CONCAT(type,Tag)))))
+
+extern void *gcalloc(size_t n, Tag *t);		/* allocate n with collection tag t */
+extern char *gcdup(const char *s);		/* copy a 0-terminated string into gc space */
+extern char *gcndup(const char *s, size_t n);	/* copy a counted string into gc space */
+
+extern void initgc(void);			/* must be called at the dawn of time */
+extern void gc(void);				/* provoke a collection, if enabled */
+extern void gcreserve(size_t nbytes);		/* provoke a collection, if enabled and not enough space */
+extern void gcenable(void);			/* enable collections */
+extern void gcdisable(void);			/* disable collections */
+extern bool gcisblocked();			/* is collection disabled? */
+
+
+/*
+ * garbage collector tags
+ */
+
+typedef struct Root Root;
+struct Root {
+	void **p;
+	Root *next;
+};
+
+extern Root *rootlist;
+
+#if REF_ASSERTIONS
+#define	refassert(e)	assert(e)
+#else
+#define	refassert(e)	NOP
+#endif
+
+#define	Ref(t, v, init) \
+	if (0) ; else { \
+		t v = init; \
+		Root (CONCAT(v,__root__)); \
+		(CONCAT(v,__root__)).p = (void **) &v; \
+		(CONCAT(v,__root__)).next = rootlist; \
+		rootlist = &(CONCAT(v,__root__))
+#define	RefPop(v) \
+		refassert(rootlist == &(CONCAT(v,__root__))); \
+		refassert(rootlist->p == (void **) &v); \
+		rootlist = rootlist->next;
+#define RefEnd(v) \
+		RefPop(v); \
+	}
+#define RefReturn(v) \
+		RefPop(v); \
+		return v; \
+	}
+#define	RefAdd(e) \
+	if (0) ; else { \
+		Root __root__; \
+		__root__.p = (void **) &e; \
+		__root__.next = rootlist; \
+		rootlist = &__root__
+#define	RefRemove(e) \
+		refassert(rootlist == &__root__); \
+		refassert(rootlist->p == (void **) &e); \
+		rootlist = rootlist->next; \
+	}
+
+#define	RefEnd2(v1, v2)		RefEnd(v1); RefEnd(v2)
+#define	RefEnd3(v1, v2, v3)	RefEnd(v1); RefEnd2(v2, v3)
+#define	RefEnd4(v1, v2, v3, v4)	RefEnd(v1); RefEnd3(v2, v3, v4)
+
+#define	RefPop2(v1, v2)		RefPop(v1); RefPop(v2)
+#define	RefPop3(v1, v2, v3)	RefPop(v1); RefPop2(v2, v3)
+#define	RefPop4(v1, v2, v3, v4)	RefPop(v1); RefPop3(v2, v3, v4)
+
+#define	RefAdd2(v1, v2)		RefAdd(v1); RefAdd(v2)
+#define	RefAdd3(v1, v2, v3)	RefAdd(v1); RefAdd2(v2, v3)
+#define	RefAdd4(v1, v2, v3, v4)	RefAdd(v1); RefAdd3(v2, v3, v4)
+
+#define	RefRemove2(v1, v2)		RefRemove(v1); RefRemove(v2)
+#define	RefRemove3(v1, v2, v3)		RefRemove(v1); RefRemove2(v2, v3)
+#define	RefRemove4(v1, v2, v3, v4)	RefRemove(v1); RefRemove3(v2, v3, v4)
+
+#include "gc_ptr.hxx"
+
+
+
 
 /* main.c */
 
@@ -127,6 +221,7 @@ extern bool isclosure(Term *term);
 extern List *mklist(Term *term, List *next);
 extern List *reverse(List *list);
 extern List *append(List *head, List *tail);
+/*extern List *append(SRef<List> head, SRef<List> tail);*/
 extern List *listcopy(List *list);
 extern int length(List *list);
 extern List *listify(int argc, char **argv);
@@ -245,13 +340,6 @@ extern void *dictget2(Dict *dict, const char *name1, const char *name2);
 extern void initconv(void);
 
 
-/* print.c -- see print.hxx for more */
-
-extern int print(const char *fmt, ...);
-extern int eprint(const char *fmt, ...);
-extern int fprint(int fd, const char *fmt, ...);
-extern void panic(const char *fmt, ...) NORETURN;
-
 
 /* str.c */
 
@@ -362,89 +450,6 @@ extern int eopen(const char *name, OpenKind k);
 
 extern const char * const version;
 
-
-/* gc.c -- see gc.hxx for more */
-
-typedef struct Tag Tag;
-#define	gcnew(type)	(reinterpret_cast<type *>(gcalloc(sizeof (type), &(CONCAT(type,Tag)))))
-
-extern void *gcalloc(size_t n, Tag *t);		/* allocate n with collection tag t */
-extern char *gcdup(const char *s);		/* copy a 0-terminated string into gc space */
-extern char *gcndup(const char *s, size_t n);	/* copy a counted string into gc space */
-
-extern void initgc(void);			/* must be called at the dawn of time */
-extern void gc(void);				/* provoke a collection, if enabled */
-extern void gcreserve(size_t nbytes);		/* provoke a collection, if enabled and not enough space */
-extern void gcenable(void);			/* enable collections */
-extern void gcdisable(void);			/* disable collections */
-extern bool gcisblocked();			/* is collection disabled? */
-
-
-/*
- * garbage collector tags
- */
-
-typedef struct Root Root;
-struct Root {
-	void **p;
-	Root *next;
-};
-
-extern Root *rootlist;
-
-#if REF_ASSERTIONS
-#define	refassert(e)	assert(e)
-#else
-#define	refassert(e)	NOP
-#endif
-
-#define	Ref(t, v, init) \
-	if (0) ; else { \
-		t v = init; \
-		Root (CONCAT(v,__root__)); \
-		(CONCAT(v,__root__)).p = (void **) &v; \
-		(CONCAT(v,__root__)).next = rootlist; \
-		rootlist = &(CONCAT(v,__root__))
-#define	RefPop(v) \
-		refassert(rootlist == &(CONCAT(v,__root__))); \
-		refassert(rootlist->p == (void **) &v); \
-		rootlist = rootlist->next;
-#define RefEnd(v) \
-		RefPop(v); \
-	}
-#define RefReturn(v) \
-		RefPop(v); \
-		return v; \
-	}
-#define	RefAdd(e) \
-	if (0) ; else { \
-		Root __root__; \
-		__root__.p = (void **) &e; \
-		__root__.next = rootlist; \
-		rootlist = &__root__
-#define	RefRemove(e) \
-		refassert(rootlist == &__root__); \
-		refassert(rootlist->p == (void **) &e); \
-		rootlist = rootlist->next; \
-	}
-
-#define	RefEnd2(v1, v2)		RefEnd(v1); RefEnd(v2)
-#define	RefEnd3(v1, v2, v3)	RefEnd(v1); RefEnd2(v2, v3)
-#define	RefEnd4(v1, v2, v3, v4)	RefEnd(v1); RefEnd3(v2, v3, v4)
-
-#define	RefPop2(v1, v2)		RefPop(v1); RefPop(v2)
-#define	RefPop3(v1, v2, v3)	RefPop(v1); RefPop2(v2, v3)
-#define	RefPop4(v1, v2, v3, v4)	RefPop(v1); RefPop3(v2, v3, v4)
-
-#define	RefAdd2(v1, v2)		RefAdd(v1); RefAdd(v2)
-#define	RefAdd3(v1, v2, v3)	RefAdd(v1); RefAdd2(v2, v3)
-#define	RefAdd4(v1, v2, v3, v4)	RefAdd(v1); RefAdd3(v2, v3, v4)
-
-#define	RefRemove2(v1, v2)		RefRemove(v1); RefRemove(v2)
-#define	RefRemove3(v1, v2, v3)		RefRemove(v1); RefRemove2(v2, v3)
-#define	RefRemove4(v1, v2, v3, v4)	RefRemove(v1); RefRemove3(v2, v3, v4)
-
-#include "gc_ptr.hxx"
 
 extern void globalroot(void *addr);
 
