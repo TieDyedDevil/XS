@@ -26,13 +26,13 @@ class SRef {
 			return ref == x;
 		}
 		bool operator==(SRef<T> x) {
-			return ref == x;
+			return ref == x.ref;
 		}
 		bool operator!=(T *x) {
 			return ref != x;
 		}
 		bool operator!=(SRef<T> x) {
-			return ref != x;
+			return ref != x.ref;
 		}
 
 		~SRef() {
