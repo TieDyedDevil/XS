@@ -10,12 +10,13 @@
 DefineTag(Closure, static);
 
 extern Closure *mkclosure(Tree *tree, Binding *binding) {
+	/* Must disable gc to protect tree + binding */
 	gcdisable();
-	Ref(Closure *, closure, gcnew(Closure));
+	SRef<Closure> closure = gcnew(Closure);
 	closure->tree = tree;
 	closure->binding = binding;
 	gcenable();
-	RefReturn(closure);
+	return closure.release();;
 }
 
 static void *ClosureCopy(void *op) {
