@@ -131,46 +131,40 @@ static List *local(Tree *defn, SRef<Tree> body,
 }
 
 /* forloop -- evaluate a for loop */
-static List *forloop(Tree *defn0, Tree *body0,
-		     Binding *binding, int evalflags) {
+static List *forloop(SRef<Tree> defn, SRef<Tree> body,
+		     SRef<Binding> outer, int evalflags) {
 	static List MULTIPLE = { NULL, NULL };
 
-	Ref(List *, result, ltrue);
-	Ref(Binding *, outer, binding);
-	Ref(Binding *, looping, NULL);
-	Ref(Tree *, body, body0);
-
-	Ref(Tree *, defn, defn0);
+	SRef<List> result = ltrue;
+	SRef<Binding> looping = NULL;
 	for (; defn != NULL; defn = defn->u[1].p) {
 		assert(defn->kind == nList);
 		if (defn->u[0].p == NULL)
 			continue;
-		Ref(Tree *, assign, defn->u[0].p);
+		SRef<Tree> assign = defn->u[0].p;
 		assert(assign->kind == nAssign);
-		Ref(List *, vars, glom(assign->u[0].p, outer, false));
-		Ref(List *, list, glom(assign->u[1].p, outer, true));
+		SRef<List> vars = glom(assign->u[0].p, outer.uget(), false);
+		SRef<List> list = glom(assign->u[1].p, outer.uget(), true);
 		if (vars == NULL)
 			fail("es:for", "null variable name");
 		for (; vars != NULL; vars = vars->next) {
-			const char *var = getstr(vars->term);
-			looping = mkbinding(var, list, looping);
+			SRef<const char> var = getstr(vars->term);
+			looping = mkbinding(var.release(), list.uget(), looping.release());
 			list = &MULTIPLE;
 		}
-		RefEnd3(list, vars, assign);
 		SIGCHK();
 	}
-	looping = reversebindings(looping);
-	RefEnd(defn);
+	looping = reversebindings(looping.release());
 
 	ExceptionHandler
 
 		for (;;) {
 			bool allnull = true;
-			Ref(Binding *, bp, outer);
-			Ref(Binding *, lp, looping);
-			Ref(Binding *, sequence, NULL);
+			SRef<Binding> bp = outer;
+			SRef<Binding> lp = looping;
+			SRef<Binding> sequence = NULL;
 			for (; lp != NULL; lp = lp->next) {
-				Ref(List *, value, NULL);
+				SRef<List> value = NULL;
 				if (lp->defn != &MULTIPLE)
 					sequence = lp;
 				assert(sequence != NULL);
@@ -180,16 +174,12 @@ static List *forloop(Tree *defn0, Tree *body0,
 					sequence->defn = sequence->defn->next;
 					allnull = false;
 				}
-				bp = mkbinding(lp->name, value, bp);
-				RefEnd(value);
+				bp = mkbinding(lp->name, value.release(), bp.release());
 			}
-			RefEnd2(sequence, lp);
 			if (allnull) {
-				RefPop(bp);
 				break;
 			}
-			result = walk(body, bp, evalflags & eval_exitonfalse);
-			RefEnd(bp);
+			result = walk(body.uget(), bp.uget(), evalflags & eval_exitonfalse);
 			SIGCHK();
 		}
 
@@ -200,9 +190,7 @@ static List *forloop(Tree *defn0, Tree *body0,
 		result = e->next;
 
 	EndExceptionHandler
-
-	RefEnd3(body, looping, outer);
-	RefReturn(result);
+	return result.release();
 }
 
 /* matchpattern -- does the text match a pattern? */
