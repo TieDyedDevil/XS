@@ -22,6 +22,14 @@
 		bool operator==(T *x) const {
 			return ref == x;
 		}
+		/* ONLY for comparisons to NULL */
+		bool operator==(int x) const {
+			/* Cast in assert is to quiet warnings about
+			 * NULL in arithmetic
+			 */
+			assert (reinterpret_cast<void*>(x) == NULL);
+			return ref == reinterpret_cast<T*>(x);
+		}
 		bool operator==(SRef<T> x) const {
 			return ref == x.ref;
 		}
@@ -30,6 +38,10 @@
 		}
 		bool operator!=(SRef<T> x) const {
 			return ref != x.ref;
+		}
+		bool operator!=(int x) const {
+			assert (reinterpret_cast<void*>(x) == NULL);
+			return ref != reinterpret_cast<T*>(x);
 		}
 
 		~SRef() {
