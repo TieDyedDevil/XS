@@ -504,14 +504,17 @@ extern List *raised(List *e);
 		_localhandler.evaldepth = evaldepth; \
 		_localhandler.up = tophandler; \
 		tophandler = &_localhandler; \
-		if (!setjmp(_localhandler.label)) {
+		if (!setjmp(_localhandler.label)) { \
+			{
 
 #define CatchException(e) \
+		} \
 			pophandler(&_localhandler); \
 		} else { \
 			List *e = raised(exception); \
 
 #define CatchExceptionIf(condition, e) \
+		} \
 			if (condition) \
 				pophandler(&_localhandler); \
 		} else { \
