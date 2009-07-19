@@ -194,33 +194,26 @@ static List *forloop(SRef<Tree> defn, SRef<Tree> body,
 }
 
 /* matchpattern -- does the text match a pattern? */
-static List *matchpattern(Tree *subjectform0, Tree *patternform0,
-			  Binding *binding) {
+static List *matchpattern(SRef<Tree> subjectform, SRef<Tree> patternform,
+			  SRef<Binding> binding) {
 	bool result;
-	List *pattern;
 	StrList *quote = NULL;
-	Ref(Binding *, bp, binding);
-	Ref(Tree *, patternform, patternform0);
-	Ref(List *, subject, glom(subjectform0, bp, true));
-	pattern = glom2(patternform, bp, &quote);
-	result = listmatch(subject, pattern, quote);
-	RefEnd3(subject, patternform, bp);
-	return result ? ltrue : lfalse;
+	SRef<List> subject = glom(subjectform.release(), binding.uget(), true);
+	SRef<List> pattern = glom2(patternform.uget(), binding.uget(), &quote);
+	return listmatch(subject.release(), pattern.release(), quote) 
+		? ltrue 
+		: lfalse;
 }
 
 /* extractpattern -- Like matchpattern, but returns matches */
-static List *extractpattern(Tree *subjectform0, Tree *patternform0,
-			    Binding *binding) {
-	List *pattern;
+static List *extractpattern(SRef<Tree> subjectform, SRef<Tree> patternform,
+			    SRef<Binding> binding) {
 	StrList *quote = NULL;
-	Ref(List *, result, NULL);
-	Ref(Binding *, bp, binding);
-	Ref(Tree *, patternform, patternform0);
-	Ref(List *, subject, glom(subjectform0, bp, true));
-	pattern = glom2(patternform, bp, &quote);
-	result = (List *) extractmatches(subject, pattern, quote);
-	RefEnd3(subject, patternform, bp);
-	RefReturn(result);
+	SRef<List> result = NULL;
+	SRef<List> subject = glom(subjectform.uget(), binding.uget(), true);
+	SRef<List> pattern = glom2(patternform.uget(), binding.uget(), &quote);
+	result = (List *) extractmatches(subject.release(), pattern.release(), quote);
+	return result.release();
 }
 
 /* walk -- walk through a tree, evaluating nodes */
