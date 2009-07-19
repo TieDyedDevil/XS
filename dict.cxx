@@ -3,9 +3,13 @@
 #include "es.hxx"
 #include "gc.hxx"
 
-#define	INIT_DICT_SIZE	2
-#define	REMAIN(n)	(((n) * 2) / 3)
-#define	GROW(n)		((n) * 2)
+static const int INIT_DICT_SIZE = 2;
+inline static int remain(int n)	{
+	return n * 2 / 3;
+}
+inline static int grow(int n) {
+	return n * 2;
+}
 
 /*
  * hashing
@@ -72,7 +76,7 @@ static Dict *mkdict0(int size) {
 	Dict *dict = reinterpret_cast<Dict*>(gcalloc(len, &DictTag));
 	memzero(dict, len);
 	dict->size = size;
-	dict->remain = REMAIN(size);
+	dict->remain = remain(size);
 	return dict;
 }
 
@@ -111,31 +115,25 @@ static Assoc *get(Dict *dict, const char *name) {
 	return NULL;
 }
 
-static Dict *put(Dict *dict, const char *name, void *value);
+static Dict *put(SRef<Dict> dict, SRef<const char> name, SRef<void> value);
 static void putForAll(void *dict, const char *name, void *value) {
 	put(reinterpret_cast<Dict*>(dict), name, value);
 }
 
-static Dict *put(Dict *dict, const char *name, void *value) {
+static Dict *put(SRef<Dict> dict, SRef<const char> name, SRef<void> value) {
 	unsigned long n, mask;
 	Assoc *ap;
-	assert(get(dict, name) == NULL);
+	assert(get(dict.uget(), name.uget()) == NULL);
 	assert(value != NULL);
 
 	if (dict->remain <= 1) {
-		Dict *newDict;
-		Ref(Dict *, old, dict);
-		Ref(const char *, np, name);
-		Ref(void *, vp, value);
-		newDict = mkdict0(GROW(old->size));
-		dictforall(old, putForAll, newDict);
+		SRef<Dict> newDict;
+		newDict = mkdict0(grow(dict->size));
+		dictforall(dict.uget(), putForAll, newDict.uget());
 		dict = newDict;
-		name = np;
-		value = vp;
-		RefEnd3(vp, np, old);
 	}
 
-	n = strhash(name);
+	n = strhash(name.uget());
 	mask = dict->size - 1;
 	for (; (ap = &dict->table[n & mask])->name != DEAD; n++)
 		if (ap->name == NULL) {
@@ -143,9 +141,9 @@ static Dict *put(Dict *dict, const char *name, void *value) {
 			break;
 		}
 
-	ap->name = name;
-	ap->value = value;
-	return dict;
+	ap->name = name.uget();
+	ap->value = value.uget();
+	return dict.release();
 }
 
 static void rm(Dict *dict, Assoc *ap) {
@@ -193,16 +191,13 @@ extern Dict *dictput(Dict *dict, const char *name, void *value) {
 	return dict;
 }
 
-extern void dictforall(Dict *dp, void (*proc)(void *, const char *, void *), void *arg) {
+extern void dictforall(SRef<Dict> dict, void (*proc)(void *, const char *, void *), SRef<void> argp) {
 	int i;
-	Ref(Dict *, dict, dp);
-	Ref(void *, argp, arg);
 	for (i = 0; i < dict->size; i++) {
 		Assoc *ap = &dict->table[i];
 		if (ap->name != NULL && ap->name != DEAD)
-			(*proc)(argp, ap->name, ap->value);
+			(*proc)(argp.uget(), ap->name, ap->value);
 	}
-	RefEnd2(argp, dict);
 }
 
 /* dictget2 -- look up the catenation of two names (such a hack!) */
