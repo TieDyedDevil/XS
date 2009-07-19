@@ -218,7 +218,7 @@ extern bool isclosure(Term *term);
 
 /* list.c */
 
-extern List *mklist(Term *term, List *next);
+extern List *mklist(SRef<Term> term, SRef<List> next);
 extern List *reverse(List *list);
 extern List *append(SRef<List> head, SRef<List> tail);
 extern List *listcopy(List *list);

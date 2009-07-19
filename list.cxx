@@ -9,13 +9,11 @@
 
 DefineTag(List, static);
 
-extern List *mklist(Term *term, List *next) {
-	gcdisable();
+extern List *mklist(SRef<Term> term, SRef<List> next) {
 	assert(term != NULL);
 	SRef<List> list = gcnew(List);
-	list->term = term;
-	list->next = next;
-	gcenable();
+	list->term = term.release();
+	list->next = next.release();
 	return list.release();
 }
 
