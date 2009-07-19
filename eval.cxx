@@ -107,39 +107,27 @@ static Binding *letbindings(SRef<Tree> defn, SRef<Binding> binding,
 }
 
 /* localbind -- recursively convert a Bindings list into dynamic binding */
-static List *localbind(Binding *dynamic0, Binding *lexical0,
-		       Tree *body0, int evalflags) {
-	if (dynamic0 == NULL)
-		return walk(body0, lexical0, evalflags);
+static List *localbind(SRef<Binding> dynamic, SRef<Binding> lexical,
+		       SRef<Tree> body, int evalflags) {
+	if (!dynamic)
+		return walk(body.uget(), lexical.uget(), evalflags);
 	else {
 		Push p;
-		Ref(List *, result, NULL);
-		Ref(Tree *, body, body0);
-		Ref(Binding *, dynamic, dynamic0);
-		Ref(Binding *, lexical, lexical0);
-
+		SRef<List> result;
 		varpush(&p, dynamic->name, dynamic->defn);
 		result = localbind(dynamic->next, lexical, body, evalflags);
 		varpop(&p);
 
-		RefEnd3(lexical, dynamic, body);
-		RefReturn(result);
+		return result.release();
 	}
 }
 
 /* local -- build, recursively, one layer of local assignment */
-static List *local(Tree *defn, Tree *body0,
-		   Binding *bindings0, int evalflags) {
-	Ref(List *, result, NULL);
-	Ref(Tree *, body, body0);
-	Ref(Binding *, bindings, bindings0);
-	Ref(Binding *, dynamic,
-	    reversebindings(letbindings(defn, NULL, bindings, evalflags)));
-
-	result = localbind(dynamic, bindings, body, evalflags);
-
-	RefEnd3(dynamic, bindings, body);
-	RefReturn(result);
+static List *local(Tree *defn, SRef<Tree> body,
+		   SRef<Binding> bindings, int evalflags) {
+	SRef<Binding> dynamic =
+	    reversebindings(letbindings(defn, NULL, bindings, evalflags));
+	return localbind(dynamic, bindings, body, evalflags);
 }
 
 /* forloop -- evaluate a for loop */
