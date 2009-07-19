@@ -18,7 +18,7 @@ class SRef {
 			ref = p;
 		}
 		SRef& operator=(void* p) {
-			ref = p;
+			ref = reinterpret_cast<T*>(p);
 		}
 		operator bool() const {
 			return ref != NULL;
@@ -40,9 +40,15 @@ class SRef {
 		}
 
 		~SRef() {
-			refassert(rootlist == &root);
-			refassert(rootlist->p == reinterpret_cast<void **>(&ref));
-			rootlist = rootlist->next;
+			if (&root == rootlist) {
+				refassert(rootlist->p == reinterpret_cast<void **>(&ref));
+				rootlist = rootlist->next;
+			} else {
+				Root *x = rootlist;
+				while (x->next != &root) x = x->next;
+				refassert(x->next->p == reinterpret_cast<void **>(&ref));
+				x->next = x->next->next;
+			}
 		}
 		T* get() const {
 			assert(gcisblocked());
