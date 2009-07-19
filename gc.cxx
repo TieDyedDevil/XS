@@ -539,17 +539,12 @@ extern void *gcalloc(size_t nbytes, Tag *tag) {
 DefineTag(String, notstatic);
 
 extern char *gcndup(const char *s, size_t n) {
-	char *ns;
+	SRef<char> ns = reinterpret_cast<char*>(gcalloc((n + 1) * sizeof (char), &StringTag));
+	memcpy(ns.uget(), s, n);
+	ns.uget()[n] = '\0';
+	assert(strlen(ns.uget()) == n);
 
-	gcdisable();
-	ns = reinterpret_cast<char*>(gcalloc((n + 1) * sizeof (char), &StringTag));
-	memcpy(ns, s, n);
-	ns[n] = '\0';
-	assert(strlen(ns) == n);
-
-	Ref(char *, result, ns);
-	gcenable();
-	RefReturn(result);
+	return ns.release();
 }
 
 extern char *gcdup(const char *s) {
