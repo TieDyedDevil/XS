@@ -17,7 +17,7 @@ static char *strerror(int n) {
 #endif
 
 /* esstrerror -- a wrapper around sterror(3) */
-extern char *esstrerror(int n) {
+extern const char *esstrerror(int n) {
   char *error = strerror(n);
 
   if (error == NULL)

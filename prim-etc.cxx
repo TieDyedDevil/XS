@@ -100,7 +100,7 @@ PRIM(whatis) {
 			list = fn;
 		else {
 			if (isabsolute(prog)) {
-				char *error = checkexecutable(prog);
+				const char *error = checkexecutable(prog);
 				if (error != NULL)
 					fail("$&whatis", "%s: %s", prog, error);
 			} else

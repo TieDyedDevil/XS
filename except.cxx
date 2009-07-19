@@ -51,14 +51,18 @@ extern void fail (const char * from,  const char * fmt, ...) {
 	s = strv(fmt, args);
 	va_end(args);
 
-	gcdisable();
-	Ref(List *, e, mklist(mkstr("error"),
-			      mklist(mkstr((char *) from),
-				     mklist(mkstr(s), NULL))));
-	while (gcisblocked())
-		gcenable();
-	throwE(e);
-	RefEnd(e);
+	List *x;
+	{
+		gcdisable();
+		SRef<List> e = mklist(mkstr("error"),
+			      	mklist(mkstr((char *) from),
+				     	mklist(mkstr(s), NULL)));
+		while (gcisblocked())
+			gcenable();
+		x = e.release();
+	}
+	throwE(x);
+	NOTREACHED;
 }
 
 /* newchildcatcher -- remove the current handler chain for a new child */

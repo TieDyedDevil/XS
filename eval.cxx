@@ -232,21 +232,20 @@ top:
 	    case nConcat: case nList: case nQword: case nVar: case nVarsub:
 	    case nWord: case nThunk: case nLambda: case nCall: case nPrim: {
 		List *list;
-		Ref(Binding *, bp, binding);
-		list = glom(tree, binding, true);
-		binding = bp;
-		RefEnd(bp);
+		SRef<Binding> bp = binding;
+		list = glom(tree, bp.uget(), true);
+		binding = bp.release();
 		return eval(list, binding, flags);
 	    }
 
 	    case nAssign:
 		return assign(tree->u[0].p, tree->u[1].p, binding);
 
-	    case nLet: case nClosure:
-		Ref(Tree *, body, tree->u[1].p);
+	    case nLet: case nClosure: {
+		SRef<Tree> body = tree->u[1].p;
 		binding = letbindings(tree->u[0].p, binding, binding, flags);
-		tree = body;
-		RefEnd(body);
+		tree = body.release();
+	    }
 		goto top;
 
 	    case nLocal:
@@ -269,17 +268,13 @@ top:
 }
 
 /* bindargs -- bind an argument list to the parameters of a lambda */
-extern Binding *bindargs(Tree *params, List *args, Binding *binding) {
-	if (params == NULL)
-		return mkbinding("*", args, binding);
+extern Binding *bindargs(SRef<Tree> params, SRef<List> args, SRef<Binding> binding) {
+	if (!params) return mkbinding("*", args.release(), binding.release());
 
-	gcdisable();
-
-	for (; params != NULL; params = params->u[1].p) {
-		Tree *param;
-		List *value;
+	for (; params; params = params->u[1].p) {
+		SRef<List> value;
 		assert(params->kind == nList);
-		param = params->u[0].p;
+		SRef<Tree> param = params->u[0].p;
 		assert(param->kind == nWord || param->kind == nQword);
 		if (args == NULL)
 			value = NULL;
@@ -290,12 +285,10 @@ extern Binding *bindargs(Tree *params, List *args, Binding *binding) {
 			value = mklist(args->term, NULL);
 			args = args->next;
 		}
-		binding = mkbinding(param->u[0].s, value, binding);
+		binding = mkbinding(param->u[0].s, value.release(), binding.release());
 	}
 
-	Ref(Binding *, result, binding);
-	gcenable();
-	RefReturn(result);
+	return binding.release();
 }
 
 /* pathsearch -- evaluate fn %pathsearch + some argument */
@@ -387,8 +380,8 @@ restart:
 	}
 	if (isabsolute(name.uget())) {
 		const char *error = checkexecutable(name.uget());
-		if (error != NULL)
-			fail("$&whatis", "%s: %s", name, error);
+		if (error)
+			fail("$&whatis", "%s: %s", name.uget(), error);
 		list = forkexec(name.uget(), list.release(), flags & eval_inchild);
 		goto done;
 	}

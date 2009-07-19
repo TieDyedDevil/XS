@@ -175,7 +175,7 @@ extern Dict *initprims_access(Dict *primdict) {
 	return primdict;
 }
 
-extern char *checkexecutable(const char *file) {
+extern const char *checkexecutable(const char *file) {
 	int err = testfile(file, EXEC, S_IFREG);
 	return err == 0 ? NULL : esstrerror(err);
 }

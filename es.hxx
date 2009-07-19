@@ -243,10 +243,10 @@ extern Binding *reversebindings(Binding *binding);
 
 /* eval.c */
 
-extern Binding *bindargs(Tree *params, List *args, Binding *binding);
+extern Binding *bindargs(SRef<Tree> params, SRef<List> args, SRef<Binding> binding);
 extern List *forkexec(const char *file, List *list, bool inchild);
 extern List *walk(Tree *tree, Binding *binding, int flags);
-extern List *eval(List *list, Binding *binding, int flags);
+extern List *eval(SRef<List> list, SRef<Binding> binding, int flags);
 extern List *eval1(Term *term, int flags);
 extern List *pathsearch(Term *term);
 
@@ -313,7 +313,7 @@ extern void printstatus(int pid, int status);
 
 /* access.c */
 
-extern char *checkexecutable(const char *file);
+extern const char *checkexecutable(const char *file);
 
 
 /* proc.c */
@@ -356,7 +356,7 @@ extern void sortvector(Vector *v);
 
 /* util.c */
 
-extern char *esstrerror(int err);
+extern const char *esstrerror(int err);
 extern void uerror(char *msg);
 extern void *ealloc(size_t n);
 extern void *erealloc(void *p, size_t n);
