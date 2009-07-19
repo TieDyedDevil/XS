@@ -309,20 +309,19 @@ extern List *pathsearch(Term *term) {
 }
 
 /* eval -- evaluate a list, producing a list */
-extern List *eval(List *list0, Binding *binding0, int flags) {
+extern List *eval(SRef<List> list, SRef<Binding> binding, int flags) {
 	Closure *volatile cp;
-	List *fn;
 
 	if (++evaldepth >= maxevaldepth)
 		fail("es:eval", "max-eval-depth exceeded");
 
-	Ref(List *, list, list0);
-	Ref(Binding *, binding, binding0);
-	Ref(const char *, funcname, NULL);
+	SRef<const char> name;
+
+	SRef<const char> funcname = NULL;
+	SRef<List> fn;
 
 restart:
 	if (list == NULL) {
-		RefPop3(funcname, binding, list);
 		--evaldepth;
 		return ltrue;
 	}
@@ -332,30 +331,29 @@ restart:
 		switch (cp->tree->kind) {
 		    case nPrim:
 			assert(cp->binding == NULL);
-			list = prim(cp->tree->u[0].s, list->next, binding, flags);
+			list = prim(cp->tree->u[0].s, list->next, binding.uget(), flags);
 			break;
 		    case nThunk:
 			list = walk(cp->tree->u[0].p, cp->binding, flags);
 			break;
 		    case nLambda:
 			ExceptionHandler
-
+			{
 				Push p;
-				Ref(Tree *, tree, cp->tree);
-				Ref(Binding *, context,
+				SRef<Tree> tree = cp->tree;
+				SRef<Binding> context =
 					       bindargs(tree->u[0].p,
 							list->next,
-							cp->binding));
-				if (funcname != NULL)
+							cp->binding);
+				if (funcname)
 					varpush(&p, "0",
-						    mklist(mkterm(funcname,
+						    mklist(mkterm(funcname.uget(),
 								  NULL),
 							   NULL));
-				list = walk(tree->u[1].p, context, flags);
-				if (funcname != NULL)
+				list = walk(tree->u[1].p, context.uget(), flags);
+				if (funcname)
 					varpop(&p);
-				RefEnd2(context, tree);
-
+			}
 			CatchException (e)
 
 				if (termeq(e->term, "return")) {
@@ -380,29 +378,26 @@ restart:
 
 	/* the logic here is duplicated in $&whatis */
 
-	Ref(const char *, name, getstr(list->term));
-	fn = varlookup2("fn-", name, binding);
+	name = getstr(list->term);
+	fn = varlookup2("fn-", name.uget(), binding.uget());
 	if (fn != NULL) {
 		funcname = name;
 		list = append(fn, list->next);
-		RefPop(name);
 		goto restart;
 	}
-	if (isabsolute(name)) {
-		const char *error = checkexecutable(name);
+	if (isabsolute(name.uget())) {
+		const char *error = checkexecutable(name.uget());
 		if (error != NULL)
 			fail("$&whatis", "%s: %s", name, error);
-		list = forkexec(name, list, flags & eval_inchild);
-		RefPop(name);
+		list = forkexec(name.uget(), list.release(), flags & eval_inchild);
 		goto done;
 	}
-	RefEnd(name);
 
 	fn = pathsearch(list->term);
 	if (fn != NULL && fn->next == NULL
 	    && (cp = getclosure(fn->term)) == NULL) {
 		const char *name = getstr(fn->term);
-		list = forkexec(name, list, flags & eval_inchild);
+		list = forkexec(name, list.release(), flags & eval_inchild);
 		goto done;
 	}
 
@@ -411,10 +406,9 @@ restart:
 
 done:
 	--evaldepth;
-	if ((flags & eval_exitonfalse) && !istrue(list))
-		exit(exitstatus(list));
-	RefEnd2(funcname, binding);
-	RefReturn(list);
+	if ((flags & eval_exitonfalse) && !istrue(list.uget()))
+		exit(exitstatus(list.uget()));
+	return list.release();
 }
 
 /* eval1 -- evaluate a term, producing a list */
