@@ -235,7 +235,7 @@ extern Tree *mk(NodeKind , ...);
 
 /* closure.c */
 
-extern Closure *mkclosure(Tree *tree, Binding *binding);
+extern Closure *mkclosure(SRef<Tree> tree, SRef<Binding> binding);
 extern Closure *extractbindings(Tree *tree);
 extern Binding *mkbinding(const char *name, List *defn, Binding *next);
 extern Binding *reversebindings(Binding *binding);
