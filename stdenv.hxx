@@ -115,8 +115,9 @@ extern void *qsort(
 
 #define CONCAT(a,b)	a ## b
 
-/* No macro expansion */
-#define STRING(s)	#s
+/* Two for macro expansion */
+#define _STRING(s)	#s
+#define STRING(s) _STRING(s)
 
 /*
  * types we use throughout es
