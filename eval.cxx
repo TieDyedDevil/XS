@@ -4,22 +4,19 @@
 
 unsigned long evaldepth = 0, maxevaldepth = MAXmaxevaldepth;
 
-static void failexec(const char *file, List *args) NORETURN;
-static void failexec(const char *file, List *args) {
+static void failexec(SRef<const char> file, SRef<List> args) NORETURN;
+static void failexec(SRef<const char> file, SRef<List> args) {
 	List *fn;
 	assert(gcisblocked());
 	fn = varlookup("fn-%exec-failure", NULL);
 	if (fn != NULL) {
 		int olderror = errno;
-		Ref(List *, list, append(fn, mklist(mkstr(file), args)));
-		RefAdd(file);
+		SRef<List> list = append(fn, mklist(mkstr(file.release()), args.release()));
 		gcenable();
-		RefRemove(file);
-		eval(list, NULL, 0);
-		RefEnd(list);
+		eval(list.release(), NULL, 0);
 		errno = olderror;
 	}
-	eprint("%s: %s\n", file, esstrerror(errno));
+	eprint("%s: %s\n", file.uget(), esstrerror(errno));
 	exit(1);
 }
 
@@ -45,22 +42,20 @@ extern List *forkexec(const char *file, List *list, bool inchild) {
 }
 
 /* assign -- bind a list of values to a list of variables */
-static List *assign(Tree *varform, Tree *valueform0, Binding *binding0) {
-	Ref(List *, result, NULL);
+static List *assign(SRef<Tree> varform, SRef<Tree> valueform, SRef<Binding> binding) {
+	SRef<List> result = NULL;
 
-	Ref(Tree *, valueform, valueform0);
-	Ref(Binding *, binding, binding0);
-	Ref(List *, vars, glom(varform, binding, false));
+	SRef<List> vars = glom(varform.release(), binding.uget(), false);
 
 	if (vars == NULL)
 		fail("es:assign", "null variable name");
 
-	Ref(List *, values, glom(valueform, binding, true));
+	SRef<List> values = glom(valueform.release(), binding.uget(), true);
 	result = values;
 
 	for (; vars != NULL; vars = vars->next) {
-		List *value;
-		Ref(const char *, name, getstr(vars->term));
+		SRef<List> value;
+		SRef<const char> name = getstr(vars->term);
 		if (values == NULL)
 			value = NULL;
 		else if (vars->next == NULL || values->next == NULL) {
@@ -70,37 +65,31 @@ static List *assign(Tree *varform, Tree *valueform0, Binding *binding0) {
 			value = mklist(values->term, NULL);
 			values = values->next;
 		}
-		vardef(name, binding, value);
-		RefEnd(name);
+		vardef(name.release(), binding.release(), value.release());
 	}
 
-	RefEnd4(values, vars, binding, valueform);
-	RefReturn(result);
+	return result.release();
 }
 
 /* letbindings -- create a new Binding containing let-bound variables */
-static Binding *letbindings(Tree *defn0, Binding *outer0,
-			    Binding *context0, int evalflags) {
-	Ref(Binding *, binding, outer0);
-	Ref(Binding *, context, context0);
-	Ref(Tree *, defn, defn0);
-
+static Binding *letbindings(SRef<Tree> defn, SRef<Binding> binding,
+			    SRef<Binding> context, int evalflags) {
 	for (; defn != NULL; defn = defn->u[1].p) {
 		assert(defn->kind == nList);
 		if (defn->u[0].p == NULL)
 			continue;
 
-		Ref(Tree *, assign, defn->u[0].p);
+		SRef<Tree> assign = defn->u[0].p;
 		assert(assign->kind == nAssign);
-		Ref(List *, vars, glom(assign->u[0].p, context, false));
-		Ref(List *, values, glom(assign->u[1].p, context, true));
+		SRef<List> vars = glom(assign->u[0].p, context.uget(), false);
+		SRef<List> values = glom(assign->u[1].p, context.uget(), true);
 
 		if (vars == NULL)
 			fail("es:let", "null variable name");
 
 		for (; vars != NULL; vars = vars->next) {
-			List *value;
-			Ref(const char *, name, getstr(vars->term));
+			SRef<List> value;
+			SRef<const char> name = getstr(vars->term);
 			if (values == NULL)
 				value = NULL;
 			else if (vars->next == NULL || values->next == NULL) {
@@ -110,15 +99,11 @@ static Binding *letbindings(Tree *defn0, Binding *outer0,
 				value = mklist(values->term, NULL);
 				values = values->next;
 			}
-			binding = mkbinding(name, value, binding);
-			RefEnd(name);
+			binding = mkbinding(name.release(), value.release(), binding.release());
 		}
-
-		RefEnd3(values, vars, assign);
 	}
 
-	RefEnd2(defn, context);
-	RefReturn(binding);
+	return binding.release();
 }
 
 /* localbind -- recursively convert a Bindings list into dynamic binding */
