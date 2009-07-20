@@ -4,22 +4,20 @@
 #include "gc.hxx"
 
 /* concat -- cartesion cross product concatenation */
-extern List *concat(List *list1, List *list2) {
-	List **p, *result = NULL;
+static List *concat(SRef<List> list1,SRef<List> list2) {
+	/* p is needed such that result can be set the first
+	   time, p_tmp is used in place of result for the rest
+	*/
+	SRef<List> result = NULL, p_tmp;
 
-	gcdisable();
-	for (p = &result; list1 != NULL; list1 = list1->next) {
-		List *lp;
-		for (lp = list2; lp != NULL; lp = lp->next) {
-			List *np = mklist(termcat(list1->term, lp->term), NULL);
-			*p = np;
-			p = &np->next;
-		}
+	for (SRef<List> *p = &result; list1 != NULL; list1 = list1->next) {
+		for (SRef<List> lp = list2;
+		     lp != NULL;
+		     p_tmp = (*p)->next, p = &p_tmp, lp = lp->next)
+		
+			*p = mklist(termcat(list1->term, lp->term), NULL);
 	}
-
-	Ref(List *, list, result);
-	gcenable();
-	RefReturn(list);
+	return result.release();
 }
 
 /* qcat -- concatenate two quote flag terms */
