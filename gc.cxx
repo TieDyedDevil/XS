@@ -324,7 +324,7 @@ static inline void *follow(Tag *tagp) {
 }
 
 /* forward -- forward an individual pointer from old space
- * forward will NEVER modify the contents of p.
+ * NOTE: forward will NEVER modify the contents of p.
  */
 extern void *forward(void *p) {
 	Tag *tag;
