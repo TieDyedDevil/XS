@@ -21,64 +21,67 @@ static List *concat(SRef<List> list1,SRef<List> list2) {
 }
 
 /* qcat -- concatenate two quote flag terms */
-static const char *qcat(const char *q1, const char *q2, Term *t1, Term *t2) {
-	size_t len1, len2;
-	char *result, *s;
-
-	assert(gcisblocked());
-
+static const char *qcat(SRef<const char> q1,
+			SRef<const char> q2,
+			SRef<Term> t1,
+			SRef<Term> t2)
+{
 	if (q1 == QUOTED && q2 == QUOTED)
 		return QUOTED;
 	if (q1 == UNQUOTED && q2 == UNQUOTED)
 		return UNQUOTED;
 
-	len1 = (q1 == QUOTED || q1 == UNQUOTED) ? strlen(getstr(t1)) : strlen(q1);
-	len2 = (q2 == QUOTED || q2 == UNQUOTED) ? strlen(getstr(t2)) : strlen(q2);
+	size_t len1 = (q1 == QUOTED || q1 == UNQUOTED)
+		? strlen(getstr(t1.uget()))
+		: strlen(q1.uget());
+	size_t len2 = (q2 == QUOTED || q2 == UNQUOTED)
+		? strlen(getstr(t2.uget()))
+		: strlen(q2.uget());
+	SRef<char> result, s;
 	result = s = reinterpret_cast<char*>(gcalloc(len1 + len2 + 1, &StringTag));
 
 	if (q1 == QUOTED)
-		memset(s, 'q', len1);
+		memset(s.uget(), 'q', len1);
 	else if (q1 == UNQUOTED)
-		memset(s, 'r', len1);
+		memset(s.uget(), 'r', len1);
 	else
-		memcpy(s, q1, len1);
-	s += len1;
+		memcpy(s.uget(), q1.uget(), len1);
+		
 	if (q2 == QUOTED)
-		memset(s, 'q', len2);
+		memset(&s[len1], 'q', len2);
 	else if (q2 == UNQUOTED)
-		memset(s, 'r', len2);
+		memset(&s[len1], 'r', len2);
 	else
-		memcpy(s, q2, len2);
-	s += len2;
-	*s = '\0';
+		memcpy(&s[len1], q2.uget(), len2);
+	s[len1 + len2] = '\0';
 
-	return result;
+	return result.release();
 }
 
 /* qconcat -- cartesion cross product concatenation; also produces a quote list */
-static List *qconcat(List *list1, List *list2, StrList *ql1, StrList *ql2, StrList **quotep) {
-	List **p, *result = NULL;
-	StrList **qp;
+static List *qconcat(SRef<List> list1, SRef<List> list2,
+		     SRef<StrList> ql1, SRef<StrList> ql2, SRef<StrList> *quotep) {
+	SRef<List> result, tmp_p, *p;
+	SRef<StrList> tmp_qp, *qp;
 
-	gcdisable();
 	for (p = &result, qp = quotep; list1 != NULL; list1 = list1->next, ql1 = ql1->next) {
-		List *lp;
-		StrList *qlp;
+		SRef<List> lp;
+		SRef<StrList> qlp;
 		for (lp = list2, qlp = ql2; lp != NULL; lp = lp->next, qlp = qlp->next) {
-			List *np;
 			StrList *nq;
-			np = mklist(termcat(list1->term, lp->term), NULL);
-			*p = np;
-			p = &np->next;
-			nq = mkstrlist(qcat(ql1->str, qlp->str, list1->term, lp->term), NULL);
-			*qp = nq;
-			qp = &nq->next;
+			*p = mklist(termcat(list1->term, lp->term), NULL);
+			tmp_p = (*p)->next;
+			p = &tmp_p;
+			gcdisable();
+			*qp = mkstrlist(
+				qcat(ql1->str, qlp->str, list1->term, lp->term),
+				NULL);
+			gcenable();
+			tmp_qp = (*qp)->next;
+			qp = &tmp_qp;
 		}
 	}
-
-	Ref(List *, list, result);
-	gcenable();
-	RefReturn(list);
+	return result.release();
 }
 
 /* subscript -- variable subscripting */
@@ -278,7 +281,11 @@ extern List *glom2(Tree *tree, Binding *binding, StrList **quotep) {
 			Ref(StrList *, qr, NULL);
 			l = glom2(tp->u[0].p, bp, &ql);
 			r = glom2(tp->u[1].p, bp, &qr);
-			list = qconcat(l, r, ql, qr, &qlist);
+			{
+				SRef<StrList> t = qlist;
+				list = qconcat(l, r, ql, qr, &t);
+				qlist = t.release();
+			}
 			RefEnd4(qr, ql, r, l);
 			tp = NULL;
 			break;
