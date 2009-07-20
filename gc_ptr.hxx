@@ -6,6 +6,10 @@ class SRef {
 			assert(ref != NULL);
 			return *ref;
 		}
+		T& operator[](int n) const {
+			assert(ref != NULL);
+			return ref[n];
+		}
 };
 
 template<>
