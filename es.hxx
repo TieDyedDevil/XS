@@ -269,7 +269,7 @@ extern List *glom2(Tree *tree, Binding *binding, StrList **quotep);
 
 extern const char *QUOTED, *UNQUOTED;
 
-extern List *glob(List *list, StrList *quote);
+extern List *glob(SRef<List> list, SRef<StrList> quote);
 extern bool haswild(const char *pattern, const char *quoting);
 /* Needed for some of the readline tab-completion */
 extern List *dirmatch(const char *prefix, const char *dirname,

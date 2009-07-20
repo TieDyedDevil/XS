@@ -200,46 +200,43 @@ static List *glob0(List *list, StrList *quote) {
 }
 
 /* expandhome -- do tilde expansion by calling fn %home */
-static char *expandhome(char *s, StrList *qp) {
-	int c;
+static char *expandhome(SRef<char> string, SRef<StrList> quote) {
 	size_t slash;
-	List *fn = varlookup("fn-%home", NULL);
+	SRef<List> fn = varlookup("fn-%home", NULL);
 
-	assert(*s == '~');
-	assert(qp->str == UNQUOTED || *qp->str == 'r');
+	assert(*string == '~');
+	assert(quote->str == UNQUOTED || *quote->str == 'r');
 
-	if (fn == NULL)
-		return s;
-
-	for (slash = 1; (c = s[slash]) != '/' && c != '\0'; slash++)
+	if (fn == NULL) return string.release();
+	
+	int c;
+	for (slash = 1; (c = string[slash]) != '/' && c != '\0'; slash++)
 		;
 
-	Ref(char *, string, s);
-	Ref(StrList *, quote, qp);
-	Ref(List *, list, NULL);
-	RefAdd(fn);
+	SRef<List> list = NULL;
 	if (slash > 1)
-		list = mklist(mkstr(gcndup(s + 1, slash - 1)), NULL);
-	RefRemove(fn);
+		list = mklist(mkstr(gcndup(string.uget() + 1, slash - 1)), NULL);
 
 	list = eval(append(fn, list), NULL, 0);
 
 	if (list != NULL) {
 		if (list->next != NULL)
 			fail("es:expandhome", "%%home returned more than one value");
-		Ref(char *, home, gcdup(getstr(list->term)));
+		SRef<char> home = gcdup(getstr(list->term));
 		if (c == '\0') {
 			string = home;
 			quote->str = QUOTED;
 		} else {
-			size_t pathlen = strlen(string);
-			size_t homelen = strlen(home);
+			size_t pathlen = strlen(string.uget());
+			size_t homelen = strlen(home.uget());
 			size_t len = pathlen - slash + homelen;
-			s = reinterpret_cast<char*>(gcalloc(len + 1, &StringTag));
-			memcpy(s, home, homelen);
-			memcpy(&s[homelen], &string[slash], pathlen - slash);
-			s[len] = '\0';
-			string = s;
+			{
+				SRef<char> t = reinterpret_cast<char*>(gcalloc(len + 1, &StringTag));
+				memcpy(t.uget(), home.uget(), homelen);
+				memcpy(&t[homelen], &string[slash], pathlen - slash);
+				t[len] = '\0';
+				string = t;
+			}
 			if (quote->str == UNQUOTED) {
 				char *q = reinterpret_cast<char*>(gcalloc(len + 1, &StringTag));
 				memset(q, 'q', homelen);
@@ -256,48 +253,33 @@ static char *expandhome(char *s, StrList *qp) {
 				quote->str = q;
 			}
 		}
-		RefEnd(home);
 	}
-	RefEnd2(list, quote);
-	RefReturn(string);
+	return string.release();
 }
 
 /* glob -- globbing prepass (glob if we need to, and dispatch for tilde expansion) */
-extern List *glob(List *list, StrList *quote) {
-	List *lp;
-	StrList *qp;
+extern List *glob(SRef<List> list, SRef<StrList> quote) {
+	SRef<List> lp;
+	SRef<StrList> qp;
 	bool doglobbing = false;
 
-	for (lp = list, qp = quote; lp != NULL; lp = lp->next, qp = qp->next)
+	for (lp = list, qp = quote; lp; lp = lp->next, qp = qp->next)
 		if (qp->str != QUOTED) {
 			assert(lp->term != NULL);
 			assert(!isclosure(lp->term));
-			Ref(char *,str, gcdup(getstr(lp->term)));
-			assert(qp->str == UNQUOTED || strlen(qp->str) == strlen(str));
-			if (hastilde(str, qp->str)) {
-				Ref(List *, l0, list);
-				Ref(List *, lr, lp);
-				Ref(StrList *, q0, quote);
-				Ref(StrList *, qr, qp);
-				str = expandhome(str, qr);
-				lr->term = mkstr(str);
-				lp = lr;
-				qp = qr;
-				list = l0;
-				quote = q0;
-				RefEnd4(qr, q0, lr, l0);
+			SRef<char> str = gcdup(getstr(lp->term));
+			assert(qp->str == UNQUOTED || \
+			       strlen(qp->str) == strlen(str.uget()));
+			if (hastilde(str.uget(), qp->str)) {
+				str = expandhome(str, qp);
+				lp->term = mkstr(str.uget());
 			}
-			if (haswild(str, qp->str))
+			if (haswild(str.uget(), qp->str))
 				doglobbing = true;
-			lp->term->str = str;
-			RefEnd(str);
+			lp->term->str = str.release();
 		}
 
-	if (!doglobbing)
-		return list;
-	gcdisable();
-	list = glob0(list, quote);
-	Ref(List *, result, list);
-	gcenable();
-	RefReturn(result);
+	if (!doglobbing) return list.release();
+	list = glob0(list.release(), quote.release());
+	return list.release();
 }
