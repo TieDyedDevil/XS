@@ -120,12 +120,8 @@ static List *listglob(List *list, char *pattern, char *quote, size_t slashcount)
 }
 
 /* glob1 -- glob pattern path against the file system */
-static List *glob1(const char *pattern, const char *quote) {
-	const char *s, *q;
-	char *d, *p, *qd, *qp;
+static List *glob1(SRef<const char> pattern, SRef<const char> quote) {
 	size_t psize;
-	List *matched;
-
 	static char *dir = NULL, *pat = NULL, *qdir = NULL, *qpat = NULL, *raw = NULL;
 	static size_t dsize = 0;
 
@@ -140,11 +136,13 @@ static List *glob1(const char *pattern, const char *quote) {
 		dsize = psize;
 		memset(raw, 'r', psize);
 	}
+
+	char *d, *p, *qd, *qp;
 	d = dir;
 	qd = qdir;
-	q = (quote == UNQUOTED) ? raw : quote;
-
-	s = pattern;
+	gcdisable();
+	const char *q = (quote == UNQUOTED) ? raw : quote.get();
+	const char *s = pattern.get();
 	if (*s == '/')
 		while (*s == '/')
 			*d++ = *s++, *qd++ = *q++;
@@ -158,10 +156,12 @@ static List *glob1(const char *pattern, const char *quote) {
 	 * Remember that w cannot consist of slashes alone (the other way *s could be
 	 * zero) since doglob gets called iff there's a metacharacter to be matched
 	 */
-	if (*s == '\0')
+	if (*s == '\0') {
+		gcenable();
 		return dirmatch("", ".", dir, qdir);
+	}
 
-	matched = (*pattern == '/')
+	SRef<List> matched = (*pattern == '/')
 			? mklist(mkstr(dir), NULL)
 			: dirmatch("", ".", dir, qdir);
 	do {
@@ -172,9 +172,10 @@ static List *glob1(const char *pattern, const char *quote) {
 		for (p = pat, qp = qpat; *s != '/' && *s != '\0';)
 			*p++ = *s++, *qp++ = *q++; /* get pat */
 		*p = '\0';
-		matched = listglob(matched, pat, qpat, slashcount);
+		matched = listglob(matched.uget(), pat, qpat, slashcount);
 	} while (*s != '\0' && matched != NULL);
 
+	gcenable();
 	return matched;
 }
 
