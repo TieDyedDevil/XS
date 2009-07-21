@@ -45,8 +45,10 @@ static int ishiddenfile(const char *s) {
 }
 
 /* dirmatch -- match a pattern against the contents of directory */
-List *dirmatch(SRef<const char> prefix, SRef<const char> dirname,
-	       	   SRef<const char> pattern, SRef<const char> quote) {
+List *dirmatch(SRef<const char> prefix, 
+	       SRef<const char> dirname,
+	       SRef<const char> pattern, 
+	       SRef<const char> quote) {
 	static struct stat s;
 
 	/*
@@ -90,44 +92,42 @@ List *dirmatch(SRef<const char> prefix, SRef<const char> dirname,
 
 /* listglob -- glob a directory plus a filename pattern into a list of names */
 static List *listglob(List *list, char *pattern, char *quote, size_t slashcount) {
-	List *result, **prevp;
+	SRef<List> result, t_prevp, *prevp;
 
-	for (result = NULL, prevp = &result; list != NULL; list = list->next) {
+	for (prevp = &result; list != NULL; list = list->next) {
 		static char *prefix = NULL;
 		static size_t prefixlen = 0;
 
 		assert(list->term != NULL);
 		assert(!isclosure(list->term));
 
-		const char *dir = getstr(list->term);
-		size_t dirlen = strlen(dir);
+		SRef<const char> dir = getstr(list->term);
+		size_t dirlen = strlen(dir.uget());
 		if (dirlen + slashcount + 1 >= prefixlen) {
 			prefixlen = dirlen + slashcount + 1;
 			prefix = reinterpret_cast<char*>(erealloc(prefix, prefixlen));
 		}
-		memcpy(prefix, dir, dirlen);
+		memcpy(prefix, dir.uget(), dirlen);
 		memset(prefix + dirlen, '/', slashcount);
 		prefix[dirlen + slashcount] = '\0';
 
 		*prevp = dirmatch(prefix, dir, pattern, quote);
-		while (*prevp != NULL)
-			prevp = &(*prevp)->next;
+		while (*prevp != NULL) {
+			t_prevp = (*prevp)->next;
+			prevp = &t_prevp;
+		}
 	}
-	return result;
+	return result.release();
 }
 
 /* glob1 -- glob pattern path against the file system */
 static List *glob1(const char *pattern, const char *quote) {
-	const char *s, *q;
-	char *d, *p, *qd, *qp;
-	size_t psize;
-	List *matched;
-
 	static char *dir = NULL, *pat = NULL, *qdir = NULL, *qpat = NULL, *raw = NULL;
 	static size_t dsize = 0;
 
 	assert(quote != QUOTED);
 
+	size_t psize;
 	if ((psize = strlen(pattern) + 1) > dsize || pat == NULL) {
 		pat = reinterpret_cast<char*>(erealloc(pat, psize));
 		raw = reinterpret_cast<char*>(erealloc(raw, psize));
@@ -137,6 +137,9 @@ static List *glob1(const char *pattern, const char *quote) {
 		dsize = psize;
 		memset(raw, 'r', psize);
 	}
+
+	char *d, *p, *qd, *qp;
+	const char *s, *q;
 	d = dir;
 	qd = qdir;
 	q = (quote == UNQUOTED) ? raw : quote;
@@ -158,7 +161,7 @@ static List *glob1(const char *pattern, const char *quote) {
 	if (*s == '\0')
 		return dirmatch("", ".", dir, qdir);
 
-	matched = (*pattern == '/')
+	SRef<List> matched = (*pattern == '/')
 			? mklist(mkstr(dir), NULL)
 			: dirmatch("", ".", dir, qdir);
 	do {
@@ -169,10 +172,10 @@ static List *glob1(const char *pattern, const char *quote) {
 		for (p = pat, qp = qpat; *s != '/' && *s != '\0';)
 			*p++ = *s++, *qp++ = *q++; /* get pat */
 		*p = '\0';
-		matched = listglob(matched, pat, qpat, slashcount);
+		matched = listglob(matched.uget(), pat, qpat, slashcount);
 	} while (*s != '\0' && matched != NULL);
 
-	return matched;
+	return matched.release();
 }
 
 /* glob0 -- glob a list, (destructively) passing through entries we don't care about */
