@@ -45,8 +45,11 @@ static int ishiddenfile(const char *s) {
 }
 
 /* dirmatch -- match a pattern against the contents of directory */
-List *dirmatch(SRef<const char> prefix, SRef<const char> dirname,
-	       	   SRef<const char> pattern, SRef<const char> quote) {
+List *dirmatch(const char *prefix, const char *dirname,
+	       const char *pattern, const char *quote) {
+	List *list, **prevp;
+	static DIR *dirp;
+	static Dirent *dp;
 	static struct stat s;
 
 	/*
@@ -54,38 +57,32 @@ List *dirmatch(SRef<const char> prefix, SRef<const char> dirname,
 	 * is necessary (sigh);  the check is done here instead of with the
 	 * opendir to handle a trailing slash.
 	 */
-	if (stat(dirname.uget(), &s) == -1 || (s.st_mode & S_IFMT) != S_IFDIR)
+	if (stat(dirname, &s) == -1 || (s.st_mode & S_IFMT) != S_IFDIR)
 		return NULL;
 
-	if (!haswild(pattern.uget(), quote.uget())) {
-		char *name = str("%s%s", prefix.uget(), pattern.uget());
+	if (!haswild(pattern, quote)) {
+		char *name = str("%s%s", prefix, pattern);
 		if (lstat(name, &s) == -1)
 			return NULL;
 		return mklist(mkstr(name), NULL);
 	}
 
-	DIR *dirp = opendir(dirname.uget());
+	assert(gcisblocked());
+
+	dirp = opendir(dirname);
 	if (dirp == NULL)
 		return NULL;
-
-	Dirent *dp;
-	SRef<List> list; 
-	SRef<List> *prevp = &list;
-	SRef<List> t;
-	while ((dp = readdir(dirp)) != NULL)
-		if (match(dp->d_name, pattern.uget(), quote.uget())
-		    	&& (!ishiddenfile(dp->d_name) 
-			|| *pattern == '.')) 
-		{
-			SRef<List> lp = mklist(
-				mkstr(str("%s%s", prefix.uget(), dp->d_name)),
-		 		NULL);
+	for (list = NULL, prevp = &list; (dp = readdir(dirp)) != NULL;)
+		if (match(dp->d_name, pattern, quote)
+		    && (!ishiddenfile(dp->d_name) || *pattern == '.')) {
+			List *lp = mklist(mkstr(str("%s%s",
+						    prefix, dp->d_name)),
+					  NULL);
 			*prevp = lp;
-			t = lp->next;
-			prevp = &t;
+			prevp = &lp->next;
 		}
 	closedir(dirp);
-	return list.release();
+	return list;
 }
 
 /* listglob -- glob a directory plus a filename pattern into a list of names */
