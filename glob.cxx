@@ -89,22 +89,26 @@ List *dirmatch(SRef<const char> prefix,
 
 /* listglob -- glob a directory plus a filename pattern into a list of names */
 static List *listglob(List *list, char *pattern, char *quote, size_t slashcount) {
-	List *result, **prevp;
+	SRef<List> result; 
+	List **prevp;
 
-	for (result = NULL, prevp = &result; list != NULL; list = list->next) {
+	for (result = NULL, prevp = result.rget(); 
+			list != NULL; 
+			list = list->next) {
 		static char *prefix = NULL;
 		static size_t prefixlen = 0;
 
 		assert(list->term != NULL);
 		assert(!isclosure(list->term));
 
-		const char *dir = getstr(list->term);
-		size_t dirlen = strlen(dir);
+		SRef<const char> dir = getstr(list->term);
+		size_t dirlen = strlen(dir.uget());
 		if (dirlen + slashcount + 1 >= prefixlen) {
 			prefixlen = dirlen + slashcount + 1;
-			prefix = reinterpret_cast<char*>(erealloc(prefix, prefixlen));
+			prefix = reinterpret_cast<char*>(
+					erealloc(prefix, prefixlen));
 		}
-		memcpy(prefix, dir, dirlen);
+		memcpy(prefix, dir.uget(), dirlen);
 		memset(prefix + dirlen, '/', slashcount);
 		prefix[dirlen + slashcount] = '\0';
 
@@ -112,7 +116,7 @@ static List *listglob(List *list, char *pattern, char *quote, size_t slashcount)
 		while (*prevp != NULL)
 			prevp = &(*prevp)->next;
 	}
-	return result;
+	return result.release();
 }
 
 /* glob1 -- glob pattern path against the file system */
