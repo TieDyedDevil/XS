@@ -69,6 +69,10 @@
 		T* uget() const {
 			return ref;
 		}
+		T** rget() {
+			return &ref;
+		}
+
 		/* Object should NOT be used after a release() without reassignment - this will
 		 * probably lead to a NULL pointer dereference
 		 */

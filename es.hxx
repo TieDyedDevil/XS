@@ -272,8 +272,10 @@ extern const char *QUOTED, *UNQUOTED;
 extern List *glob(SRef<List> list, SRef<StrList> quote);
 extern bool haswild(const char *pattern, const char *quoting);
 /* Needed for some of the readline tab-completion */
-extern List *dirmatch(const char *prefix, const char *dirname,
-		      const char *pattern, const char *quote);
+extern List *dirmatch(SRef<const char> prefix, 
+		      SRef<const char> dirname,
+		      SRef<const char> pattern, 
+		      SRef<const char> quote);
 
 
 /* match.c */

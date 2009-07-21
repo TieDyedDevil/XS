@@ -23,7 +23,6 @@ class SRef {
 			assert(ref != NULL);
 			return ref[n];
 		}
-		
 };
 
 template<>
