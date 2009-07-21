@@ -67,8 +67,8 @@ List *dirmatch(SRef<const char> prefix,
 		return mklist(mkstr(name), NULL);
 	}
 
-	static DIR *dirp = opendir(dirname.uget());
-	static Dirent *dp;
+	DIR *dirp = opendir(dirname.uget());
+	Dirent *dp;
 	if (dirp == NULL)
 		return NULL;
 
