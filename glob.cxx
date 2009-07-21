@@ -127,7 +127,7 @@ static List *glob1(SRef<const char> pattern, SRef<const char> quote) {
 
 	assert(quote != QUOTED);
 
-	if ((psize = strlen(pattern) + 1) > dsize || pat == NULL) {
+	if ((psize = strlen(pattern.uget()) + 1) > dsize || pat == NULL) {
 		pat = reinterpret_cast<char*>(erealloc(pat, psize));
 		raw = reinterpret_cast<char*>(erealloc(raw, psize));
 		dir = reinterpret_cast<char*>(erealloc(dir, psize));
@@ -176,25 +176,26 @@ static List *glob1(SRef<const char> pattern, SRef<const char> quote) {
 	} while (*s != '\0' && matched != NULL);
 
 	gcenable();
-	return matched;
+	return matched.release();
 }
 
 /* glob0 -- glob a list, (destructively) passing through entries we don't care about */
-static List *glob0(List *list, StrList *quote) {
-	List *result, **prevp, *expand1;
+static List *glob0(SRef<List> list, SRef<StrList> quote) {
+	SRef<List> result; 
+	List **prevp, *expand1;
 
-	for (result = NULL, prevp = &result; list != NULL;
+	for (result = NULL, prevp = result.rget(); list != NULL;
 	     list = list->next, quote = quote->next) {
-		const char *str;
+		SRef<const char> str;
 		if (
 			quote->str == QUOTED
-			|| !haswild(str = getstr(list->term), quote->str)
+			|| !haswild((str = getstr(list->term)).uget(), quote->str)
 		) {
-			*prevp = list;
+			*prevp = list.uget();
 			prevp = &list->next;
-		} else if ((expand1 = glob1(str, quote->str)) == NULL) {
+		} else if ((expand1 = glob1(str.uget(), quote->str)) == NULL) {
 			list->term->str = ""; 
-			*prevp = list;
+			*prevp = list.uget();
 			prevp = &list->next;			
 		}
 		else {
@@ -203,7 +204,7 @@ static List *glob0(List *list, StrList *quote) {
 				prevp = &(*prevp)->next;
 		}
 	}
-	return result;
+	return result.release();
 }
 
 /* expandhome -- do tilde expansion by calling fn %home */
