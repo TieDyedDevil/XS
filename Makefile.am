@@ -1,7 +1,7 @@
 # Makefile for xs
 
 AM_YFLAGS = -d
-AUTOMAKE_OPTIONS = dejagnu
+#AUTOMAKE_OPTIONS = dejagnu
 RUNTESTDEFAULTFLAGS = --tool xs XS=`pwd`/xs --srcdir $$srcdir/testsuite --debug
 
 dist_man_MANS = xs.1
@@ -38,9 +38,13 @@ ctags	:
 
 mostlyclean-local: 
 	rm -f $(GEN)
-test	: check trip
+test	: check trip testxs
 trip	: xs $(srcdir)/trip.xs
 	./xs < $(srcdir)/trip.xs
+
+# No point in including all the actual tests as deps
+testxs  : xs $(srcdir)/test.xs
+	$(srcdir)/test.xs
 
 src	:
 	@echo ${OTHER} ${CFILES} ${HFILES}

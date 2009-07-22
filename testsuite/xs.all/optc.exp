@@ -1,9 +1,0 @@
-set test "commands args match"
-xs_send "$XS -c 'echo \$0 \$2 \$#*' a b c d e f"
-xs_match "$XS b 6"
-
-set test "failure on empty command"
-xs_send "$XS -c >\[2\] /dev/null || echo failed"
-# INVESTIGATE: $XS -c 2>{/dev/null} does crazy stuff
-# Should just fail
-xs_match "failed"
