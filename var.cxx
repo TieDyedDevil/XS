@@ -27,10 +27,10 @@ static bool specialvar(const char *name) {
 	return (*name == '*' || *name == '0') && name[1] == '\0';
 }
 
-static bool hasbindings(List *list) {
+static bool hasbindings(SRef<List> list) {
 	for (; list != NULL; list = list->next)
 		if (isclosure(list->term)) {
-			Closure *closure = getclosure(list->term);
+			SRef<Closure> closure = getclosure(list->term);
 			assert(closure != NULL);
 			if (closure->binding != NULL)
 				return true;
