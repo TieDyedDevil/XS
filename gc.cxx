@@ -668,7 +668,7 @@ static char *tree2name(NodeKind k) {
 
 
 static size_t dump(Tag *t, void *p) {
-	char *s = t->tname;
+	const char *s = t->tname;
 	print("%8ux %s\t", p, s);
 
 	if (streq(s, "String")) {
