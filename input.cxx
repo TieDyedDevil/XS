@@ -70,7 +70,7 @@ static const char *locate(Input *in, const char *s) {
 static const char *error = NULL;
 
 /* yyerror -- yacc error entry point */
-extern void yyerror(char *s) {
+extern void yyerror(const char *s) {
 #if sgi
 	/* this is so that trip.es works */
 	if (streq(s, "Syntax error"))

@@ -75,7 +75,7 @@ extern Tree *prefix(char *s, Tree *t) {
 }
 
 /* flatten -- flatten the output of the glommer so we can pass the result as a single element */
-extern Tree *flatten(Tree *t, char *sep) {
+extern Tree *flatten(Tree *t, const char *sep) {
 	return mk(nCall, prefix("%flatten", treecons(mk(nQword, sep), treecons(t, NULL))));
 }
 

@@ -5,7 +5,7 @@
 
 static Dict *prims;
 
-extern List *prim(char *s, List *list, Binding *binding, int evalflags) {
+extern List *prim(const char *s, List *list, Binding *binding, int evalflags) {
 	List *(*p)(List *, Binding *, int);
 	p = (List *(*)(List *, Binding *, int)) dictget(prims, s);
 	if (p == NULL)

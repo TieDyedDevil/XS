@@ -404,7 +404,7 @@ extern List *esoptend(void);
 
 /* prim.c */
 
-extern List *prim(char *s, List *list, Binding *binding, int evalflags);
+extern List *prim(const char *s, List *list, Binding *binding, int evalflags);
 extern void initprims(void);
 
 

@@ -17,7 +17,7 @@ extern Tree *thunkify(Tree *tree);
 
 extern Tree *prefix(char *s, Tree *t);
 extern Tree *backquote(Tree *ifs, Tree *body);
-extern Tree *flatten(Tree *t, char *sep);
+extern Tree *flatten(Tree *t, const char *sep);
 extern Tree *fnassign(Tree *name, Tree *defn);
 extern Tree *mklambda(Tree *params, Tree *body);
 extern Tree *mkseq(char *op, Tree *t1, Tree *t2);
