@@ -11,7 +11,7 @@ struct Tag {
 	size_t (*scan)(void *);
 #if ASSERTIONS || GCVERBOSE
 	long magic;
-	char *tname;
+	const char *tname;
 #endif
 };
 
