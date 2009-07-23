@@ -61,13 +61,13 @@ static char *(*realgetenv)(const char *) = stdgetenv;
  */
 
 /* locate -- identify where an error came from */
-static char *locate(Input *in, char *s) {
+static const char *locate(Input *in, const char *s) {
 	return (in->runflags & run_interactive)
 		? s
 		: str("%s:%d: %s", in->name, in->lineno, s);
 }
 
-static char *error = NULL;
+static const char *error = NULL;
 
 /* yyerror -- yacc error entry point */
 extern void yyerror(char *s) {
@@ -81,7 +81,7 @@ extern void yyerror(char *s) {
 }
 
 /* warn -- print a warning */
-static void warn(char *s) {
+static void warn(const char *s) {
 	eprint("warning: %s\n", locate(input, s));
 }
 
@@ -452,9 +452,8 @@ extern Tree *parse(const char *pr1, const char *pr2) {
 	gcenable();
 
 	if (result || error != NULL) {
-		char *e;
 		assert(error != NULL);
-		e = error;
+		const char *e = error;
 		error = NULL;
 		fail("$&parse", "%s", e);
 	}
