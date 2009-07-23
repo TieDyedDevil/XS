@@ -38,15 +38,12 @@ static bool hasbindings(List *list) {
 	return false;
 }
 
-static Var *mkvar(List *defn) {
-	Ref(Var *, var, NULL);
-	Ref(List *, lp, defn);
-	var = gcnew(Var);
+static Var *mkvar(SRef<List> defn) {
+	SRef<Var> var = gcnew(Var);
 	var->env = NULL;
-	var->defn = lp;
-	var->flags = hasbindings(lp) ? var_hasbindings : 0;
-	RefEnd(lp);
-	RefReturn(var);
+	var->flags = hasbindings(defn.uget()) ? var_hasbindings : 0;
+	var->defn = defn.release();
+	return var.release();
 }
 
 static void *VarCopy(void *op) {
@@ -148,22 +145,19 @@ extern List *varlookup2(const char *name1, const char *name2, Binding *bp) {
 	return var->defn;
 }
 
-static List *callsettor(const char *name, List *defn) {
+static List *callsettor(SRef<const char> name, SRef<List> defn) {
+	SRef<List> settor;
+
+	if (specialvar(name.uget()) || (settor = varlookup2("set-", name.uget(), NULL)) == NULL)
+		return defn.release();
+
 	Push p;
-	List *settor;
+	varpush(&p, "0", mklist(mkstr(name.uget()), NULL));
 
-	if (specialvar(name) || (settor = varlookup2("set-", name, NULL)) == NULL)
-		return defn;
-
-	Ref(List *, lp, defn);
-	Ref(List *, fn, settor);
-	varpush(&p, "0", mklist(mkstr(name), NULL));
-
-	lp = listcopy(eval(append(fn, lp), NULL, 0));
+	defn = listcopy(eval(append(settor, defn), NULL, 0));
 
 	varpop(&p);
-	RefEnd(fn);
-	RefReturn(lp);
+	return defn.release();
 }
 
 extern void vardef(const char *name, Binding *binding, List *defn) {
