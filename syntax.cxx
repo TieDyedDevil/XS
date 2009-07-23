@@ -70,7 +70,7 @@ static bool firstis(Tree *t, const char *s) {
 }
 
 /* prefix -- prefix a tree with a given word */
-extern Tree *prefix(char *s, Tree *t) {
+extern Tree *prefix(const char *s, Tree *t) {
 	return treecons(mk(nWord, s), t);
 }
 
@@ -175,7 +175,7 @@ extern Tree *mkredircmd(char *cmd, int fd) {
 extern Tree *mkredir(Tree *cmd, Tree *file) {
 	Tree *word = NULL;
 	if (file != NULL && file->kind == nThunk) {	/* /dev/fd operations */
-		char *op;
+		const char *op;
 		Tree *var;
 		static int id = 0;
 		if (firstis(cmd, "%open"))
