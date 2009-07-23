@@ -15,46 +15,37 @@ extern Term *mkterm(const char *str, Closure *closure) {
 	RefReturn(term);
 }
 
-extern Term *mkstr(const char *str) {
-	Term *term;
-	Ref(const char *, string, str);
-	term = gcnew(Term);
-        term->str = string;
+extern Term *mkstr(SRef<const char> str) {
+	SRef<Term> term = gcnew(Term);
+        term->str = str.release();
 	term->closure = NULL;
-        RefEnd(string);
-        return term;
+        return term.release();
 }
 
-extern Closure *getclosure(Term *term) {
+extern Closure *getclosure(SRef<Term> term) {
 	if (term->closure == NULL) {
-		const char *s = term->str;
-		assert(s != NULL);
+		SRef<const char> s = term->str;
+		assert(s);
 		if (
-			((*s == '{' || *s == '@') && s[strlen(s) - 1] == '}')
+			((*s == '{' || *s == '@') && s[strlen(s.uget()) - 1] == '}')
 			|| (*s == '$' && s[1] == '&')
-			|| hasprefix(s, "%closure")
+			|| hasprefix(s.uget(), "%closure")
 		) {
-			Ref(Term *, tp, term);
-			Ref(Tree *, np, parsestring(s));
-			if (np == NULL) {
-				RefPop2(np, tp);
-				return NULL;
-			}
-			tp->closure = extractbindings(np);
-			tp->str = NULL;
-			term = tp;
-			RefEnd2(np, tp);
+			SRef<Tree> np = parsestring(s.uget());
+			if (np == NULL) return NULL;
+			term->closure = extractbindings(np.uget());
+			term->str = NULL;
 		}
 	}
 	return term->closure;
 }
 
-extern const char *getstr(Term *term) {
-	const char *s = term->str;
-	Closure *closure = term->closure;
+extern const char *getstr(SRef<Term> term) {
+	SRef<const char> s = term->str;
+	SRef<Closure> closure = term->closure;
 	assert((s == NULL) != (closure == NULL));
 	if (s != NULL)
-		return s;
+		return s.release();
 
 #if 0	/* TODO: decide whether getstr() leaves term in closure or string form */
 	Ref(Term *, tp, term);
@@ -64,22 +55,17 @@ extern const char *getstr(Term *term) {
 	RefEnd(tp);
 	return s;
 #else
-	return str("%C", closure);
+	return str("%C", closure.uget());
 #endif
 }
 
-extern Term *termcat(Term *t1, Term *t2) {
+extern Term *termcat(SRef<Term> t1, SRef<Term> t2) {
 	if (t1 == NULL)
-		return t2;
+		return t2.release();
 	if (t2 == NULL)
-		return t1;
-
-	Ref(Term *, term, mkstr(NULL));
-	Ref(const char *, str1, getstr(t1));
-	Ref(const char *, str2, getstr(t2));
-	term->str = str("%s%s", str1, str2);
-	RefEnd2(str2, str1);
-	RefReturn(term);
+		return t1.release();
+	return mkstr(
+		str("%s%s", getstr(t1.uget()), getstr(t2.uget())));
 }
 
 
