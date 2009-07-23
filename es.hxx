@@ -290,7 +290,7 @@ extern void initvars(void);
 extern void initenv(char **envp, bool isprotected);
 extern void hidevariables(void);
 extern void validatevar(const char *var);
-extern List *varlookup(const char *name, Binding *binding);
+extern List *varlookup(SRef<const char> name, SRef<Binding> binding);
 extern List *varlookup2(const char *name1, const char *name2, Binding *binding);
 extern void vardef(const char *, Binding *, List *);
 extern Vector *mkenv(void);

@@ -111,22 +111,22 @@ extern void setnoexport(List *list) {
 }
 
 /* varlookup -- lookup a variable in the current context */
-extern List *varlookup(const char *name, Binding *bp) {
-	Var *var;
+extern List *varlookup(SRef<const char> name, SRef<Binding> bp) {
+	SRef<Var> var;
 
-	if (iscounting(name)) {
-		Term *term = nth(varlookup("*", bp), strtol(name, NULL, 10));
+	if (iscounting(name.uget())) {
+		SRef<Term> term = nth(varlookup("*", bp), strtol(name.uget(), NULL, 10));
 		if (term == NULL)
 			return NULL;
 		return mklist(term, NULL);
 	}
 
-	validatevar(name);
+	validatevar(name.uget());
 	for (; bp != NULL; bp = bp->next)
-		if (streq(name, bp->name))
+		if (streq(name.uget(), bp->name))
 			return bp->defn;
 
-	var = reinterpret_cast<Var*>(dictget(vars, name));
+	var = reinterpret_cast<Var*>(dictget(vars, name.uget()));
 	if (var == NULL)
 		return NULL;
 	return var->defn;
