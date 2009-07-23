@@ -42,7 +42,7 @@ static bool allprintable(const char *s) {
 	return true;
 }
 
-static char *dumpstring(const char *string) {
+static const char *dumpstring(const char *string) {
 	char *name;
 	if (string == NULL)
 		return "NULL";
@@ -79,7 +79,7 @@ static char *dumpstring(const char *string) {
 	return name;
 }
 
-static char *dumplist(List *list);
+static const char *dumplist(List *list);
 
 static const char *nodename(NodeKind k) {
 	switch(k) {
@@ -105,7 +105,7 @@ static const char *nodename(NodeKind k) {
 	}
 }
 
-static char *dumptree(Tree *tree) {
+static const char *dumptree(Tree *tree) {
 	char *name;
 	if (tree == NULL)
 		return "NULL";
@@ -133,7 +133,7 @@ static char *dumptree(Tree *tree) {
 	return name;
 }
 
-static char *dumpbinding(Binding *binding) {
+static const char *dumpbinding(Binding *binding) {
 	char *name;
 	if (binding == NULL)
 		return "NULL";
@@ -151,7 +151,7 @@ static char *dumpbinding(Binding *binding) {
 	return name;
 }
 
-static char *dumpclosure(Closure *closure) {
+static const char *dumpclosure(Closure *closure) {
 	char *name;
 	if (closure == NULL)
 		return "NULL";
@@ -168,7 +168,7 @@ static char *dumpclosure(Closure *closure) {
 	return name;
 }
 
-static char *dumpterm(Term *term) {
+static const char *dumpterm(Term *term) {
 	char *name;
 	if (term == NULL)
 		return "NULL";
@@ -185,7 +185,7 @@ static char *dumpterm(Term *term) {
 	return name;
 }
 
-static char *dumplist(List *list) {
+static const char *dumplist(List *list) {
 	char *name;
 	if (list == NULL)
 		return "NULL";
