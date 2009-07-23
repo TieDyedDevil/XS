@@ -52,7 +52,7 @@ struct Tree {
 	NodeKind kind;
 	union {
 		Tree *p;
-		char *s;
+		const char *s;
 		int i;
 	} u[2];
 };

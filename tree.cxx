@@ -79,7 +79,7 @@ static size_t Tree1Scan(void *p) {
 	    default:
 		panic("Tree1Scan: bad node kind %d", n->kind);
 	    case nPrim: case nWord: case nQword:
-	    	n->u[0].s = reinterpret_cast<char*>(forward(n->u[0].s));
+	    	n->u[0].s = reinterpret_cast<const char*>(forward(const_cast<char*>(n->u[0].s)));
 		break;
 	    case nCall: case nThunk: case nVar:
 	    	n->u[0].p = reinterpret_cast<Tree*>(forward(n->u[0].p));

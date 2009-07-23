@@ -69,7 +69,7 @@ static Binding *extract(Tree *tree, Binding *bindings) {
 				assert(defn->kind == nList);
 				assert(k == nWord || k == nQword || k == nPrim);
 				if (k == nPrim) {
-					char *prim = word->u[0].s;
+					const char *prim = word->u[0].s;
 					if (streq(prim, "nestedbinding")) {
 						int i, count;
 						Chain *cp;
