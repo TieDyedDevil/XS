@@ -29,7 +29,7 @@ dnl enable debug stuff
 if test $debug_build = yes; then
 	AC_DEFINE(REF_ASSERTIONS,1,"Enable assertions for GC Refs")
 	AC_DEFINE(GCDEBUG,1,"Enable GC debug mode")
-	CFLAGS="-Wall -Wextra -O0 -ggdb3"
+	CXXFLAGS="-Wall -Wextra -O0 -ggdb3"
 fi
 
 
