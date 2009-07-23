@@ -20,7 +20,7 @@
 
 %union {
 	Tree *tree;
-	char *str;
+	const char *str;
 	NodeKind kind;
 }
 
