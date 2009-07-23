@@ -5,15 +5,12 @@
 
 /* concat -- cartesion cross product concatenation */
 static List *concat(SRef<List> list1,SRef<List> list2) {
-	/* p is needed such that result can be set the first
-	   time, p_tmp is used in place of result for the rest
-	*/
-	SRef<List> result = NULL, p_tmp;
+	SRef<List> result = NULL;
 
-	for (SRef<List> *p = &result; list1 != NULL; list1 = list1->next) {
+	for (List **p = result.rget(); list1 != NULL; list1 = list1->next) {
 		for (SRef<List> lp = list2;
 		     lp != NULL;
-		     p_tmp = (*p)->next, p = &p_tmp, lp = lp->next)
+		     p = &(*p)->next, lp = lp->next)
 		
 			*p = mklist(termcat(list1->term, lp->term), NULL);
 	}
