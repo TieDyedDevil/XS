@@ -115,7 +115,7 @@ int main(int argc, char **argv) {
 	if (argc == 0) {
 		argc = 1;
 		argv = reinterpret_cast<char**>(ealloc(2 * sizeof (char *)));
-		argv[0] = "es";
+		argv[0] = strdup("es");
 		argv[1] = NULL;
 	}
 	if (argv[0][0] == '-')
