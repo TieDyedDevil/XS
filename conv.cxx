@@ -28,9 +28,9 @@ static int treecount(Tree *tree) {
 }
 
 /* binding -- print a binding statement */
-static void binding(Format *f, char *keyword, Tree *tree) {
+static void binding(Format *f, const char *keyword, Tree *tree) {
 	fmtprint(f, "%s(", keyword);
-	char *sep = "";
+	const char *sep = "";
 	for (Tree *np = tree->u[0].p; np != NULL; np = np->u[1].p) {
 		assert(np->kind == nList);
 		Tree *binding = np->u[0].p;
