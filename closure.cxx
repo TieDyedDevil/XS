@@ -137,11 +137,11 @@ extern Closure *extractbindings(Tree *tree0) {
 
 	chain = chain->next;
 
-	Ref(Closure *, result, me.closure);
+	SRef<Closure> result = me.closure;
 	result->tree = tree;
 	result->binding = bindings;
 	gcenable();
-	RefReturn(result);
+	return result.release();
 }
 
 
@@ -151,16 +151,14 @@ extern Closure *extractbindings(Tree *tree0) {
 
 DefineTag(Binding, static);
 
-extern Binding *mkbinding(const char *name, List *defn, Binding *next) {
+extern Binding *mkbinding(SRef<const char> name, SRef<List> defn, SRef<Binding> next) {
 	assert(next == NULL || next->name != NULL);
-	validatevar(name);
-	gcdisable();
-	Ref(Binding *, binding, gcnew(Binding));
-	binding->name = name;
-	binding->defn = defn;
-	binding->next = next;
-	gcenable();
-	RefReturn(binding);
+	validatevar(name.uget());
+	SRef<Binding> binding = gcnew(Binding);
+	binding->name = name.release();
+	binding->defn = defn.release();
+	binding->next = next.release();
+	return binding.release();
 }
 
 extern Binding *reversebindings(Binding *binding) {
