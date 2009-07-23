@@ -57,25 +57,23 @@ static const char *qcat(SRef<const char> q1,
 
 /* qconcat -- cartesion cross product concatenation; also produces a quote list */
 static List *qconcat(SRef<List> list1, SRef<List> list2,
-		     SRef<StrList> ql1, SRef<StrList> ql2, SRef<StrList> *quotep) {
-	SRef<List> result, tmp_p, *p;
-	SRef<StrList> tmp_qp, *qp;
+		     SRef<StrList> ql1, SRef<StrList> ql2, StrList **quotep) {
+	SRef<List> result; 
+	List **p;
+	StrList **qp;
 
-	for (p = &result, qp = quotep; list1 != NULL; list1 = list1->next, ql1 = ql1->next) {
+	for (p = result.rget(), qp = quotep; list1 != NULL; list1 = list1->next, ql1 = ql1->next) {
 		SRef<List> lp;
 		SRef<StrList> qlp;
 		for (lp = list2, qlp = ql2; lp != NULL; lp = lp->next, qlp = qlp->next) {
-			StrList *nq;
 			*p = mklist(termcat(list1->term, lp->term), NULL);
-			tmp_p = (*p)->next;
-			p = &tmp_p;
+			p = &(*p)->next;
 			gcdisable();
 			*qp = mkstrlist(
 				qcat(ql1->str, qlp->str, list1->term, lp->term),
 				NULL);
 			gcenable();
-			tmp_qp = (*qp)->next;
-			qp = &tmp_qp;
+			qp = &(*qp)->next;
 		}
 	}
 	return result.release();
