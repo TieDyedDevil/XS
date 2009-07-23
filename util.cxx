@@ -28,7 +28,7 @@ extern const char *esstrerror(int n) {
 
 
 /* uerror -- print a unix error, our version of perror */
-extern void uerror(char *s) {
+extern void uerror(const char *s) {
 	if (s != NULL)
 		eprint("%s: %s\n", s, esstrerror(errno));
 	else

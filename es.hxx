@@ -359,7 +359,7 @@ extern void sortvector(Vector *v);
 /* util.c */
 
 extern const char *esstrerror(int err);
-extern void uerror(char *msg);
+extern void uerror(const char *msg);
 extern void *ealloc(size_t n);
 extern void *erealloc(void *p, size_t n);
 extern void efree(void *p);
