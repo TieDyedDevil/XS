@@ -38,18 +38,6 @@ fn expect {
 	echo >[1=2] -n expect $^*^': '
 }
 
-# test the syntax error printer
-
-# local (prompt := '') {
-#	if {!~ `` \n {$es -clet>[2=1]} *'1: '*' error near let'} {
-#		fail print syntax error
-#	}
-#	if {!~ `` \n {$es -ic let>[2=1]} *' error'} {
-#		fail print syntax error
-#	}
-# }
-
-
 # lexical tests
 
 errorcheck 'tokenizer error'	{$es -c 'echo hi |[2'} 'expected ''='' or '']'' after digit'
