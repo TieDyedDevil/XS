@@ -78,7 +78,7 @@ extern void print_prompt2(void) {
 }
 
 /* scanerror -- called for lexical errors */
-static void scanerror(char *s) {
+static void scanerror(const char *s) {
 	int c;
 	/* TODO: check previous character? rc's last hack? */
 	while ((c = GETC()) != '\n' && c != EOF)
@@ -369,7 +369,7 @@ top:	while ((c = GETC()) == ' ' || c == '\t')
 	}
 
 	{
-		char *cmd;
+		const char *cmd;
 		int fd[2];
 	case '<':
 		fd[0] = 0;

@@ -27,7 +27,7 @@ extern Tree *mkclose(int fd);
 extern Tree *mkdup(int fd0, int fd1);
 extern Tree *redirect(Tree *t);
 extern Tree *mkredir(Tree *cmd, Tree *file);
-extern Tree *mkredircmd(char *cmd, int fd);
+extern Tree *mkredircmd(const char *cmd, int fd);
 extern Tree *redirappend(Tree *t, Tree *r);
 
 

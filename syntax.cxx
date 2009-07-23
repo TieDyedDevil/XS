@@ -168,7 +168,7 @@ extern Tree *redirect(Tree *t) {
 	return r;
 }
 
-extern Tree *mkredircmd(char *cmd, int fd) {
+extern Tree *mkredircmd(const char *cmd, int fd) {
 	return prefix(cmd, prefix(str("%d", fd), NULL));
 }
 
