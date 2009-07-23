@@ -38,29 +38,6 @@ fn expect {
 	echo >[1=2] -n expect $^*^': '
 }
 
-#
-# lexical analysis
-#
-
-let (ifs := '') {
-	if {!~ 'h i' `{echo -n h\
-i}} {
-		fail backslash-newline to space conversion }
-	if {!~ $es^\\es `{echo -n $es\\es}} {
-		fail backslash after variable name did not terminate variable name scan }
-	if {!~ $es^' es' `{echo -n $es\
-es}} {
-		fail backslash-newline after variable name space conversion }
-	if {!~ 'h\i' `{echo -n h\\i}} {
-		fail backslash in the middle of word }
-	if {!~ 'h \ i' `{echo -n h \\ i}} {
-		fail free-standing backslash }
-}
-
-if {! $es -c '# eof in comment'} {
-	fail eof in comment exited with nonzero status
-}
-
 # test the syntax error printer
 
 # local (prompt := '') {
