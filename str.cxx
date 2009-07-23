@@ -15,11 +15,10 @@ static void str_grow(Format *f, size_t more) {
 
 /* strv -- print a formatted string into gc space */
 extern char *strv(const char *fmt, va_list args) {
-	Buffer *buf;
 	Format format;
 
 	gcdisable();
-	buf = openbuffer(0);
+	Buffer *buf = openbuffer(0);
 	format.u.p	= buf;
 #if NO_VA_LIST_ASSIGN
 	memcpy(format.args, args, sizeof(va_list));
