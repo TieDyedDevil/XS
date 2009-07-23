@@ -160,7 +160,7 @@ static const Suffix timesuf[] = {
 };
 
 typedef struct {
-	char *name;
+	const char *name;
 	int flag;
 	const Suffix *suffix;
 } Limit;
