@@ -6,13 +6,11 @@
 
 DefineTag(Term, static);
 
-extern Term *mkterm(const char *str, Closure *closure) {
-	gcdisable();
-	Ref(Term *, term, reinterpret_cast<Term*>(gcnew(Term)));
-	term->str = str;
-	term->closure = closure;
-	gcenable();
-	RefReturn(term);
+extern SRef<Term> mkterm(SRef<const char> str, SRef<Closure> closure) {
+	SRef<Term> term = reinterpret_cast<Term*>(gcnew(Term));
+	term->str = str.release();
+	term->closure = closure.release();
+	return term;
 }
 
 extern Term *mkstr(SRef<const char> str) {

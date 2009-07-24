@@ -63,7 +63,7 @@ static Binding *extract(Tree *tree, Binding *bindings) {
 			assert(name->kind == nWord || name->kind == nQword);
 			defn = revtree(defn->u[1].p);
 			for (; defn != NULL; defn = defn->u[1].p) {
-				Term *term;
+				SRef<Term> term;
 				Tree *word = defn->u[0].p;
 				NodeKind k = word->kind;
 				assert(defn->kind == nList);

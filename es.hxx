@@ -207,7 +207,7 @@ extern void undefer(int ticket);
 
 /* term.c */
 
-extern Term *mkterm(const char *str, Closure *closure);
+extern SRef<Term> mkterm(SRef<const char> str, SRef<Closure> closure);
 extern Term *mkstr(SRef<const char> str);
 extern const char *getstr(SRef<Term> term);
 extern Closure *getclosure(SRef<Term> term);
