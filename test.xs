@@ -67,7 +67,8 @@ fn match_re result {
     return <={eval '~ `` '' {output} *'^$^result^'*' }
 }
 let (dir := `{pwd} 
-     logfile := `{pwd}^/xs.log) {
+     logfile := `{pwd}^/xs.log) 
+{
     rm -f $logfile
     fn log msg {
         echo $msg | tee -a $logfile
