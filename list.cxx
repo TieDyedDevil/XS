@@ -82,12 +82,12 @@ extern int length(List *list) {
 
 /* listify -- turn an argc/argv vector into a list */
 extern List *listify(int argc, char **argv) {
-	Ref(List *, list, NULL);
+	SRef<List> list;
 	while (argc > 0) {
-		Term *term = mkstr(argv[--argc]);
+		SRef<Term> term = mkstr(argv[--argc]);
 		list = mklist(term, list);
 	}
-	RefReturn(list);
+	return list.release();
 }
 
 /* nth -- return nth element of a list, indexed from 1 */
