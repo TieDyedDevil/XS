@@ -30,13 +30,12 @@ static void initpath(void) {
 	int i;
 	static const char * const path[] = { INITIAL_PATH };
 
-	Ref(List *, list, NULL);
+	SRef<List> list = NULL;
 	for (i = arraysize(path); i-- > 0;) {
 		SRef<Term> t = mkstr((char *) path[i]);
 		list = mklist(t, list);
 	}
-	vardef("path", NULL, list);
-	RefEnd(list);
+	vardef("path", NULL, list.release());
 }
 
 /* initpid -- set $pid for this shell */
