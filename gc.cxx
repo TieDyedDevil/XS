@@ -312,7 +312,9 @@ extern void globalroot(void *addr) {
 
 /* not portable to word addressed machines */
 /* Must be macro to be used as lvalue */
-#define	TAG(p)		(((Tag **) p)[-1])
+static inline Tag*& tag(void *p) {
+	return reinterpret_cast<Tag **>(p)[-1];
+}
 static inline bool forwarded(Tag *tagp) {
 	return (int) (tagp) & 1;
 }
@@ -327,7 +329,7 @@ static inline void *follow(Tag *tagp) {
  * NOTE: forward will NEVER modify the contents of p.
  */
 extern void *forward(void *p) {
-	Tag *tag;
+	Tag *ptag;
 	void *np;
 
 	if (!isinspace(oldSpace, p)) {
@@ -337,17 +339,17 @@ extern void *forward(void *p) {
 
 	VERBOSE(("GC %8ux : ", p));
 
-	tag = TAG(p);
-	assert(tag != NULL);
-	if (forwarded(tag)) {
-		np = follow(tag);
-		assert(TAG(np)->magic == TAGMAGIC);
-		VERBOSE(("%s	-> %8ux (followed)\n", TAG(np)->tname, np));
+	ptag = tag(p);
+	assert(ptag != NULL);
+	if (forwarded(ptag)) {
+		np = follow(ptag);
+		assert(tag(np)->magic == TAGMAGIC);
+		VERBOSE(("%s	-> %8ux (followed)\n", tag(np)->tname, np));
 	} else {
-		assert(tag->magic == TAGMAGIC);
-		np = (*tag->copy)(p);
+		assert(ptag->magic == TAGMAGIC);
+		np = (*ptag->copy)(p);
 		VERBOSE(("%s	-> %8ux (forwarded)\n", tag->tname, np));
-		TAG(p) = follow_to(reinterpret_cast<char*>(np));
+		tag(p) = follow_to(reinterpret_cast<char*>(np));
 	}
 	return np;
 }
@@ -392,7 +394,6 @@ static void scanspace(void) {
 extern void gcenable(void) {
 	assert(gcblocked > 0);
 	--gcblocked;
-	/* This takes way too much cpu time, should not be caled so often? */
 
 	if (!gcblocked && newSpace->next != NULL)
 		gc();
@@ -616,6 +617,185 @@ extern Buffer *bufputc(Buffer *buf, char c) {
 extern void freebuffer(Buffer *buf) {
 	efree(buf);
 }
+
+#if GCVERBOSE
+/*
+ * memdump -- print out all of gc space, as best as possible
+ */
+
+static char    *
+tree1name(NodeKind k)
+{
+    switch (k) {
+    default:
+	panic("tree1name: bad node kind %d", k);
+    case nPrim:
+	return "Prim";
+    case nQword:
+	return "Qword";
+    case nCall:
+	return "Call";
+    case nThunk:
+	return "Thunk";
+    case nVar:
+	return "Var";
+    case nWord:
+	return "Word";
+    }
+}
+
+static char    *
+tree2name(NodeKind k)
+{
+    switch (k) {
+    default:
+	panic("tree2name: bad node kind %d", k);
+    case nAssign:
+	return "Assign";
+    case nConcat:
+	return "Concat";
+    case nClosure:
+	return "Closure";
+    case nFor:
+	return "For";
+    case nLambda:
+	return "Lambda";
+    case nLet:
+	return "Let";
+    case nList:
+	return "List";
+    case nLocal:
+	return "Local";
+    case nMatch:
+	return "Match";
+    case nExtract:
+	return "Extract";
+    case nVarsub:
+	return "Varsub";
+    }
+}
+
+/*
+ * having these here violates every data hiding rule in the book 
+ */
+
+typedef struct {
+    char           *name;
+    void           *value;
+} Assoc;
+struct Dict {
+    int             size,
+                    remain;
+    Assoc           table[1];	/* variable length */
+};
+
+#include "var.hxx"
+#include "term.hxx"
+
+
+static size_t
+dump(Tag * t, void *p)
+{
+    const char     *s = t->tname;
+    print("%8ux %s\t", p, s);
+
+    if (streq(s, "String")) {
+	print("%s\n", p);
+	return strlen(reinterpret_cast < char *>(p)) +1;
+    }
+
+    if (streq(s, "Term")) {
+	Term           *t = reinterpret_cast < Term * >(p);
+	print("str = %ux  closure = %ux\n", t->str, t->closure);
+	return sizeof(Term);
+    }
+
+    if (streq(s, "List")) {
+	List           *l = reinterpret_cast < List * >(p);
+	print("term = %ux  next = %ux\n", l->term, l->next);
+	return sizeof(List);
+    }
+
+    if (streq(s, "StrList")) {
+	StrList        *l = reinterpret_cast < StrList * >(p);
+	print("str = %ux  next = %ux\n", l->str, l->next);
+	return sizeof(StrList);
+    }
+
+    if (streq(s, "Closure")) {
+	Closure        *c = reinterpret_cast < Closure * >(p);
+	print("tree = %ux  binding = %ux\n", c->tree, c->binding);
+	return sizeof(Closure);
+    }
+
+    if (streq(s, "Binding")) {
+	Binding        *b = reinterpret_cast < Binding * >(p);
+	print("name = %ux  defn = %ux  next = %ux\n", b->name, b->defn,
+	      b->next);
+	return sizeof(Binding);
+    }
+
+    if (streq(s, "Var")) {
+	Var            *v = reinterpret_cast < Var * >(p);
+	print("defn = %ux  env = %ux  flags = %d\n",
+	      v->defn, v->env, v->flags);
+	return sizeof(Var);
+    }
+
+    if (streq(s, "Tree1")) {
+	Tree           *t = reinterpret_cast < Tree * >(p);
+	print("%s	%ux\n", tree1name(t->kind), t->u[0].p);
+	return offsetof(Tree, u[1]);
+    }
+
+    if (streq(s, "Tree2")) {
+	Tree           *t = reinterpret_cast < Tree * >(p);
+	print("%s	%ux  %ux\n", tree2name(t->kind), t->u[0].p,
+	      t->u[1].p);
+	return offsetof(Tree, u[2]);
+    }
+
+    if (streq(s, "Vector")) {
+	Vector         *v = reinterpret_cast < Vector * >(p);
+	int             i;
+	print("alloclen = %d  count = %d [", v->alloclen, v->count);
+	for (i = 0; i <= v->alloclen; i++)
+	    print("%s%ux", i == 0 ? "" : " ", v->vector[i]);
+	print("]\n");
+	return offsetof(Vector,
+			vector[0]) + sizeof(char *) * (v->alloclen + 1);
+    }
+
+    if (streq(s, "Dict")) {
+	Dict           *d = reinterpret_cast < Dict * >(p);
+	int             i;
+	print("size = %d  remain = %d\n", d->size, d->remain);
+	for (i = 0; i < d->size; i++)
+	    print("\tname = %ux  value = %ux\n",
+		  d->table[i].name, d->table[i].value);
+	return offsetof(Dict, table[0]) + sizeof(char *) * (d->size);
+    }
+
+    print("<<unknown>>\n");
+    return 0;
+}
+
+extern void
+memdump(void)
+{
+    Space          *sp;
+    for (sp = newSpace; sp != NULL; sp = sp->next) {
+	char           *scan = sp->bot;
+	while (scan < sp->current) {
+	    Tag            *tag = *(Tag **) scan;
+	    assert(tag->magic == TAGMAGIC);
+	    scan += sizeof(Tag *);
+	    scan += ALIGN(dump(tag, scan));
+	}
+    }
+}
+#endif
+
 
 
 #if GCVERBOSE
