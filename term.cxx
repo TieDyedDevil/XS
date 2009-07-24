@@ -46,11 +46,9 @@ extern const char *getstr(SRef<Term> term) {
 		return s.release();
 
 #if 0	/* TODO: decide whether getstr() leaves term in closure or string form */
-	Ref(Term *, tp, term);
 	s = str("%C", closure);
-	tp->str = s;
-	tp->closure = NULL;
-	RefEnd(tp);
+	term->str = s;
+	term->closure = NULL;
 	return s;
 #else
 	return str("%C", closure.uget());

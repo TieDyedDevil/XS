@@ -222,8 +222,8 @@ static List *extractsinglematch(const char *subject, const char *pattern,
 extern List *extractmatches(List *subjects, List *patterns, StrList *quotes) {
 	List **prevp;
 	List *subject;
-	Ref(List *, result, NULL);
-	prevp = &result;
+	SRef<List> result;
+	prevp = result.rget();
 
 	gcdisable();
 
@@ -248,5 +248,5 @@ extern List *extractmatches(List *subjects, List *patterns, StrList *quotes) {
 	}
 
 	gcenable();
-	RefReturn(result);
+	return result.release();
 }
