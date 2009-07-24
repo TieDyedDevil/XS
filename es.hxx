@@ -225,7 +225,7 @@ extern List *listcopy(List *list);
 extern int length(List *list);
 extern List *listify(int argc, char **argv);
 extern Term *nth(List *list, int n);
-extern List *sortlist(List *list);
+extern SRef<List> sortlist(SRef<List> list);
 
 
 /* tree.c */
@@ -293,7 +293,7 @@ extern void validatevar(const char *var);
 extern List *varlookup(SRef<const char> name, SRef<Binding> binding);
 extern List *varlookup2(const char *name1, const char *name2, Binding *binding);
 extern void vardef(const char *, Binding *, List *);
-extern Vector *mkenv(void);
+extern SRef<Vector> mkenv(void);
 extern void setnoexport(List *list);
 extern void addtolist(void *arg, const char *key, void *value);
 extern List *listvars(bool internal);
@@ -351,9 +351,9 @@ extern StrList *mkstrlist(const char *, StrList *);
 
 /* vec.c */
 
-extern Vector *mkvector(int n);
-extern Vector *vectorize(List *list);
-extern void sortvector(Vector *v);
+extern SRef<Vector> mkvector(int n);
+extern SRef<Vector> vectorize(SRef<List> list);
+extern void sortvector(SRef <Vector> v);
 
 
 /* util.c */

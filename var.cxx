@@ -16,7 +16,7 @@
 
 Dict *vars;
 static Dict *noexport;
-static Vector *env, *sortenv;
+static SRef<Vector> env, sortenv;
 static int envmin;
 static bool isdirty = true;
 static bool rebound = true;
@@ -273,14 +273,14 @@ static void mkenv0(void *dummy, const char *key, void *value) {
 	assert(env->count < env->alloclen);
 	env->vector[env->count++] = var->env;
 	if (env->count == env->alloclen) {
-		Vector *newenv = mkvector(env->alloclen * 2);
+		SRef<Vector> newenv = mkvector(env->alloclen * 2);
 		newenv->count = env->count;
 		memcpy(newenv->vector, env->vector, env->count * sizeof *env->vector);
 		env = newenv;
 	}
 }
 	
-extern Vector *mkenv(void) {
+extern SRef<Vector> mkenv(void) {
 	if (isdirty || rebound) {
 		env->count = envmin;
 		gcdisable();		/* TODO: make this a good guess */
@@ -413,7 +413,7 @@ extern void initenv(char **envp, bool isprotected) {
 		if (eq == NULL) {
 			env->vector[env->count++] = envstr;
 			if (env->count == env->alloclen) {
-				Vector *newenv = mkvector(env->alloclen * 2);
+				SRef<Vector> newenv = mkvector(env->alloclen * 2);
 				newenv->count = env->count;
 				memcpy(newenv->vector, env->vector,
 				       env->count * sizeof *env->vector);

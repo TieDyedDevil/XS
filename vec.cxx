@@ -2,12 +2,13 @@
 
 #include "es.hxx"
 #include "gc.hxx"
+#include <algorithm>
 
 DefineTag(Vector, static);
 
-extern Vector *mkvector(int n) {
+extern SRef<Vector> mkvector(int n) {
 	int i;
-	Vector *v = reinterpret_cast<Vector*>(
+	SRef<Vector> v = reinterpret_cast<Vector*>(
 	  gcalloc(offsetof(Vector, vector[0]) +
 		  (n + 1) * sizeof(char*),
 		  &VectorTag));
@@ -35,31 +36,29 @@ static size_t VectorScan(void *p) {
 }
 
 
-extern Vector *vectorize(List *list) {
-	int i, n = length(list);
+extern SRef<Vector> vectorize(SRef<List> list) {
+	int i, n = length(list.uget());
 
-	Ref(Vector *, v, NULL);
-	Ref(List *, lp, list);
+	SRef<Vector> v = NULL;
 	v = mkvector(n);
 	v->count = n;
 
-	for (i = 0; lp != NULL; lp = lp->next, i++) {
+	for (i = 0; list != NULL; list = list->next, i++) {
 	        /* must evaluate before v->vector[i] */
-		const char *s = getstr(lp->term); 
-		v->vector[i] = gcdup(s);
+		SRef<const char> s = getstr(list->term); 
+		v->vector[i] = gcdup(s.uget());
 	}
 
-	RefEnd(lp);
-	RefReturn(v);
+	return v.release();
 }
 
-/* qstrcmp -- a strcmp wrapper for qsort */
-extern int qstrcmp(const void *s1, const void *s2) {
-	return strcmp(*(const char **)s1, *(const char **)s2);
+/* qstrcmp -- a strcmp wrapper for sort */
+extern int qstrcmp(const char *s1, const char *s2) {
+	return strcmp(s1, s2) < 0;
 }
 
 /* sortvector */
-extern void sortvector(Vector *v) {
+extern void sortvector(SRef<Vector> v) {
 	assert(v->vector[v->count] == NULL);
-	qsort(v->vector, v->count, sizeof (char *), qstrcmp);
+	std::sort(v->vector, v->vector + v->count, qstrcmp);
 }

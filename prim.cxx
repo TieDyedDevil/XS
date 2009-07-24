@@ -18,7 +18,7 @@ PRIM(primitives) {
 	if (primlist == NULL) {
 		globalroot(&primlist);
 		dictforall(prims, addtolist, &primlist);
-		primlist = sortlist(primlist);
+		primlist = sortlist(primlist).release();
 	}
 	return primlist;
 }

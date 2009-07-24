@@ -23,7 +23,7 @@ static void failexec(SRef<const char> file, SRef<List> args) {
 /* forkexec -- fork (if necessary) and exec */
 extern List *forkexec(const char *file, List *list, bool inchild) {
 	gcdisable();
-	Vector *env = mkenv();
+	SRef<Vector> env = mkenv();
 	int pid = efork(!inchild, false);
 	if (pid == 0) {
 		execve(file, vectorize(list)->vector, env->vector);

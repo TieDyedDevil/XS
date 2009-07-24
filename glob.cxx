@@ -199,7 +199,7 @@ static List *glob0(SRef<List> list, SRef<StrList> quote) {
 			prevp = &list->next;			
 		}
 		else {
-			*prevp = sortlist(expand1);
+			*prevp = sortlist(expand1).release();
 			while (*prevp != NULL)
 				prevp = &(*prevp)->next;
 		}

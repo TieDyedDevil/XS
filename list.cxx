@@ -102,15 +102,8 @@ extern Term *nth(List *list, int n) {
 }
 
 /* sortlist */
-extern List *sortlist(List *list) {
-	if (length(list) > 1) {
-		Vector *v = vectorize(list);
-		sortvector(v);
-		gcdisable();
-		Ref(List *, lp, listify(v->count, v->vector));
-		gcenable();
-		list = lp;
-		RefEnd(lp);
-	}
-	return list;
+extern SRef<List> sortlist(SRef<List> list) {
+	SRef<Vector> v = vectorize(list);
+	sortvector(v);
+	return list = listify(v->count, v->vector);
 }
