@@ -40,10 +40,10 @@ let (passes := 0
 
 
     fn results {
-	    log 'Expected passes:     ' $passes
-	    log 'Unexpected failures: ' $fails
-	    if {test $fails -eq 0} exit 0
-	    else exit $fails
+	log 'Expected passes:     ' $passes
+	log 'Unexpected failures: ' $fails
+    	rm -r /dev/shm/xs*
+	if {test $fails -eq 0} { exit 0 } { exit $fails }
     }
 }
 fn conds requirements {
@@ -83,4 +83,3 @@ let (dir := `{pwd}
     }
 }
 results
-rm -r /dev/shm/xs.*
