@@ -90,14 +90,12 @@ extern char *mprint (const char * fmt, ...) {
 
 DefineTag(StrList, static);
 
-extern StrList *mkstrlist(const char *str, StrList *next) {
-	gcdisable();
+extern SRef<StrList> mkstrlist(SRef<const char> str, SRef<StrList> next) {
 	assert(str != NULL);
-	Ref(StrList *, list, gcnew(StrList));
-	list->str = str;
-	list->next = next;
-	gcenable();
-	RefReturn(list);
+	SRef<StrList> list = gcnew(StrList);
+	list->str = str.release();
+	list->next = next.release();
+	return list.release();
 }
 
 static void *StrListCopy(void *op) {

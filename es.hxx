@@ -346,7 +346,7 @@ extern void initconv(void);
 
 extern char *str(const char *fmt, ...);	/* create a gc space string by printing */
 extern char *mprint(const char *fmt, ...);	/* create an ealloc space string by printing */
-extern StrList *mkstrlist(const char *, StrList *);
+extern SRef<StrList> mkstrlist(SRef<const char> str, SRef<StrList> next);
 
 
 /* vec.c */

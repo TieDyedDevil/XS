@@ -71,7 +71,7 @@ static List *qconcat(SRef<List> list1, SRef<List> list2,
 			p = &(*p)->next;
 			*qp = mkstrlist(
 				qcat(ql1->str, qlp->str, list1->term, lp->term),
-				NULL);
+				NULL).release();
 			qp = &(*qp)->next;
 		}
 	}
