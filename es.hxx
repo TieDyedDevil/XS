@@ -261,8 +261,8 @@ extern unsigned long evaldepth, maxevaldepth;
 
 /* glom.c */
 
-extern List *glom(Tree *tree, Binding *binding, bool globit);
-extern List *glom2(Tree *tree, Binding *binding, StrList **quotep);
+extern List *glom(SRef<Tree> tree, SRef<Binding> binding, bool globit);
+extern List *glom2(SRef<Tree> tree, SRef<Binding> binding, StrList **quotep);
 
 
 /* glob.c */

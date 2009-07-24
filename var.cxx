@@ -317,15 +317,14 @@ static void listinternal(void *arg, const char *key, void *value) {
 
 /* listvars -- return a list of all the (dynamic) variables */
 extern List *listvars(bool internal) {
-	Ref(List *, varlist, NULL);
+	SRef<List> varlist;
 	dictforall(vars, internal ? listinternal : listexternal, &varlist);
-	varlist = sortlist(varlist);
-	RefReturn(varlist);
+	return (varlist = sortlist(varlist.uget())).release();
 }
 
 /* hide -- worker function for dictforall to hide initial state */
 static void hide(void *dummy, const char *key, void *value) {
-	((Var *) value)->flags |= var_isinternal;
+	reinterpret_cast<Var *>(value)->flags |= var_isinternal;
 }
 
 /* hidevariables -- mark all variables as internal */
@@ -350,16 +349,14 @@ extern void initvars(void) {
 }
 
 /* importvar -- import a single environment variable */
-static void importvar(char *name0, char *value) {
+static void importvar(SRef<char> name, SRef<char> value) {
 	char sep[2] = { ENV_SEPARATOR, '\0' };
 
-	Ref(char *, name, name0);
-	Ref(List *, defn, NULL);
-	defn = fsplit(sep, mklist(mkstr(value + 1), NULL), false);
+	SRef<List> defn;
+	defn = fsplit(sep, mklist(mkstr(value.uget() + 1), NULL), false);
 
-	if (strchr(value, ENV_ESCAPE) != NULL) {
-		List *list;
-		gcdisable();
+	if (strchr(value.uget(), ENV_ESCAPE) != NULL) {
+		SRef<List> list;
 		for (list = defn; list != NULL; list = list->next) {
 			int offset = 0;
 			const char *word = list->term->str;
@@ -398,10 +395,8 @@ static void importvar(char *name0, char *value) {
 				}
 			}
 		}
-		gcenable();
 	}
-	vardef(name, NULL, defn);
-	RefEnd2(defn, name);
+	vardef(name.uget(), NULL, defn.uget());
 }
 
 

@@ -65,7 +65,7 @@ static List *assign(SRef<Tree> varform, SRef<Tree> valueform, SRef<Binding> bind
 			value = mklist(values->term, NULL);
 			values = values->next;
 		}
-		vardef(name.release(), binding.release(), value.release());
+		vardef(name.release(), binding.uget(), value.release());
 	}
 
 	return result.release();
