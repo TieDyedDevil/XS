@@ -1,9 +1,6 @@
 #!./xs
 VERBOSE := false
 if $VERBOSE { DOTARGS := -v }
-fn arith cmds {
-    echo $cmds | bc
-}
 
 let (TMPOUT := /dev/shm/xs.$pid.testout) {
     # Ends up without newlines
@@ -30,11 +27,11 @@ let (passes := 0
      fails  := 0)
 {
     fn pass { 
-	passes := `{arith 1 + $passes}
+	passes := `{expr 1 + $passes}
         log 'Passed: ' $TESTNAME
     }
     fn fail { 
-	fails := `{arith 1 + $fails} 
+	fails := `{expr 1 + $fails} 
 	log 'Failed: ' $TESTNAME
     }
 
