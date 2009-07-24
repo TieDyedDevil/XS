@@ -113,15 +113,13 @@ extern bool match(const char *s, const char *p, const char *q) {
  *	() matches (), but otherwise null patterns match nothing.
  */
 
-extern bool listmatch(List *subject, List *pattern, StrList *quote) {
+extern bool listmatch(SRef<List> subject, SRef<List> pattern, SRef<StrList> quote) {
 	if (subject == NULL) {
 		if (pattern == NULL)
 			return true;
-		Ref(List *, p, pattern);
-		Ref(StrList *, q, quote);
-		for (; p != NULL; p = p->next, q = q->next) {
+		for (; pattern; pattern = pattern->next, quote = quote->next) {
 			/* one or more stars match null */
-			const char *pw = getstr(p->term), *qw = q->str;
+			const char *pw = getstr(pattern->term), *qw = quote->str;
 			if (*pw != '\0' && qw != QUOTED) {
 				int i;
 				bool matched = true;
@@ -132,38 +130,28 @@ extern bool listmatch(List *subject, List *pattern, StrList *quote) {
 						break;
 					}
 				if (matched) {
-					RefPop2(q, p);
 					return true;
 				}
 			}
 		}
-		RefEnd2(q, p);
 		return false;
-	}
-
-	Ref(List *, s, subject);
-	Ref(List *, p, pattern);
-	Ref(StrList *, q, quote);
-
-	for (; p != NULL; p = p->next, q = q->next) {
-		assert(q != NULL);
-		assert(p->term != NULL);
-		assert(q->str != NULL);
-		Ref(const char *, pw, getstr(p->term));
-		Ref(const char *, qw, q->str);
-		Ref(List *, t, s);
-		for (; t != NULL; t = t->next) {
-			const char *tw = getstr(t->term);
-			if (match(tw, pw, qw)) {
-				RefPop3(t, qw, pw);
-				RefPop3(q, p, s);
-				return true;
+	} else {
+		for (; pattern; pattern = pattern->next, quote = quote->next) {
+			assert(quote != NULL);
+			assert(pattern->term != NULL);
+			assert(quote->str != NULL);
+			SRef<const char> pw = getstr(pattern->term);
+			SRef<const char> qw = quote->str;
+			SRef<List> t = subject;
+			for (; t != NULL; t = t->next) {
+				SRef<const char> tw = getstr(t->term);
+				if (match(tw.release(), pw.uget(), qw.uget())) {
+					return true;
+				}
 			}
 		}
-		RefEnd3(t, qw, pw);
+		return false;
 	}
-	RefEnd3(q, p, s);
-	return false;
 }
 
 /*

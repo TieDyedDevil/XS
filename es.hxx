@@ -280,7 +280,7 @@ extern List *dirmatch(SRef<const char> prefix,
 
 /* match.c */
 extern bool match(const char *subject, const char *pattern, const char *quote);
-extern bool listmatch(List *subject, List *pattern, StrList *quote);
+extern bool listmatch(SRef<List> subject, SRef<List> pattern, SRef<StrList> quote);
 extern List *extractmatches(List *subjects, List *patterns, StrList *quotes);
 
 

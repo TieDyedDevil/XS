@@ -294,14 +294,14 @@ extern void sigchk(void) {
 		}
 	}
 	resetparser();
-	Ref(List *, e,
-	    mklist(mkstr("signal"), mklist(mkstr(signame(sig)), NULL)));
+	SRef<List> e =
+	    mklist(mkstr("signal"), mklist(mkstr(signame(sig)), NULL));
 
 	switch (sigeffect[sig]) {
 	case sig_catch:
 		while (gcisblocked())
 			gcenable();
-		throwE(e);
+		throwE(e.release());
 		NOTREACHED;
 	case sig_special:
 		assert(sig == SIGINT);
@@ -311,7 +311,7 @@ extern void sigchk(void) {
 		sigint_newline = true;
 		while (gcisblocked())
 			gcenable();
-		throwE(e);
+		throwE(e.release());
 		NOTREACHED;
 		break;
 	case sig_noop:
@@ -320,5 +320,4 @@ extern void sigchk(void) {
 		/* panic("sigchk: caught %L with sigeffect %d", e, " ", sigeffect[sig]); */
 		break;
 	}
-	RefEnd(e);
 }
