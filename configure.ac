@@ -115,27 +115,6 @@ fi
 AC_FUNC_WAIT3
 AC_CHECK_FUNCS(strerror strtol lstat setrlimit sigrelse sighold sigaction sysconf setsid)
 
-AC_CACHE_CHECK(for an abused getenv, es_cv_abused_getenv,
-AC_TRY_RUN(
-[
-changequote(,)
-char *foo = 0;
-char *foov[] = { "-a", "-bfoo", "bar" };
-int fooc = (sizeof(foov) / sizeof(foov[0]));
-
-int getenv() { return *foo; }
-int main() { while (-1 != getopt(fooc, foov, "ab:")); exit(0); }
-changequote([,])
-], 
-es_cv_abused_getenv=no,
-[es_cv_abused_getenv=yes
-AC_DEFINE(ABUSED_GETENV,, Getenv called by crt*.o or getopt)]))
-
-if test "$es_cv_abused_getenv" = yes
-then
-	rm -f core conftest.core
-fi
-
 dnl Check to see if you can assign to a va_list
 AC_CACHE_CHECK(whether assignment to va_list ok?, es_cv_assign_va_list,
 AC_TRY_COMPILE(

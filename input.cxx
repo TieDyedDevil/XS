@@ -1,6 +1,5 @@
 
 /* input.c -- read input from files or strings ($Revision: 1.2 $) */
-/* stdgetenv is based on the FreeBSD getenv */
 
 #include "es.hxx"
 #include "term.hxx"
@@ -48,11 +47,6 @@ extern char *rl_completer_quote_characters;
 #endif
 
 
-#if ABUSED_GETENV
-static char *stdgetenv(const char *);
-static char *esgetenv(const char *);
-static char *(*realgetenv)(const char *) = stdgetenv;
-#endif
 #endif
 
 
@@ -301,74 +295,6 @@ static char ** command_completion(const char *text, int start, int end) {
 	} else assert (results == NULL);
 	return results;
 }
-
-#if ABUSED_GETENV
-
-/* getenv -- fake version of getenv for readline (or other libraries) */
-static char *esgetenv(const char *name) {
-	List *value = varlookup(name, NULL);
-	if (value == NULL)
-		return NULL;
-	else {
-		char *export;
-		static Dict *envdict;
-		static bool initialized = false;
-		Ref(char *, string, NULL);
-
-		gcdisable();
-		if (!initialized) {
-			initialized = true;
-			envdict = mkdict();
-			globalroot(&envdict);
-		}
-
-		string = dictget(envdict, name);
-		if (string != NULL)
-			efree(string);
-
-		export = str("%W", value);
-		string = ealloc(strlen(export) + 1);
-		strcpy(string, export);
-		envdict = dictput(envdict, (char *) name, string);
-
-		gcenable();
-		RefReturn(string);
-	}
-}
-static char *
-stdgetenv(name)
-	register const char *name;
-{
-	extern char **environ;
-	register int len;
-	register const char *np;
-	register char **p, *c;
-
-	if (name == NULL || environ == NULL)
-		return (NULL);
-	for (np = name; *np && *np != '='; ++np)
-		continue;
-	len = np - name;
-	for (p = environ; (c = *p) != NULL; ++p)
-		if (strncmp(c, name, len) == 0 && c[len] == '=') {
-			return (c + len + 1);
-		}
-	return (NULL);
-}
-
-char *
-getenv(char *name)
-{
-	return realgetenv(name);
-}
-
-extern void
-initgetenv(void)
-{
-	realgetenv = esgetenv;
-}
-
-#endif /* ABUSED_GETENV */
 
 #endif	/* READLINE */
 
