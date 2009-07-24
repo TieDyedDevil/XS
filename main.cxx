@@ -32,7 +32,7 @@ static void initpath(void) {
 
 	Ref(List *, list, NULL);
 	for (i = arraysize(path); i-- > 0;) {
-		Term *t = mkstr((char *) path[i]);
+		SRef<Term> t = mkstr((char *) path[i]);
 		list = mklist(t, list);
 	}
 	vardef("path", NULL, list);

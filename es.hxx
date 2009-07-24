@@ -208,10 +208,10 @@ extern void undefer(int ticket);
 /* term.c */
 
 extern SRef<Term> mkterm(SRef<const char> str, SRef<Closure> closure);
-extern Term *mkstr(SRef<const char> str);
+extern SRef<Term> mkstr(SRef<const char> str);
 extern const char *getstr(SRef<Term> term);
 extern Closure *getclosure(SRef<Term> term);
-extern Term *termcat(SRef<Term> t1, SRef<Term> t2);
+extern SRef<Term> termcat(SRef<Term> t1, SRef<Term> t2);
 extern bool termeq(Term *term, const char *s);
 extern bool isclosure(Term *term);
 

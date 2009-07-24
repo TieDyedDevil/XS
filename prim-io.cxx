@@ -233,10 +233,9 @@ PRIM(pipe) {
 
 	Ref(List *, result, NULL);
 	do {
-		Term *t;
 		int status = ewaitfor(pids[--n]);
 		printstatus(0, status);
-		t = mkstr(mkstatus(status));
+		SRef<Term> t = mkstr(mkstatus(status));
 		result = mklist(t, result);
 	} while (0 < n);
 	if (evalflags & eval_inchild)

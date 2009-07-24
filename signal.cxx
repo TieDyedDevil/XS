@@ -233,7 +233,7 @@ extern List *mksiglist(void) {
 	int sig = NSIG;
 	Sigeffect effects[NSIG];
 	getsigeffects(effects);
-	Ref(List *, lp, NULL);
+	SRef<List> lp = NULL;
 	while (--sig > 0) {
 		int prefix;
 		switch (effects[sig]) {
@@ -244,14 +244,13 @@ extern List *mksiglist(void) {
 		case sig_noop:		prefix = '/';	break;
 		case sig_special:	prefix = '.';	break;
 		}
-		Ref(char *, name, signame(sig));
+		SRef<const char> name = signame(sig);
 		if (prefix != '\0')
-			name = str("%c%s", prefix, name);
-		Ref(Term *, term, mkstr(name));
+			name = str("%c%s", prefix, name.uget());
+		SRef<Term> term = mkstr(name);
 		lp = mklist(term, lp);
-		RefEnd2(term, name);
 	}
-	RefReturn(lp);
+	return lp.release();
 }
 
 

@@ -71,7 +71,7 @@ extern int esopt(const char *options) {
 		}
 		termarg = (nextchar == 0)
 				? args->term
-				: mkstr(gcdup(arg + nextchar));
+				: mkstr(gcdup(arg + nextchar)).release();
 		nextchar = 0;
 		args = args->next;
 	}

@@ -131,14 +131,13 @@ PRIM(fsplit) {
 }
 
 PRIM(var) {
-	Term *term;
 	if (list == NULL)
 		return NULL;
 	Ref(List *, rest, list->next);
 	Ref(const char *, name, getstr(list->term));
 	Ref(List *, defn, varlookup(name, NULL));
 	rest = prim_var(rest, NULL, evalflags);
-	term = mkstr(str("%S = %#L", name, defn, " "));
+	SRef<Term> term = mkstr(str("%S = %#L", name, defn, " "));
 	list = mklist(term, rest);
 	RefEnd3(defn, name, rest);
 	return list;

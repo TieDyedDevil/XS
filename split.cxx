@@ -44,7 +44,7 @@ extern void splitstring(const char *in, size_t len, bool endword) {
 	if (splitchars) {
 		assert(buf == NULL);
 		while (s < inend) {
-			Term *term = mkstr(gcndup((char *) s++, 1));
+			SRef<Term> term = mkstr(gcndup((char *) s++, 1));
 			value = mklist(term, value);
 		}
 		gcenable();
@@ -58,7 +58,7 @@ extern void splitstring(const char *in, size_t len, bool endword) {
 		int c = *s++;
 		if (buf != NULL)
 			if (isifs[c]) {
-				Term *term = mkstr(sealcountedbuffer(buf));
+				SRef<Term> term = mkstr(sealcountedbuffer(buf));
 				value = mklist(term, value);
 				buf = coalesce ? NULL : openbuffer(0);
 			} else
@@ -68,7 +68,7 @@ extern void splitstring(const char *in, size_t len, bool endword) {
 	}
 
 	if (endword && buf != NULL) {
-		Term *term = mkstr(sealcountedbuffer(buf));
+		SRef<Term> term = mkstr(sealcountedbuffer(buf));
 		value = mklist(term, value);
 		buf = NULL;
 	}
@@ -80,7 +80,7 @@ extern List *endsplit(void) {
 	List *result;
 
 	if (buffer != NULL) {
-		Term *term = mkstr(sealcountedbuffer(buffer));
+		SRef<Term> term = mkstr(sealcountedbuffer(buffer));
 		value = mklist(term, value);
 		buffer = NULL;
 	}

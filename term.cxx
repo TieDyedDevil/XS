@@ -13,11 +13,11 @@ extern SRef<Term> mkterm(SRef<const char> str, SRef<Closure> closure) {
 	return term;
 }
 
-extern Term *mkstr(SRef<const char> str) {
+extern SRef<Term> mkstr(SRef<const char> str) {
 	SRef<Term> term = gcnew(Term);
         term->str = str.release();
 	term->closure = NULL;
-        return term.release();
+        return term;
 }
 
 extern Closure *getclosure(SRef<Term> term) {
@@ -57,7 +57,7 @@ extern const char *getstr(SRef<Term> term) {
 #endif
 }
 
-extern Term *termcat(SRef<Term> t1, SRef<Term> t2) {
+extern SRef<Term> termcat(SRef<Term> t1, SRef<Term> t2) {
 	if (t1 == NULL)
 		return t2.release();
 	if (t2 == NULL)

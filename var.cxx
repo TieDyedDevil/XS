@@ -301,7 +301,7 @@ extern SRef<Vector> mkenv(void) {
 /* addtolist -- dictforall procedure to create a list */
 extern void addtolist(void *arg, const char *key, void *value) {
 	List **listp = reinterpret_cast<List**>(arg);
-	Term *term = mkstr(key);
+	SRef<Term> term = mkstr(key);
 	*listp = mklist(term, *listp);
 }
 

@@ -171,7 +171,7 @@ PRIM(apids) {
 	Ref(List *, lp, NULL);
 	for (p = proclist; p != NULL; p = p->next)
 		if (p->background && p->alive) {
-			Term *t = mkstr(str("%d", p->pid));
+			SRef<Term> t = mkstr(str("%d", p->pid));
 			lp = mklist(t, lp);
 		}
 	/* TODO: sort the return value, but by number? */

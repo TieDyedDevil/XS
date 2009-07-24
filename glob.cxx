@@ -280,7 +280,7 @@ extern SRef<List> glob(SRef<List> list, SRef<StrList> quote) {
 			       strlen(qp->str) == strlen(str.uget()));
 			if (hastilde(str.uget(), qp->str)) {
 				str = expandhome(str, qp);
-				lp->term = mkstr(str.uget());
+				lp->term = mkstr(str.uget()).release();
 			}
 			if (haswild(str.uget(), qp->str))
 				doglobbing = true;
