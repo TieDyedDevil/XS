@@ -180,7 +180,7 @@ static List *glob1(SRef<const char> pattern, SRef<const char> quote) {
 }
 
 /* glob0 -- glob a list, (destructively) passing through entries we don't care about */
-static List *glob0(SRef<List> list, SRef<StrList> quote) {
+static SRef<List> glob0(SRef<List> list, SRef<StrList> quote) {
 	SRef<List> result; 
 	List **prevp, *expand1;
 
@@ -204,7 +204,7 @@ static List *glob0(SRef<List> list, SRef<StrList> quote) {
 				prevp = &(*prevp)->next;
 		}
 	}
-	return result.release();
+	return result;
 }
 
 /* expandhome -- do tilde expansion by calling fn %home */
@@ -266,7 +266,7 @@ static char *expandhome(SRef<char> string, SRef<StrList> quote) {
 }
 
 /* glob -- globbing prepass (glob if we need to, and dispatch for tilde expansion) */
-extern List *glob(SRef<List> list, SRef<StrList> quote) {
+extern SRef<List> glob(SRef<List> list, SRef<StrList> quote) {
 	SRef<List> lp;
 	SRef<StrList> qp;
 	bool doglobbing = false;
@@ -287,7 +287,7 @@ extern List *glob(SRef<List> list, SRef<StrList> quote) {
 			lp->term->str = str.release();
 		}
 
-	if (!doglobbing) return list.release();
-	list = glob0(list.release(), quote.release());
-	return list.release();
+	if (!doglobbing) return list;
+	list = glob0(list, quote);
+	return list;
 }

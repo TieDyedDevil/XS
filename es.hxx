@@ -261,7 +261,7 @@ extern unsigned long evaldepth, maxevaldepth;
 
 /* glom.c */
 
-extern List *glom(SRef<Tree> tree, SRef<Binding> binding, bool globit);
+extern SRef<List> glom(SRef<Tree> tree, SRef<Binding> binding, bool globit);
 extern List *glom2(SRef<Tree> tree, SRef<Binding> binding, StrList **quotep);
 
 
@@ -269,7 +269,7 @@ extern List *glom2(SRef<Tree> tree, SRef<Binding> binding, StrList **quotep);
 
 extern const char *QUOTED, *UNQUOTED;
 
-extern List *glob(SRef<List> list, SRef<StrList> quote);
+extern SRef<List> glob(SRef<List> list, SRef<StrList> quote);
 extern bool haswild(const char *pattern, const char *quoting);
 /* Needed for some of the readline tab-completion */
 extern List *dirmatch(SRef<const char> prefix, 

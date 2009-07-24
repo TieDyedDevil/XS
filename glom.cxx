@@ -279,7 +279,7 @@ extern List *glom2(SRef<Tree> tree, SRef<Binding> binding, StrList **quotep) {
 }
 
 /* glom -- top level glom dispatching */
-extern List *glom(SRef<Tree> tree, SRef<Binding> binding, bool globit) {
+extern SRef<List> glom(SRef<Tree> tree, SRef<Binding> binding, bool globit) {
 	if (globit) {
 		SRef<StrList> quote;
 		SRef<List> list = glom2(tree.release(), binding.release(), quote.rget());

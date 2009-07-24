@@ -231,9 +231,8 @@ top:
 
 	    case nConcat: case nList: case nQword: case nVar: case nVarsub:
 	    case nWord: case nThunk: case nLambda: case nCall: case nPrim: {
-		List *list;
 		SRef<Binding> bp = binding;
-		list = glom(tree, bp.uget(), true);
+		SRef<List> list = glom(tree, bp.uget(), true);
 		binding = bp.release();
 		return eval(list, binding, flags);
 	    }
