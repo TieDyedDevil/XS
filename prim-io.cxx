@@ -342,7 +342,7 @@ restart:
 		close(fd);
 		fail("$&backquote", "backquote read: %s", esstrerror(errno));
 	}
-	return endsplit();
+	return endsplit().release();
 }
 
 PRIM(backquote) {

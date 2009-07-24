@@ -412,8 +412,8 @@ extern void initprims(void);
 
 extern void startsplit(const char *sep, bool coalesce);
 extern void splitstring(const char *in, size_t len, bool endword);
-extern List *endsplit(void);
-extern List *fsplit(const char *sep, List *list, bool coalesce);
+extern SRef<List> endsplit(void);
+extern SRef<List> fsplit(const char *sep, SRef<List> list, bool coalesce);
 
 
 /* signal.c */

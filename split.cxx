@@ -76,8 +76,8 @@ extern void splitstring(const char *in, size_t len, bool endword) {
 	gcenable();
 }
 
-extern List *endsplit(void) {
-	List *result;
+extern SRef<List> endsplit(void) {
+	SRef<List> result;
 
 	if (buffer != NULL) {
 		SRef<Term> term = mkstr(sealcountedbuffer(buffer));
@@ -89,15 +89,11 @@ extern List *endsplit(void) {
 	return result;
 }
 
-extern List *fsplit(const char *sep, List *list, bool coalesce) {
-	Ref(List *, lp, list);
+extern SRef<List> fsplit(const char *sep, SRef<List> list, bool coalesce) {
 	startsplit(sep, coalesce);
-	for (; lp != NULL; lp = lp->next) {
-		/* No need for Ref because gc cannot run
-		 * between these two statements         */
-		const char *s = getstr(lp->term);
-		splitstring(s, strlen(s), true);
+	for (; list; list = list->next) {
+		SRef<const char> s = getstr(list->term);
+		splitstring(s.uget(), strlen(s.uget()), true);
 	}
-	RefEnd(lp);
 	return endsplit();
 }

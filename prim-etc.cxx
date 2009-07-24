@@ -115,19 +115,19 @@ PRIM(whatis) {
 PRIM(split) {
 	if (list == NULL)
 		fail("$&split", "usage: %%split separator [args ...]");
-	Ref(List *, lp, list);
+	SRef<List> lp = list;
 	const char *sep = getstr(lp->term);
 	lp = fsplit(sep, lp->next, true);
-	RefReturn(lp);
+	return lp.release();
 }
 
 PRIM(fsplit) {
 	if (list == NULL)
 		fail("$&fsplit", "usage: %%fsplit separator [args ...]");
-	Ref(List *, lp, list);
+	SRef<List> lp = list;
 	const char *sep = getstr(lp->term);
 	lp = fsplit(sep, lp->next, false);
-	RefReturn(lp);
+	return lp.release();
 }
 
 PRIM(var) {
