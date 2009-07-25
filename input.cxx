@@ -244,17 +244,23 @@ static inline char * basename(char *str) {
 	return rindex(str, '/') + 1;
 }
 
+#include "var.hxx"
+/* TODO Variable completion on $ */
 static char ** command_completion(const char *text, int start, int end) {
-	if (start != 0) return NULL; /* Only for first word on line */	
-
+	{
+		int i = 0;
+		while (isspace(text[i])) ++i;
+		if (start > i) return NULL; /* Only for first word on line */	
+		else text += i;
+	}
 	char **results = NULL;
 	
 	/* Leave room for \0, and special first element */
 	int result_p = 1;
 	int results_size = 2;
 
-	gcdisable();	
-	for (List *paths = varlookup("path", NULL);
+	/* Lookup matching commands */
+	for (SRef<List> paths = varlookup("path", NULL);
 	     paths != NULL;
 	     paths = paths->next)
 	{
@@ -264,12 +270,12 @@ static char ** command_completion(const char *text, int start, int end) {
 		path[l_path] = '/';
 		path[l_path + 1] = '\0';
 	
-		char * glob_string = reinterpret_cast<char*>(malloc(sizeof(char) * (end - start + 2)));
+		char * glob_string = reinterpret_cast<char*>(ealloc(sizeof(char) * (end - start + 2)));
 		memcpy(glob_string, text, (end - start) * sizeof(char));
 		*(glob_string + end - start) = '*';
 		*(glob_string + end - start + 1) = '\0';	
 
-		List* glob_result = dirmatch(path, path, glob_string, UNQUOTED);
+		SRef<List> glob_result = dirmatch(path, path, glob_string, UNQUOTED);
 		efree(path);
 
 		int l = length(glob_result);
@@ -277,14 +283,26 @@ static char ** command_completion(const char *text, int start, int end) {
 		
 		results_size += l;
 		results = reinterpret_cast<char**>(erealloc(results, results_size * sizeof(char*)));
-		for (List *i = glob_result; i != NULL; i = i->next, ++result_p) {
+		for (SRef<List> i = glob_result; i != NULL; i = i->next, ++result_p) {
 			/* Can't directly use gc_string, because readline
 			 * needs to free() the result 
 			 */
 			results[result_p] = strdup(basename(i->term->str));
 		}
 	}
-	gcenable();
+
+	SRef<List> lvars;
+	dictforall(vars, addtolist, &lvars);
+	/* Match (some) variables - can't easily match lexical/local because that would require partially
+	 * parsing/evaluating the input (which would contain a let/local somewhere in it) */
+	for (; lvars; lvars = lvars->next) {
+		SRef<const char> str = getstr(lvars->term);
+		if (strncmp("fn-", str.uget(), 3) != 0
+		   || strncmp(text, str.uget() + 3, end - start) != 0) continue;
+		++results_size;
+		results = reinterpret_cast<char**>(erealloc(results, results_size * sizeof(char*)));
+		results[result_p++] = strdup(str.release() + 3);
+	}
 
 	assert (result_p == results_size - 1);
 	int num_results = results_size - 2;
