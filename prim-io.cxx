@@ -15,31 +15,30 @@ static int getnumber(const char *s) {
 	return result;
 }
 
-static List *redir(List *(*rop)(int *fd, List *list), List *list, int evalflags) {
+static SRef<List> redir(SRef<List> (*rop)(int *fd, SRef<List> list), SRef<List> list, int evalflags) {
 	int destfd, srcfd;
 	volatile int inparent = (evalflags & eval_inchild) == 0;
 	volatile int ticket = UNREGISTERED;
 
 	assert(list != NULL);
-	Ref(List *, lp, list);
-	destfd = getnumber(getstr(lp->term));
-	lp = (*rop)(&srcfd, lp->next);
+	destfd = getnumber(getstr(list->term));
+	list = (*rop)(&srcfd, list->next);
 
 	ExceptionHandler
 		ticket = (srcfd == -1)
 			   ? defer_close(inparent, destfd)
 			   : defer_mvfd(inparent, srcfd, destfd);
-		lp = eval(lp, NULL, evalflags);
+		list = eval(list, NULL, evalflags);
 		undefer(ticket);
 	CatchException (e)
 		undefer(ticket);
 		throwE(e);
 	EndExceptionHandler
 
-	RefReturn(lp);
+	return list;
 }
 
-#define	REDIR(name)	static List *CONCAT(redir_,name)(int *srcfdp, List *list)
+#define	REDIR(name)	static SRef<List> CONCAT(redir_,name)(int *srcfdp, SRef<List> list)
 
 static void argcount(const char *s) NORETURN;
 static void argcount(const char *s) {
@@ -63,10 +62,9 @@ REDIR(openfile) {
 	};
 
 	assert(length(list) == 3);
-	Ref(List *, lp, list);
 
-	const char *mode = getstr(lp->term);
-	lp = lp->next;
+	const char *mode = getstr(list->term);
+	list = list->next;
 	for (i = 0;; i++) {
 		if (modes[i].name == NULL)
 			fail("$&openfile", "bad %%openfile mode: %s", mode);
@@ -76,44 +74,41 @@ REDIR(openfile) {
 		}
 	}
 
-	const char *name = getstr(lp->term);
-	lp = lp->next;
+	const char *name = getstr(list->term);
+	list = list->next;
 	fd = eopen(name, kind);
 	if (fd == -1)
 		fail("$&openfile", "%s: %s", name, esstrerror(errno));
 	*srcfdp = fd;
-	RefReturn(lp);
+	return list;
 }
 
 PRIM(openfile) {
-	List *lp;
 	caller = "$&openfile";
 	if (length(list) != 4)
 		argcount("%openfile mode fd file cmd");
 	/* transpose the first two elements */
-	lp = list->next;
+	SRef<List> lp = list->next;
 	list->next = lp->next;
-	lp->next = list;
-	return redir(redir_openfile, lp, evalflags);
+	lp->next = list.release();
+	return redir(redir_openfile, lp.release(), evalflags);
 }
 
 REDIR(dup) {
 	int fd;
 	assert(length(list) == 2);
-	Ref(List *, lp, list);
-	fd = dup(fdmap(getnumber(getstr(lp->term))));
+	fd = dup(fdmap(getnumber(getstr(list->term))));
 	if (fd == -1)
 		fail("$&dup", "dup: %s", esstrerror(errno));
 	*srcfdp = fd;
-	lp = lp->next;
-	RefReturn(lp);
+	return list->next;
 }
 
 PRIM(dup) {
 	caller = "$&dup";
 	if (length(list) != 3)
 		argcount("%dup newfd oldfd cmd");
-	return redir(redir_dup, list, evalflags);
+	return redir(redir_dup, list.release(), evalflags);
 }
 
 REDIR(close) {
@@ -125,7 +120,7 @@ PRIM(close) {
 	caller = "$&close";
 	if (length(list) != 2)
 		argcount("%close fd cmd");
-	return redir(redir_close, list, evalflags);
+	return redir(redir_close, list.release(), evalflags);
 }
 
 /* pipefork -- create a pipe and fork */
@@ -162,9 +157,9 @@ REDIR(here) {
 	List *doc, *tail, **tailp;
 
 	assert(list != NULL);
-	for (tailp = &list; (tail = *tailp)->next != NULL; tailp = &tail->next)
+	for (tailp = list.rget(); (tail = *tailp)->next != NULL; tailp = &tail->next)
 		;
-	doc = (list == tail) ? NULL : list;
+	doc = (list == tail) ? NULL : list.uget();
 	*tailp = NULL;
 
 	if ((pid = pipefork(p, NULL)) == 0) {		/* child that writes to pipe */
@@ -182,7 +177,7 @@ PRIM(here) {
 	caller = "$&here";
 	if (length(list) < 2)
 		argcount("%here fd [word ...] cmd");
-	return redir(redir_here, list, evalflags);
+	return redir(redir_here, list.release(), evalflags);
 }
 
 PRIM(pipe) {
@@ -231,7 +226,7 @@ PRIM(pipe) {
 		close(p[1]);
 	}
 
-	Ref(List *, result, NULL);
+	SRef<List> result;
 	do {
 		int status = ewaitfor(pids[--n]);
 		printstatus(0, status);
@@ -239,8 +234,8 @@ PRIM(pipe) {
 		result = mklist(t, result);
 	} while (0 < n);
 	if (evalflags & eval_inchild)
-		exit(exitstatus(result));
-	RefReturn(result);
+		exit(exitstatus(result.uget()));
+	return result;
 }
 
 #ifdef HAVE_DEV_FD
@@ -251,25 +246,24 @@ PRIM(readfrom) {
 	caller = "$&readfrom";
 	if (length(list) != 3)
 		argcount("%readfrom var input cmd");
-	Ref(List *, lp, list);
-	Ref(const char *, var, getstr(lp->term));
-	lp = lp->next;
-	Ref(Term *, input, lp->term);
-	lp = lp->next;
-	Ref(Term *, cmd, lp->term);
+	SRef<const char> var = getstr(list->term);
+	list = list->next;
+	SRef<Term> input = list->term;
+	list = list->next;
+	SRef<Term> cmd = list->term;
 
 	if ((pid = pipefork(p, NULL)) == 0) {
 		close(p[0]);
 		mvfd(p[1], 1);
-		exit(exitstatus(eval1(input, evalflags &~ eval_inchild)));
+		exit(exitstatus(eval1(input.uget(), evalflags &~ eval_inchild)));
 	}
 
 	close(p[1]);
-	lp = mklist(mkstr(str(DEVFD_PATH, p[0])), NULL);
-	varpush(&push, var, lp);
+	list = mklist(mkstr(str(DEVFD_PATH, p[0])), NULL);
+	varpush(&push, var.release(), list.uget());
 
 	ExceptionHandler
-		lp = eval1(cmd, evalflags);
+		list = eval1(cmd.uget(), evalflags);
 	CatchException (e)
 		close(p[0]);
 		ewaitfor(pid);
@@ -280,8 +274,7 @@ PRIM(readfrom) {
 	status = ewaitfor(pid);
 	printstatus(0, status);
 	varpop(&push);
-	RefEnd3(cmd, input, var);
-	RefReturn(lp);
+	return list;
 }
 
 PRIM(writeto) {
@@ -291,25 +284,24 @@ PRIM(writeto) {
 	caller = "$&writeto";
 	if (length(list) != 3)
 		argcount("%writeto var output cmd");
-	Ref(List *, lp, list);
-	Ref(const char *, var, getstr(lp->term));
-	lp = lp->next;
-	Ref(Term *, output, lp->term);
-	lp = lp->next;
-	Ref(Term *, cmd, lp->term);
+	SRef<const char> var = getstr(list->term);
+	list = list->next;
+	SRef<Term> output = list->term;
+	list = list->next;
+	SRef<Term> cmd = list->term;
 
 	if ((pid = pipefork(p, NULL)) == 0) {
 		close(p[1]);
 		mvfd(p[0], 0);
-		exit(exitstatus(eval1(output, evalflags &~ eval_inchild)));
+		exit(exitstatus(eval1(output.uget(), evalflags &~ eval_inchild)));
 	}
 
 	close(p[0]);
-	lp = mklist(mkstr(str(DEVFD_PATH, p[1])), NULL);
-	varpush(&push, var, lp);
+	list = mklist(mkstr(str(DEVFD_PATH, p[1])), NULL);
+	varpush(&push, var.uget(), list.uget());
 
 	ExceptionHandler
-		lp = eval1(cmd, evalflags);
+		list = eval1(cmd.uget(), evalflags);
 	CatchException (e)
 		close(p[1]);
 		ewaitfor(pid);
@@ -320,8 +312,7 @@ PRIM(writeto) {
 	status = ewaitfor(pid);
 	printstatus(0, status);
 	varpop(&push);
-	RefEnd3(cmd, output, var);
-	RefReturn(lp);
+	return list;
 }
 #endif
 
@@ -352,26 +343,23 @@ PRIM(backquote) {
 	if (list == NULL)
 		fail(caller, "usage: backquote separator command [args ...]");
 
-	Ref(List *, lp, list);
-	Ref(const char *, sep, getstr(lp->term));
-	lp = lp->next;
+	SRef<const char> sep = getstr(list->term);
+	list = list->next;
 
 	if ((pid = pipefork(p, NULL)) == 0) {
 		mvfd(p[1], 1);
 		close(p[0]);
-		exit(exitstatus(eval(lp, NULL, evalflags | eval_inchild)));
+		exit(exitstatus(eval(list, NULL, evalflags | eval_inchild)));
 	}
 
 	close(p[1]);
 	gcdisable();
-	lp = bqinput(sep, p[0]);
+	list = bqinput(sep.uget(), p[0]);
 	close(p[0]);
 	status = ewaitfor(pid);
 	printstatus(0, status);
-	lp = mklist(mkstr(mkstatus(status)), lp);
+	list = mklist(mkstr(mkstatus(status)), list);
 	gcenable();
-	list = lp;
-	RefEnd2(sep, lp);
 	SIGCHK();
 	return list;
 }

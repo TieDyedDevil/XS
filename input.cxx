@@ -398,8 +398,8 @@ extern void resetparser(void) {
 /* runinput -- run from an input source */
 extern List *runinput(Input *in, int runflags) {
 	volatile int flags = runflags;
-	List * volatile result;
-	List *repl, *dispatch;
+	volatile SRef<List> result;
+	SRef<List> repl, dispatch;
 	Push push;
 	const char *dispatcher[] = {
 		"fn-%eval-noprint",
@@ -422,14 +422,14 @@ extern List *runinput(Input *in, int runflags) {
 			      NULL);
 		if (flags & eval_exitonfalse)
 			dispatch = mklist(mkstr("%exit-on-false"), dispatch);
-		varpush(&push, "fn-%dispatch", dispatch);
+		varpush(&push, "fn-%dispatch", dispatch.uget());
 
 		repl = varlookup((flags & run_interactive)
 				   ? "fn-%interactive-loop"
 				   : "fn-%batch-loop",
 				 NULL);
 		result = (repl == NULL)
-				? prim("batchloop", NULL, NULL, flags)
+				? prim("batchloop", NULL, NULL, flags).release()
 				: eval(repl, NULL, flags);
 
 		varpop(&push);
@@ -444,7 +444,7 @@ extern List *runinput(Input *in, int runflags) {
 
 	input = in->prev;
 	(*in->cleanup)(in);
-	return result;
+	return result.release();
 }
 
 

@@ -73,7 +73,7 @@ extern List *listcopy(List *list) {
 }
 
 /* length -- lenth of a list */
-extern int length(List *list) {
+extern int length(SRef<List> list) {
 	int len = 0;
 	for (; list != NULL; list = list->next)
 		++len;

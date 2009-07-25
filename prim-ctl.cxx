@@ -4,45 +4,37 @@
 #include "prim.hxx"
 
 PRIM(seq) {
-	Ref(List *, result, ltrue);
-	Ref(List *, lp, list);
-	for (; lp != NULL; lp = lp->next)
-		result = eval1(lp->term, evalflags &~ (lp->next == NULL ? 0 : eval_inchild));
-	RefEnd(lp);
-	RefReturn(result);
+	SRef<List> result = ltrue;
+	for (; list; list = list->next)
+		result = eval1(list->term, evalflags &~ (list->next == NULL ? 0 : eval_inchild));
+	return result;
 }
 
 PRIM(if) {
-	Ref(List *, lp, list);
-	for (; lp != NULL; lp = lp->next) {
-		List *cond = eval1(lp->term, evalflags & (lp->next == NULL ? eval_inchild : 0));
-		lp = lp->next;
-		if (lp == NULL) {
-			RefPop(lp);
+	for (; list != NULL; list = list->next) {
+		List *cond = eval1(list->term, evalflags & (list->next == NULL ? eval_inchild : 0));
+		list = list->next;
+		if (list == NULL) {
 			return cond;
 		}
 		if (istrue(cond)) {
-			List *result = eval1(lp->term, evalflags);
-			RefPop(lp);
+			List *result = eval1(list->term, evalflags);
 			return result;
 		}
 	}
-	RefEnd(lp);
 	return ltrue;
 }
 
 PRIM(forever) {
-	Ref(List *, body, list);
-	for (;;)
-		list = eval(body, NULL, evalflags & eval_exitonfalse);
-	RefEnd(body);
+	SRef<List> body = list;
+	for (;;) list = eval(body, NULL, evalflags & eval_exitonfalse);
 	return list;
 }
 
 PRIM(throw) {
 	if (list == NULL)
 		fail("$&throw", "usage: throw exception [args ...]");
-	throwE(list);
+	throwE(list.release());
 	NOTREACHED;
 }
 
@@ -52,15 +44,14 @@ PRIM(catch) {
 	if (list == NULL)
 		fail("$&catch", "usage: catch catcher body");
 
-	Ref(List *, result, NULL);
-	Ref(List *, lp, list);
+	SRef<List> result = NULL;
 
 	do {
 		retry = false;
 
 		ExceptionHandler
 
-			result = eval(lp->next, NULL, evalflags);
+			result = eval(list->next, NULL, evalflags);
 
 		CatchException (frombody)
 
@@ -68,7 +59,7 @@ PRIM(catch) {
 			ExceptionHandler
 				result
 				  = eval(mklist(mkstr("$&noreturn"),
-					        mklist(lp->term, frombody)),
+					        mklist(list->term, frombody)),
 					 NULL,
 					 evalflags);
 				unblocksignals();
@@ -83,8 +74,7 @@ PRIM(catch) {
 
 		EndExceptionHandler
 	} while (retry);
-	RefEnd(lp);
-	RefReturn(result);
+	return result;
 }
 
 extern Dict *initprims_controlflow(Dict *primdict) {

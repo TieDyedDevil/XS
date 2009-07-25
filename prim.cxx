@@ -5,11 +5,10 @@
 
 static Dict *prims;
 
-extern List *prim(const char *s, List *list, Binding *binding, int evalflags) {
-	List *(*p)(List *, Binding *, int);
-	p = (List *(*)(List *, Binding *, int)) dictget(prims, s);
-	if (p == NULL)
-		fail("es:prim", "unknown primitive: %s", s);
+extern SRef<List> prim(const char *s, SRef<List> list, SRef<Binding> binding, int evalflags) {
+	typedef SRef<List> (*Prim)(SRef<List>, SRef<Binding>, int);
+	Prim p = reinterpret_cast<Prim>(dictget(prims, s));
+	if (p == NULL) fail("es:prim", "unknown primitive: %s", s);
 	return (*p)(list, binding, evalflags);
 }
 

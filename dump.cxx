@@ -246,7 +246,7 @@ static void printheader(List *title) {
 }
 
 extern void runinitial(void) {
-	List *title = runfd(0, "initial.es", 0);
+	List *title = runfd(0, "initial.xs", 0);
 
 	gcdisable();
 

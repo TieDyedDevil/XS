@@ -71,10 +71,9 @@ PRIM(fork) {
 PRIM(run) {
 	if (list == NULL)
 		fail("$&run", "usage: %%run file argv0 argv1 ...");
-	Ref(List *, lp, list);
-	const char *file = getstr(lp->term);
-	lp = forkexec(file, lp->next, (evalflags & eval_inchild) != 0);
-	RefReturn(lp);
+	const char *file = getstr(list->term);
+	list = forkexec(file, list->next, (evalflags & eval_inchild) != 0);
+	return list;
 }
 
 PRIM(umask) {
@@ -113,10 +112,9 @@ PRIM(setsignals) {
 	Sigeffect effects[NSIG];
 	for (i = 0; i < NSIG; i++)
 		effects[i] = sig_default;
-	Ref(List *, lp, list);
-	for (; lp != NULL; lp = lp->next) {
+	for (; list != NULL; list = list->next) {
 		int sig;
-		const char *s = getstr(lp->term);
+		const char *s = getstr(list->term);
 		Sigeffect effect = sig_catch;
 		switch (*s) {
 		case '-':	effect = sig_ignore;	s++; break;
@@ -128,7 +126,6 @@ PRIM(setsignals) {
 			fail("$&setsignals", "unknown signal: %s", s);
 		effects[sig] = effect;
 	}
-	RefEnd(lp);
 	blocksignals();
 	setsigeffects(effects);
 	unblocksignals();
@@ -255,32 +252,31 @@ static LIMIT_T parselimit(const Limit *limit, const char *s) {
 PRIM(limit) {
 	const Limit *lim = limits;
 	bool hard = false;
-	Ref(List *, lp, list);
 
-	if (lp != NULL && streq(getstr(lp->term), "-h")) {
+	if (list != NULL && streq(getstr(list->term), "-h")) {
 		hard = true;
-		lp = lp->next;
+		list = list->next;
 	}
 
-	if (lp == NULL)
+	if (!list)
 		for (; lim->name != NULL; lim++)
 			printlimit(lim, hard);
 	else {
-		const char *name = getstr(lp->term);
+		const char *name = getstr(list->term);
 		for (;; lim++) {
 			if (lim->name == NULL)
 				fail("$&limit", "%s: no such limit", name);
 			if (streq(name, lim->name))
 				break;
 		}
-		lp = lp->next;
-		if (lp == NULL)
+		list = list->next;
+		if (list == NULL)
 			printlimit(lim, hard);
 		else {
 			LIMIT_T n;
 			struct rlimit rlim;
 			getrlimit(lim->flag, &rlim);
-			n = parselimit(lim, getstr(lp->term));
+			n = parselimit(lim, getstr(list->term));
 			if (hard)
 				rlim.rlim_max = n;
 			else
@@ -289,7 +285,6 @@ PRIM(limit) {
 				fail("$&limit", "setrlimit: %s", esstrerror(errno));
 		}
 	}
-	RefEnd(lp);
 	return ltrue;
 }
 #endif	/* BSD_LIMITS */
@@ -303,13 +298,11 @@ PRIM(time) {
 	time_t t0, t1;
 	struct rusage r;
 
-	Ref(List *, lp, list);
-
 	gc();	/* do a garbage collection first to ensure reproducible results */
 	t0 = time(NULL);
 	pid = efork(true, false);
 	if (pid == 0)
-		exit(exitstatus(eval(lp, NULL, evalflags | eval_inchild)));
+		exit(exitstatus(eval(list, NULL, evalflags | eval_inchild)));
 	status = ewait(pid, false, &r);
 	t1 = time(NULL);
 	SIGCHK();
@@ -320,16 +313,14 @@ PRIM(time) {
 		t1 - t0,
 		r.ru_utime.tv_sec, (long) (r.ru_utime.tv_usec / 100000),
 		r.ru_stime.tv_sec, (long) (r.ru_stime.tv_usec / 100000),
-		lp, " "
+		list.uget(), " "
 	);
 
-	RefEnd(lp);
 	return mklist(mkstr(mkstatus(status)), NULL);
 
 #else	/* !HAVE_WAIT3 */
 
 	int pid, status;
-	Ref(List *, lp, list);
 
 	gc();	/* do a garbage collection first to ensure reproducible results */
 	pid = efork(true, false);
@@ -344,7 +335,7 @@ PRIM(time) {
 		t0 = times(&tms);
 		pid = efork(true, false);
 		if (pid == 0)
-			exit(exitstatus(eval(lp, NULL, evalflags | eval_inchild)));
+			exit(exitstatus(eval(list, NULL, evalflags | eval_inchild)));
 
 		status = ewaitfor(pid);
 		t1 = times(&tms);
@@ -359,7 +350,7 @@ PRIM(time) {
 			(t1 - t0 + ticks / 2) / ticks,
 			tms.tms_cutime / ticks, ((tms.tms_cutime * 10) / ticks) % 10,
 			tms.tms_cstime / ticks, ((tms.tms_cstime * 10) / ticks) % 10,
-			lp, " "
+			list.uget(), " "
 		);
 		exit(status);
 	}
@@ -367,7 +358,6 @@ PRIM(time) {
 	SIGCHK();
 	printstatus(0, status);
 
-	RefEnd(lp);
 	return mklist(mkstr(mkstatus(status)), NULL);
 
 #endif	/* !HAVE_WAIT3 */

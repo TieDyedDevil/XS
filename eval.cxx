@@ -156,15 +156,19 @@ static List *forloop(SRef<Tree> defn, SRef<Tree> body,
 	}
 	looping = reversebindings(looping.release());
 
+	bool allnull;
+	SRef<Binding> bp, lp, sequence; 
+	SRef<List> value;
+
 	ExceptionHandler
 
 		for (;;) {
-			bool allnull = true;
-			SRef<Binding> bp = outer;
-			SRef<Binding> lp = looping;
-			SRef<Binding> sequence = NULL;
+			allnull = true;
+			bp = outer;
+			lp = looping;
+			sequence = NULL;
 			for (; lp != NULL; lp = lp->next) {
-				SRef<List> value = NULL;
+				value = NULL;
 				if (lp->defn != &MULTIPLE)
 					sequence = lp;
 				assert(sequence != NULL);
@@ -196,7 +200,6 @@ static List *forloop(SRef<Tree> defn, SRef<Tree> body,
 /* matchpattern -- does the text match a pattern? */
 static List *matchpattern(SRef<Tree> subjectform, SRef<Tree> patternform,
 			  SRef<Binding> binding) {
-	bool result;
 	StrList *quote = NULL;
 	SRef<List> subject = glom(subjectform.release(), binding.uget(), true);
 	SRef<List> pattern = glom2(patternform.uget(), binding.uget(), &quote);
@@ -329,14 +332,15 @@ restart:
 			list = walk(cp->tree->u[0].p, cp->binding, flags);
 			break;
 		    case nLambda:
+		    {
+			Push p;
+			SRef<Tree> tree = cp->tree;
+			SRef<Binding> context;
+			      
 			ExceptionHandler
-			{
-				Push p;
-				SRef<Tree> tree = cp->tree;
-				SRef<Binding> context =
-					       bindargs(tree->u[0].p,
-							list->next,
-							cp->binding);
+				context =  bindargs(tree->u[0].p,
+						    list->next,
+						     cp->binding);
 				if (funcname)
 					varpush(&p, "0",
 						    mklist(mkterm(funcname.uget(),
@@ -345,7 +349,6 @@ restart:
 				list = walk(tree->u[1].p, context.uget(), flags);
 				if (funcname)
 					varpop(&p);
-			}
 			CatchException (e)
 
 				if (termeq(e->term, "return")) {
@@ -355,6 +358,7 @@ restart:
 				throwE(e);
 
 			EndExceptionHandler
+			}
 			break;
 		    case nList: {
 			list = glom(cp->tree, cp->binding, true);

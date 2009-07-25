@@ -122,24 +122,6 @@ extern Root *rootlist;
 #define	refassert(e)	NOP
 #endif
 
-#define	Ref(t, v, init) \
-	if (0) ; else { \
-		t v = init; \
-		Root (CONCAT(v,__root__)); \
-		(CONCAT(v,__root__)).p = (void **) &v; \
-		(CONCAT(v,__root__)).next = rootlist; \
-		rootlist = &(CONCAT(v,__root__))
-#define	RefPop(v) \
-		refassert(rootlist == &(CONCAT(v,__root__))); \
-		refassert(rootlist->p == (void **) &v); \
-		rootlist = rootlist->next;
-#define RefEnd(v) \
-		RefPop(v); \
-	}
-#define RefReturn(v) \
-		RefPop(v); \
-		return v; \
-	}
 #define	RefAdd(e) \
 	if (0) ; else { \
 		Root __root__; \
@@ -152,26 +134,7 @@ extern Root *rootlist;
 		rootlist = rootlist->next; \
 	}
 
-#define	RefEnd2(v1, v2)		RefEnd(v1); RefEnd(v2)
-#define	RefEnd3(v1, v2, v3)	RefEnd(v1); RefEnd2(v2, v3)
-#define	RefEnd4(v1, v2, v3, v4)	RefEnd(v1); RefEnd3(v2, v3, v4)
-
-#define	RefPop2(v1, v2)		RefPop(v1); RefPop(v2)
-#define	RefPop3(v1, v2, v3)	RefPop(v1); RefPop2(v2, v3)
-#define	RefPop4(v1, v2, v3, v4)	RefPop(v1); RefPop3(v2, v3, v4)
-
-#define	RefAdd2(v1, v2)		RefAdd(v1); RefAdd(v2)
-#define	RefAdd3(v1, v2, v3)	RefAdd(v1); RefAdd2(v2, v3)
-#define	RefAdd4(v1, v2, v3, v4)	RefAdd(v1); RefAdd3(v2, v3, v4)
-
-#define	RefRemove2(v1, v2)		RefRemove(v1); RefRemove(v2)
-#define	RefRemove3(v1, v2, v3)		RefRemove(v1); RefRemove2(v2, v3)
-#define	RefRemove4(v1, v2, v3, v4)	RefRemove(v1); RefRemove3(v2, v3, v4)
-
 #include "gc_ptr.hxx"
-
-
-
 
 /* main.c */
 
@@ -222,7 +185,7 @@ extern List *mklist(SRef<Term> term, SRef<List> next);
 extern List *reverse(List *list);
 extern List *append(SRef<List> head, SRef<List> tail);
 extern List *listcopy(List *list);
-extern int length(List *list);
+extern int length(SRef<List> list);
 extern List *listify(int argc, char **argv);
 extern Term *nth(List *list, int n);
 extern SRef<List> sortlist(SRef<List> list);
@@ -292,7 +255,7 @@ extern void hidevariables(void);
 extern void validatevar(const char *var);
 extern List *varlookup(SRef<const char> name, SRef<Binding> binding);
 extern List *varlookup2(const char *name1, const char *name2, Binding *binding);
-extern void vardef(const char *, Binding *, List *);
+extern void vardef(SRef<const char>, Binding *, List *);
 extern SRef<Vector> mkenv(void);
 extern void setnoexport(List *list);
 extern void addtolist(void *arg, const char *key, void *value);
@@ -404,7 +367,7 @@ extern List *esoptend(void);
 
 /* prim.c */
 
-extern List *prim(const char *s, List *list, Binding *binding, int evalflags);
+extern SRef<List> prim(const char *s, SRef<List> list, SRef<Binding> binding, int evalflags);
 extern void initprims(void);
 
 

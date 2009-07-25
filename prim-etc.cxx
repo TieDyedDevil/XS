@@ -17,7 +17,7 @@ PRIM(echo) {
 			list = list->next;
 		} else if (termeq(list->term, "--"))
 			list = list->next;
-	print("%L%s", list, " ", eol);
+	print("%L%s", list.release(), " ", eol);
 	return ltrue;
 }
 
@@ -26,9 +26,8 @@ PRIM(count) {
 }
 
 PRIM(setnoexport) {
-	Ref(List *, lp, list);
-	setnoexport(lp);
-	RefReturn(lp);
+	setnoexport(list.uget());
+	return list;
 }
 
 PRIM(version) {
@@ -45,7 +44,7 @@ PRIM(dot) {
 	volatile int runflags = (evalflags & eval_inchild);
 	const char * const usage = ". [-einvx] file [arg ...]";
 
-	esoptbegin(list, "$&dot", usage);
+	esoptbegin(list.uget(), "$&dot", usage);
 	while ((c = esopt("einvx")) != EOF)
 		switch (c) {
 		case 'e':	runflags |= eval_exitonfalse;	break;
@@ -55,60 +54,56 @@ PRIM(dot) {
 		case 'x':	runflags |= run_printcmds;	break;
 		}
 
-	Ref(List *, result, NULL);
-	Ref(List *, lp, esoptend());
+	SRef<List> result;
+	SRef<List> lp = esoptend();
 	if (lp == NULL)
 		fail("$&dot", "usage: %s", usage);
 
-	Ref(const char *, file, getstr(lp->term));
+	SRef<const char> file = getstr(lp->term);
 	lp = lp->next;
-	fd = eopen(file, oOpen);
+	fd = eopen(file.uget(), oOpen);
 	if (fd == -1)
-		fail("$&dot", "%s: %s", file, esstrerror(errno));
+		fail("$&dot", "%s: %s", file.uget(), esstrerror(errno));
 
-	varpush(&star, "*", lp);
+	varpush(&star, "*", lp.uget());
 	varpush(&zero, "0", mklist(mkstr(file), NULL));
 
-	result = runfd(fd, file, runflags);
+	result = runfd(fd, file.uget(), runflags);
 
 	varpop(&zero);
 	varpop(&star);
-	RefEnd2(file, lp);
-	RefReturn(result);
+	return result;
 }
 
 PRIM(flatten) {
 	if (list == NULL)
 		fail("$&flatten", "usage: %%flatten separator [args ...]");
-	Ref(List *, lp, list);
-	const char *sep = getstr(lp->term);
-	lp = mklist(mkstr(str("%L", lp->next, sep)), NULL);
-	RefReturn(lp);
+	const char *sep = getstr(list->term);
+	list = mklist(mkstr(str("%L", list->next, sep)), NULL);
+	return list;
 }
 
 PRIM(whatis) {
 	/* the logic in here is duplicated in eval() */
 	if (list == NULL || list->next != NULL)
 		fail("$&whatis", "usage: $&whatis program");
-	Ref(Term *, term, list->term);
+	SRef<Term> term = list->term;
 	if (getclosure(term) == NULL) {
 		List *fn;
-		Ref(const char *, prog, getstr(term));
+		SRef<const char> prog = getstr(term);
 		assert(prog != NULL);
-		fn = varlookup2("fn-", prog, binding);
+		fn = varlookup2("fn-", prog.uget(), binding.uget());
 		if (fn != NULL)
 			list = fn;
 		else {
-			if (isabsolute(prog)) {
-				const char *error = checkexecutable(prog);
+			if (isabsolute(prog.uget())) {
+				const char *error = checkexecutable(prog.uget());
 				if (error != NULL)
-					fail("$&whatis", "%s: %s", prog, error);
+					fail("$&whatis", "%s: %s", prog.uget(), error);
 			} else
-				list = pathsearch(term);
+				list = pathsearch(term.uget());
 		}
-		RefEnd(prog);
 	}
-	RefEnd(term);
 	return list;
 }
 
@@ -133,13 +128,12 @@ PRIM(fsplit) {
 PRIM(var) {
 	if (list == NULL)
 		return NULL;
-	Ref(List *, rest, list->next);
-	Ref(const char *, name, getstr(list->term));
-	Ref(List *, defn, varlookup(name, NULL));
+	SRef<List> rest = list->next;
+	SRef<const char> name = getstr(list->term);
+	SRef<List> defn = varlookup(name, NULL);
 	rest = prim_var(rest, NULL, evalflags);
-	SRef<Term> term = mkstr(str("%S = %#L", name, defn, " "));
+	SRef<Term> term = mkstr(str("%S = %#L", name.uget(), defn.uget(), " "));
 	list = mklist(term, rest);
-	RefEnd3(defn, name, rest);
 	return list;
 }
 
@@ -148,29 +142,25 @@ PRIM(sethistory) {
 		sethistory(NULL);
 		return NULL;
 	}
-	Ref(List *, lp, list);
-	sethistory(getstr(lp->term));
-	RefReturn(lp);
+	sethistory(getstr(list->term));
+	return list;
 }
 
 PRIM(parse) {
 	List *result;
 	Tree *tree;
-	Ref(const char *, prompt1, NULL);
-	Ref(const char *, prompt2, NULL);
-	Ref(List *, lp, list);
-	if (lp != NULL) {
-		prompt1 = getstr(lp->term);
-		if ((lp = lp->next) != NULL)
-			prompt2 = getstr(lp->term);
+	SRef<const char> prompt1 = NULL;
+	SRef<const char> prompt2 = NULL;
+	if (list != NULL) {
+		prompt1 = getstr(list->term);
+		if ((list = list->next) != NULL)
+			prompt2 = getstr(list->term);
 	}
-	RefEnd(lp);
-	tree = parse(prompt1, prompt2);
+	tree = parse(prompt1.release(), prompt2.release());
 	result = (tree == NULL)
 		   ? NULL
 		   : mklist(mkterm(NULL, mkclosure(mk(nThunk, tree), NULL)),
 			    NULL);
-	RefEnd2(prompt2, prompt1);
 	return result;
 }
 
@@ -179,8 +169,8 @@ PRIM(exitonfalse) {
 }
 
 PRIM(batchloop) {
-	Ref(List *, result, ltrue);
-	Ref(List *, dispatch, NULL);
+	SRef<List> result = ltrue;
+	SRef<List> dispatch;
 
 	SIGCHK();
 
@@ -190,7 +180,7 @@ PRIM(batchloop) {
 			List *parser, *cmd;
 			parser = varlookup("fn-%parse", NULL);
 			cmd = (parser == NULL)
-					? prim("parse", NULL, NULL, 0)
+					? prim("parse", NULL, NULL, 0).release()
 					: eval(parser, NULL, 0);
 			SIGCHK();
 			dispatch = varlookup("fn-%dispatch", NULL);
@@ -206,12 +196,10 @@ PRIM(batchloop) {
 
 		if (!termeq(e->term, "eof"))
 			throwE(e);
-		RefEnd(dispatch);
-		if (result == ltrue)
-			result = ltrue;
-		RefReturn(result);
+		return result.release();
 
 	EndExceptionHandler
+	NOTREACHED;
 }
 
 PRIM(collect) {
@@ -244,15 +232,13 @@ PRIM(isinteractive) {
 PRIM(noreturn) {
 	if (list == NULL)
 		fail("$&noreturn", "usage: $&noreturn lambda args ...");
-	Ref(List *, lp, list);
-	Ref(Closure *, closure, getclosure(lp->term));
+	SRef<Closure> closure = getclosure(list->term);
 	if (closure == NULL || closure->tree->kind != nLambda)
-		fail("$&noreturn", "$&noreturn: %E is not a lambda", lp->term);
-	Ref(Tree *, tree, closure->tree);
-	Ref(Binding *, context, bindargs(tree->u[0].p, lp->next, closure->binding));
-	lp = walk(tree->u[1].p, context, evalflags);
-	RefEnd3(context, tree, closure);
-	RefReturn(lp);
+		fail("$&noreturn", "$&noreturn: %E is not a lambda", list->term);
+	SRef<Tree> tree = closure->tree;
+	SRef<Binding> context = bindargs(tree->u[0].p, list->next, closure->binding);
+	list = walk(tree->u[1].p, context.release(), evalflags);
+	return list;
 }
 
 PRIM(setmaxevaldepth) {
@@ -264,14 +250,13 @@ PRIM(setmaxevaldepth) {
 	}
 	if (list->next != NULL)
 		fail("$&setmaxevaldepth", "usage: $&setmaxevaldepth [limit]");
-	Ref(List *, lp, list);
-	n = strtol(getstr(lp->term), &s, 0);
+	n = strtol(getstr(list->term), &s, 0);
 	if (n < 0 || (s != NULL && *s != '\0'))
 		fail("$&setmaxevaldepth", "max-eval-depth must be set to a positive integer");
 	if (n < MINmaxevaldepth)
 		n = (n == 0) ? MAXmaxevaldepth : MINmaxevaldepth;
 	maxevaldepth = n;
-	RefReturn(lp);
+	return list;
 }
 
 #if READLINE

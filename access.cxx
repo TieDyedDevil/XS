@@ -103,11 +103,10 @@ PRIM(access) {
 	int c, perm = 0, type = 0, estatus = ENOENT;
 	bool first = false, exception = false;
 	const char *suffix = NULL;
-	List *lp;
 	const char * const usage = "access [-n name] [-1e] [-rwx] [-fdcblsp] path ...";
 
 	gcdisable();
-	esoptbegin(list, "$&access", usage);
+	esoptbegin(list.uget(), "$&access", usage);
 	while ((c = esopt("bcdefln:prswx1")) != EOF)
 		switch (c) {
 		case 'n':	suffix = getstr(esoptarg());	break;
@@ -135,6 +134,7 @@ PRIM(access) {
 		}
 	list = esoptend();
 
+	List *lp;
 	for (lp = NULL; list != NULL; list = list->next) {
 		const char *name = strdup(getstr(list->term));
 		if (suffix != NULL)

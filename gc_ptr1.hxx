@@ -53,7 +53,13 @@
 				rootlist = rootlist->next;
 			} else {
 				Root *x = rootlist;
-				while (x->next != &root) x = x->next;
+				/* x needs to be predecessor in order
+				 * to properly set ->next
+				 */
+				while (x->next != &root) {
+					refassert(x->next); /* If this fails, the root is somehow not in the list */
+					x = x->next;
+				}
 				refassert(x->next->p == (void **) &ref);
 				x->next = x->next->next;
 			}

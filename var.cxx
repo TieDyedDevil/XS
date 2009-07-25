@@ -160,35 +160,33 @@ static List *callsettor(SRef<const char> name, SRef<List> defn) {
 	return defn.release();
 }
 
-extern void vardef(const char *name, Binding *binding, List *defn) {
+extern void vardef(SRef<const char> name, Binding *binding, List *defn) {
 	Var *var;
 
-	validatevar(name);
+	validatevar(name.uget());
 	for (; binding != NULL; binding = binding->next)
-		if (streq(name, binding->name)) {
+		if (streq(name.uget(), binding->name)) {
 			binding->defn = defn;
 			rebound = true;
 			return;
 		}
 
-	RefAdd(name);
 	defn = callsettor(name, defn);
-	if (isexported(name))
+	if (isexported(name.uget()))
 		isdirty = true;
 
-	var = reinterpret_cast<Var*>(dictget(vars, name));
+	var = reinterpret_cast<Var*>(dictget(vars, name.uget()));
 	if (var != NULL)
 		if (defn != NULL) {
 			var->defn = defn;
 			var->env = NULL;
 			var->flags = hasbindings(defn) ? var_hasbindings : 0;
 		} else
-			vars = dictput(vars, name, NULL);
+			vars = dictput(vars, name.uget(), NULL);
 	else if (defn != NULL) {
 		var = mkvar(defn);
-		vars = dictput(vars, name, var);
+		vars = dictput(vars, name.uget(), var);
 	}
-	RefRemove(name);
 }
 
 extern void varpush(Push *push, const char *name, List *defn) {
