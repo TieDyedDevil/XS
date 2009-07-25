@@ -89,24 +89,6 @@ extern void panic(const char *fmt, ...) NORETURN;
 
 /* gc.cxx -- see gc.hxx for more */
 
-typedef struct Tag Tag;
-#define	gcnew(type)	(reinterpret_cast<type *>(gcalloc(sizeof (type), &(CONCAT(type,Tag)))))
-
-extern void *gcalloc(size_t n, Tag *t);		/* allocate n with collection tag t */
-extern char *gcdup(const char *s);		/* copy a 0-terminated string into gc space */
-extern char *gcndup(const char *s, size_t n);	/* copy a counted string into gc space */
-
-extern void initgc(void);			/* must be called at the dawn of time */
-extern void gc(void);				/* provoke a collection, if enabled */
-extern void gcreserve(size_t nbytes);		/* provoke a collection, if enabled and not enough space */
-extern void gcenable(void);			/* enable collections */
-extern void gcdisable(void);			/* disable collections */
-extern bool gcisblocked();			/* is collection disabled? */
-
-
-/*
- * garbage collector tags
- */
 
 typedef struct Root Root;
 struct Root {
@@ -115,13 +97,33 @@ struct Root {
 };
 
 extern Root *rootlist;
-
 #if REF_ASSERTIONS
 #define	refassert(e)	assert(e)
 #else
 #define	refassert(e)	NOP
 #endif
 
+extern bool gcisblocked();			/* is collection disabled? */
+
+#include "gc_ptr.hxx"
+
+typedef struct Tag Tag;
+#define	gcnew(type)	(reinterpret_cast<type *>(gcalloc(sizeof (type), &(CONCAT(type,Tag)))))
+
+extern void *gcalloc(size_t n, Tag *t);		/* allocate n with collection tag t */
+extern char *gcdup(const char *s);		/* copy a 0-terminated string into gc space */
+extern char *gcndup(SRef<const char> s, size_t n);	/* copy a counted string into gc space */
+
+extern void initgc(void);			/* must be called at the dawn of time */
+extern void gc(void);				/* provoke a collection, if enabled */
+extern void gcreserve(size_t nbytes);		/* provoke a collection, if enabled and not enough space */
+extern void gcenable(void);			/* enable collections */
+extern void gcdisable(void);			/* disable collections */
+
+
+/*
+ * garbage collector tags
+ */
 #define	RefAdd(e) \
 	if (0) ; else { \
 		Root __root__; \
@@ -134,7 +136,6 @@ extern Root *rootlist;
 		rootlist = rootlist->next; \
 	}
 
-#include "gc_ptr.hxx"
 
 /* main.c */
 
@@ -235,7 +236,7 @@ extern const char *QUOTED, *UNQUOTED;
 extern SRef<List> glob(SRef<List> list, SRef<StrList> quote);
 extern bool haswild(const char *pattern, const char *quoting);
 /* Needed for some of the readline tab-completion */
-extern List *dirmatch(SRef<const char> prefix, 
+extern SRef<List> dirmatch(SRef<const char> prefix, 
 		      SRef<const char> dirname,
 		      SRef<const char> pattern, 
 		      SRef<const char> quote);
