@@ -72,18 +72,21 @@ SRef<List> dirmatch(SRef<const char> prefix,
 		return NULL;
 
 	SRef<List> list; 
+	gcdisable(); /* The structure containing t->next could be forwarded, making prevp a bad pointer */
 	List **prevp = list.rget();
 	Dirent *dp;
 	while ((dp = readdir(dirp)) != NULL)
 		if (match(dp->d_name, pattern.uget(), quote.uget())
 		    && (!ishiddenfile(dp->d_name) || *pattern == '.')) {
-			*prevp = mklist(mkstr(str("%s%s",
+			List *t = mklist(mkstr(str("%s%s",
 						    prefix.uget(), dp->d_name)),
 					  NULL);
-			prevp = &(*prevp)->next;
-			assert (*prevp == NULL);
+			*prevp = t;
+			prevp = &t->next;
+			assert (t->next == NULL);
 		}
 	closedir(dirp);
+	gcenable();
 	return list;
 }
 
@@ -91,6 +94,7 @@ SRef<List> dirmatch(SRef<const char> prefix,
 static SRef<List> listglob(SRef<List> list, char *pattern, char *quote, size_t slashcount) {
 	SRef<List> result; 
 	List **prevp;
+	gcdisable();
 
 	for (prevp = result.rget(); 
 			list != NULL; 
@@ -116,6 +120,7 @@ static SRef<List> listglob(SRef<List> list, char *pattern, char *quote, size_t s
 		while (*prevp != NULL)
 			prevp = &(*prevp)->next;
 	}
+	gcenable();
 	return result.release();
 }
 
@@ -184,6 +189,7 @@ static SRef<List> glob0(SRef<List> list, SRef<StrList> quote) {
 	SRef<List> result; 
 	SRef<List> expand1;
 	List **prevp;
+	gcdisable();
 
 	for (result = NULL, prevp = result.rget(); list != NULL;
 	     list = list->next, quote = quote->next) {
@@ -206,6 +212,7 @@ static SRef<List> glob0(SRef<List> list, SRef<StrList> quote) {
 				prevp = &(*prevp)->next;
 		}
 	}
+	gcenable();
 	return result;
 }
 

@@ -89,6 +89,7 @@ static List *subscript(SRef<List> list, SRef<List> subs) {
 		goto mid_range;
 	}
 
+	gcdisable(); /* prevp could point to pointer in structure which is forwarded */
 	while (subs != NULL) {
 		lo = atoi(getstr(subs->term));
 		if (lo < 1) {
@@ -121,6 +122,7 @@ static List *subscript(SRef<List> list, SRef<List> subs) {
 			prevp = &(*prevp)->next;
 		}
 	}
+	gcenable();
 
 	return result.release();
 }
