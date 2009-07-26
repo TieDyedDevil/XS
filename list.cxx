@@ -82,12 +82,14 @@ extern int length(SRef<List> list) {
 
 /* listify -- turn an argc/argv vector into a list */
 extern List *listify(int argc, char **argv) {
-	SRef<List> list;
+	gcdisable();
+	List *list = NULL;
 	while (argc > 0) {
-		SRef<Term> term = mkstr(argv[--argc]);
+		Term *term = mkstr(argv[--argc]).release();
 		list = mklist(term, list);
 	}
-	return list.release();
+	gcenable();
+	return list;
 }
 
 /* nth -- return nth element of a list, indexed from 1 */
@@ -101,9 +103,18 @@ extern Term *nth(List *list, int n) {
 	return NULL;
 }
 
+static List *listify(SRef<Vector> v) {
+	SRef<List> list;
+	while (v->count > 0) {
+		SRef<Term> term = mkstr(v->vector[--v->count]);
+		list = mklist(term, list);
+	}
+	return list.release();
+}
+
 /* sortlist */
 extern SRef<List> sortlist(SRef<List> list) {
 	SRef<Vector> v = vectorize(list);
 	sortvector(v);
-	return list = listify(v->count, v->vector);
+	return listify(v);
 }
