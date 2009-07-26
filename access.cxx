@@ -149,7 +149,7 @@ PRIM(access) {
 							: gcdup(name)),
 					       NULL);
 				gcenable();
-				return result.release();
+				return result;
 			} else if (error != ENOENT)
 				estatus = error;
 		} else
@@ -167,7 +167,7 @@ PRIM(access) {
 
 	SRef<List> result = reverse(lp);
 	gcenable();
-	return result.release();
+	return result;
 }
 
 extern Dict *initprims_access(Dict *primdict) {

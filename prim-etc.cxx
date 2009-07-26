@@ -113,7 +113,7 @@ PRIM(split) {
 	SRef<List> lp = list;
 	const char *sep = getstr(lp->term);
 	lp = fsplit(sep, lp->next, true);
-	return lp.release();
+	return lp;
 }
 
 PRIM(fsplit) {
@@ -122,7 +122,7 @@ PRIM(fsplit) {
 	SRef<List> lp = list;
 	const char *sep = getstr(lp->term);
 	lp = fsplit(sep, lp->next, false);
-	return lp.release();
+	return lp;
 }
 
 PRIM(var) {
@@ -196,7 +196,7 @@ PRIM(batchloop) {
 
 		if (!termeq(e->term, "eof"))
 			throwE(e);
-		return result.release();
+		return result;
 
 	EndExceptionHandler
 	NOTREACHED;
