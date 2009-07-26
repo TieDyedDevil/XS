@@ -200,6 +200,7 @@ PRIM(batchloop) {
 
 	EndExceptionHandler
 	NOTREACHED;
+	return NULL; /* Quiet warnings */
 }
 
 PRIM(collect) {
