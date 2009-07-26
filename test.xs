@@ -8,8 +8,9 @@ let (TMPOUT := /dev/shm/xs.$pid.testout) {
         cat $TMPOUT
     }
     fn run name code {
-	let (dir := /dev/shm/xs.$pid.`{basename $FILE}) {
-		mkdir -p $dir
+	let (dir := /dev/shm/xs.$pid) {
+		rm -fr $dir
+		mkdir $dir
 		cd $dir
 	}
         TESTNAME := $name
