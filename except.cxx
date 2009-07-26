@@ -4,41 +4,13 @@
 #include "print.hxx"
 
 /* globals */
-Handler *tophandler = NULL;
-Handler *roothandler = NULL;
 List *exception = NULL;
-Push *pushlist = NULL;
-
-/* pophandler -- remove a handler */
-extern void pophandler(Handler *handler) {
-	assert(tophandler == handler);
-	assert(handler->rootlist == rootlist);
-	tophandler = handler->up;
-}
 
 /* throwE -- raise an exception */
 extern void throwE(List *e) {
-	Handler *handler = tophandler;
-
 	assert(!gcisblocked());
 	assert(e != NULL);
-	assert(handler != NULL);
-	tophandler = handler->up;
-	
-	while (pushlist != handler->pushlist) {
-		rootlist = &pushlist->defnroot;
-		varpop(pushlist);
-	}
-	evaldepth = handler->evaldepth;
-
-#if ASSERTIONS
-	for (; rootlist != handler->rootlist; rootlist = rootlist->next)
-		assert(rootlist != NULL);
-#else
-	rootlist = handler->rootlist;
-#endif
-	exception = e;
-	longjmp(handler->label, 1);
+	throw e;
 	NOTREACHED;
 }
 
@@ -67,7 +39,6 @@ extern void fail (const char * from,  const char * fmt, ...) {
 
 /* newchildcatcher -- remove the current handler chain for a new child */
 extern void newchildcatcher(void) {
-	tophandler = roothandler;
 }
 
 #if DEBUG_EXCEPTIONS

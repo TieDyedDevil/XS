@@ -276,7 +276,6 @@ extern void addtolist(void *arg, const char *key, void *value);
 extern List *listvars(bool internal);
 
 typedef struct Push Push;
-extern Push *pushlist;
 extern void varpush(Push *, const char *, List *);
 extern void varpop(Push *);
 
@@ -481,29 +480,13 @@ extern List *raised(List *e);
 #endif
 
 #define ExceptionHandler \
-	{ \
-		Handler _localhandler; \
-		_localhandler.rootlist = rootlist; \
-		_localhandler.pushlist = pushlist; \
-		_localhandler.evaldepth = evaldepth; \
-		_localhandler.up = tophandler; \
-		tophandler = &_localhandler; \
-		if (!setjmp(_localhandler.label)) { \
-			{
+	try {
 
-#define CatchException(e) \
-		} \
-			pophandler(&_localhandler); \
-		} else { \
-			List *e = raised(exception); \
+#define CatchException(e) } catch (List *e) {
 
 #define CatchExceptionIf(condition, e) \
-		} \
-			if (condition) \
-				pophandler(&_localhandler); \
-		} else { \
-			List *e = raised(exception); \
+		} catch (List *e) { \
+			if (!(condition)) throw (e);
 
 #define EndExceptionHandler \
-		} \
 	}

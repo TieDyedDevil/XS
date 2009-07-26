@@ -212,9 +212,6 @@ extern void varpush(Push *push, const char *name, List *defn) {
 		var->flags	= hasbindings(defn) ? var_hasbindings : 0;
 	}
 
-	push->next = pushlist;
-	pushlist = push;
-
 	push->defnroot.next = rootlist;
 	push->defnroot.p = (void **) &push->defn;
 	rootlist = &push->defnroot;
@@ -222,8 +219,6 @@ extern void varpush(Push *push, const char *name, List *defn) {
 
 extern void varpop(Push *push) {
 	Var *var;
-	
-	assert(pushlist == push);
 	assert(rootlist == &push->defnroot);
 	assert(rootlist->next == &push->nameroot);
 
@@ -246,7 +241,6 @@ extern void varpop(Push *push) {
 		vars = dictput(vars, push->name, var);
 	}
 
-	pushlist = pushlist->next;
 	rootlist = rootlist->next->next;
 }
 

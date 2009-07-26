@@ -170,8 +170,6 @@ getopt_done:
 	av = argv;
 
 	ExceptionHandler
-		roothandler = &_localhandler;	/* unhygeinic */
-
 		initinput();
 		initprims();
 		initvars();
