@@ -40,7 +40,7 @@ let (passes := 0
     fn results {
 	log 'Expected passes:     ' $passes
 	log 'Unexpected failures: ' $fails
-    	rm -r /dev/shm/xs*
+    	rm -r /dev/shm/xs.*
 	if {test $fails -eq 0} { exit 0 } { exit $fails }
     }
 }
@@ -80,5 +80,6 @@ let (dir := `{pwd}
     for (file := $dir/xs_tests/*.xs) {
         local (FILE := $file; XS := $dir/xs) . $DOTARGS $FILE
     }
+    cd $dir
 }
 results
