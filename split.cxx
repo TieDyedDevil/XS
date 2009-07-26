@@ -77,14 +77,12 @@ extern void splitstring(const char *in, size_t len, bool endword) {
 }
 
 extern SRef<List> endsplit(void) {
-	SRef<List> result;
-
 	if (buffer != NULL) {
 		SRef<Term> term = mkstr(sealcountedbuffer(buffer));
 		value = mklist(term, value);
 		buffer = NULL;
 	}
-	result = reverse(value);
+	SRef<List> result = reverse(value);
 	value = NULL;
 	return result;
 }
