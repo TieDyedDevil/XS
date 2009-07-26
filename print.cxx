@@ -3,7 +3,9 @@
 #include "es.hxx"
 #include "print.hxx"
 
-#define	MAXCONV 256
+/* Should be the > than he the largest numerical value of any normal english character used for fmttab */
+/* So for ASCII-derived, 128 should work */
+#define	MAXCONV 128
 
 /*
  * conversion functions
@@ -170,7 +172,7 @@ static bool badconv(Format *format) {
  * conversion table management
  */
 
-static Conv *fmttab;
+static Conv *fmttab = NULL;
 
 static void inittab(void) {
 	int i;
