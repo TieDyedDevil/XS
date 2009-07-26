@@ -136,7 +136,7 @@ PRIM(access) {
 
 	List *lp;
 	for (lp = NULL; list != NULL; list = list->next) {
-		const char *name = strdup(getstr(list->term));
+		const char *name = gcdup(getstr(list->term));
 		if (suffix != NULL)
 			name = pathcat(name, suffix);
 		int error = testfile(name, perm, type);
