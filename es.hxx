@@ -70,6 +70,7 @@ struct StrList {
 
 typedef struct {
 	int alloclen, count;
+	/* Variable size */
 	char *vector[1];
 } Vector;			/* environment or arguments */
 
@@ -256,7 +257,7 @@ extern void hidevariables(void);
 extern void validatevar(const char *var);
 extern List *varlookup(SRef<const char> name, SRef<Binding> binding);
 extern List *varlookup2(const char *name1, const char *name2, Binding *binding);
-extern void vardef(SRef<const char>, Binding *, List *);
+extern void vardef(SRef<const char>, SRef<Binding>, SRef<List>);
 extern SRef<Vector> mkenv(void);
 extern void setnoexport(List *list);
 extern void addtolist(void *arg, const char *key, void *value);

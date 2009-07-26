@@ -762,8 +762,7 @@ dump(Tag * t, void *p)
 	for (i = 0; i <= v->alloclen; i++)
 	    print("%s%ux", i == 0 ? "" : " ", v->vector[i]);
 	print("]\n");
-	return offsetof(Vector,
-			vector[0]) + sizeof(char *) * (v->alloclen + 1);
+	return offsetof(Vector, vector[0]) + sizeof(char *) * (v->alloclen + 1);
     }
 
     if (streq(s, "Dict")) {

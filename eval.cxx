@@ -71,7 +71,7 @@ static List *assign(SRef<Tree> varform, SRef<Tree> valueform, SRef<Binding> bind
 	return result.release();
 }
 
-/* letbindings -- create a new Binding containing let-bound variables */
+/* letbindings -- create a new Binding containing let-bound (lexical) variables */
 static Binding *letbindings(SRef<Tree> defn, SRef<Binding> binding,
 			    SRef<Binding> context, int evalflags) {
 	for (; defn != NULL; defn = defn->u[1].p) {

@@ -7,7 +7,7 @@
 DefineTag(Term, static);
 
 extern SRef<Term> mkterm(SRef<const char> str, SRef<Closure> closure) {
-	SRef<Term> term = reinterpret_cast<Term*>(gcnew(Term));
+	SRef<Term> term = gcnew(Term);
 	term->str = str.release();
 	term->closure = closure.release();
 	return term;

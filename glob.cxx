@@ -45,7 +45,7 @@ static int ishiddenfile(const char *s) {
 }
 
 /* dirmatch -- match a pattern against the contents of directory */
-List *dirmatch(SRef<const char> prefix, 
+SRef<List> dirmatch(SRef<const char> prefix, 
 	       SRef<const char> dirname,
 	       SRef<const char> pattern, 
 	       SRef<const char> quote) 
@@ -68,31 +68,31 @@ List *dirmatch(SRef<const char> prefix,
 	}
 
 	DIR *dirp = opendir(dirname.uget());
-	Dirent *dp;
 	if (dirp == NULL)
 		return NULL;
 
 	SRef<List> list; 
-	List **prevp;
-	for (list = NULL, prevp = list.rget(); (dp = readdir(dirp)) != NULL;)
+	List **prevp = list.rget();
+	Dirent *dp;
+	while ((dp = readdir(dirp)) != NULL)
 		if (match(dp->d_name, pattern.uget(), quote.uget())
 		    && (!ishiddenfile(dp->d_name) || *pattern == '.')) {
-			SRef<List> lp = mklist(mkstr(str("%s%s",
+			*prevp = mklist(mkstr(str("%s%s",
 						    prefix.uget(), dp->d_name)),
 					  NULL);
-			*prevp = lp.uget();
-			prevp = &lp->next;
+			prevp = &(*prevp)->next;
+			assert (*prevp == NULL);
 		}
 	closedir(dirp);
-	return list.release();
+	return list;
 }
 
 /* listglob -- glob a directory plus a filename pattern into a list of names */
-static List *listglob(List *list, char *pattern, char *quote, size_t slashcount) {
+static SRef<List> listglob(SRef<List> list, char *pattern, char *quote, size_t slashcount) {
 	SRef<List> result; 
 	List **prevp;
 
-	for (result = NULL, prevp = result.rget(); 
+	for (prevp = result.rget(); 
 			list != NULL; 
 			list = list->next) {
 		static char *prefix = NULL;
@@ -112,7 +112,7 @@ static List *listglob(List *list, char *pattern, char *quote, size_t slashcount)
 		memset(prefix + dirlen, '/', slashcount);
 		prefix[dirlen + slashcount] = '\0';
 
-		*prevp = dirmatch(prefix, dir, pattern, quote);
+		*prevp = dirmatch(prefix, dir, pattern, quote).release();
 		while (*prevp != NULL)
 			prevp = &(*prevp)->next;
 	}
@@ -120,7 +120,7 @@ static List *listglob(List *list, char *pattern, char *quote, size_t slashcount)
 }
 
 /* glob1 -- glob pattern path against the file system */
-static List *glob1(SRef<const char> pattern, SRef<const char> quote) {
+static SRef<List> glob1(SRef<const char> pattern, SRef<const char> quote) {
 	size_t psize;
 	static char *dir = NULL, *pat = NULL, *qdir = NULL, *qpat = NULL, *raw = NULL;
 	static size_t dsize = 0;
@@ -182,7 +182,8 @@ static List *glob1(SRef<const char> pattern, SRef<const char> quote) {
 /* glob0 -- glob a list, (destructively) passing through entries we don't care about */
 static SRef<List> glob0(SRef<List> list, SRef<StrList> quote) {
 	SRef<List> result; 
-	List **prevp, *expand1;
+	SRef<List> expand1;
+	List **prevp;
 
 	for (result = NULL, prevp = result.rget(); list != NULL;
 	     list = list->next, quote = quote->next) {
@@ -197,8 +198,9 @@ static SRef<List> glob0(SRef<List> list, SRef<StrList> quote) {
 			list->term->str = ""; 
 			*prevp = list.uget();
 			prevp = &list->next;			
-		}
-		else {
+		} else {
+			assert (expand1);
+			assert (length(expand1) >= 1);
 			*prevp = sortlist(expand1).release();
 			while (*prevp != NULL)
 				prevp = &(*prevp)->next;

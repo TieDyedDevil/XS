@@ -41,7 +41,7 @@ static bool hasbindings(SRef<List> list) {
 static Var *mkvar(SRef<List> defn) {
 	SRef<Var> var = gcnew(Var);
 	var->env = NULL;
-	var->flags = hasbindings(defn.uget()) ? var_hasbindings : 0;
+	var->flags = hasbindings(defn) ? var_hasbindings : 0;
 	var->defn = defn.release();
 	return var.release();
 }
@@ -160,13 +160,11 @@ static List *callsettor(SRef<const char> name, SRef<List> defn) {
 	return defn.release();
 }
 
-extern void vardef(SRef<const char> name, Binding *binding, List *defn) {
-	Var *var;
-
+extern void vardef(SRef<const char> name, SRef<Binding> binding, SRef<List> defn) {
 	validatevar(name.uget());
 	for (; binding != NULL; binding = binding->next)
 		if (streq(name.uget(), binding->name)) {
-			binding->defn = defn;
+			binding->defn = defn.release();
 			rebound = true;
 			return;
 		}
@@ -175,17 +173,17 @@ extern void vardef(SRef<const char> name, Binding *binding, List *defn) {
 	if (isexported(name.uget()))
 		isdirty = true;
 
-	var = reinterpret_cast<Var*>(dictget(vars, name.uget()));
-	if (var != NULL)
+	SRef<Var> var = reinterpret_cast<Var*>(dictget(vars, name.uget()));
+	if (var != NULL) {
 		if (defn != NULL) {
-			var->defn = defn;
+			var->defn = defn.uget();
 			var->env = NULL;
-			var->flags = hasbindings(defn) ? var_hasbindings : 0;
+			var->flags = hasbindings(defn.uget()) ? var_hasbindings : 0;
 		} else
 			vars = dictput(vars, name.uget(), NULL);
-	else if (defn != NULL) {
+	} else if (defn != NULL) {
 		var = mkvar(defn);
-		vars = dictput(vars, name.uget(), var);
+		vars = dictput(vars, name.uget(), var.uget());
 	}
 }
 
