@@ -37,14 +37,14 @@ extern void startsplit(const char *sep, bool coalescef) {
 }
 
 extern void splitstring(const char *in, size_t len, bool endword) {
-	gcdisable(); /* char *s can't be made gc-safe */
+	gcdisable(); /* char *s can't be made gc-safe (unless rewritten to use indices) */
 	Buffer *buf = buffer;
 	unsigned char *s = (unsigned char *) in, *inend = s + len;
 
 	if (splitchars) {
 		assert(buf == NULL);
 		while (s < inend) {
-			SRef<Term> term = mkstr(gcndup((char *) s++, 1));
+			Term *term = mkstr(gcndup((char *) s++, 1)).get();
 			value = mklist(term, value);
 		}
 		gcenable();
@@ -58,7 +58,7 @@ extern void splitstring(const char *in, size_t len, bool endword) {
 		int c = *s++;
 		if (buf != NULL)
 			if (isifs[c]) {
-				SRef<Term> term = mkstr(sealcountedbuffer(buf));
+				Term *term = mkstr(sealcountedbuffer(buf)).get();
 				value = mklist(term, value);
 				buf = coalesce ? NULL : openbuffer(0);
 			} else
@@ -68,7 +68,7 @@ extern void splitstring(const char *in, size_t len, bool endword) {
 	}
 
 	if (endword && buf != NULL) {
-		SRef<Term> term = mkstr(sealcountedbuffer(buf));
+		Term *term = mkstr(sealcountedbuffer(buf)).get();
 		value = mklist(term, value);
 		buf = NULL;
 	}
