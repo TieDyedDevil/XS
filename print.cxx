@@ -42,8 +42,7 @@ static bool zeroconv(Format *format) {
 }
 
 static void pad(Format *format, long len, int c) {
-	while (len-- > 0)
-		fmtputc(format, c);
+	while (len-- > 0) fmtputc(format, c);
 }
 
 static bool sconv(Format *format) {
@@ -226,10 +225,6 @@ extern void fmtappend(Format *format, const char *s, size_t len) {
 	}
 	memcpy(format->buf, s, len);
 	format->buf += len;
-}
-
-extern void fmtcat(Format *format, const char *s) {
-	fmtappend(format, s, strlen(s));
 }
 
 /*

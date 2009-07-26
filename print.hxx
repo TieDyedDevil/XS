@@ -31,7 +31,6 @@ extern Conv fmtinstall(int, Conv);
 extern int printfmt(Format *, const char *);
 extern int fmtprint(Format *, const char *, ...);
 extern void fmtappend(Format *, const char *, size_t);
-extern void fmtcat(Format *, const char *);
 
 extern int print(const char *fmt, ...);
 extern int eprint(const char *fmt, ...);
@@ -40,6 +39,12 @@ extern int fprint(int fd, const char *fmt, ...);
 extern char *strv(const char *fmt, va_list args);	/* varargs interface to str() */
 
 #define	FPRINT_BUFSIZ	1024
+
+inline void fmtcat(Format *format, const char *s) {
+	fmtappend(format, s, strlen(s));
+}
+
+
 
 inline void fmtputc(Format *f, char c) {
 	if (f->buf >= f->bufend)
