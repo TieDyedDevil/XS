@@ -188,8 +188,6 @@ extern void vardef(SRef<const char> name, SRef<Binding> binding, SRef<List> defn
 }
 
 extern void varpush(Push *push, const char *name, List *defn) {
-	Var *var;
-
 	validatevar(name);
 	push->name = name;
 	push->nameroot.next = rootlist;
@@ -200,7 +198,7 @@ extern void varpush(Push *push, const char *name, List *defn) {
 		isdirty = true;
 	defn = callsettor(name, defn);
 
-	var = reinterpret_cast<Var*>(dictget(vars, push->name));
+	Var *var = reinterpret_cast<Var*>(dictget(vars, push->name));
 	if (var == NULL) {
 		push->defn	= NULL;
 		push->flags	= 0;
