@@ -16,7 +16,7 @@
 
 Dict *vars;
 static Dict *noexport;
-static SRef<Vector> env, sortenv;
+static Vector *env, *sortenv;
 static int envmin;
 static bool isdirty = true;
 static bool rebound = true;
@@ -274,7 +274,7 @@ static void mkenv0(void *dummy, const char *key, void *value) {
 		SRef<Vector> newenv = mkvector(env->alloclen * 2);
 		newenv->count = env->count;
 		memcpy(newenv->vector, env->vector, env->count * sizeof *env->vector);
-		env = newenv;
+		env = newenv.release();
 	}
 }
 	
@@ -288,7 +288,7 @@ extern SRef<Vector> mkenv(void) {
 		isdirty = false;
 		rebound = false;
 		if (sortenv == NULL || env->count > sortenv->alloclen)
-			sortenv = mkvector(env->count * 2);
+			sortenv = mkvector(env->count * 2).release();
 		sortenv->count = env->count;
 		memcpy(sortenv->vector, env->vector, sizeof (char *) * (env->count + 1));
 		sortvector(sortenv);
@@ -338,7 +338,7 @@ extern void initvars(void) {
 	globalroot(&sortenv);
 	vars = mkdict();
 	noexport = NULL;
-	env = mkvector(10);
+	env = mkvector(10).release();
 }
 
 /* importvar -- import a single environment variable */
@@ -410,7 +410,7 @@ extern void initenv(char **envp, bool isprotected) {
 				newenv->count = env->count;
 				memcpy(newenv->vector, env->vector,
 				       env->count * sizeof *env->vector);
-				env = newenv;
+				env = newenv.release();
 			}
 			continue;
 		}
