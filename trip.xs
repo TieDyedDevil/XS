@@ -53,9 +53,8 @@ errorcheck 'tokenizer error'	{$es -c 'echo ''hi'} 'eof in quoted string'
 # blow the input stack
 #
 
-# FIXME: doesn't blow input stack, but something
-# about the huge number of eval's causes trouble
-# Just a stack overflow?
+# NOTE: this will take a _painfully_ long time to run on GC_ALWAYS
+# At least several minutes (have never bothered to see it terminate)
 
 if {
 	!~ hi `{
