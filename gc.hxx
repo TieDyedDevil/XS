@@ -46,10 +46,24 @@ struct Buffer {
 extern Buffer *openbuffer(size_t minsize);
 extern Buffer *expandbuffer(Buffer *buf, size_t minsize);
 extern Buffer *bufncat(Buffer *buf, const char *s, size_t len);
-extern Buffer *bufcat(Buffer *buf, const char *s);
-extern Buffer *bufputc(Buffer *buf, char c);
 extern char *sealbuffer(Buffer *buf);
 extern char *sealcountedbuffer(Buffer *buf);
-extern void freebuffer(Buffer *buf);
 
 extern void *forward( void *p);
+inline char *sealbuffer(Buffer *buf) {
+	char *s = gcdup(buf->str);
+	efree(buf);
+	return s;
+}
+inline Buffer *bufcat(Buffer *buf, const char *s) {
+	return bufncat(buf, s, strlen(s));
+}
+inline void freebuffer(Buffer *buf) {
+	efree(buf);
+}
+inline Buffer *bufputc(Buffer *buf, char c) {	
+	if (buf->current + 1 >= buf->len) 
+		buf = expandbuffer(buf, buf->current + 20);
+	buf->str[buf->current++] = c;
+	return buf;
+}

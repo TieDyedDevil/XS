@@ -586,12 +586,6 @@ extern Buffer *expandbuffer(Buffer *buf, size_t minsize) {
 	return buf;
 }
 
-extern char *sealbuffer(Buffer *buf) {
-	char *s = gcdup(buf->str);
-	efree(buf);
-	return s;
-}
-
 extern char *sealcountedbuffer(Buffer *buf) {
 	char *s = gcndup(buf->str, buf->current);
 	efree(buf);
@@ -604,18 +598,6 @@ extern Buffer *bufncat(Buffer *buf, const char *s, size_t len) {
 	memcpy(buf->str + buf->current, s, len);
 	buf->current += len;
 	return buf;
-}
-
-extern Buffer *bufcat(Buffer *buf, const char *s) {
-	return bufncat(buf, s, strlen(s));
-}
-
-extern Buffer *bufputc(Buffer *buf, char c) {
-	return bufncat(buf, &c, 1);
-}
-
-extern void freebuffer(Buffer *buf) {
-	efree(buf);
 }
 
 #if GCVERBOSE
