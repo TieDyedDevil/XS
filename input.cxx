@@ -201,8 +201,6 @@ static int eoffill(Input *in) {
 /* callreadline -- readline wrapper */
 static char *callreadline(const char *prompt) {
 	char *r;
-	if (prompt == NULL)
-		prompt = ""; /* bug fix for readline 2.0 */
 	if (resetterminal) {
 		rl_reset_terminal(NULL);
 		resetterminal = false;
