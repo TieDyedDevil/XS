@@ -118,8 +118,20 @@ extern char *gcndup(SRef<const char> s, size_t n);	/* copy a counted string into
 extern void initgc(void);			/* must be called at the dawn of time */
 extern void gc(void);				/* provoke a collection, if enabled */
 extern void gcreserve(size_t nbytes);		/* provoke a collection, if enabled and not enough space */
-extern void gcenable(void);			/* enable collections */
-extern void gcdisable(void);			/* disable collections */
+extern void gcenable();				/* enable collections */
+/* disable collections */
+inline void gcdisable() {
+	extern int gcblocked;
+	assert(gcblocked >= 0);
+	++gcblocked;
+}
+
+/* gcisblocked -- is collection disabled? */
+inline bool gcisblocked() {
+	extern int gcblocked;
+	assert(gcblocked >= 0);
+	return gcblocked != 0;
+}
 
 
 /*

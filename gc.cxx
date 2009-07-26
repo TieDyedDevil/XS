@@ -389,20 +389,13 @@ static void scanspace(void) {
 /*
  * the garbage collector public interface
  */
-
-/* gcenable -- enable collections */
-extern void gcenable(void) {
+/* enable collections */
+extern void gcenable() {
+	extern int gcblocked;
 	assert(gcblocked > 0);
 	--gcblocked;
 
-	if (!gcblocked && newSpace->next != NULL)
-		gc();
-}
-
-/* gcdisable -- disable collections */
-extern void gcdisable(void) {
-	assert(gcblocked >= 0);
-	++gcblocked;
+	if (!gcblocked && newSpace->next != NULL) gc();
 }
 
 /* gcreserve -- provoke a collection if there's not a certain amount of space around */
@@ -418,11 +411,6 @@ extern void gcreserve(size_t minfree) {
 #endif
 }
 
-/* gcisblocked -- is collection disabled? */
-extern bool gcisblocked(void) {
-	assert(gcblocked >= 0);
-	return gcblocked != 0;
-}
 
 /* gc -- actually do a garbage collection */
 extern void gc(void) {
