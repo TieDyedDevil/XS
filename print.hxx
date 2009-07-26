@@ -1,6 +1,5 @@
 /* print.hxx -- interface to formatted printing routines ($Revision: 1.1.1.1 $) */
 
-typedef struct Format Format;
 struct Format {
     /* for the formatting routines */
 	va_list args;
@@ -42,14 +41,8 @@ extern char *strv(const char *fmt, va_list args);	/* varargs interface to str() 
 
 #define	FPRINT_BUFSIZ	1024
 
-/*
- * the following macro should by rights be coded as an expression, not
- * a statement, but certain compilers (notably DEC) have trouble with
- * void expressions inside the ?: operator. (sheesh, give me a break!)
- */
-#define	fmtputc(f, c) \
-	STMT( \
-		if ((f)->buf >= (f)->bufend) \
-			(*(f)->grow)((f), (size_t)1); \
-		*(f)->buf++ = (c) \
-	)
+inline void fmtputc(Format *f, char c) {
+	if (f->buf >= f->bufend)
+		(*f->grow)(f, (size_t)32); 
+	*f->buf++ = c;
+}
