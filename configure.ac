@@ -24,6 +24,7 @@ AC_ARG_WITH(editline, AS_HELP_STRING(--with-editline, use the Editline library),
 	use_editline=yes)
 
 AC_ARG_ENABLE(debug, AS_HELP_STRING(--enable-debug, debug mode for xs developers), debug_build=yes) 
+AC_ARG_ENABLE(gcprotect, AS_HELP_STRING(--enable-gcprotect, [GC-related code safeguarding \(included in --enable-debug\)]), gc_protect=yes) 
 AC_ARG_ENABLE(static, AS_HELP_STRING(--enable-static, build statically), static_xs=yes) 
 
 if test "$static_xs" = yes; then
@@ -32,9 +33,14 @@ fi
 
 dnl enable debug stuff
 if test "$debug_build" = yes; then
+	AC_DEFINE(ASSERTIONS,1,"Enable normal assertions")
 	AC_DEFINE(REF_ASSERTIONS,1,"Enable assertions for GC Refs")
 	AC_DEFINE(GCDEBUG,1,"Enable GC debug mode")
 	CXXFLAGS="-Wall -Wextra -O0 -ggdb3"
+fi
+
+if test "$gc_protect" = yes; then
+	AC_DEFINE(GCPROTECT,1,"Enable GC protection against using deprecated, invalid memory")
 fi
 
 
