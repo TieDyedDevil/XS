@@ -9,12 +9,12 @@ DefineTag(Vector, static);
 
 size_t vector_size(const Vector *v) {
 	/* TODO: +1 is probably just an artifact of an earlier time, no? */
-	return reinterpret_cast<const char*>(v->vector + (v->alloclen + 1)) - reinterpret_cast<const char*>(v);
+	return reinterpret_cast<const char*>(v->vector + v->alloclen + 1) - reinterpret_cast<const char*>(v);
 }
 
 extern SRef<Vector> mkvector(int n) {
 	int i;
-	SRef<Vector> v = reinterpret_cast<Vector*>(gcalloc(offsetof(Vector, vector[0]), &VectorTag));
+	SRef<Vector> v = reinterpret_cast<Vector*>(gcalloc(offsetof(Vector, vector[0]) + (n + 1) * sizeof(char*), &VectorTag));
 	v->alloclen = n;
 	v->count = 0;
 	for (i = 0; i <= n; i++)
