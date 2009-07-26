@@ -339,11 +339,16 @@ extern const char *esstrerror(int err);
 extern void uerror(const char *msg);
 extern void *ealloc(size_t n);
 extern void *erealloc(void *p, size_t n);
-extern void efree(void *p);
 extern void ewrite(int fd, const char *s, size_t n);
 extern long eread(int fd, char *buf, size_t n);
 extern bool isabsolute(const char *path);
 extern bool streq2(const char *s, const char *t1, const char *t2);
+
+/* efree -- error checked free */
+inline void efree(void *p) {
+	assert(p != NULL);
+	free(p);
+}
 
 
 /* input.c */

@@ -82,12 +82,6 @@ extern void *erealloc(void *p, size_t n) {
 	return p;
 }
 
-/* efree -- error checked free */
-extern void efree(void *p) {
-	assert(p != NULL);
-	free(p);
-}
-
 
 /*
  * private interfaces to system calls
