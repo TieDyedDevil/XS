@@ -438,11 +438,18 @@ extern void globalroot(void *addr);
 /* struct Push -- varpush() placeholder */
 
 struct Push {
+	Push(const char *name, List *defn) : already_popped(false) {
+		varpush(this, name, defn);
+	}
+	~Push() {
+		if (!already_popped) varpop(this);
+	}
 	Push *next;
 	const char *name;
 	List *defn;
 	int flags;
 	Root nameroot, defnroot;
+	bool already_popped;
 };
 
 

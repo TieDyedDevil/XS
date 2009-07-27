@@ -151,12 +151,10 @@ static List *callsettor(SRef<const char> name, SRef<List> defn) {
 	if (specialvar(name.uget()) || (settor = varlookup2("set-", name.uget(), NULL)) == NULL)
 		return defn.release();
 
-	Push p;
-	varpush(&p, "0", mklist(mkstr(name.uget()), NULL));
+	Push p("0", mklist(mkstr(name.uget()), NULL));
 
 	defn = listcopy(eval(append(settor, defn), NULL, 0));
 
-	varpop(&p);
 	return defn.release();
 }
 

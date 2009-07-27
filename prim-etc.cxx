@@ -40,7 +40,6 @@ PRIM(exec) {
 
 PRIM(dot) {
 	int c, fd;
-	Push zero, star;
 	volatile int runflags = (evalflags & eval_inchild);
 	const char * const usage = ". [-einvx] file [arg ...]";
 
@@ -65,13 +64,11 @@ PRIM(dot) {
 	if (fd == -1)
 		fail("$&dot", "%s: %s", file.uget(), esstrerror(errno));
 
-	varpush(&star, "*", lp.uget());
-	varpush(&zero, "0", mklist(mkstr(file), NULL));
+	Push star("0", mklist(mkstr(file), NULL));
+	Push zero("*", lp.uget());
 
 	result = runfd(fd, file.uget(), runflags);
 
-	varpop(&zero);
-	varpop(&star);
 	return result;
 }
 

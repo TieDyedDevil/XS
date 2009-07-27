@@ -416,7 +416,6 @@ extern List *runinput(Input *in, int runflags) {
 	volatile int flags = runflags;
 	volatile SRef<List> result;
 	SRef<List> repl, dispatch;
-	Push push;
 	const char *dispatcher[] = {
 		"fn-%eval-noprint",
 		"fn-%eval-print",
@@ -438,7 +437,8 @@ extern List *runinput(Input *in, int runflags) {
 			      NULL);
 		if (flags & eval_exitonfalse)
 			dispatch = mklist(mkstr("%exit-on-false"), dispatch);
-		varpush(&push, "fn-%dispatch", dispatch.uget());
+
+		Push push("fn-%dispatch", dispatch.uget());
 
 		repl = varlookup((flags & run_interactive)
 				   ? "fn-%interactive-loop"
@@ -447,8 +447,6 @@ extern List *runinput(Input *in, int runflags) {
 		result = (repl == NULL)
 				? prim("batchloop", NULL, NULL, flags).release()
 				: eval(repl, NULL, flags);
-
-		varpop(&push);
 
 	CatchException (e)
 
