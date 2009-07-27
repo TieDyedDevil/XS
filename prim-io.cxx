@@ -3,6 +3,7 @@
 #include "es.hxx"
 #include "gc.hxx"
 #include "prim.hxx"
+#include <stdio.h>
 
 static const char *caller;
 
@@ -137,7 +138,8 @@ static int pipefork(int p[2], int *extra) {
 
 	ExceptionHandler
 		pid = efork(true, false);
-	CatchExceptionIf (pid != 0, e)
+	CatchException (e)
+		if (pid == 0) abort();   /* Code for parent only */
 		unregisterfd(&p[0]);
 		unregisterfd(&p[1]);
 		if (extra != NULL)
@@ -296,7 +298,7 @@ PRIM(writeto) {
 	list = mklist(mkstr(str(DEVFD_PATH, p[1])), NULL);
 
 	ExceptionHandler
-		Push(var.uget(), list.uget());
+		Push push(var.uget(), list.uget());
 		list = eval1(cmd.uget(), evalflags);
 	CatchException (e)
 		close(p[1]);

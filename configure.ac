@@ -24,11 +24,16 @@ AC_ARG_WITH(editline, AS_HELP_STRING(--with-editline, use the Editline library),
 	use_editline=yes)
 
 AC_ARG_ENABLE(debug, AS_HELP_STRING(--enable-debug, debug mode for xs developers), debug_build=yes) 
-AC_ARG_ENABLE(gcprotect, AS_HELP_STRING(--enable-gcprotect, [GC-related code safeguarding \(included in --enable-debug\)]), gc_protect=yes) 
 AC_ARG_ENABLE(static, AS_HELP_STRING(--enable-static, build statically), static_xs=yes) 
+AC_ARG_ENABLE(gcprotect, AS_HELP_STRING(--enable-gcprotect, [GC-related code safeguarding \(included in --enable-debug\)]), gc_protect=yes) 
+AC_ARG_ENABLE(assertions, AS_HELP_STRING(--enable-assertions, [Normal assertions]), assertions=yes) 
 
 if test "$static_xs" = yes; then
 	LDFLAGS=-static
+fi
+
+if test "$assertions" = yes; then
+	AC_DEFINE(ASSERTIONS,1,"Enable normal assertions")
 fi
 
 dnl enable debug stuff

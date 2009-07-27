@@ -65,7 +65,6 @@ extern int efork(bool parent, bool background) {
 	}
 	closefds();
 	setsigdefaults();
-	newchildcatcher();
 	return 0;
 }
 

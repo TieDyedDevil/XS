@@ -37,10 +37,6 @@ extern void fail (const char * from,  const char * fmt, ...) {
 	NOTREACHED;
 }
 
-/* newchildcatcher -- remove the current handler chain for a new child */
-extern void newchildcatcher(void) {
-}
-
 #if DEBUG_EXCEPTIONS
 /* raised -- print exceptions as we climb the exception stack */
 extern List *raised(List *e) {

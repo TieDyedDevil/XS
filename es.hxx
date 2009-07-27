@@ -446,18 +446,17 @@ extern void globalroot(void *addr);
 /* struct Push -- varpush() placeholder */
 
 struct Push {
-	Push(const char *name, List *defn) : already_popped(false) {
+	Push(const char *name, List *defn) {
 		varpush(this, name, defn);
 	}
 	~Push() {
-		if (!already_popped) varpop(this);
+		varpop(this);
 	}
 	Push *next;
 	const char *name;
 	List *defn;
 	int flags;
 	Root nameroot, defnroot;
-	bool already_popped;
 };
 
 
@@ -486,7 +485,6 @@ extern List *exception;
 extern void pophandler(Handler *handler);
 extern void throwE(List *exc) NORETURN;
 extern void fail(const char *from, const char *name, ...) NORETURN;
-extern void newchildcatcher(void);
 
 #if DEBUG_EXCEPTIONS
 extern List *raised(List *e);
