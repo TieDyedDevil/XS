@@ -138,15 +138,23 @@ inline bool gcisblocked() {
  * garbage collector tags
  */
 #define	RefAdd(e) \
-	if (0) ; else { \
+	{ \
 		Root __root__; \
 		__root__.p = (void **) &e; \
 		__root__.next = rootlist; \
-		rootlist = &__root__
+		rootlist = &__root__; \
+	try {
+
 #define	RefRemove(e) \
 		refassert(rootlist == &__root__); \
 		refassert(rootlist->p == (void **) &e); \
 		rootlist = rootlist->next; \
+	} catch (List *t) { \
+		refassert(rootlist == &__root__); \
+		refassert(rootlist->p == (void **) &e); \
+		rootlist = rootlist->next; \
+		throwE(t); \
+	} \
 	}
 
 
