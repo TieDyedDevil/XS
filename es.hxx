@@ -485,6 +485,8 @@ extern List *exception;
 extern void pophandler(Handler *handler);
 extern void throwE(List *exc) NORETURN;
 extern void fail(const char *from, const char *name, ...) NORETURN;
+extern void print_exception(List *e);
+
 
 #if DEBUG_EXCEPTIONS
 extern List *raised(List *e);

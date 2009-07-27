@@ -37,6 +37,10 @@ extern void fail (const char * from,  const char * fmt, ...) {
 	NOTREACHED;
 }
 
+void print_exception(List *e) {
+	eprint("%L\n", e, " ");
+}
+
 #if DEBUG_EXCEPTIONS
 /* raised -- print exceptions as we climb the exception stack */
 extern List *raised(List *e) {

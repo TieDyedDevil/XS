@@ -124,6 +124,7 @@ PRIM(close) {
 	return redir(redir_close, list.release(), evalflags);
 }
 
+
 /* pipefork -- create a pipe and fork */
 static int pipefork(int p[2], int *extra) {
 	volatile int pid = 0;
@@ -139,7 +140,6 @@ static int pipefork(int p[2], int *extra) {
 	ExceptionHandler
 		pid = efork(true, false);
 	CatchException (e)
-		if (pid == 0) abort();   /* Code for parent only */
 		unregisterfd(&p[0]);
 		unregisterfd(&p[1]);
 		if (extra != NULL)
@@ -165,9 +165,15 @@ REDIR(here) {
 	*tailp = NULL;
 
 	if ((pid = pipefork(p, NULL)) == 0) {		/* child that writes to pipe */
-		close(p[0]);
-		fprint(p[1], "%L", doc, "");
-		exit(0);
+		try {
+			close(p[0]);
+			fprint(p[1], "%L", doc, "");
+			exit(0);
+		} catch (List *e) {
+			eprint("Received error in here redirection child:\n");
+			print_exception(e);
+			exit(9);
+		}
 	}
 
 	close(p[1]);
@@ -205,18 +211,24 @@ PRIM(pipe) {
 		pid = (list->next == NULL) ? efork(true, false) : pipefork(p, &inpipe);
 
 		if (pid == 0) {		/* child */
-			if (inpipe != -1) {
-				assert(infd != -1);
-				releasefd(infd);
-				mvfd(inpipe, infd);
+			try {
+				if (inpipe != -1) {
+					assert(infd != -1);
+					releasefd(infd);
+					mvfd(inpipe, infd);
+				}
+				if (list->next != NULL) {
+					int fd = getnumber(getstr(list->next->term));
+					releasefd(fd);
+					mvfd(p[1], fd);
+					close(p[0]);
+				}
+				exit(exitstatus(eval1(list->term, evalflags | eval_inchild)));
+			} catch (List *e) {
+				eprint("Received error in %%pipe child process:\n");
+				print_exception(e);
+				exit(9);
 			}
-			if (list->next != NULL) {
-				int fd = getnumber(getstr(list->next->term));
-				releasefd(fd);
-				mvfd(p[1], fd);
-				close(p[0]);
-			}
-			exit(exitstatus(eval1(list->term, evalflags | eval_inchild)));
 		}
 		pids[n++] = pid;
 		close(inpipe);
@@ -253,9 +265,15 @@ PRIM(readfrom) {
 	SRef<Term> cmd = list->term;
 
 	if ((pid = pipefork(p, NULL)) == 0) {
-		close(p[0]);
-		mvfd(p[1], 1);
-		exit(exitstatus(eval1(input.uget(), evalflags &~ eval_inchild)));
+		try {
+			close(p[0]);
+			mvfd(p[1], 1);
+			exit(exitstatus(eval1(input.uget(), evalflags &~ eval_inchild)));
+		} catch (List *e) {
+			eprint("Received exception in %%readfrom (<{}) child process:\n");
+			print_exception(e);
+			exit(9);
+		}
 	}
 
 	close(p[1]);
@@ -289,9 +307,15 @@ PRIM(writeto) {
 	SRef<Term> cmd = list->term;
 
 	if ((pid = pipefork(p, NULL)) == 0) {
-		close(p[1]);
-		mvfd(p[0], 0);
-		exit(exitstatus(eval1(output.uget(), evalflags &~ eval_inchild)));
+		try {
+			close(p[1]);
+			mvfd(p[0], 0);
+			exit(exitstatus(eval1(output.uget(), evalflags &~ eval_inchild)));
+		} catch (List *e) {
+			eprint("Received error in %%writeto (>{}) child process:\n");
+			print_exception(e);
+			exit(9);
+		}
 	}
 
 	close(p[0]);
@@ -344,9 +368,15 @@ PRIM(backquote) {
 	list = list->next;
 
 	if ((pid = pipefork(p, NULL)) == 0) {
-		mvfd(p[1], 1);
-		close(p[0]);
-		exit(exitstatus(eval(list, NULL, evalflags | eval_inchild)));
+		try {
+			mvfd(p[1], 1);
+			close(p[0]);
+			exit(exitstatus(eval(list, NULL, evalflags | eval_inchild)));
+		} catch (List *e) {
+			eprint("%%backquote received exception from child process: ");
+			print_exception(e);
+			exit(9);
+		}
 	}
 
 	close(p[1]);
