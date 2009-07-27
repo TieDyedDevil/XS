@@ -241,8 +241,6 @@ PRIM(pipe) {
 #ifdef HAVE_DEV_FD
 PRIM(readfrom) {
 	int pid, p[2], status;
-	Push push;
-
 	caller = "$&readfrom";
 	if (length(list) != 3)
 		argcount("%readfrom var input cmd");
@@ -260,9 +258,9 @@ PRIM(readfrom) {
 
 	close(p[1]);
 	list = mklist(mkstr(str(DEVFD_PATH, p[0])), NULL);
-	varpush(&push, var.release(), list.uget());
 
 	ExceptionHandler
+		Push push(var.release(), list.uget());
 		list = eval1(cmd.uget(), evalflags);
 	CatchException (e)
 		close(p[0]);
@@ -273,13 +271,11 @@ PRIM(readfrom) {
 	close(p[0]);
 	status = ewaitfor(pid);
 	printstatus(0, status);
-	varpop(&push);
 	return list;
 }
 
 PRIM(writeto) {
 	int pid, p[2], status;
-	Push push;
 
 	caller = "$&writeto";
 	if (length(list) != 3)
@@ -298,9 +294,9 @@ PRIM(writeto) {
 
 	close(p[0]);
 	list = mklist(mkstr(str(DEVFD_PATH, p[1])), NULL);
-	varpush(&push, var.uget(), list.uget());
 
 	ExceptionHandler
+		Push(var.uget(), list.uget());
 		list = eval1(cmd.uget(), evalflags);
 	CatchException (e)
 		close(p[1]);
@@ -311,7 +307,6 @@ PRIM(writeto) {
 	close(p[1]);
 	status = ewaitfor(pid);
 	printstatus(0, status);
-	varpop(&push);
 	return list;
 }
 #endif

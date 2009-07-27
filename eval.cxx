@@ -112,12 +112,9 @@ static List *localbind(SRef<Binding> dynamic, SRef<Binding> lexical,
 	if (!dynamic)
 		return walk(body.uget(), lexical.uget(), evalflags);
 	else {
-		Push p;
 		SRef<List> result;
-		varpush(&p, dynamic->name, dynamic->defn);
+		Push p(dynamic->name, dynamic->defn);
 		result = localbind(dynamic->next, lexical, body, evalflags);
-		varpop(&p);
-
 		return result.release();
 	}
 }
@@ -333,7 +330,6 @@ restart:
 			break;
 		    case nLambda:
 		    {
-			Push p;
 			SRef<Tree> tree = cp->tree;
 			SRef<Binding> context;
 			      
@@ -341,14 +337,13 @@ restart:
 				context =  bindargs(tree->u[0].p,
 						    list->next,
 						     cp->binding);
-				if (funcname)
-					varpush(&p, "0",
-						    mklist(mkterm(funcname.uget(),
-								  NULL),
-							   NULL));
-				list = walk(tree->u[1].p, context.uget(), flags);
-				if (funcname)
-					varpop(&p);
+				if (funcname) {
+					Push p("0",
+					     mklist(mkterm(funcname.uget(),
+							  NULL),
+					 	    NULL));
+					list = walk(tree->u[1].p, context.uget(), flags);
+				} else list = walk(tree->u[1].p, context.uget(), flags);
 			CatchException (e)
 
 				if (termeq(e->term, "return")) {

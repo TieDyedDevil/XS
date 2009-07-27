@@ -27,6 +27,7 @@ extern void throwE(List *e) {
 	
 	while (pushlist != handler->pushlist) {
 		rootlist = &pushlist->defnroot;
+		pushlist->already_popped = true;
 		varpop(pushlist);
 	}
 	evaldepth = handler->evaldepth;

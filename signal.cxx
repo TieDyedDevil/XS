@@ -158,7 +158,6 @@ extern void getsigeffects(Sigeffect effects[]) {
 
 extern void initsignals(bool interactive, bool allowdumps) {
 	int sig;
-	Push settor;
 
 	for (sig = 0; sig < nsignals; sig++)
 		if (signals[sig].sig < 1 || NSIG <= signals[sig].sig)
@@ -204,9 +203,8 @@ extern void initsignals(bool interactive, bool allowdumps) {
 	}
 
 	/* here's the end-run around set-signals */
-	varpush(&settor, "set-signals", NULL);
+	Push settor("set-signals", NULL);
 	vardef("signals", NULL, mksiglist());
-	varpop(&settor);
 }
 
 extern void setsigdefaults(void) {
