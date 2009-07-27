@@ -283,7 +283,7 @@ static void deprecate(Space *space) {
 }
 
 /* isinspace -- does an object lie inside a given Space? */
-extern bool isinspace(Space *space, const void *p) {
+static bool isinspace(Space *space, const void *p) {
 	for (; space != NULL; space = space->next)
 		if (in_space(p, space)) {
 		 	assert(reinterpret_cast<const char*>(p) < space->current);
