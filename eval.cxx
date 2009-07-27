@@ -300,12 +300,22 @@ extern List *pathsearch(Term *term) {
 	return eval(append(search, list), NULL, 0);
 }
 
+class Depth_tracker {
+	public:
+		Depth_tracker() {
+			if (++evaldepth >= maxevaldepth)
+				fail("es:eval", "max-eval-depth exceeded");
+		}
+		~Depth_tracker() {
+			--evaldepth;
+		}
+};
+
 /* eval -- evaluate a list, producing a list */
 extern List *eval(SRef<List> list, SRef<Binding> binding, int flags) {
 	Closure *volatile cp;
 
-	if (++evaldepth >= maxevaldepth)
-		fail("es:eval", "max-eval-depth exceeded");
+	Depth_tracker t;
 
 	SRef<const char> name;
 
@@ -313,10 +323,7 @@ extern List *eval(SRef<List> list, SRef<Binding> binding, int flags) {
 	SRef<List> fn;
 
 restart:
-	if (list == NULL) {
-		--evaldepth;
-		return ltrue;
-	}
+	if (list == NULL) return ltrue;
 	assert(list->term != NULL);
 
 	if ((cp = getclosure(list->term)) != NULL) {
@@ -396,7 +403,6 @@ restart:
 	goto restart;
 
 done:
-	--evaldepth;
 	if ((flags & eval_exitonfalse) && !istrue(list.uget()))
 		exit(exitstatus(list.uget()));
 	return list.release();
