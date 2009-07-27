@@ -413,6 +413,7 @@ static bool Bconv(Format *f) {
 
 	default: NOTREACHED;
 	}
+	return false;
 }
 #endif
 
