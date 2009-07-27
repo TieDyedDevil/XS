@@ -171,8 +171,7 @@ PRIM(batchloop) {
 
 	SIGCHK();
 
-	ExceptionHandler
-
+	try {
 		for (;;) {
 			List *parser, *cmd;
 			parser = varlookup("fn-%parse", NULL);
@@ -188,14 +187,13 @@ PRIM(batchloop) {
 				SIGCHK();
 			}
 		}
-
-	CatchException (e)
+	} catch (List *e) {
 
 		if (!termeq(e->term, "eof"))
 			throwE(e);
 		return result;
 
-	EndExceptionHandler
+	}
 	NOTREACHED;
 	return NULL; /* Quiet warnings */
 }

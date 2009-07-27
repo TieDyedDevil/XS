@@ -488,20 +488,4 @@ extern void fail(const char *from, const char *name, ...) NORETURN;
 extern void print_exception(List *e);
 
 
-#if DEBUG_EXCEPTIONS
-extern List *raised(List *e);
-#else
-#define	raised(e)	(e)
-#endif
 
-#define ExceptionHandler \
-	try {
-
-#define CatchException(e) } catch (List *e) {
-
-#define CatchExceptionIf(condition, e) \
-		} catch (List *e) { \
-			if (!(condition)) throw (e);
-
-#define EndExceptionHandler \
-	}

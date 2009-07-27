@@ -119,21 +119,17 @@ extern Closure *extractbindings(Tree *tree0) {
 	me.next = chain;
 	chain = &me;
 
-	ExceptionHandler
-
+	try {
 		while (tree->kind == nClosure) {
 			bindings = extract(tree->u[0].p, bindings);
 			tree = tree->u[1].p;
 			if (tree->kind == nList && tree->u[1].p == NULL)
 				tree = tree->u[0].p; 
 		}
-
-	CatchException (e)
-	
+	} catch (List *e) {
 		chain = chain->next;
 		throwE(e);
-
-	EndExceptionHandler
+	}
 
 	chain = chain->next;
 

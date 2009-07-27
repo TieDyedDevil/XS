@@ -429,8 +429,7 @@ extern List *runinput(Input *in, int runflags) {
 	in->prev = input;
 	input = in;
 
-	ExceptionHandler
-
+	try {
 		dispatch
 	          = varlookup(dispatcher[((flags & run_printcmds) ? 1 : 0)
 					 + ((flags & run_noexec) ? 2 : 0)],
@@ -447,14 +446,11 @@ extern List *runinput(Input *in, int runflags) {
 		result = (repl == NULL)
 				? prim("batchloop", NULL, NULL, flags).release()
 				: eval(repl, NULL, flags);
-
-	CatchException (e)
-
+	} catch (List *e) {
 		(*input->cleanup)(input);
 		input = input->prev;
 		throwE(e);
-
-	EndExceptionHandler
+	}
 
 	input = in->prev;
 	(*in->cleanup)(in);
@@ -543,15 +539,15 @@ extern Tree *parseinput(Input *in) {
 	in->get = get;
 	input = in;
 
-	ExceptionHandler
+	try {
 		result = parse(NULL, NULL);
 		if (get(in) != EOF)
 			fail("$&parse", "more than one value in term");
-	CatchException (e)
+	} catch (List *e) {
 		(*input->cleanup)(input);
 		input = input->prev;
 		throwE(e);
-	EndExceptionHandler
+	}
 
 	input = in->prev;
 	(*in->cleanup)(in);

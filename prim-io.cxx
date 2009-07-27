@@ -25,16 +25,16 @@ static SRef<List> redir(SRef<List> (*rop)(int *fd, SRef<List> list), SRef<List> 
 	destfd = getnumber(getstr(list->term));
 	list = (*rop)(&srcfd, list->next);
 
-	ExceptionHandler
+	try {
 		ticket = (srcfd == -1)
 			   ? defer_close(inparent, destfd)
 			   : defer_mvfd(inparent, srcfd, destfd);
 		list = eval(list, NULL, evalflags);
 		undefer(ticket);
-	CatchException (e)
+	} catch (List *e) {
 		undefer(ticket);
 		throwE(e);
-	EndExceptionHandler
+	}
 
 	return list;
 }
@@ -137,15 +137,15 @@ static int pipefork(int p[2], int *extra) {
 	if (extra != NULL)
 		registerfd(extra, false);
 
-	ExceptionHandler
+	try {
 		pid = efork(true, false);
-	CatchException (e)
+	} catch (List *e) {
 		unregisterfd(&p[0]);
 		unregisterfd(&p[1]);
 		if (extra != NULL)
 			unregisterfd(extra);
 		throwE(e);
-	EndExceptionHandler;
+	}
 
 	unregisterfd(&p[0]);
 	unregisterfd(&p[1]);
@@ -279,14 +279,14 @@ PRIM(readfrom) {
 	close(p[1]);
 	list = mklist(mkstr(str(DEVFD_PATH, p[0])), NULL);
 
-	ExceptionHandler
+	try {
 		Push push(var.release(), list.uget());
 		list = eval1(cmd.uget(), evalflags);
-	CatchException (e)
+	} catch (List *e) {
 		close(p[0]);
 		ewaitfor(pid);
 		throwE(e);
-	EndExceptionHandler
+	}
 
 	close(p[0]);
 	status = ewaitfor(pid);
@@ -321,14 +321,14 @@ PRIM(writeto) {
 	close(p[0]);
 	list = mklist(mkstr(str(DEVFD_PATH, p[1])), NULL);
 
-	ExceptionHandler
+	try {
 		Push push(var.uget(), list.uget());
 		list = eval1(cmd.uget(), evalflags);
-	CatchException (e)
+	} catch (List *e) {
 		close(p[1]);
 		ewaitfor(pid);
 		throwE(e);
-	EndExceptionHandler
+	}
 
 	close(p[1]);
 	status = ewaitfor(pid);

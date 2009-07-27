@@ -40,11 +40,3 @@ extern void fail (const char * from,  const char * fmt, ...) {
 void print_exception(List *e) {
 	eprint("%L\n", e, " ");
 }
-
-#if DEBUG_EXCEPTIONS
-/* raised -- print exceptions as we climb the exception stack */
-extern List *raised(List *e) {
-	eprint("raised (sp @ %x) %L\n", &e, e, " ");
-	return e;
-}
-#endif

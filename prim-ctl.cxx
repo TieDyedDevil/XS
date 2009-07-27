@@ -49,30 +49,30 @@ PRIM(catch) {
 	do {
 		retry = false;
 
-		ExceptionHandler
+		try {
 
 			result = eval(list->next, NULL, evalflags);
 
-		CatchException (frombody)
+		} catch (List *frombody) {
 
 			blocksignals();
-			ExceptionHandler
+			try {
 				result
 				  = eval(mklist(mkstr("$&noreturn"),
 					        mklist(list->term, frombody)),
 					 NULL,
 					 evalflags);
 				unblocksignals();
-			CatchException (fromcatcher)
+			} catch (List *fromcatcher) {
 
 				if (termeq(fromcatcher->term, "retry")) {
 					retry = true;
 					unblocksignals();
 				} else
 					throwE(fromcatcher);
-			EndExceptionHandler
+			}
 
-		EndExceptionHandler
+		}
 	} while (retry);
 	return result;
 }

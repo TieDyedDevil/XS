@@ -157,8 +157,7 @@ static List *forloop(SRef<Tree> defn, SRef<Tree> body,
 	SRef<Binding> bp, lp, sequence; 
 	SRef<List> value;
 
-	ExceptionHandler
-
+	try {
 		for (;;) {
 			allnull = true;
 			bp = outer;
@@ -183,14 +182,11 @@ static List *forloop(SRef<Tree> defn, SRef<Tree> body,
 			result = walk(body.uget(), bp.uget(), evalflags & eval_exitonfalse);
 			SIGCHK();
 		}
-
-	CatchException (e)
-
+	} catch (List *e) {
 		if (!termeq(e->term, "break"))
 			throwE(e);
 		result = e->next;
-
-	EndExceptionHandler
+	}
 	return result.release();
 }
 
@@ -340,7 +336,7 @@ restart:
 			SRef<Tree> tree = cp->tree;
 			SRef<Binding> context;
 			      
-			ExceptionHandler
+			try {
 				context =  bindargs(tree->u[0].p,
 						    list->next,
 						     cp->binding);
@@ -351,17 +347,15 @@ restart:
 					 	    NULL));
 					list = walk(tree->u[1].p, context.uget(), flags);
 				} else list = walk(tree->u[1].p, context.uget(), flags);
-			CatchException (e)
-
+			} catch (List *e) {
 				if (termeq(e->term, "return")) {
 					list = e->next;
 					goto done;
 				}
 				throwE(e);
-
-			EndExceptionHandler
-			}
-			break;
+			}	
+		    }
+		    break;
 		    case nList: {
 			list = glom(cp->tree, cp->binding, true);
 			list = append(list, list->next);

@@ -48,9 +48,9 @@ static void runxsrc(void) {
 	char *xsrc = str("%L/.xsrc", varlookup("home", NULL), "\001");
 	int fd = eopen(xsrc, oOpen);
 	if (fd != -1) {
-		ExceptionHandler
+		try {
 			runfd(fd, xsrc, 0);
-		CatchException (e)
+		} catch (List *e) {
 			if (termeq(e->term, "exit"))
 				exit(exitstatus(e->next));
 			else if (termeq(e->term, "error"))
@@ -60,7 +60,7 @@ static void runxsrc(void) {
 			else if (!issilentsignal(e))
 				eprint("uncaught exception: %L\n", e, " ");
 			return;
-		EndExceptionHandler
+		}
 	}
 }
 
@@ -169,7 +169,7 @@ getopt_done:
 	ac = argc;
 	av = argv;
 
-	ExceptionHandler
+	try {
 		initinput();
 		initprims();
 		initvars();
@@ -203,8 +203,7 @@ getopt_done:
 			return exitstatus(runstring(cmd, NULL, runflags));
 		return exitstatus(runfd(0, "stdin", runflags));
 
-	CatchException (e)
-
+	} catch (List *e) {
 		if (termeq(e->term, "exit"))
 			return exitstatus(e->next);
 		else if (termeq(e->term, "error"))
@@ -214,6 +213,5 @@ getopt_done:
 		else if (!issilentsignal(e))
 			eprint("uncaught exception: %L\n", e, " ");
 		return 1;
-
-	EndExceptionHandler
+	}
 }
