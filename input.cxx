@@ -37,6 +37,7 @@ static int historyfd = -1;
 #include <stdio.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+bool continued_input = false;
 int rl_meta_chars;	/* for editline; ignored for gnu readline */
 
 #if 0 /* Add support for using this when header is unavailable? */
@@ -215,7 +216,7 @@ static int eoffill(Input *in) {
 
 #if READLINE
 /* callreadline -- readline wrapper */
-static char *callreadline(const char *prompt) {
+static char *callreadline() {
 	char *r;
 	if (resetterminal) {
 		rl_reset_terminal(NULL);
@@ -224,9 +225,8 @@ static char *callreadline(const char *prompt) {
 	interrupted = false;
 	if (!setjmp(slowlabel)) {
 		slow = true;
-		r = interrupted ? NULL : readline(prompt);
-	} else
-		r = NULL;
+		r = interrupted ? NULL : readline(continued_input ? prompt2 : prompt);
+	} else  r = NULL;
 	slow = false;
 	if (r == NULL)
 		errno = EINTR;
@@ -338,7 +338,7 @@ static int fdfill(Input *in) {
 
 #if READLINE
 	if (in->runflags & run_interactive && in->fd == 0) {
-		char *rlinebuf = callreadline(prompt);
+		char *rlinebuf = callreadline();
 		if (rlinebuf == NULL)
 
 			nread = 0;

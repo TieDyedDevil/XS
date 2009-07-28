@@ -16,7 +16,7 @@ inline bool isodigit(char c) {
 typedef enum { NW, RW, KW } State;	/* "nonword", "realword", "keyword" */
 
 static State w = NW;
-static bool newline = false;
+static bool newline = false; 
 static bool goterror = false;
 static size_t bufsize = 0;
 static char *tokenbuf = NULL;
@@ -72,7 +72,7 @@ char dnw[] = {
 extern void print_prompt2(void) {
 	input->lineno++;
 #if READLINE
-	prompt = prompt2;
+	continued_input = true;
 #else
 	if ((input->runflags & run_interactive) && prompt2 != NULL)
 		eprint("%s", prompt2);
@@ -163,8 +163,6 @@ int yylex(void) {
 	meta = (dollar ? dnw : nw);
 	dollar = false;
 	if (newline) {
-		--input->lineno; /* slight space optimization; print_prompt2() always increments lineno */
-		print_prompt2();
 		newline = false;
 		assert (yyloc.last_line <= input->lineno);
 		/* \n sets yylloc.last_line, but not first_line
@@ -320,7 +318,8 @@ top:	while ((c = GETC()) == ' ' || c == '\t')
 				return ENDFILE;
 		/* FALLTHROUGH */
 	case '\n':
-		yylloc.last_line = ++input->lineno;
+		print_prompt2();
+		yylloc.last_line = input->lineno;
 		newline = true;
 		w = NW;
 		return NL;
@@ -434,6 +433,9 @@ top:	while ((c = GETC()) == ' ' || c == '\t')
 }
 
 extern void inityy(void) {
+#if READLINE
+	continued_input = false;
+#endif
 	w = NW;
 	if (bufsize > BUFMAX) {		/* return memory to the system if the buffer got too large */
 		efree(tokenbuf);
