@@ -4,6 +4,7 @@
 #include "es.hxx"
 #include "term.hxx"
 #include "input.hxx"
+#include "parse.h"
 
 
 /*
@@ -57,8 +58,8 @@ extern char *rl_completer_quote_characters;
 /* locate -- identify where an error came from */
 static const char *locate(Input *in, const char *s) {
 	return (in->runflags & run_interactive)
-		? s
-		: str("%s:%d: %s", in->name, in->lineno, s);
+		? str("columns %d-%d %s", yylloc.first_column, yylloc.last_column, s)
+		: str("%s:%d-%d:%d-%d %s", in->name,  yylloc.first_line, yylloc.last_line, yylloc.first_column, yylloc.last_column, s);
 }
 
 static const char *error = NULL;
@@ -123,6 +124,18 @@ extern void sethistory(const char *file) {
 	history = file;
 }
 
+int GETC() {
+	int c = (*input->get)(input);
+	switch (c) {
+	case '\t': yylloc.last_column = (yylloc.last_column / 8 + 1) * 8; break;
+	case '\n':
+		yylloc.first_column = yylloc.last_column = 0;
+		++yylloc.last_line;
+		break;
+	default: ++yylloc.last_column;
+	}
+	return c;
+}
 
 /*
  * unget -- character pushback
@@ -146,6 +159,9 @@ static int ungetfill(Input *in) {
 
 /* unget -- push back one character */
 extern void unget(Input *in, int c) {
+	--yylloc.last_column;
+	if (yylloc.first_column > yylloc.last_column) yylloc.first_column = yylloc.last_column;
+
 	if (in->ungot > 0) {
 		assert(in->ungot < MAXUNGET);
 		in->unget[in->ungot++] = c;
@@ -595,6 +611,8 @@ extern bool isinteractive(void) {
 /* initinput -- called at dawn of time from main() */
 extern void initinput(void) {
 	input = NULL;
+	yylloc.first_line = yylloc.last_line = 1;
+	yylloc.first_column = yylloc.last_column = 0;
 
 	/* declare the global roots */
 	globalroot(&history);		/* history file */

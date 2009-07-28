@@ -81,7 +81,7 @@ extern void validatevar(const char *var) {
 	if (*var == '\0')
 		fail("es:var", "zero-length variable name");
 	if (iscounting(var))
-		fail("es:var", "illegal variable name: %S", var);
+		fail("es:var", "illegal variable name (is a number): %S", var);
 #if !PROTECT_ENV
 	if (strchr(var, '=') != NULL)
 		fail("es:var", "'=' in variable name: %S", var);
