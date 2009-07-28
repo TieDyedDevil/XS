@@ -1,12 +1,13 @@
-/* token.c -- lexical analyzer for es ($Revision: 1.1.1.1 $)
- * */
+/* token.c -- lexical analyzer for es ($Revision: 1.1.1.1 $) */
 
 #include "es.hxx"
 #include "input.hxx"
 #include "syntax.hxx"
 #include "parse.h"
 
-#define	isodigit(c)	('0' <= (c) && (c) < '8')
+inline bool isodigit(char c) {
+	return '0' <= c && c < '8';
+}
 
 #define	BUFSIZE	((size_t) 1000)
 #define	BUFMAX	(8 * BUFSIZE)
@@ -143,8 +144,6 @@ static bool getfds(int fd[2], int c, int default0, int default1) {
 	}
 	return true;
 }
-
-
 
 int yylex(void) {
 	static bool dollar = false;
