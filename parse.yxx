@@ -6,6 +6,8 @@
 #include "syntax.hxx"
 %}
 
+%error-verbose
+
 %token	WORD QWORD
 %token	LOCAL LET FOR CLOSURE FN
 %token	ANDAND BACKBACK EXTRACT CALL COUNT DUP FLAT OROR PRIM REDIR SUB ASSIGN
