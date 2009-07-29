@@ -4,9 +4,19 @@
 #include "es.hxx"
 #include "input.hxx"
 #include "syntax.hxx"
+
+typedef struct yyltype
+{
+  int first_line;
+  int first_column;
+  int last_line;
+  int last_column;
+} yyltype;
+#define YYLTYPE yyltype
 %}
 
 %error-verbose
+%locations
 
 %token	WORD QWORD
 %token	LOCAL LET FOR CLOSURE FN

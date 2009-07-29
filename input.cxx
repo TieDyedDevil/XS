@@ -4,6 +4,7 @@
 #include "es.hxx"
 #include "term.hxx"
 #include "input.hxx"
+#include "parse.h"
 
 
 /*
@@ -36,6 +37,7 @@ static int historyfd = -1;
 #include <stdio.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+bool continued_input = false;
 int rl_meta_chars;	/* for editline; ignored for gnu readline */
 
 #if 0 /* Add support for using this when header is unavailable? */
@@ -57,8 +59,8 @@ extern char *rl_completer_quote_characters;
 /* locate -- identify where an error came from */
 static const char *locate(Input *in, const char *s) {
 	return (in->runflags & run_interactive)
-		? s
-		: str("%s:%d: %s", in->name, in->lineno, s);
+		? str("columns %d-%d %s", yylloc.first_column, yylloc.last_column, s)
+		: str("%s:%d-%d:%d-%d %s", in->name,  yylloc.first_line, yylloc.last_line, yylloc.first_column, yylloc.last_column, s);
 }
 
 static const char *error = NULL;
@@ -123,6 +125,18 @@ extern void sethistory(const char *file) {
 	history = file;
 }
 
+int GETC() {
+	int c = (*input->get)(input);
+	switch (c) {
+	case '\t': yylloc.last_column = (yylloc.last_column / 8 + 1) * 8; break;
+	case '\n':
+		yylloc.first_column = yylloc.last_column = 0;
+		++yylloc.last_line;
+		break;
+	default: ++yylloc.last_column;
+	}
+	return c;
+}
 
 /*
  * unget -- character pushback
@@ -146,6 +160,9 @@ static int ungetfill(Input *in) {
 
 /* unget -- push back one character */
 extern void unget(Input *in, int c) {
+	--yylloc.last_column;
+	if (yylloc.first_column > yylloc.last_column) yylloc.first_column = yylloc.last_column;
+
 	if (in->ungot > 0) {
 		assert(in->ungot < MAXUNGET);
 		in->unget[in->ungot++] = c;
@@ -199,7 +216,7 @@ static int eoffill(Input *in) {
 
 #if READLINE
 /* callreadline -- readline wrapper */
-static char *callreadline(const char *prompt) {
+static char *callreadline() {
 	char *r;
 	if (resetterminal) {
 		rl_reset_terminal(NULL);
@@ -208,9 +225,8 @@ static char *callreadline(const char *prompt) {
 	interrupted = false;
 	if (!setjmp(slowlabel)) {
 		slow = true;
-		r = interrupted ? NULL : readline(prompt);
-	} else
-		r = NULL;
+		r = interrupted ? NULL : readline(continued_input ? prompt2 : prompt);
+	} else  r = NULL;
 	slow = false;
 	if (r == NULL)
 		errno = EINTR;
@@ -322,7 +338,7 @@ static int fdfill(Input *in) {
 
 #if READLINE
 	if (in->runflags & run_interactive && in->fd == 0) {
-		char *rlinebuf = callreadline(prompt);
+		char *rlinebuf = callreadline();
 		if (rlinebuf == NULL)
 
 			nread = 0;
@@ -595,6 +611,8 @@ extern bool isinteractive(void) {
 /* initinput -- called at dawn of time from main() */
 extern void initinput(void) {
 	input = NULL;
+	yylloc.first_line = yylloc.last_line = 1;
+	yylloc.first_column = yylloc.last_column = 0;
 
 	/* declare the global roots */
 	globalroot(&history);		/* history file */
