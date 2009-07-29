@@ -176,7 +176,7 @@ static void enclose(Format *f, Binding *binding, const char *sep) {
 	if (binding != NULL) {
 		Binding *next = binding->next;
 		enclose(f, next, ";");
-		fmtprint(f, "%S=%#L%s", binding->name, binding->defn, " ", sep);
+		fmtprint(f, "%S:=%#L%s", binding->name, binding->defn, " ", sep);
 	}
 }
 
