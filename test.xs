@@ -15,7 +15,7 @@ let (TMPOUT := /dev/shm/xs.$pid.testout) {
 	}
         TESTNAME := $name
 	log2 Running $name...
-        RETURNVALUE := <={eval $code >$TMPOUT >[2=1]}
+        RETURNVALUE := <={fork {$code >$TMPOUT >[2=1]}}
 	log2 Done running $name....
 	log2 $TESTNAME produced output:
 	log2 `{output}
