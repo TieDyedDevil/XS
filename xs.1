@@ -339,6 +339,7 @@ The empty list is represented by
 Lists have no hierarchical structure;
 a list inside another list is expanded so that the
 outer list contains all the elements of the inner list.
+(This is the same as perl's "list interpolation".)
 Thus, the following are all equivalent:
 .Ds
 .Cr "one two three"
@@ -354,6 +355,21 @@ are two very
 different things.
 Assigning the null string to variable is a valid
 operation, but it does not remove its definition.
+.PP
+Since lists can span multiple lines without explicit line
+continuations, they are ideal for long commands. For example:
+.Ds
+.Cr "if \e
+.Cr "   {~ $x *error*} { break } \e"
+.Cr "   {~ $x *good*}  { echo no problem  }"
+.De
+.PP is the same as
+.Ds
+.Cr "if (
+.Cr "   {~ $x *error*} { break }" 
+.Cr "   {~ $x *good*}  { echo no problem  }"
+.Cr ")"
+.De
 .SS Concatenation
 Two lists may be joined by the concatenation operator
 .Rc ( ^ ).
