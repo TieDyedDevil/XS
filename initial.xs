@@ -195,7 +195,7 @@ fn-while := $&noreturn @ cond body {
 	}
 }
 
-fn-switch := $&noreturn @ value args {
+fn-switch := @ value args {
 	if {~ $args ()} {
 		throw error switch 'usage: switch value [case1 action1] [case2 action2]...default'
 	}
