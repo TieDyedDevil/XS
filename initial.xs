@@ -195,6 +195,19 @@ fn-while := $&noreturn @ cond body {
 	}
 }
 
+fn-switch := $&noreturn @ value args {
+	if {~ $args ()} {
+		throw error switch 'usage: switch value [case1 action1] [case2 action2]...default'
+	}
+	for ((cond action) := $args) {
+		if {~ $action ()} { 
+			# Code for default action
+			return <={$cond}
+		}
+		~ $value $cond && return <={$action}
+	}
+}
+
 #	The cd builtin provides a friendlier veneer over the cd primitive:
 #	it knows about no arguments meaning ``cd $home'' and has friendlier
 #	error messages than the raw $&cd.  (It also used to search $cdpath,

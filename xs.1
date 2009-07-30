@@ -2055,6 +2055,13 @@ Causes the current function to exit,
 returning the named
 .IR value .
 .TP
+.Cr "switch \fIvalue\fP \fI\fR[\fPcase1 action1\fR]\fP\fP...\fI\fR[\fPdefault-action\fR]\fP\fP"
+Go through the list of cases, 
+testing if they are equal to
+.IR value .
+The matching action of the first
+case which matches is executed.
+.TP
 .Cr "throw \fIexception arg ...\fP"
 Raise the named exception, passing all of the arguments to
 .Cr throw
