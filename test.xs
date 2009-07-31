@@ -18,7 +18,7 @@ let (TMPOUT := /dev/shm/xs.$pid.testout) {
         RETURNVALUE := <={fork {$code >$TMPOUT >[2=1]}}
 	log2 Done running $name....
 	log2 $TESTNAME produced output:
-	log2 `{output}
+	log2 `output
 	log2 $TESTNAME exited:
 	log2 $RETURNVALUE
     }
@@ -57,18 +57,18 @@ fn expect-success {
     return $RETURNVALUE
 }
 fn expect-failure {
-    return <={! expect-success}
+    ! expect-success
 }
 fn match result {
     log2 Matching...
-    return <={~ `` '' {output} *^$^result^* }
+    ~ `` '' output *^$^result^*
 }
 fn match_re result {
     log2 Match_re....
-    return <={eval '~ `` '' {output} *'^$^result^'*' }
+    eval '~ `` '' output *'^$^result^'*'
 }
-let (dir := `{pwd} 
-     logfile := `{pwd}^/xs.log) 
+let (dir := `pwd 
+     logfile := `pwd^/xs.log) 
 {
     rm -f $logfile
     fn log msg {
