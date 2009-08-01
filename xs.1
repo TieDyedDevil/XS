@@ -1440,8 +1440,8 @@ being raised.
 The following exceptions are known:
 .TP
 .Cr "break \fIvalue\fP"
-Exit from a loop.
-The return value of the loop is the argument to the exception.
+Exit from a loop or a switch.
+The return value of the loop/switch is the argument to the exception.
 .TP
 .Cr eof
 Raised by
@@ -2061,6 +2061,10 @@ testing if they are equal to
 .IR value .
 The matching action of the first
 case which matches is executed.
+The break exception can be used to
+manually exit the switch, but
+is not necessary to signify the
+end of an action (unlike in C).
 .TP
 .Cr "throw \fIexception arg ...\fP"
 Raise the named exception, passing all of the arguments to

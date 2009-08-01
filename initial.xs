@@ -195,16 +195,23 @@ fn-while := $&noreturn @ cond body {
 	}
 }
 
-fn-switch := @ value args {
+fn-switch := $&noreturn @ value args {
 	if {~ $args ()} {
 		throw error switch 'usage: switch value [case1 action1] [case2 action2]...default'
 	}
-	for ((cond action) := $args) {
-		if {~ $action ()} { 
-			# Code for default action
-			return <={$cond}
+	catch @ e value {
+		if {!~ $e break} {
+			throw $e $value
 		}
-		~ $value $cond && return <={$action}
+		result $value
+	} {
+		for ((cond action) := $args) {
+			if {~ $action ()} { 
+				# Code for default action
+				break <={$cond}
+			}
+			~ $value $cond && break <={$action}
+		}
 	}
 }
 
