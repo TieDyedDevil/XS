@@ -63,7 +63,7 @@ fn match result {
 }
 fn match_re result {
     log2 Match_re....
-    eval '~ `` '' output *'^$^result^'*'
+    eval '~ `` '''' output *'^$^result^'*'
 }
 let (dir := `pwd 
      logfile := `pwd^/xs.log) 
