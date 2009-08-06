@@ -3,6 +3,8 @@
 #include "es.hxx"
 #include "var.hxx"
 #include "term.hxx"
+#include "gc.hxx"
+#include "print.hxx"
 
 #define	MAXVARNAME 20
 
@@ -50,7 +52,7 @@ static const char *dumpstring(const char *string) {
 	if (name == NULL) {
 		name = str("S_%F", string);
 		if (strlen(name) > MAXVARNAME)
-			name = str("X_%ulx", string);
+			name = str("X_%ulx", (long long) string);
 		print("static const char %s[] = ", name);
 		if (allprintable(string))
 			print("\"%s\";\n", string);
@@ -109,7 +111,7 @@ static const char *dumptree(Tree *tree) {
 	char *name;
 	if (tree == NULL)
 		return "NULL";
-	name = str("&T_%ulx", tree);
+	name = str("&T_%ulx", (long long) tree);
 	if (dictget(cvars, name) == NULL) {
 		switch (tree->kind) {
 		    default:
@@ -137,7 +139,7 @@ static const char *dumpbinding(Binding *binding) {
 	char *name;
 	if (binding == NULL)
 		return "NULL";
-	name = str("&B_%ulx", binding);
+	name = str("&B_%ulx", (long long) binding);
 	if (dictget(cvars, name) == NULL) {
 		print(
 			"static const Binding %s = { (char *) %s, (List *) %s, (Binding *) %s };\n",
@@ -155,7 +157,7 @@ static const char *dumpclosure(Closure *closure) {
 	char *name;
 	if (closure == NULL)
 		return "NULL";
-	name = str("&C_%ulx", closure);
+	name = str("&C_%ulx",  (long long) closure);
 	if (dictget(cvars, name) == NULL) {
 		print(
 			"static const Closure %s = { (Binding *) %s, (Tree *) %s };\n",
@@ -172,7 +174,7 @@ static const char *dumpterm(Term *term) {
 	char *name;
 	if (term == NULL)
 		return "NULL";
-	name = str("&E_%ulx", term);
+	name = str("&E_%ulx", (long long) term);
 	if (dictget(cvars, name) == NULL) {
 		print(
 			"static const Term %s = { (char *) %s, (Closure *) %s };\n",
@@ -189,7 +191,7 @@ static const char *dumplist(List *list) {
 	char *name;
 	if (list == NULL)
 		return "NULL";
-	name = str("&L_%ulx", list);
+	name = str("&L_%ulx", (long long) list);
 	if (dictget(cvars, name) == NULL) {
 		print(
 			"static const List %s = { (Term *) %s, (List *) %s };\n",
@@ -208,8 +210,17 @@ static void dumpvar(void *ignore, const char *key, void *value) {
 	dumplist(var->defn);
 }
 
+static Buffer *varbuf = NULL;
+static void defprint(const char *fmt, ...) {
+	if (varbuf == NULL) varbuf = openbuffer(2048);
+	va_list args;
+	va_start(args, fmt);
+	varbuf = bufcat(varbuf, strv(fmt, args));
+	va_end(args);
+}
+
 static void dumpdef(const char *name, Var *var) {
-	print("\t{ %s, (const List *) %s },\n", dumpstring(name), dumplist(var->defn));
+	defprint("\t{ %s, (const List *) %s },\n", dumpstring(name), dumplist(var->defn));
 }
 
 static void dumpfunctions(void *ignore, const char *key, void *value) {
@@ -245,6 +256,8 @@ static void printheader(List *title) {
 	print("%s\n\n", PPSTRING(TreeTypes));
 }
 
+
+
 extern void runinitial(void) {
 	List *title = runfd(0, "initial.xs", 0);
 
@@ -257,12 +270,13 @@ extern void runinitial(void) {
 	dictforall(vars, dumpvar, NULL);
 
 	/* these must be assigned in this order, or things just won't work */
-	print("\nstatic const struct { const char *name; const List *value; } defs[] = {\n");
+	defprint("\nstatic const struct { const char *name; const List *value; } defs[] = {\n");
 	dictforall(vars, dumpfunctions, NULL);
 	dictforall(vars, dumpsettors, NULL);
 	dictforall(vars, dumpvariables, NULL);
-	print("\t{ NULL, NULL }\n");
-	print("};\n\n");
+	defprint("\t{ NULL, NULL }\n");
+	defprint("};\n\n");
+	print(sealbuffer(varbuf));
 
 	print("\nextern void runinitial(void) {\n");
 	print("\tint i;\n");

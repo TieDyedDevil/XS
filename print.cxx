@@ -64,7 +64,7 @@ static bool sconv(Format *format) {
 	return false;
 }
 
-char *utoa(unsigned long u, char *t, unsigned int radix, const char *digit) {
+char *utoa(unsigned long long u, char *t, unsigned int radix, const char *digit) {
 	if (u >= radix) {
 		t = utoa(u / radix, t, radix, digit);
 		u %= radix;
@@ -80,16 +80,17 @@ static void intconv(Format *format, unsigned int radix, int upper, const char *a
 	};
 	char padchar;
 	size_t len, pre, zeroes, padding, width;
-	long n, flags;
-	unsigned long u;
-	char number[64], prefix[20];
+	long long n; 
+	long flags;
+	unsigned long long u;
+	char number[999], prefix[20];
 
 	if (radix > 36)
 		return;
 
 	flags = format->flags;
 	if (flags & FMT_long)
-		n = va_arg(format->args, long);
+		n = va_arg(format->args, long long);
 	else if (flags & FMT_short)
 		n = va_arg(format->args, int);
 	else

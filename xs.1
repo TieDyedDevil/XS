@@ -2797,9 +2797,6 @@ This is used for debugging.
 .Cr $home/.esrc ,
 .Cr /dev/null
 .SH BUGS
-Lexical scope which is shared by two variables (or closures) in a parent shell
-is split in child shells.
-.PP
 The interpreter should be properly tail recursive;
 that is, tail calls should not consume stack space.
 .PP

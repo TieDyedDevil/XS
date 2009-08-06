@@ -2,8 +2,9 @@
 
 #include "es.hxx"
 #include "print.hxx"
-
-
+#include <map> 
+#include <time.h>
+#include <stdint.h>
 /* %L -- print a list */
 static bool Lconv(Format *f) {
 	const char *fmt = (f->flags & FMT_altform) ? "%S%s" : "%s%s";
@@ -173,9 +174,14 @@ top:
 
 /* enclose -- build up a closure */
 static void enclose(Format *f, Binding *binding, const char *sep) {
+	// Map of bindings in closures to ids
+	static std::map<Binding*, uint64_t> closure_bindings;
 	if (binding != NULL) {
 		Binding *next = binding->next;
 		enclose(f, next, ";");
+		if (!closure_bindings.count(binding))
+			closure_bindings[binding] = (static_cast<uint64_t>(time(NULL)) << 32) | rand();
+		fmtprint(f, "__id__:=%0lx;", closure_bindings[binding]);
 		fmtprint(f, "%S:=%#L%s", binding->name, binding->defn, " ", sep);
 	}
 }

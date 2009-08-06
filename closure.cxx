@@ -2,6 +2,8 @@
 
 #include "es.hxx"
 #include "gc.hxx"
+#include <stdint.h>
+#include <map>
 
 /*
  * Closure garbage collection support
@@ -53,8 +55,11 @@ static Chain *chain = NULL;
 
 static Binding *extract(Tree *tree, Binding *bindings) {
 	assert(gcisblocked());
+	static std::map<uint64_t, Binding *> bindmap;
 
 	for (; tree != NULL; tree = tree->u[1].p) {
+		Tree *iddefn = tree->u[0].p;
+		tree = tree->u[1].p;
 		Tree *defn = tree->u[0].p;
 		assert(tree->kind == nList);
 		if (defn != NULL) {
@@ -98,7 +103,14 @@ static Binding *extract(Tree *tree, Binding *bindings) {
 					term = mkstr(word->u[0].s);
 				list = mklist(term, list);
 			}
-			bindings = mkbinding(name->u[0].s, list, bindings);
+
+			const char *id_s = iddefn->u[1].p->u[0].p->u[0].s;
+			int id = strtoll(id_s, NULL, 16);
+
+			if (!bindmap.count(id)) bindmap[id] = mkbinding(name->u[0].s, list, bindings);
+			// The closure should include the same outer bindings as we expect
+			assert (bindings == bindmap[id]->next); 
+			bindings = bindmap[id];
 		}
 	}
 
