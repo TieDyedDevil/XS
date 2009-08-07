@@ -76,21 +76,21 @@ extern void splitstring(const char *in, size_t len, bool endword) {
 	gcenable();
 }
 
-extern SRef<List> endsplit(void) {
+extern Ref<List> endsplit(void) {
 	if (buffer != NULL) {
-		SRef<Term> term = mkstr(sealcountedbuffer(buffer));
+		Ref<Term> term = mkstr(sealcountedbuffer(buffer));
 		value = mklist(term, value);
 		buffer = NULL;
 	}
-	SRef<List> result = reverse(value);
+	Ref<List> result = reverse(value);
 	value = NULL;
 	return result;
 }
 
-extern SRef<List> fsplit(const char *sep, SRef<List> list, bool coalesce) {
+extern Ref<List> fsplit(const char *sep, Ref<List> list, bool coalesce) {
 	startsplit(sep, coalesce);
 	for (; list; list = list->next) {
-		SRef<const char> s = getstr(list->term);
+		Ref<const char> s = getstr(list->term);
 		splitstring(s.uget(), strlen(s.uget()), true);
 	}
 	return endsplit();

@@ -6,30 +6,30 @@
 
 DefineTag(Term, static);
 
-extern SRef<Term> mkterm(SRef<const char> str, SRef<Closure> closure) {
-	SRef<Term> term = gcnew(Term);
+extern Ref<Term> mkterm(Ref<const char> str, Ref<Closure> closure) {
+	Ref<Term> term = gcnew(Term);
 	term->str = str.release();
 	term->closure = closure.release();
 	return term;
 }
 
-extern SRef<Term> mkstr(SRef<const char> str) {
-	SRef<Term> term = gcnew(Term);
+extern Ref<Term> mkstr(Ref<const char> str) {
+	Ref<Term> term = gcnew(Term);
         term->str = str.release();
 	term->closure = NULL;
         return term;
 }
 
-extern Closure *getclosure(SRef<Term> term) {
+extern Closure *getclosure(Ref<Term> term) {
 	if (term->closure == NULL) {
-		SRef<const char> s = term->str;
+		Ref<const char> s = term->str;
 		assert(s);
 		if (
 			((*s == '{' || *s == '@') && s[strlen(s.uget()) - 1] == '}')
 			|| (*s == '$' && s[1] == '&')
 			|| hasprefix(s.uget(), "%closure")
 		) {
-			SRef<Tree> np = parsestring(s.uget());
+			Ref<Tree> np = parsestring(s.uget());
 			if (np == NULL) return NULL;
 			term->closure = extractbindings(np.uget());
 			term->str = NULL;
@@ -38,9 +38,9 @@ extern Closure *getclosure(SRef<Term> term) {
 	return term->closure;
 }
 
-extern const char *getstr(SRef<Term> term) {
-	SRef<const char> s = term->str;
-	SRef<Closure> closure = term->closure;
+extern const char *getstr(Ref<Term> term) {
+	Ref<const char> s = term->str;
+	Ref<Closure> closure = term->closure;
 	assert((s == NULL) != (closure == NULL));
 	if (s != NULL)
 		return s.release();
@@ -55,7 +55,7 @@ extern const char *getstr(SRef<Term> term) {
 #endif
 }
 
-extern SRef<Term> termcat(SRef<Term> t1, SRef<Term> t2) {
+extern Ref<Term> termcat(Ref<Term> t1, Ref<Term> t2) {
 	if (t1 == NULL)
 		return t2.release();
 	if (t2 == NULL)

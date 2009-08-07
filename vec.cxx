@@ -12,9 +12,9 @@ size_t vector_size(const Vector *v) {
 	return reinterpret_cast<const char*>(v->vector + v->alloclen + 1) - reinterpret_cast<const char*>(v);
 }
 
-extern SRef<Vector> mkvector(int n) {
+extern Ref<Vector> mkvector(int n) {
 	int i;
-	SRef<Vector> v = reinterpret_cast<Vector*>(gcalloc(offsetof(Vector, vector[0]) + (n + 1) * sizeof(char*), &VectorTag));
+	Ref<Vector> v = reinterpret_cast<Vector*>(gcalloc(offsetof(Vector, vector[0]) + (n + 1) * sizeof(char*), &VectorTag));
 	v->alloclen = n;
 	v->count = 0;
 	for (i = 0; i <= n; i++)
@@ -37,9 +37,9 @@ static size_t VectorScan(void *p) {
 	return vector_size(v);;
 }
 
-extern SRef<Vector> vectorize(SRef<List> list) {
+extern Ref<Vector> vectorize(Ref<List> list) {
 	int n = length(list.uget());
-	SRef<Vector> v = mkvector(n);
+	Ref<Vector> v = mkvector(n);
 	v->count = n; /* GC may forward extra NULL pointers, no matter */
 	for (int i = 0; list != NULL; list = list->next, i++) {
 		/* gcdup() must occur _before_ v->vector[i] because
@@ -58,7 +58,7 @@ extern int qstrcmp(const char *s1, const char *s2) {
 }
 
 /* sortvector */
-extern void sortvector(SRef<Vector> v) {
+extern void sortvector(Ref<Vector> v) {
 	assert(v->vector[v->count] == NULL);
 	std::sort(v->vector, v->vector + v->count, qstrcmp);
 }

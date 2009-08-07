@@ -7,12 +7,12 @@
 	both leading to bad things
    Works fine with non-gc pointers too (although it doesn't auto-free them)
 
-   You should NOT, as an exception, form an SRef to an object with a custom scanner/copier
+   You should NOT, as an exception, form an Ref to an object with a custom scanner/copier
    while that scanner/copier would not operate correctly, if the object you are creating
    will not be setup properly by the next possible gc run (gc(), gcenable(), or any gc allocation)
 */
 template <class T>
-class SRef {
+class Ref {
 #include "gc_ptr1.hxx"
 	public:
 		T& operator*() const {
@@ -26,7 +26,7 @@ class SRef {
 };
 
 template<>
-class SRef<void> {
+class Ref<void> {
 	typedef void T;
 #include "gc_ptr1.hxx"
 };

@@ -26,7 +26,7 @@ extern void fail (const char * from,  const char * fmt, ...) {
 	List *x;
 	{
 		gcdisable();
-		SRef<List> e = mklist(mkstr("error"),
+		Ref<List> e = mklist(mkstr("error"),
 			      	mklist(mkstr((char *) from),
 				     	mklist(mkstr(s), NULL)));
 		while (gcisblocked())

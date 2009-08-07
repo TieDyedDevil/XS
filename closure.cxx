@@ -11,8 +11,8 @@
 
 DefineTag(Closure, static);
 
-extern Closure *mkclosure(SRef<Tree> tree, SRef<Binding> binding) {
-	SRef<Closure> closure = gcnew(Closure);
+extern Closure *mkclosure(Ref<Tree> tree, Ref<Binding> binding) {
+	Ref<Closure> closure = gcnew(Closure);
 	closure->tree = tree.release();
 	closure->binding = binding.release();
 	return closure.release();;
@@ -68,7 +68,7 @@ static Binding *extract(Tree *tree, Binding *bindings) {
 			assert(name->kind == nWord || name->kind == nQword);
 			defn = revtree(defn->u[1].p);
 			for (; defn != NULL; defn = defn->u[1].p) {
-				SRef<Term> term;
+				Ref<Term> term;
 				Tree *word = defn->u[0].p;
 				NodeKind k = word->kind;
 				assert(defn->kind == nList);
@@ -145,7 +145,7 @@ extern Closure *extractbindings(Tree *tree0) {
 
 	chain = chain->next;
 
-	SRef<Closure> result = me.closure;
+	Ref<Closure> result = me.closure;
 	result->tree = tree;
 	result->binding = bindings;
 	gcenable();
@@ -159,10 +159,10 @@ extern Closure *extractbindings(Tree *tree0) {
 
 DefineTag(Binding, static);
 
-extern Binding *mkbinding(SRef<const char> name, SRef<List> defn, SRef<Binding> next) {
+extern Binding *mkbinding(Ref<const char> name, Ref<List> defn, Ref<Binding> next) {
 	assert(next == NULL || next->name != NULL);
 	validatevar(name.uget());
-	SRef<Binding> binding = gcnew(Binding);
+	Ref<Binding> binding = gcnew(Binding);
 	binding->name = name.release();
 	binding->defn = defn.release();
 	binding->next = next.release();

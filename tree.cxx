@@ -13,12 +13,12 @@ static Tree* tgcalloc(size_t s, Tag *t) {
 /* mk -- make a new node; used to generate the parse tree */
 extern Tree *mk (NodeKind  t, ...) {
 	va_list ap;
-	SRef<Tree> n;
+	Ref<Tree> n;
 
 	/* There is no way to make this gc-safe
 	 * because var-args are inherently
 	 * not gc-safe (can't pass
-	 * SRef's through them)
+	 * Ref's through them)
 	 */
 	gcdisable();
 	va_start(ap, t);

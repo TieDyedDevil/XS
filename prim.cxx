@@ -5,8 +5,8 @@
 
 static Dict *prims;
 
-extern SRef<List> prim(const char *s, SRef<List> list, SRef<Binding> binding, int evalflags) {
-	typedef SRef<List> (*Prim)(SRef<List>, SRef<Binding>, int);
+extern Ref<List> prim(const char *s, Ref<List> list, Ref<Binding> binding, int evalflags) {
+	typedef Ref<List> (*Prim)(Ref<List>, Ref<Binding>, int);
 	Prim p = reinterpret_cast<Prim>(dictget(prims, s));
 	if (p == NULL) fail("es:prim", "unknown primitive: %s", s);
 	return (*p)(list, binding, evalflags);

@@ -1,18 +1,18 @@
 	public: 
-		SRef() : ref(NULL) {
+		Ref() : ref(NULL) {
 			addroot();
 		}
-		SRef(const SRef<T>& orig) : ref(orig.ref) {
+		Ref(const Ref<T>& orig) : ref(orig.ref) {
 			addroot();
 		}
-		SRef(T* x) : ref(x) {
+		Ref(T* x) : ref(x) {
 			addroot();
 		}
-		SRef& operator=(const SRef<T>& x) {
+		Ref& operator=(const Ref<T>& x) {
 			ref = x.ref;
 			return *this;
 		}
-		SRef& operator=(T* p) {
+		Ref& operator=(T* p) {
 			ref = p;
 			return *this;
 		}
@@ -30,13 +30,13 @@
 			assert (reinterpret_cast<void*>(x) == NULL);
 			return ref == reinterpret_cast<T*>(x);
 		}
-		bool operator==(SRef<T> x) const {
+		bool operator==(Ref<T> x) const {
 			return ref == x.ref;
 		}
 		bool operator!=(T *x) const {
 			return ref != x;
 		}
-		bool operator!=(SRef<T> x) const {
+		bool operator!=(Ref<T> x) const {
 			return ref != x.ref;
 		}
 		bool operator!=(int x) const {
@@ -44,7 +44,7 @@
 			return ref != reinterpret_cast<T*>(x);
 		}
 
-		~SRef() {
+		~Ref() {
 			if (&root == rootlist) {
 				/* MUST use c-cast here because we don't
 				 * know if we should const_cast or not

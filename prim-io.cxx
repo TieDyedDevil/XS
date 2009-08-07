@@ -16,7 +16,7 @@ static int getnumber(const char *s) {
 	return result;
 }
 
-static SRef<List> redir(SRef<List> (*rop)(int *fd, SRef<List> list), SRef<List> list, int evalflags) {
+static Ref<List> redir(Ref<List> (*rop)(int *fd, Ref<List> list), Ref<List> list, int evalflags) {
 	int destfd, srcfd;
 	volatile int inparent = (evalflags & eval_inchild) == 0;
 	volatile int ticket = UNREGISTERED;
@@ -39,7 +39,7 @@ static SRef<List> redir(SRef<List> (*rop)(int *fd, SRef<List> list), SRef<List> 
 	return list;
 }
 
-#define	REDIR(name)	static SRef<List> CONCAT(redir_,name)(int *srcfdp, SRef<List> list)
+#define	REDIR(name)	static Ref<List> CONCAT(redir_,name)(int *srcfdp, Ref<List> list)
 
 static void argcount(const char *s) NORETURN;
 static void argcount(const char *s) {
@@ -89,7 +89,7 @@ PRIM(openfile) {
 	if (length(list) != 4)
 		argcount("%openfile mode fd file cmd");
 	/* transpose the first two elements */
-	SRef<List> lp = list->next;
+	Ref<List> lp = list->next;
 	list->next = lp->next;
 	lp->next = list.release();
 	return redir(redir_openfile, lp.release(), evalflags);
@@ -240,11 +240,11 @@ PRIM(pipe) {
 		close(p[1]);
 	}
 
-	SRef<List> result;
+	Ref<List> result;
 	do {
 		int status = ewaitfor(pids[--n]);
 		printstatus(0, status);
-		SRef<Term> t = mkstr(mkstatus(status));
+		Ref<Term> t = mkstr(mkstatus(status));
 		result = mklist(t, result);
 	} while (0 < n);
 	if (evalflags & eval_inchild)
@@ -258,11 +258,11 @@ PRIM(readfrom) {
 	caller = "$&readfrom";
 	if (length(list) != 3)
 		argcount("%readfrom var input cmd");
-	SRef<const char> var = getstr(list->term);
+	Ref<const char> var = getstr(list->term);
 	list = list->next;
-	SRef<Term> input = list->term;
+	Ref<Term> input = list->term;
 	list = list->next;
-	SRef<Term> cmd = list->term;
+	Ref<Term> cmd = list->term;
 
 	if ((pid = pipefork(p, NULL)) == 0) {
 		try {
@@ -300,11 +300,11 @@ PRIM(writeto) {
 	caller = "$&writeto";
 	if (length(list) != 3)
 		argcount("%writeto var output cmd");
-	SRef<const char> var = getstr(list->term);
+	Ref<const char> var = getstr(list->term);
 	list = list->next;
-	SRef<Term> output = list->term;
+	Ref<Term> output = list->term;
 	list = list->next;
-	SRef<Term> cmd = list->term;
+	Ref<Term> cmd = list->term;
 
 	if ((pid = pipefork(p, NULL)) == 0) {
 		try {
@@ -364,7 +364,7 @@ PRIM(backquote) {
 	if (list == NULL)
 		fail(caller, "usage: backquote separator command [args ...]");
 
-	SRef<const char> sep = getstr(list->term);
+	Ref<const char> sep = getstr(list->term);
 	list = list->next;
 
 	if ((pid = pipefork(p, NULL)) == 0) {

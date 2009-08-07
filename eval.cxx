@@ -4,14 +4,14 @@
 
 unsigned long evaldepth = 0, maxevaldepth = MAXmaxevaldepth;
 
-static void failexec(SRef<const char> file, SRef<List> args) NORETURN;
-static void failexec(SRef<const char> file, SRef<List> args) {
+static void failexec(Ref<const char> file, Ref<List> args) NORETURN;
+static void failexec(Ref<const char> file, Ref<List> args) {
 	List *fn;
 	assert(gcisblocked());
 	fn = varlookup("fn-%exec-failure", NULL);
 	if (fn != NULL) {
 		int olderror = errno;
-		SRef<List> list = append(fn, mklist(mkstr(file.release()), args.release()));
+		Ref<List> list = append(fn, mklist(mkstr(file.release()), args.release()));
 		gcenable();
 		eval(list.release(), NULL, 0);
 		errno = olderror;
@@ -23,7 +23,7 @@ static void failexec(SRef<const char> file, SRef<List> args) {
 /* forkexec -- fork (if necessary) and exec */
 extern List *forkexec(const char *file, List *list, bool inchild) {
 	gcdisable();
-	SRef<Vector> env = mkenv();
+	Ref<Vector> env = mkenv();
 	int pid = efork(!inchild, false);
 	if (pid == 0) {
 		execve(file, vectorize(list)->vector, env->vector);
@@ -42,20 +42,20 @@ extern List *forkexec(const char *file, List *list, bool inchild) {
 }
 
 /* assign -- bind a list of values to a list of variables */
-static List *assign(SRef<Tree> varform, SRef<Tree> valueform, SRef<Binding> binding) {
-	SRef<List> result = NULL;
+static List *assign(Ref<Tree> varform, Ref<Tree> valueform, Ref<Binding> binding) {
+	Ref<List> result = NULL;
 
-	SRef<List> vars = glom(varform.release(), binding.uget(), false);
+	Ref<List> vars = glom(varform.release(), binding.uget(), false);
 
 	if (vars == NULL)
 		fail("es:assign", "null variable name");
 
-	SRef<List> values = glom(valueform.release(), binding.uget(), true);
+	Ref<List> values = glom(valueform.release(), binding.uget(), true);
 	result = values;
 
 	for (; vars != NULL; vars = vars->next) {
-		SRef<List> value;
-		SRef<const char> name = getstr(vars->term);
+		Ref<List> value;
+		Ref<const char> name = getstr(vars->term);
 		if (values == NULL)
 			value = NULL;
 		else if (vars->next == NULL || values->next == NULL) {
@@ -72,24 +72,24 @@ static List *assign(SRef<Tree> varform, SRef<Tree> valueform, SRef<Binding> bind
 }
 
 /* letbindings -- create a new Binding containing let-bound (lexical) variables */
-static Binding *letbindings(SRef<Tree> defn, SRef<Binding> binding,
-			    SRef<Binding> context, int evalflags) {
+static Binding *letbindings(Ref<Tree> defn, Ref<Binding> binding,
+			    Ref<Binding> context, int evalflags) {
 	for (; defn != NULL; defn = defn->u[1].p) {
 		assert(defn->kind == nList);
 		if (defn->u[0].p == NULL)
 			continue;
 
-		SRef<Tree> assign = defn->u[0].p;
+		Ref<Tree> assign = defn->u[0].p;
 		assert(assign->kind == nAssign);
-		SRef<List> vars = glom(assign->u[0].p, context.uget(), false);
-		SRef<List> values = glom(assign->u[1].p, context.uget(), true);
+		Ref<List> vars = glom(assign->u[0].p, context.uget(), false);
+		Ref<List> values = glom(assign->u[1].p, context.uget(), true);
 
 		if (vars == NULL)
 			fail("es:let", "null variable name");
 
 		for (; vars != NULL; vars = vars->next) {
-			SRef<List> value;
-			SRef<const char> name = getstr(vars->term);
+			Ref<List> value;
+			Ref<const char> name = getstr(vars->term);
 			if (values == NULL)
 				value = NULL;
 			else if (vars->next == NULL || values->next == NULL) {
@@ -107,12 +107,12 @@ static Binding *letbindings(SRef<Tree> defn, SRef<Binding> binding,
 }
 
 /* localbind -- recursively convert a Bindings list into dynamic binding */
-static List *localbind(SRef<Binding> dynamic, SRef<Binding> lexical,
-		       SRef<Tree> body, int evalflags) {
+static List *localbind(Ref<Binding> dynamic, Ref<Binding> lexical,
+		       Ref<Tree> body, int evalflags) {
 	if (!dynamic)
 		return walk(body.uget(), lexical.uget(), evalflags);
 	else {
-		SRef<List> result;
+		Ref<List> result;
 		Push p(dynamic->name, dynamic->defn);
 		result = localbind(dynamic->next, lexical, body, evalflags);
 		return result.release();
@@ -120,32 +120,32 @@ static List *localbind(SRef<Binding> dynamic, SRef<Binding> lexical,
 }
 
 /* local -- build, recursively, one layer of local assignment */
-static List *local(Tree *defn, SRef<Tree> body,
-		   SRef<Binding> bindings, int evalflags) {
-	SRef<Binding> dynamic =
+static List *local(Tree *defn, Ref<Tree> body,
+		   Ref<Binding> bindings, int evalflags) {
+	Ref<Binding> dynamic =
 	    reversebindings(letbindings(defn, NULL, bindings, evalflags));
 	return localbind(dynamic, bindings, body, evalflags);
 }
 
 /* forloop -- evaluate a for loop */
-static List *forloop(SRef<Tree> defn, SRef<Tree> body,
-		     SRef<Binding> outer, int evalflags) {
+static List *forloop(Ref<Tree> defn, Ref<Tree> body,
+		     Ref<Binding> outer, int evalflags) {
 	static List MULTIPLE = { NULL, NULL };
 
-	SRef<List> result = ltrue;
-	SRef<Binding> looping = NULL;
+	Ref<List> result = ltrue;
+	Ref<Binding> looping = NULL;
 	for (; defn != NULL; defn = defn->u[1].p) {
 		assert(defn->kind == nList);
 		if (defn->u[0].p == NULL)
 			continue;
-		SRef<Tree> assign = defn->u[0].p;
+		Ref<Tree> assign = defn->u[0].p;
 		assert(assign->kind == nAssign);
-		SRef<List> vars = glom(assign->u[0].p, outer.uget(), false);
-		SRef<List> list = glom(assign->u[1].p, outer.uget(), true);
+		Ref<List> vars = glom(assign->u[0].p, outer.uget(), false);
+		Ref<List> list = glom(assign->u[1].p, outer.uget(), true);
 		if (vars == NULL)
 			fail("es:for", "null variable name");
 		for (; vars != NULL; vars = vars->next) {
-			SRef<const char> var = getstr(vars->term);
+			Ref<const char> var = getstr(vars->term);
 			looping = mkbinding(var.release(), list.uget(), looping.release());
 			list = &MULTIPLE;
 		}
@@ -154,8 +154,8 @@ static List *forloop(SRef<Tree> defn, SRef<Tree> body,
 	looping = reversebindings(looping.release());
 
 	bool allnull;
-	SRef<Binding> bp, lp, sequence; 
-	SRef<List> value;
+	Ref<Binding> bp, lp, sequence; 
+	Ref<List> value;
 
 	try {
 		for (;;) {
@@ -191,23 +191,23 @@ static List *forloop(SRef<Tree> defn, SRef<Tree> body,
 }
 
 /* matchpattern -- does the text match a pattern? */
-static List *matchpattern(SRef<Tree> subjectform, SRef<Tree> patternform,
-			  SRef<Binding> binding) {
+static List *matchpattern(Ref<Tree> subjectform, Ref<Tree> patternform,
+			  Ref<Binding> binding) {
 	StrList *quote = NULL;
-	SRef<List> subject = glom(subjectform.release(), binding.uget(), true);
-	SRef<List> pattern = glom2(patternform.uget(), binding.uget(), &quote);
+	Ref<List> subject = glom(subjectform.release(), binding.uget(), true);
+	Ref<List> pattern = glom2(patternform.uget(), binding.uget(), &quote);
 	return listmatch(subject.release(), pattern.release(), quote) 
 		? ltrue 
 		: lfalse;
 }
 
 /* extractpattern -- Like matchpattern, but returns matches */
-static List *extractpattern(SRef<Tree> subjectform, SRef<Tree> patternform,
-			    SRef<Binding> binding) {
+static List *extractpattern(Ref<Tree> subjectform, Ref<Tree> patternform,
+			    Ref<Binding> binding) {
 	StrList *quote = NULL;
-	SRef<List> result = NULL;
-	SRef<List> subject = glom(subjectform.uget(), binding.uget(), true);
-	SRef<List> pattern = glom2(patternform.uget(), binding.uget(), &quote);
+	Ref<List> result = NULL;
+	Ref<List> subject = glom(subjectform.uget(), binding.uget(), true);
+	Ref<List> pattern = glom2(patternform.uget(), binding.uget(), &quote);
 	result = (List *) extractmatches(subject.release(), pattern.release(), quote);
 	return result.release();
 }
@@ -227,8 +227,8 @@ top:
 
 	    case nConcat: case nList: case nQword: case nVar: case nVarsub:
 	    case nWord: case nThunk: case nLambda: case nCall: case nPrim: {
-		SRef<Binding> bp = binding;
-		SRef<List> list = glom(tree, bp.uget(), true);
+		Ref<Binding> bp = binding;
+		Ref<List> list = glom(tree, bp.uget(), true);
 		binding = bp.release();
 		return eval(list, binding, flags);
 	    }
@@ -237,7 +237,7 @@ top:
 		return assign(tree->u[0].p, tree->u[1].p, binding);
 
 	    case nLet: case nClosure: {
-		SRef<Tree> body = tree->u[1].p;
+		Ref<Tree> body = tree->u[1].p;
 		binding = letbindings(tree->u[0].p, binding, binding, flags);
 		tree = body.release();
 	    }
@@ -263,13 +263,13 @@ top:
 }
 
 /* bindargs -- bind an argument list to the parameters of a lambda */
-extern Binding *bindargs(SRef<Tree> params, SRef<List> args, SRef<Binding> binding) {
+extern Binding *bindargs(Ref<Tree> params, Ref<List> args, Ref<Binding> binding) {
 	if (!params) return mkbinding("*", args.release(), binding.release());
 
 	for (; params; params = params->u[1].p) {
-		SRef<List> value;
+		Ref<List> value;
 		assert(params->kind == nList);
-		SRef<Tree> param = params->u[0].p;
+		Ref<Tree> param = params->u[0].p;
 		assert(param->kind == nWord || param->kind == nQword);
 		if (args == NULL)
 			value = NULL;
@@ -308,15 +308,15 @@ class Depth_tracker {
 };
 
 /* eval -- evaluate a list, producing a list */
-extern List *eval(SRef<List> list, SRef<Binding> binding, int flags) {
+extern List *eval(Ref<List> list, Ref<Binding> binding, int flags) {
 	Closure *volatile cp;
 
 	Depth_tracker t;
 
-	SRef<const char> name;
+	Ref<const char> name;
 
-	SRef<const char> funcname = NULL;
-	SRef<List> fn;
+	Ref<const char> funcname = NULL;
+	Ref<List> fn;
 
 restart:
 	if (list == NULL) return ltrue;
@@ -333,8 +333,8 @@ restart:
 			break;
 		    case nLambda:
 		    {
-			SRef<Tree> tree = cp->tree;
-			SRef<Binding> context;
+			Ref<Tree> tree = cp->tree;
+			Ref<Binding> context;
 			      
 			try {
 				context =  bindargs(tree->u[0].p,

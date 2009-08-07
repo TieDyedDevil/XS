@@ -27,10 +27,10 @@ static bool specialvar(const char *name) {
 	return (*name == '*' || *name == '0') && name[1] == '\0';
 }
 
-static bool hasbindings(SRef<List> list) {
+static bool hasbindings(Ref<List> list) {
 	for (; list != NULL; list = list->next)
 		if (isclosure(list->term)) {
-			SRef<Closure> closure = getclosure(list->term);
+			Ref<Closure> closure = getclosure(list->term);
 			assert(closure != NULL);
 			if (closure->binding != NULL)
 				return true;
@@ -38,8 +38,8 @@ static bool hasbindings(SRef<List> list) {
 	return false;
 }
 
-static Var *mkvar(SRef<List> defn) {
-	SRef<Var> var = gcnew(Var);
+static Var *mkvar(Ref<List> defn) {
+	Ref<Var> var = gcnew(Var);
 	var->env = NULL;
 	var->flags = hasbindings(defn) ? var_hasbindings : 0;
 	var->defn = defn.release();
@@ -111,11 +111,11 @@ extern void setnoexport(List *list) {
 }
 
 /* varlookup -- lookup a variable in the current context */
-extern List *varlookup(SRef<const char> name, SRef<Binding> bp) {
-	SRef<Var> var;
+extern List *varlookup(Ref<const char> name, Ref<Binding> bp) {
+	Ref<Var> var;
 
 	if (iscounting(name.uget())) {
-		SRef<Term> term = nth(varlookup("*", bp), strtol(name.uget(), NULL, 10));
+		Ref<Term> term = nth(varlookup("*", bp), strtol(name.uget(), NULL, 10));
 		if (term == NULL)
 			return NULL;
 		return mklist(term, NULL);
@@ -145,8 +145,8 @@ extern List *varlookup2(const char *name1, const char *name2, Binding *bp) {
 	return var->defn;
 }
 
-static List *callsettor(SRef<const char> name, SRef<List> defn) {
-	SRef<List> settor;
+static List *callsettor(Ref<const char> name, Ref<List> defn) {
+	Ref<List> settor;
 
 	if (specialvar(name.uget()) || (settor = varlookup2("set-", name.uget(), NULL)) == NULL)
 		return defn.release();
@@ -158,7 +158,7 @@ static List *callsettor(SRef<const char> name, SRef<List> defn) {
 	return defn.release();
 }
 
-extern void vardef(SRef<const char> name, SRef<Binding> binding, SRef<List> defn) {
+extern void vardef(Ref<const char> name, Ref<Binding> binding, Ref<List> defn) {
 	validatevar(name.uget());
 	for (; binding != NULL; binding = binding->next)
 		if (streq(name.uget(), binding->name)) {
@@ -171,7 +171,7 @@ extern void vardef(SRef<const char> name, SRef<Binding> binding, SRef<List> defn
 	if (isexported(name.uget()))
 		isdirty = true;
 
-	SRef<Var> var = reinterpret_cast<Var*>(dictget(vars, name.uget()));
+	Ref<Var> var = reinterpret_cast<Var*>(dictget(vars, name.uget()));
 	if (var != NULL) {
 		if (defn != NULL) {
 			var->defn = defn.uget();
@@ -259,14 +259,14 @@ static void mkenv0(void *dummy, const char *key, void *value) {
 	assert(env->count < env->alloclen);
 	env->vector[env->count++] = var->env;
 	if (env->count == env->alloclen) {
-		SRef<Vector> newenv = mkvector(env->alloclen * 2);
+		Ref<Vector> newenv = mkvector(env->alloclen * 2);
 		newenv->count = env->count;
 		memcpy(newenv->vector, env->vector, env->count * sizeof *env->vector);
 		env = newenv.release();
 	}
 }
 	
-extern SRef<Vector> mkenv(void) {
+extern Ref<Vector> mkenv(void) {
 	if (isdirty || rebound) {
 		env->count = envmin;
 		gcdisable();		/* TODO: make this a good guess */
@@ -287,7 +287,7 @@ extern SRef<Vector> mkenv(void) {
 /* addtolist -- dictforall procedure to create a list */
 extern void addtolist(void *arg, const char *key, void *value) {
 	List **listp = reinterpret_cast<List**>(arg);
-	SRef<Term> term = mkstr(key);
+	Ref<Term> term = mkstr(key);
 	*listp = mklist(term, *listp);
 }
 
@@ -303,7 +303,7 @@ static void listinternal(void *arg, const char *key, void *value) {
 
 /* listvars -- return a list of all the (dynamic) variables */
 extern List *listvars(bool internal) {
-	SRef<List> varlist;
+	Ref<List> varlist;
 	dictforall(vars, internal ? listinternal : listexternal, &varlist);
 	return (varlist = sortlist(varlist.uget())).release();
 }
@@ -330,14 +330,14 @@ extern void initvars(void) {
 }
 
 /* importvar -- import a single environment variable */
-static void importvar(SRef<char> name, SRef<char> value) {
+static void importvar(Ref<char> name, Ref<char> value) {
 	char sep[2] = { ENV_SEPARATOR, '\0' };
 
-	SRef<List> defn;
+	Ref<List> defn;
 	defn = fsplit(sep, mklist(mkstr(value.uget() + 1), NULL), false);
 
 	if (strchr(value.uget(), ENV_ESCAPE) != NULL) {
-		SRef<List> list;
+		Ref<List> list;
 		for (list = defn; list != NULL; list = list->next) {
 			int offset = 0;
 			const char *word = list->term->str;
@@ -394,7 +394,7 @@ extern void initenv(char **envp, bool isprotected) {
 		if (eq == NULL) {
 			env->vector[env->count++] = envstr;
 			if (env->count == env->alloclen) {
-				SRef<Vector> newenv = mkvector(env->alloclen * 2);
+				Ref<Vector> newenv = mkvector(env->alloclen * 2);
 				newenv->count = env->count;
 				memcpy(newenv->vector, env->vector,
 				       env->count * sizeof *env->vector);

@@ -527,8 +527,8 @@ extern void *gcalloc(size_t nbytes, Tag *tag) {
 #define notstatic
 DefineTag(String, notstatic);
 
-extern char *gcndup(SRef<const char> s, size_t n) {
-	SRef<char> ns = reinterpret_cast<char*>(gcalloc((n + 1) * sizeof (char), &StringTag));
+extern char *gcndup(Ref<const char> s, size_t n) {
+	Ref<char> ns = reinterpret_cast<char*>(gcalloc((n + 1) * sizeof (char), &StringTag));
 	memcpy(ns.uget(), s.uget(), n);
 	ns[n] = '\0';
 	assert(strlen(ns.uget()) == n);

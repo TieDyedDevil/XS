@@ -167,10 +167,10 @@ top:
 
 PRIM(apids) {
 	Proc *p;
-	SRef<List> lp;
+	Ref<List> lp;
 	for (p = proclist; p != NULL; p = p->next)
 		if (p->background && p->alive) {
-			SRef<Term> t = mkstr(str("%d", p->pid));
+			Ref<Term> t = mkstr(str("%d", p->pid));
 			lp = mklist(t, lp);
 		}
 	/* TODO: sort the return value, but by number? */

@@ -143,7 +143,7 @@ PRIM(access) {
 
 		if (first) {
 			if (error == 0) {
-				SRef<List> result = 
+				Ref<List> result = 
 					mklist(mkstr(suffix == NULL
 							? name
 							: gcdup(name)),
@@ -165,7 +165,7 @@ PRIM(access) {
 			fail("$&access", "%s", esstrerror(estatus));
 	}
 
-	SRef<List> result = reverse(lp);
+	Ref<List> result = reverse(lp);
 	gcenable();
 	return result;
 }

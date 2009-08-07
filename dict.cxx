@@ -115,19 +115,19 @@ static Assoc *get(Dict *dict, const char *name) {
 	return NULL;
 }
 
-static Dict *put(SRef<Dict> dict, SRef<const char> name, SRef<void> value);
+static Dict *put(Ref<Dict> dict, Ref<const char> name, Ref<void> value);
 static void putForAll(void *dict, const char *name, void *value) {
 	put(reinterpret_cast<Dict*>(dict), name, value);
 }
 
-static Dict *put(SRef<Dict> dict, SRef<const char> name, SRef<void> value) {
+static Dict *put(Ref<Dict> dict, Ref<const char> name, Ref<void> value) {
 	unsigned long n, mask;
 	Assoc *ap;
 	assert(get(dict.uget(), name.uget()) == NULL);
 	assert(value != NULL);
 
 	if (dict->remain <= 1) {
-		SRef<Dict> newDict;
+		Ref<Dict> newDict;
 		newDict = mkdict0(grow(dict->size));
 		dictforall(dict.uget(), putForAll, newDict.uget());
 		dict = newDict;
@@ -191,7 +191,7 @@ extern Dict *dictput(Dict *dict, const char *name, void *value) {
 	return dict;
 }
 
-extern void dictforall(SRef<Dict> dict, void (*proc)(void *, const char *, void *), SRef<void> argp) {
+extern void dictforall(Ref<Dict> dict, void (*proc)(void *, const char *, void *), Ref<void> argp) {
 	int i;
 	for (i = 0; i < dict->size; i++) {
 		Assoc *ap = &dict->table[i];

@@ -53,12 +53,12 @@ PRIM(dot) {
 		case 'x':	runflags |= run_printcmds;	break;
 		}
 
-	SRef<List> result;
-	SRef<List> lp = esoptend();
+	Ref<List> result;
+	Ref<List> lp = esoptend();
 	if (lp == NULL)
 		fail("$&dot", "usage: %s", usage);
 
-	SRef<const char> file = getstr(lp->term);
+	Ref<const char> file = getstr(lp->term);
 	lp = lp->next;
 	fd = eopen(file.uget(), oOpen);
 	if (fd == -1)
@@ -84,10 +84,10 @@ PRIM(whatis) {
 	/* the logic in here is duplicated in eval() */
 	if (list == NULL || list->next != NULL)
 		fail("$&whatis", "usage: $&whatis program");
-	SRef<Term> term = list->term;
+	Ref<Term> term = list->term;
 	if (getclosure(term) == NULL) {
 		List *fn;
-		SRef<const char> prog = getstr(term);
+		Ref<const char> prog = getstr(term);
 		assert(prog != NULL);
 		fn = varlookup2("fn-", prog.uget(), binding.uget());
 		if (fn != NULL)
@@ -107,7 +107,7 @@ PRIM(whatis) {
 PRIM(split) {
 	if (list == NULL)
 		fail("$&split", "usage: %%split separator [args ...]");
-	SRef<List> lp = list;
+	Ref<List> lp = list;
 	const char *sep = getstr(lp->term);
 	lp = fsplit(sep, lp->next, true);
 	return lp;
@@ -116,7 +116,7 @@ PRIM(split) {
 PRIM(fsplit) {
 	if (list == NULL)
 		fail("$&fsplit", "usage: %%fsplit separator [args ...]");
-	SRef<List> lp = list;
+	Ref<List> lp = list;
 	const char *sep = getstr(lp->term);
 	lp = fsplit(sep, lp->next, false);
 	return lp;
@@ -125,11 +125,11 @@ PRIM(fsplit) {
 PRIM(var) {
 	if (list == NULL)
 		return NULL;
-	SRef<List> rest = list->next;
-	SRef<const char> name = getstr(list->term);
-	SRef<List> defn = varlookup(name, NULL);
+	Ref<List> rest = list->next;
+	Ref<const char> name = getstr(list->term);
+	Ref<List> defn = varlookup(name, NULL);
 	rest = prim_var(rest, NULL, evalflags);
-	SRef<Term> term = mkstr(str("%S = %#L", name.uget(), defn.uget(), " "));
+	Ref<Term> term = mkstr(str("%S = %#L", name.uget(), defn.uget(), " "));
 	list = mklist(term, rest);
 	return list;
 }
@@ -146,8 +146,8 @@ PRIM(sethistory) {
 PRIM(parse) {
 	List *result;
 	Tree *tree;
-	SRef<const char> prompt1 = NULL;
-	SRef<const char> prompt2 = NULL;
+	Ref<const char> prompt1 = NULL;
+	Ref<const char> prompt2 = NULL;
 	if (list != NULL) {
 		prompt1 = getstr(list->term);
 		if ((list = list->next) != NULL)
@@ -166,8 +166,8 @@ PRIM(exitonfalse) {
 }
 
 PRIM(batchloop) {
-	SRef<List> result = ltrue;
-	SRef<List> dispatch;
+	Ref<List> result = ltrue;
+	Ref<List> dispatch;
 
 	SIGCHK();
 
@@ -228,11 +228,11 @@ PRIM(isinteractive) {
 PRIM(noreturn) {
 	if (list == NULL)
 		fail("$&noreturn", "usage: $&noreturn lambda args ...");
-	SRef<Closure> closure = getclosure(list->term);
+	Ref<Closure> closure = getclosure(list->term);
 	if (closure == NULL || closure->tree->kind != nLambda)
 		fail("$&noreturn", "$&noreturn: %E is not a lambda", list->term);
-	SRef<Tree> tree = closure->tree;
-	SRef<Binding> context = bindargs(tree->u[0].p, list->next, closure->binding);
+	Ref<Tree> tree = closure->tree;
+	Ref<Binding> context = bindargs(tree->u[0].p, list->next, closure->binding);
 	list = walk(tree->u[1].p, context.release(), evalflags);
 	return list;
 }

@@ -9,9 +9,9 @@
 
 DefineTag(List, static);
 
-extern List *mklist(SRef<Term> term, SRef<List> next) {
+extern List *mklist(Ref<Term> term, Ref<List> next) {
 	assert(term != NULL);
-	SRef<List> list = gcnew(List);
+	Ref<List> list = gcnew(List);
 	list->term = term.release();
 	list->next = next.release();
 	return list.release();
@@ -50,7 +50,7 @@ extern List *reverse(List *list) {
 }
 
 /* append -- merge two lists, non-destructively */
-extern List *append(SRef<List> head, SRef<List> tail) {
+extern List *append(Ref<List> head, Ref<List> tail) {
 	List *lp, **prevp;
 	gcreserve(40 * sizeof (List));
 	gcdisable();
@@ -62,7 +62,7 @@ extern List *append(SRef<List> head, SRef<List> tail) {
 	}
 	*prevp = tail.release();
 
-	SRef<List> result = lp;
+	Ref<List> result = lp;
 	gcenable();
 	return result.release();
 }
@@ -73,7 +73,7 @@ extern List *listcopy(List *list) {
 }
 
 /* length -- lenth of a list */
-extern int length(SRef<List> list) {
+extern int length(Ref<List> list) {
 	int len = 0;
 	for (; list != NULL; list = list->next)
 		++len;
@@ -103,18 +103,18 @@ extern Term *nth(List *list, int n) {
 	return NULL;
 }
 
-static List *listify(SRef<Vector> v) {
-	SRef<List> list;
+static List *listify(Ref<Vector> v) {
+	Ref<List> list;
 	while (v->count > 0) {
-		SRef<Term> term = mkstr(v->vector[--v->count]);
+		Ref<Term> term = mkstr(v->vector[--v->count]);
 		list = mklist(term, list);
 	}
 	return list.release();
 }
 
 /* sortlist */
-extern SRef<List> sortlist(SRef<List> list) {
-	SRef<Vector> v = vectorize(list);
+extern Ref<List> sortlist(Ref<List> list) {
+	Ref<Vector> v = vectorize(list);
 	sortvector(v);
 	return listify(v);
 }

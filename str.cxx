@@ -90,9 +90,9 @@ extern char *mprint (const char * fmt, ...) {
 
 DefineTag(StrList, static);
 
-extern SRef<StrList> mkstrlist(SRef<const char> str, SRef<StrList> next) {
+extern Ref<StrList> mkstrlist(Ref<const char> str, Ref<StrList> next) {
 	assert(str != NULL);
-	SRef<StrList> list = gcnew(StrList);
+	Ref<StrList> list = gcnew(StrList);
 	list->str = str.release();
 	list->next = next.release();
 	return list.release();

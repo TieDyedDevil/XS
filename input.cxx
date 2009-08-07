@@ -278,7 +278,7 @@ static char ** command_completion(const char *text, int start, int end) {
 	int results_size = 2;
 
 	/* Lookup matching commands */
-	for (SRef<List> paths = varlookup("path", NULL);
+	for (Ref<List> paths = varlookup("path", NULL);
 	     paths != NULL;
 	     paths = paths->next)
 	{
@@ -293,7 +293,7 @@ static char ** command_completion(const char *text, int start, int end) {
 		*(glob_string + end - start) = '*';
 		*(glob_string + end - start + 1) = '\0';	
 
-		SRef<List> glob_result = dirmatch(path, path, glob_string, UNQUOTED);
+		Ref<List> glob_result = dirmatch(path, path, glob_string, UNQUOTED);
 		efree(path);
 
 		int l = length(glob_result);
@@ -301,7 +301,7 @@ static char ** command_completion(const char *text, int start, int end) {
 		
 		results_size += l;
 		results = reinterpret_cast<char**>(erealloc(results, results_size * sizeof(char*)));
-		for (SRef<List> i = glob_result; i != NULL; i = i->next, ++result_p) {
+		for (Ref<List> i = glob_result; i != NULL; i = i->next, ++result_p) {
 			/* Can't directly use gc_string, because readline
 			 * needs to free() the result 
 			 */
@@ -309,12 +309,12 @@ static char ** command_completion(const char *text, int start, int end) {
 		}
 	}
 
-	SRef<List> lvars;
+	Ref<List> lvars;
 	dictforall(vars, addtolist, &lvars);
 	/* Match (some) variables - can't easily match lexical/local because that would require partially
 	 * parsing/evaluating the input (which would contain a let/local somewhere in it) */
 	for (; lvars; lvars = lvars->next) {
-		SRef<const char> str = getstr(lvars->term);
+		Ref<const char> str = getstr(lvars->term);
 		if (strncmp("fn-", str.uget(), 3) != 0
 		   || strncmp(text, str.uget() + 3, end - start) != 0) continue;
 		++results_size;
@@ -434,8 +434,8 @@ extern void resetparser(void) {
 /* runinput -- run from an input source */
 extern List *runinput(Input *in, int runflags) {
 	volatile int flags = runflags;
-	volatile SRef<List> result;
-	SRef<List> repl, dispatch;
+	volatile Ref<List> result;
+	Ref<List> repl, dispatch;
 	const char *dispatcher[] = {
 		"fn-%eval-noprint",
 		"fn-%eval-print",

@@ -113,7 +113,7 @@ typedef struct Tag Tag;
 
 extern void *gcalloc(size_t n, Tag *t);		/* allocate n with collection tag t */
 extern char *gcdup(const char *s);		/* copy a 0-terminated string into gc space */
-extern char *gcndup(SRef<const char> s, size_t n);	/* copy a counted string into gc space */
+extern char *gcndup(Ref<const char> s, size_t n);	/* copy a counted string into gc space */
 
 extern void initgc(void);			/* must be called at the dawn of time */
 extern void gc(void);				/* provoke a collection, if enabled */
@@ -192,25 +192,25 @@ extern void undefer(int ticket);
 
 /* term.c */
 
-extern SRef<Term> mkterm(SRef<const char> str, SRef<Closure> closure);
-extern SRef<Term> mkstr(SRef<const char> str);
-extern const char *getstr(SRef<Term> term);
-extern Closure *getclosure(SRef<Term> term);
-extern SRef<Term> termcat(SRef<Term> t1, SRef<Term> t2);
+extern Ref<Term> mkterm(Ref<const char> str, Ref<Closure> closure);
+extern Ref<Term> mkstr(Ref<const char> str);
+extern const char *getstr(Ref<Term> term);
+extern Closure *getclosure(Ref<Term> term);
+extern Ref<Term> termcat(Ref<Term> t1, Ref<Term> t2);
 extern bool termeq(Term *term, const char *s);
 extern bool isclosure(Term *term);
 
 
 /* list.c */
 
-extern List *mklist(SRef<Term> term, SRef<List> next);
+extern List *mklist(Ref<Term> term, Ref<List> next);
 extern List *reverse(List *list);
-extern List *append(SRef<List> head, SRef<List> tail);
+extern List *append(Ref<List> head, Ref<List> tail);
 extern List *listcopy(List *list);
-extern int length(SRef<List> list);
+extern int length(Ref<List> list);
 extern List *listify(int argc, char **argv);
 extern Term *nth(List *list, int n);
-extern SRef<List> sortlist(SRef<List> list);
+extern Ref<List> sortlist(Ref<List> list);
 
 
 /* tree.c */
@@ -220,18 +220,18 @@ extern Tree *mk(NodeKind , ...);
 
 /* closure.c */
 
-extern Closure *mkclosure(SRef<Tree> tree, SRef<Binding> binding);
+extern Closure *mkclosure(Ref<Tree> tree, Ref<Binding> binding);
 extern Closure *extractbindings(Tree *tree);
-extern Binding *mkbinding(SRef<const char> name, SRef<List> defn, SRef<Binding> next);
+extern Binding *mkbinding(Ref<const char> name, Ref<List> defn, Ref<Binding> next);
 extern Binding *reversebindings(Binding *binding);
 
 
 /* eval.c */
 
-extern Binding *bindargs(SRef<Tree> params, SRef<List> args, SRef<Binding> binding);
+extern Binding *bindargs(Ref<Tree> params, Ref<List> args, Ref<Binding> binding);
 extern List *forkexec(const char *file, List *list, bool inchild);
 extern List *walk(Tree *tree, Binding *binding, int flags);
-extern List *eval(SRef<List> list, SRef<Binding> binding, int flags);
+extern List *eval(Ref<List> list, Ref<Binding> binding, int flags);
 extern List *eval1(Term *term, int flags);
 extern List *pathsearch(Term *term);
 
@@ -246,26 +246,26 @@ extern unsigned long evaldepth, maxevaldepth;
 
 /* glom.c */
 
-extern SRef<List> glom(SRef<Tree> tree, SRef<Binding> binding, bool globit);
-extern List *glom2(SRef<Tree> tree, SRef<Binding> binding, StrList **quotep);
+extern Ref<List> glom(Ref<Tree> tree, Ref<Binding> binding, bool globit);
+extern List *glom2(Ref<Tree> tree, Ref<Binding> binding, StrList **quotep);
 
 
 /* glob.c */
 
 extern const char *QUOTED, *UNQUOTED;
 
-extern SRef<List> glob(SRef<List> list, SRef<StrList> quote);
+extern Ref<List> glob(Ref<List> list, Ref<StrList> quote);
 extern bool haswild(const char *pattern, const char *quoting);
 /* Needed for some of the readline tab-completion */
-extern SRef<List> dirmatch(SRef<const char> prefix, 
-		      SRef<const char> dirname,
-		      SRef<const char> pattern, 
-		      SRef<const char> quote);
+extern Ref<List> dirmatch(Ref<const char> prefix, 
+		      Ref<const char> dirname,
+		      Ref<const char> pattern, 
+		      Ref<const char> quote);
 
 
 /* match.c */
 extern bool match(const char *subject, const char *pattern, const char *quote);
-extern bool listmatch(SRef<List> subject, SRef<List> pattern, SRef<StrList> quote);
+extern bool listmatch(Ref<List> subject, Ref<List> pattern, Ref<StrList> quote);
 extern List *extractmatches(List *subjects, List *patterns, StrList *quotes);
 
 
@@ -275,10 +275,10 @@ extern void initvars(void);
 extern void initenv(char **envp, bool isprotected);
 extern void hidevariables(void);
 extern void validatevar(const char *var);
-extern List *varlookup(SRef<const char> name, SRef<Binding> binding);
+extern List *varlookup(Ref<const char> name, Ref<Binding> binding);
 extern List *varlookup2(const char *name1, const char *name2, Binding *binding);
-extern void vardef(SRef<const char>, SRef<Binding>, SRef<List>);
-extern SRef<Vector> mkenv(void);
+extern void vardef(Ref<const char>, Ref<Binding>, Ref<List>);
+extern Ref<Vector> mkenv(void);
 extern void setnoexport(List *list);
 extern void addtolist(void *arg, const char *key, void *value);
 extern List *listvars(bool internal);
@@ -314,7 +314,7 @@ extern int ewait(int pid, bool interruptible, void *rusage);
 
 typedef struct Dict Dict;
 extern Dict *mkdict(void);
-extern void dictforall(SRef<Dict> dict, void (*proc)(void *, const char *, void *), SRef<void> arg);
+extern void dictforall(Ref<Dict> dict, void (*proc)(void *, const char *, void *), Ref<void> arg);
 extern void *dictget(Dict *dict, const char *name);
 extern Dict *dictput(Dict *dict, const char *name, void *value);
 extern void *dictget2(Dict *dict, const char *name1, const char *name2);
@@ -330,14 +330,14 @@ extern void initconv(void);
 
 extern char *str(const char *fmt, ...);	/* create a gc space string by printing */
 extern char *mprint(const char *fmt, ...);	/* create an ealloc space string by printing */
-extern SRef<StrList> mkstrlist(SRef<const char> str, SRef<StrList> next);
+extern Ref<StrList> mkstrlist(Ref<const char> str, Ref<StrList> next);
 
 
 /* vec.c */
 
-extern SRef<Vector> mkvector(int n);
-extern SRef<Vector> vectorize(SRef<List> list);
-extern void sortvector(SRef <Vector> v);
+extern Ref<Vector> mkvector(int n);
+extern Ref<Vector> vectorize(Ref<List> list);
+extern void sortvector(Ref <Vector> v);
 
 
 /* util.c */
@@ -396,7 +396,7 @@ extern List *esoptend(void);
 
 /* prim.c */
 
-extern SRef<List> prim(const char *s, SRef<List> list, SRef<Binding> binding, int evalflags);
+extern Ref<List> prim(const char *s, Ref<List> list, Ref<Binding> binding, int evalflags);
 extern void initprims(void);
 
 
@@ -404,8 +404,8 @@ extern void initprims(void);
 
 extern void startsplit(const char *sep, bool coalesce);
 extern void splitstring(const char *in, size_t len, bool endword);
-extern SRef<List> endsplit(void);
-extern SRef<List> fsplit(const char *sep, SRef<List> list, bool coalesce);
+extern Ref<List> endsplit(void);
+extern Ref<List> fsplit(const char *sep, Ref<List> list, bool coalesce);
 
 
 /* signal.c */

@@ -30,9 +30,9 @@ static void initpath(void) {
 	int i;
 	static const char * const path[] = { INITIAL_PATH };
 
-	SRef<List> list = NULL;
+	Ref<List> list = NULL;
 	for (i = arraysize(path); i-- > 0;) {
-		SRef<Term> t = mkstr((char *) path[i]);
+		Ref<Term> t = mkstr((char *) path[i]);
 		list = mklist(t, list);
 	}
 	vardef("path", NULL, list.release());

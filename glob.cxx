@@ -45,10 +45,10 @@ static int ishiddenfile(const char *s) {
 }
 
 /* dirmatch -- match a pattern against the contents of directory */
-SRef<List> dirmatch(SRef<const char> prefix, 
-	       SRef<const char> dirname,
-	       SRef<const char> pattern, 
-	       SRef<const char> quote) 
+Ref<List> dirmatch(Ref<const char> prefix, 
+	       Ref<const char> dirname,
+	       Ref<const char> pattern, 
+	       Ref<const char> quote) 
 {
 	static struct stat s;
 
@@ -71,7 +71,7 @@ SRef<List> dirmatch(SRef<const char> prefix,
 	if (dirp == NULL)
 		return NULL;
 
-	SRef<List> list; 
+	Ref<List> list; 
 	gcdisable(); /* The structure containing t->next could be forwarded, making prevp a bad pointer */
 	List **prevp = list.rget();
 	Dirent *dp;
@@ -91,8 +91,8 @@ SRef<List> dirmatch(SRef<const char> prefix,
 }
 
 /* listglob -- glob a directory plus a filename pattern into a list of names */
-static SRef<List> listglob(SRef<List> list, char *pattern, char *quote, size_t slashcount) {
-	SRef<List> result; 
+static Ref<List> listglob(Ref<List> list, char *pattern, char *quote, size_t slashcount) {
+	Ref<List> result; 
 	List **prevp;
 	gcdisable();
 
@@ -105,7 +105,7 @@ static SRef<List> listglob(SRef<List> list, char *pattern, char *quote, size_t s
 		assert(list->term != NULL);
 		assert(!isclosure(list->term));
 
-		SRef<const char> dir = getstr(list->term);
+		Ref<const char> dir = getstr(list->term);
 		size_t dirlen = strlen(dir.uget());
 		if (dirlen + slashcount + 1 >= prefixlen) {
 			prefixlen = dirlen + slashcount + 1;
@@ -125,7 +125,7 @@ static SRef<List> listglob(SRef<List> list, char *pattern, char *quote, size_t s
 }
 
 /* glob1 -- glob pattern path against the file system */
-static SRef<List> glob1(SRef<const char> pattern, SRef<const char> quote) {
+static Ref<List> glob1(Ref<const char> pattern, Ref<const char> quote) {
 	size_t psize;
 	static char *dir = NULL, *pat = NULL, *qdir = NULL, *qpat = NULL, *raw = NULL;
 	static size_t dsize = 0;
@@ -166,7 +166,7 @@ static SRef<List> glob1(SRef<const char> pattern, SRef<const char> quote) {
 		return dirmatch("", ".", dir, qdir);
 	}
 
-	SRef<List> matched = (*pattern == '/')
+	Ref<List> matched = (*pattern == '/')
 			? mklist(mkstr(dir), NULL)
 			: dirmatch("", ".", dir, qdir);
 	do {
@@ -185,15 +185,15 @@ static SRef<List> glob1(SRef<const char> pattern, SRef<const char> quote) {
 }
 
 /* glob0 -- glob a list, (destructively) passing through entries we don't care about */
-static SRef<List> glob0(SRef<List> list, SRef<StrList> quote) {
-	SRef<List> result; 
-	SRef<List> expand1;
+static Ref<List> glob0(Ref<List> list, Ref<StrList> quote) {
+	Ref<List> result; 
+	Ref<List> expand1;
 	List **prevp;
 	gcdisable();
 
 	for (result = NULL, prevp = result.rget(); list != NULL;
 	     list = list->next, quote = quote->next) {
-		SRef<const char> str;
+		Ref<const char> str;
 		if (
 			quote->str == QUOTED
 			|| !haswild((str = getstr(list->term)).uget(), quote->str)
@@ -217,9 +217,9 @@ static SRef<List> glob0(SRef<List> list, SRef<StrList> quote) {
 }
 
 /* expandhome -- do tilde expansion by calling fn %home */
-static char *expandhome(SRef<char> string, SRef<StrList> quote) {
+static char *expandhome(Ref<char> string, Ref<StrList> quote) {
 	size_t slash;
-	SRef<List> fn = varlookup("fn-%home", NULL);
+	Ref<List> fn = varlookup("fn-%home", NULL);
 
 	assert(*string == '~');
 	assert(quote->str == UNQUOTED || *quote->str == 'r');
@@ -230,7 +230,7 @@ static char *expandhome(SRef<char> string, SRef<StrList> quote) {
 	for (slash = 1; (c = string[slash]) != '/' && c != '\0'; slash++)
 		;
 
-	SRef<List> list = NULL;
+	Ref<List> list = NULL;
 	if (slash > 1)
 		list = mklist(mkstr(gcndup(string.uget() + 1, slash - 1)), NULL);
 
@@ -239,7 +239,7 @@ static char *expandhome(SRef<char> string, SRef<StrList> quote) {
 	if (list != NULL) {
 		if (list->next != NULL)
 			fail("es:expandhome", "%%home returned more than one value");
-		SRef<char> home = gcdup(getstr(list->term));
+		Ref<char> home = gcdup(getstr(list->term));
 		if (c == '\0') {
 			string = home;
 			quote->str = QUOTED;
@@ -248,7 +248,7 @@ static char *expandhome(SRef<char> string, SRef<StrList> quote) {
 			size_t homelen = strlen(home.uget());
 			size_t len = pathlen - slash + homelen;
 			{
-				SRef<char> t = reinterpret_cast<char*>(gcalloc(len + 1, &StringTag));
+				Ref<char> t = reinterpret_cast<char*>(gcalloc(len + 1, &StringTag));
 				memcpy(t.uget(), home.uget(), homelen);
 				memcpy(&t[homelen], &string[slash], pathlen - slash);
 				t[len] = '\0';
@@ -275,16 +275,16 @@ static char *expandhome(SRef<char> string, SRef<StrList> quote) {
 }
 
 /* glob -- globbing prepass (glob if we need to, and dispatch for tilde expansion) */
-extern SRef<List> glob(SRef<List> list, SRef<StrList> quote) {
-	SRef<List> lp;
-	SRef<StrList> qp;
+extern Ref<List> glob(Ref<List> list, Ref<StrList> quote) {
+	Ref<List> lp;
+	Ref<StrList> qp;
 	bool doglobbing = false;
 
 	for (lp = list, qp = quote; lp; lp = lp->next, qp = qp->next)
 		if (qp->str != QUOTED) {
 			assert(lp->term != NULL);
 			assert(!isclosure(lp->term));
-			SRef<char> str = gcdup(getstr(lp->term));
+			Ref<char> str = gcdup(getstr(lp->term));
 			assert(qp->str == UNQUOTED || \
 			       strlen(qp->str) == strlen(str.uget()));
 			if (hastilde(str.uget(), qp->str)) {

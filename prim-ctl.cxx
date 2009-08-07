@@ -4,7 +4,7 @@
 #include "prim.hxx"
 
 PRIM(seq) {
-	SRef<List> result = ltrue;
+	Ref<List> result = ltrue;
 	for (; list; list = list->next)
 		result = eval1(list->term, evalflags &~ (list->next == NULL ? 0 : eval_inchild));
 	return result;
@@ -26,7 +26,7 @@ PRIM(if) {
 }
 
 PRIM(forever) {
-	SRef<List> body = list;
+	Ref<List> body = list;
 	for (;;) list = eval(body, NULL, evalflags & eval_exitonfalse);
 	return list;
 }
@@ -44,7 +44,7 @@ PRIM(catch) {
 	if (list == NULL)
 		fail("$&catch", "usage: catch catcher body");
 
-	SRef<List> result = NULL;
+	Ref<List> result = NULL;
 
 	do {
 		retry = false;
