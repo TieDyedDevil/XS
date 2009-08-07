@@ -65,7 +65,7 @@
 
 fn-.		:= $&dot
 fn-access	:= $&access
-#fn-break	:= $&break
+fn-break	:= $&break
 fn-catch	:= $&catch
 fn-echo		:= $&echo
 fn-exec		:= $&exec
@@ -98,7 +98,7 @@ fn-false	:= result 1
 #	return.  The interpreter main() routine (and nothing else)
 #	catches the exit exception.
 
-#fn-break	:= throw break
+fn-break	:= throw break
 fn-exit		:= throw exit
 fn-return	:= throw return
 
@@ -184,17 +184,12 @@ fn-while := $&noreturn @ cond body {
 		}
 		result $value
 	} {
-		let (result := <=true
-		     body := 'let ( fn-break := throw break ) {'^$body^'}'
-		     )
+		let (result := <=true)
 			forever {
-				if $cond {
-					echo $cond true
-					echo evalling $body
-					result := <={eval $body}
-					echo done eval
-				} {
+				if {!$cond} {
 					throw break $result
+				} {
+					result := <=$body
 				}
 			}
 	}
@@ -214,14 +209,12 @@ fn-switch := $&noreturn @ value args {
 		}
 		result $value
 	} {
-		for ((cond action) := $args) 
-		let (action := 'let ( fn-break := throw break )'^$action) {
+		for ((cond action) := $args) {
 			if {~ $action ()} { 
 				# Code for default action
-				let (cond := 'let ( fn-break := throw break )'^$cond)
-					throw break <={eval $cond}
+				break <={$cond}
 			}
-			~ $value $cond && throw break <={eval $action}
+			~ $value $cond && break <={$action}
 		}
 	}
 }
