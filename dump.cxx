@@ -276,6 +276,7 @@ extern void runinitial(void) {
 	dictforall(vars, dumpvariables, NULL);
 	defprint("\t{ NULL, NULL }\n");
 	defprint("};\n\n");
+	bufputc(varbuf, '\0');
 	print(sealbuffer(varbuf));
 
 	print("\nextern void runinitial(void) {\n");
