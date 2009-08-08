@@ -590,7 +590,7 @@ if {~ <=$&primitives writeto} {
 fn-%home	:= $&home
 
 #	Path searching used to be a primitive, but the access function
-#	means that it can be written easier in es.  Is is not called for
+#	means that it can be written easier in es.  It is not called for
 #	absolute path names or for functions.
 
 fn %pathsearch name { access -n $name -1e -xf $path }

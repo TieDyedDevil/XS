@@ -54,8 +54,8 @@ static void *VarCopy(void *op) {
 
 static size_t VarScan(void *p) {
 	Var *var = reinterpret_cast<Var*>(p);
-	var->defn = reinterpret_cast<List*>(forward(var->defn));
-	var->env = reinterpret_cast<char*>(((var->flags & var_hasbindings) && rebound) ? NULL : forward(var->env));
+	var->defn = forward(var->defn);
+	var->env = ((var->flags & var_hasbindings) && rebound) ? NULL : forward(var->env);
 	return sizeof (Var);
 }
 

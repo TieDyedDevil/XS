@@ -46,10 +46,13 @@ struct Buffer {
 extern Buffer *openbuffer(size_t minsize);
 extern Buffer *expandbuffer(Buffer *buf, size_t minsize);
 extern Buffer *bufncat(Buffer *buf, const char *s, size_t len);
-extern char *sealbuffer(Buffer *buf);
 extern char *sealcountedbuffer(Buffer *buf);
 
-extern void *forward( void *p);
+template <class T>
+inline T* forward(T *p) {
+	extern void * forward_v(void *);
+	return (T*) forward_v((void *) p);
+}
 inline char *sealbuffer(Buffer *buf) {
 	char *s = gcdup(buf->str);
 	efree(buf);

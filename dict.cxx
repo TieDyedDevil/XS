@@ -93,9 +93,8 @@ static size_t DictScan(void *p) {
 	int i;
 	for (i = 0; i < dict->size; i++) {
 		Assoc *ap = &dict->table[i];
-		ap->name  = reinterpret_cast<const char*>(
-				   forward(const_cast<char*>(ap->name)));
-		ap->value = reinterpret_cast<void*>(forward(ap->value));
+		ap->name  = forward(const_cast<char*>(ap->name));
+		ap->value = forward(ap->value);
 	}
 	return offsetof(Dict, table[0]) + sizeof(Assoc) * dict->size;
 }

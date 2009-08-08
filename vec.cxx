@@ -33,7 +33,7 @@ static void *VectorCopy(void *ov_void) {
 static size_t VectorScan(void *p) {
 	Vector *v = reinterpret_cast<Vector*>(p);
 	for (int i = 0; i <= v->count; i++)
-		v->vector[i] = reinterpret_cast<char*>(forward(v->vector[i]));
+		v->vector[i] = forward(v->vector[i]);
 	return vector_size(v);;
 }
 

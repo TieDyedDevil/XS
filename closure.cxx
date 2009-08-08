@@ -26,8 +26,8 @@ static void *ClosureCopy(void *op) {
 
 static size_t ClosureScan(void *p) {
 	Closure *closure = reinterpret_cast<Closure*>(p);
-	closure->tree = reinterpret_cast<Tree*>(forward(closure->tree));
-	closure->binding = reinterpret_cast<Binding*>(forward(closure->binding));
+	closure->tree = forward(closure->tree);
+	closure->binding = forward(closure->binding);
 	return sizeof (Closure);
 }
 
@@ -194,9 +194,8 @@ static size_t BindingScan(void *p) {
 	Binding *binding = reinterpret_cast<Binding*>(p);
 	/* const_cast needed because forward doesn't know that
 	   what it returns will be kept const */
-	binding->name = reinterpret_cast<const char*>(
-			    forward(const_cast<char*>(binding->name)));
-	binding->defn = reinterpret_cast<List*>(forward(binding->defn));
-	binding->next = reinterpret_cast<Binding*>(forward(binding->next));
+	binding->name = forward(const_cast<char*>(binding->name));
+	binding->defn = forward(binding->defn);
+	binding->next = forward(binding->next);
 	return sizeof (Binding);
 }

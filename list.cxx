@@ -25,8 +25,8 @@ static void *ListCopy(void *op) {
 
 static size_t ListScan(void *p) {
 	List *list = reinterpret_cast<List*>(p);
-	list->term = reinterpret_cast<Term*>(forward(list->term));
-	list->next = reinterpret_cast<List*>(forward(list->next));
+	list->term = forward(list->term);
+	list->next = forward(list->next);
 	return sizeof (List);
 }
 

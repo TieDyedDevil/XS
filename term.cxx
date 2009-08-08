@@ -73,8 +73,8 @@ static void *TermCopy(void *op) {
 
 static size_t TermScan(void *p) {
 	Term *term = reinterpret_cast<Term*>(p);
-	term->closure = reinterpret_cast<Closure*>(forward(term->closure));
-	term->str = reinterpret_cast<const char*>(forward(const_cast<char*>(term->str)));
+	term->closure = forward(term->closure);
+	term->str = forward(const_cast<char*>(term->str));
 	return sizeof (Term);
 }
 

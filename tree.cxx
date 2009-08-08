@@ -83,10 +83,10 @@ static size_t Tree1Scan(void *p) {
 	    default:
 		panic("Tree1Scan: bad node kind %d", n->kind);
 	    case nPrim: case nWord: case nQword:
-	    	n->u[0].s = reinterpret_cast<const char*>(forward(const_cast<char*>(n->u[0].s)));
+	    	n->u[0].s = forward(const_cast<char*>(n->u[0].s));
 		break;
 	    case nCall: case nThunk: case nVar:
-	    	n->u[0].p = reinterpret_cast<Tree*>(forward(n->u[0].p));
+	    	n->u[0].p = forward(n->u[0].p);
 		break;
 	} 
 	return offsetof(Tree, u[1]);
@@ -98,8 +98,8 @@ static size_t Tree2Scan(void *p) {
 	    case nAssign:  case nConcat: case nClosure: case nFor:
 	    case nLambda: case nLet: case nList:  case nLocal:
 	    case nVarsub: case nMatch: case nExtract:
-	    	n->u[0].p = reinterpret_cast<Tree*>(forward(n->u[0].p));
-		n->u[1].p = reinterpret_cast<Tree*>(forward(n->u[1].p));
+	    	n->u[0].p = forward(n->u[0].p);
+		n->u[1].p = forward(n->u[1].p);
 		break;
 	    default:
 		panic("Tree2Scan: bad node kind %d", n->kind);

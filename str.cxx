@@ -106,8 +106,8 @@ static void *StrListCopy(void *op) {
 
 static size_t StrListScan(void *p) {
 	StrList *list = reinterpret_cast<StrList*>(p);
-	list->str = reinterpret_cast<char*>(forward((void *) list->str));
-	list->next = reinterpret_cast<StrList*>(forward(list->next));
+	list->str = forward(list->str);
+	list->next = forward(list->next);
 	return sizeof (StrList);
 }
 
