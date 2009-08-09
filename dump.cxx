@@ -142,7 +142,7 @@ static const char *dumpbinding(Binding *binding) {
 	name = str("&B_%ulx", (long long) binding);
 	if (dictget(cvars, name) == NULL) {
 		print(
-			"static const Binding %s = { (char *) %s, (List *) %s, (Binding *) %s };\n",
+			"static Binding %s = { (char *) %s, (List *) %s, (Binding *) %s };\n",
 			name + 1,
 			dumpstring(binding->name),
 			dumplist(binding->defn),
