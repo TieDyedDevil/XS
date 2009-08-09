@@ -289,7 +289,9 @@ extern Ref<List> glob(Ref<List> list, Ref<StrList> quote) {
 			       strlen(qp->str) == strlen(str.uget()));
 			if (hastilde(str.uget(), qp->str)) {
 				str = expandhome(str, qp);
-				lp->term = mkstr(str.uget()).release();
+				/* Safety against forwarding of lp */
+				Term *t = mkstr(str.uget()).uget();
+				lp->term = t;
 			}
 			if (haswild(str.uget(), qp->str))
 				doglobbing = true;
