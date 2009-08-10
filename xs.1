@@ -2044,6 +2044,22 @@ that each shell it forks will put itself into a new process group.
 Note that the controlling tty for the process must be on standard error
 (file descriptor 2) when this operation is run.
 .TP
+.Cr "popd"
+.IR cd
+into the directory that was last pushed by
+.IR pushd ,
+popping the directory off of an internal stack.
+If it's internal stack is empty (for example,
+if
+.IR pushd
+has not been called), then stays in the current directory.
+Also prints out the stack, starting from the top.
+.TP
+.Cr "pushd \fR[\fP\fIdir\fP\fR]\fP"
+Add directory's absolute path onto 
+.IR popd 's 
+stack. Also outputs the stack.
+.TP 
 .Cr "result \fIvalue ...\fP"
 Returns its arguments.
 This is

@@ -575,6 +575,32 @@ if {~ <=$&primitives writeto} {
 #	}
 #}
 
+# Directory push, pretty similar to other pushds (perhaps simpler though)
+# Relies on pwd
+let (dlist:=.) {
+	fn pushd dir {
+		~ $dir () && dir := `/bin/pwd
+		!~ $#dir 1 && throw error pushd ( 
+				Wrong number of arguments '('$#dir, should be 0 or 1')'
+				\n'Usage: pushd [directory]'
+			)
+
+		# If the directory is not absolute, we need to make it so
+		~ $dir [~/]* && dir := `/bin/pwd^/^$dir
+
+		dlist := $dir $dlist
+		echo $dlist
+	}
+	fn popd {
+		let (dir:=) {
+			(dir dlist) := $dlist
+			~ $dlist () && dlist := .
+			cd $dir
+			echo $dlist
+		}
+	}
+}
+
 
 #
 # Hook functions
