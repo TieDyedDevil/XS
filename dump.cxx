@@ -38,17 +38,16 @@ static Dict *cvars, *strings;
 
 static bool allprintable(const char *s) {
 	int c;
-	for (; (c = *(unsigned char *) s) != '\0'; s++)
+	for (; (c = *(unsigned const char *) s) != '\0'; s++)
 		if (!isprint(c) || c == '"' || c == '\\')
 			return false;
 	return true;
 }
 
 static const char *dumpstring(const char *string) {
-	char *name;
 	if (string == NULL)
 		return "NULL";
-	name = reinterpret_cast<char*>(dictget(strings, string));
+	const char *name = reinterpret_cast<const char*>(dictget(strings, string));
 	if (name == NULL) {
 		name = str("S_%F", string);
 		if (strlen(name) > MAXVARNAME)
@@ -58,9 +57,8 @@ static const char *dumpstring(const char *string) {
 			print("\"%s\";\n", string);
 		else {
 			int c;
-			const char *s;
 			print("{ ");
-			for (s = string; (c = *(unsigned char *) s) != '\0'; s++) {
+			for (const char *s = string; (c = *(unsigned const char *) s) != '\0'; s++) {
 				switch (c) {
 				case '\a':	print("'\\a'");		break;
 				case '\b':	print("'\\b'");		break;
@@ -76,7 +74,7 @@ static const char *dumpstring(const char *string) {
 			}
 			print("'\\0', };\n");
 		}
-		strings = dictput(strings, string, name);
+		strings = dictput(strings, string, (void *) name);
 	}
 	return name;
 }
@@ -108,26 +106,25 @@ static const char *nodename(NodeKind k) {
 }
 
 static const char *dumptree(Tree *tree) {
-	char *name;
 	if (tree == NULL)
 		return "NULL";
-	name = str("&T_%ulx", (long long) tree);
+	const char *name = str("&T_%ulx", (long long) tree);
 	if (dictget(cvars, name) == NULL) {
 		switch (tree->kind) {
 		    default:
 			panic("dumptree: bad node kind %d", tree->kind);
 		    case nWord: case nQword: case nPrim:
-			print("static const Tree_s %s = { n%s, { { (char *) %s } } };\n",
+			print("static Tree_s %s = { n%s, { { %s } } };\n",
 			      name + 1, nodename(tree->kind), dumpstring(tree->u[0].s));
 			break;
 		    case nCall: case nThunk: case nVar:
-			print("static const Tree_p %s = { n%s, { { (Tree *) %s } } };\n",
+			print("static Tree_p %s = { n%s, { { (Tree *) %s } } };\n",
 			      name + 1, nodename(tree->kind), dumptree(tree->u[0].p));
 			break;
 		    case nAssign:  case nConcat: case nClosure: case nFor:
 		    case nLambda: case nLet: case nList:  case nLocal:
 		    case nVarsub: case nMatch: case nExtract:
-			print("static const Tree_pp %s = { n%s, { { (Tree *) %s }, { (Tree *) %s } } };\n",
+			print("static Tree_pp %s = { n%s, { { (Tree *) %s }, { (Tree *) %s } } };\n",
 			      name + 1, nodename(tree->kind), dumptree(tree->u[0].p), dumptree(tree->u[1].p));
 		}
 		cvars = dictput(cvars, name, tree);
@@ -135,6 +132,7 @@ static const char *dumptree(Tree *tree) {
 	return name;
 }
 
+static void rootadd(const char *name);
 static const char *dumpbinding(Binding *binding) {
 	char *name;
 	if (binding == NULL)
@@ -142,25 +140,27 @@ static const char *dumpbinding(Binding *binding) {
 	name = str("&B_%ulx", (long long) binding);
 	if (dictget(cvars, name) == NULL) {
 		print(
-			"static Binding %s = { (char *) %s, (List *) %s, (Binding *) %s };\n",
+			"static Binding %s = { %s, %s, %s };\n",
 			name + 1,
 			dumpstring(binding->name),
 			dumplist(binding->defn),
 			dumpbinding(binding->next)
 		);
+		rootadd(str("%s.name", name + 1));
+		rootadd(str("%s.defn", name + 1));
+		rootadd(str("%s.next", name + 1));
 		cvars = dictput(cvars, name, binding);
 	}
 	return name;
 }
 
 static const char *dumpclosure(Closure *closure) {
-	char *name;
 	if (closure == NULL)
 		return "NULL";
-	name = str("&C_%ulx",  (long long) closure);
+	const char *name = str("&C_%ulx",  (long long) closure);
 	if (dictget(cvars, name) == NULL) {
 		print(
-			"static const Closure %s = { (Binding *) %s, (Tree *) %s };\n",
+			"static Closure %s = { (Binding *) %s, (Tree *) %s };\n",
 			name + 1,
 			dumpbinding(closure->binding),
 			dumptree(closure->tree)
@@ -171,13 +171,12 @@ static const char *dumpclosure(Closure *closure) {
 }
 
 static const char *dumpterm(Term *term) {
-	char *name;
 	if (term == NULL)
 		return "NULL";
-	name = str("&E_%ulx", (long long) term);
+	const char *name = str("&E_%ulx", (long long) term);
 	if (dictget(cvars, name) == NULL) {
 		print(
-			"static const Term %s = { (char *) %s, (Closure *) %s };\n",
+			"static Term %s = { %s, (Closure *) %s };\n",
 			name + 1,
 			dumpstring(term->str),
 			dumpclosure(term->closure)
@@ -188,13 +187,12 @@ static const char *dumpterm(Term *term) {
 }
 
 static const char *dumplist(List *list) {
-	char *name;
 	if (list == NULL)
 		return "NULL";
-	name = str("&L_%ulx", (long long) list);
+	const char *name = str("&L_%ulx", (long long) list);
 	if (dictget(cvars, name) == NULL) {
 		print(
-			"static const List %s = { (Term *) %s, (List *) %s };\n",
+			"static List %s = { %s, %s };\n",
 			name + 1,
 			dumpterm(list->term),
 			dumplist(list->next)
@@ -210,17 +208,17 @@ static void dumpvar(void *ignore, const char *key, void *value) {
 	dumplist(var->defn);
 }
 
-static Buffer *varbuf = NULL;
-static void defprint(const char *fmt, ...) {
-	if (varbuf == NULL) varbuf = openbuffer(2048);
-	va_list args;
-	va_start(args, fmt);
-	varbuf = bufcat(varbuf, strv(fmt, args));
-	va_end(args);
+static Buffer *rootbuf = NULL;
+static void rootadd(const char* name) {
+	if (name == "NULL") return;
+	if (rootbuf == NULL) rootbuf = openbuffer(2048);
+	rootbuf = bufcat(rootbuf, str("globalroot((void *) &%s);\n", name));
 }
 
+static Buffer *varbuf = NULL;
+
 static void dumpdef(const char *name, Var *var) {
-	defprint("\t{ %s, (const List *) %s },\n", dumpstring(name), dumplist(var->defn));
+	varbuf = bufcat(varbuf, str("\t{ %s, (List *) %s },\n", dumpstring(name), dumplist(var->defn)));
 }
 
 static void dumpfunctions(void *ignore, const char *key, void *value) {
@@ -237,7 +235,7 @@ static void dumpvariables(void *ignore, const char *key, void *value) {
 }
 
 #define TreeTypes \
-	typedef struct { NodeKind k; struct { char *s; } u[1]; } Tree_s; \
+	typedef struct { NodeKind k; struct { const char *s; } u[1]; } Tree_s; \
 	typedef struct { NodeKind k; struct { Tree *p; } u[1]; } Tree_p; \
 	typedef struct { NodeKind k; struct { Tree *p; } u[2]; } Tree_pp;
 TreeTypes
@@ -269,20 +267,23 @@ extern void runinitial(void) {
 	printheader(title);
 	dictforall(vars, dumpvar, NULL);
 
+	varbuf = openbuffer(1024);
 	/* these must be assigned in this order, or things just won't work */
-	defprint("\nstatic const struct { const char *name; const List *value; } defs[] = {\n");
+	bufcat(varbuf, "\nstatic const struct { const char *name; List *value; } defs[] = {\n");
 	dictforall(vars, dumpfunctions, NULL);
 	dictforall(vars, dumpsettors, NULL);
 	dictforall(vars, dumpvariables, NULL);
-	defprint("\t{ NULL, NULL }\n");
-	defprint("};\n\n");
+	bufcat(varbuf, "\t{ NULL, NULL }\n");
+	bufcat(varbuf, "};\n\n");
 	bufputc(varbuf, '\0');
 	print(sealbuffer(varbuf));
 
 	print("\nextern void runinitial(void) {\n");
 	print("\tint i;\n");
 	print("\tfor (i = 0; defs[i].name != NULL; i++)\n");
-	print("\t\tvardef((char *) defs[i].name, NULL, (List *) defs[i].value);\n");
+	print("\t\tvardef(defs[i].name, NULL, defs[i].value);\n");
+	bufputc(rootbuf, '\0');
+	print(sealbuffer(rootbuf));
 	print("}\n");
 
 	exit(0);
