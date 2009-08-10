@@ -164,7 +164,6 @@ int yylex(void) {
 	dollar = false;
 	if (newline) {
 		newline = false;
-		assert (yyloc.last_line <= input->lineno);
 		/* \n sets yylloc.last_line, but not first_line
 		 * in case the newline is syntactically invalid
 		 */
