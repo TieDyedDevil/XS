@@ -327,6 +327,10 @@ static inline void *follow(Tag *tagp) {
 
 /* forward -- forward an individual pointer from old space
  * NOTE: forward will NEVER modify the contents of p.
+ *
+ * If p is not gc-allocated, the contents of p will NOT be forwarded,
+ * even if they point to gc-space. If you have a structure like that,
+ * you can instead root the individual members of the structure
  */
 extern void *forward_v(void *p) {
 	Tag *ptag;
