@@ -2032,6 +2032,17 @@ See
 .IR getrlimit (2)
 for details on resource limit semantics.
 .TP
+.Cr "map \fIaction\fP \fIlist\fP
+Call
+.I action
+with a single argument for each element of \fIlist\fP.
+Since lists auto-expand, list
+contains the rest of the arguments to the command.
+Returns the list of results of each action.
+If action returns a list, it is expanded inside
+the list of results - therefore, the list of results
+can be a different size than list.
+.TP
 .Cr "newpgrp"
 Puts
 .I xs
@@ -2044,20 +2055,26 @@ that each shell it forks will put itself into a new process group.
 Note that the controlling tty for the process must be on standard error
 (file descriptor 2) when this operation is run.
 .TP
+.Cr "omap \fIaction\fP \fIlist\fP
+Like
+.I map
+, but return the list of the outputs of action, in the same form as if
+`` '' action were called.
+.TP
 .Cr "popd"
-.IR cd
+.I cd
 into the directory that was last pushed by
-.IR pushd ,
-popping the directory off of an internal stack.
+.I pushd
+, popping the directory off of an internal stack.
 If it's internal stack is empty (for example,
 if
-.IR pushd
+.I pushd
 has not been called), then stays in the current directory.
 Also prints out the stack, starting from the top.
 .TP
 .Cr "pushd \fR[\fP\fIdir\fP\fR]\fP"
 Add directory's absolute path onto 
-.IR popd 's 
+.I popd 's 
 stack. Also outputs the stack.
 .TP 
 .Cr "result \fIvalue ...\fP"

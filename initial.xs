@@ -219,6 +219,22 @@ fn-switch := $&noreturn @ value args {
 	}
 }
 
+# Like map from functional programming, alt. to loop structures
+# Different in that if f returns a list,
+# it becomes multiple elements in the new list
+# Returns value as list (since last operation is assign, no return needed)
+
+fn-map := $&noreturn @ fn-f list {
+	let (result:=)
+		for (item := $list)
+			result := $result <={f $item}
+}
+
+# Like map, but uses output (without splitting) of f
+fn-omap := $&noreturn @ fn-f list {
+	map @ x { result `` '' { f $x } } $list
+}
+
 #	The cd builtin provides a friendlier veneer over the cd primitive:
 #	it knows about no arguments meaning ``cd $home'' and has friendlier
 #	error messages than the raw $&cd.  (It also used to search $cdpath,
