@@ -1,3 +1,37 @@
+Es 0.9beta to xs 1.1
+--------------------
+
+Some c++ features are used in the code-base now,
+so it is no longer valid C (and obviously needs
+a c++ compiler)
+
+The assignment operator is now := instead of =. Using
+= was inconvenient because many commands use = to 
+specify "long" arguments (--foo=blah).
+
+Closures in child shells should operate the same as they did
+in their parents - if f and g share x, changing x in f changes
+x in g, which previously did not work. The implementation operates
+by adding an __id__ definition before variables in each closure.
+
+The build system has been rather improved - automake is used instead of 
+a manually written Makefile.in, and the autoconf files updated to operate
+with the latest version of autoconf. There are a few new --enable options.
+
+Some simple new functions have been added - map, omap, until, switch.
+
+Readline now has tab-complete for functions & binaries in path.
+
+The init-file is now .xsrc (since es and xs are not compatible).
+
+[implementation] The Ref() macros have been replaced with the Ref RAII-style class, which is much cleaner
+and removed the need for RefEnd()s. varbegin()/varend() are wrapped around by
+a similar class. (This is the most significant reason for using c++.)
+
+Many old compatibility cludges (like reiser cpp support) have been dropped.
+
+The old Es changelog follows:
+
 CHANGES		-*- mode: indented-text -*- ($Revision: 1.4 $)
 =======
 
