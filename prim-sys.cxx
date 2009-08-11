@@ -311,8 +311,8 @@ PRIM(time) {
 	eprint(
 		"%6ldr %5ld.%ldu %5ld.%lds\t%L\n",
 		t1 - t0,
-		r.ru_utime.tv_sec, (long) (r.ru_utime.tv_usec / 100000),
-		r.ru_stime.tv_sec, (long) (r.ru_stime.tv_usec / 100000),
+		(long long) r.ru_utime.tv_sec, (long long) (r.ru_utime.tv_usec / 100000),
+		(long long) r.ru_stime.tv_sec, (long long) (r.ru_stime.tv_usec / 100000),
 		list.uget(), " "
 	);
 
