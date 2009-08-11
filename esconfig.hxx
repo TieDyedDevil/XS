@@ -148,10 +148,6 @@
  *		header file.  if not, es will try to use <varargs.h>, but
  *		you may need to hack a bit to get that working.
  *
- *	USE_VOLATILE
- *		allow volatile declarations.  if your compiler
- *		supports 'em, use 'em.
- *
  *	USE_UNISTD
  *		define this if you have the include file <unistd.h>
  *

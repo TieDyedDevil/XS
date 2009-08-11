@@ -433,8 +433,8 @@ extern void resetparser(void) {
 
 /* runinput -- run from an input source */
 extern List *runinput(Input *in, int runflags) {
-	volatile int flags = runflags;
-	volatile Ref<List> result;
+	int flags = runflags;
+	Ref<List> result;
 	Ref<List> repl, dispatch;
 	const char *dispatcher[] = {
 		"fn-%eval-noprint",
