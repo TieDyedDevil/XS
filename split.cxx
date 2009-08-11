@@ -36,6 +36,13 @@ extern void startsplit(const char *sep, bool coalescef) {
 	}
 }
 
+template <bool coalesce>
+static inline bool handleifs(Buffer*& buf, char c) {
+	Term *term = mkstr(sealcountedbuffer(buf)).get();
+	value = mklist(term, value);
+	buf = coalesce ? NULL : openbuffer(0);
+}
+
 extern void splitstring(const char *in, size_t len, bool endword) {
 	gcdisable(); /* char *s can't be made gc-safe (unless rewritten to use indices) */
 	Buffer *buf = buffer;
@@ -51,20 +58,22 @@ extern void splitstring(const char *in, size_t len, bool endword) {
 		return;
 	}
 
-	if (!coalesce && buf == NULL)
-		buf = openbuffer(0);
-
-	while (s < inend) {
-		int c = *s++;
-		if (buf != NULL)
-			if (isifs[c]) {
-				Term *term = mkstr(sealcountedbuffer(buf)).get();
-				value = mklist(term, value);
-				buf = coalesce ? NULL : openbuffer(0);
-			} else
-				buf = bufputc(buf, c);
-		else if (!isifs[c])
-			buf = bufputc(openbuffer(0), c);
+	if (coalesce) {
+		while (s < inend) {
+			int c = *s++;
+			if (buf != NULL) {
+				if (isifs[c]) handleifs<true>(buf, c);
+				else  buf = bufputc(buf, c);
+			} else if (!isifs[c])
+				buf = bufputc(openbuffer(0), c);
+		}
+	} else {
+		if (buf == NULL) buf = openbuffer(0);
+		while (s < inend) {
+			int c = *s++;
+			if (isifs[c]) handleifs<false>(buf, c);
+			else  buf = bufputc(buf, c);
+		}
 	}
 
 	if (endword && buf != NULL) {
