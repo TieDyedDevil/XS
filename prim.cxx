@@ -2,36 +2,38 @@
 
 #include "es.hxx"
 #include "prim.hxx"
+#include <map>
 
-static Dict *prims;
+static Prim_dict prims;
+#include <iostream>
 
 extern Ref<List> prim(const char *s, Ref<List> list, Ref<Binding> binding, int evalflags) {
-	typedef Ref<List> (*Prim)(Ref<List>, Ref<Binding>, int);
-	Prim p = reinterpret_cast<Prim>(dictget(prims, s));
-	if (p == NULL) fail("es:prim", "unknown primitive: %s", s);
-	return (*p)(list, binding, evalflags);
+	Prim p = prims[s];
+	if (p) return (*prims[s])(list, binding, evalflags);
+	else fail("es:prim", "unknown primitive: %s", s);
 }
 
 PRIM(primitives) {
 	static List *primlist = NULL;
 	if (primlist == NULL) {
 		globalroot(&primlist);
-		dictforall(prims, addtolist, &primlist);
-		primlist = sortlist(primlist).release();
+		for (Prim_dict::iterator i = prims.begin(); i != prims.end(); ++i) {
+			Ref<Term> term = mkstr(i->first.c_str());
+			primlist = mklist(term, primlist);
+			// Needed because char* is sorted by pointer, not character
+			primlist = sortlist(primlist).release();
+		}
 	}
 	return primlist;
 }
 
 extern void initprims(void) {
-	prims = mkdict();
-	globalroot(&prims);
-
-	prims = initprims_controlflow(prims);
-	prims = initprims_io(prims);
-	prims = initprims_etc(prims);
-	prims = initprims_sys(prims);
-	prims = initprims_proc(prims);
-	prims = initprims_access(prims);
+	initprims_controlflow(prims);
+	initprims_io(prims);
+	initprims_etc(prims);
+	initprims_sys(prims);
+	initprims_proc(prims);
+	initprims_access(prims);
 
 #define	primdict prims
 	X(primitives);

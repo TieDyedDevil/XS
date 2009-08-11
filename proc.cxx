@@ -194,8 +194,7 @@ PRIM(wait) {
 	return mklist(mkstr(mkstatus(ewait(pid, true, NULL))), NULL);
 }
 
-extern Dict *initprims_proc(Dict *primdict) {
+extern void initprims_proc(Prim_dict& primdict) {
 	X(apids);
 	X(wait);
-	return primdict;
 }

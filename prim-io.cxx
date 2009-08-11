@@ -433,7 +433,7 @@ PRIM(read) {
 	}
 }
 
-extern Dict *initprims_io(Dict *primdict) {
+extern void initprims_io(Prim_dict& primdict) {
 	X(openfile);
 	X(close);
 	X(dup);
@@ -446,5 +446,4 @@ extern Dict *initprims_io(Dict *primdict) {
 	X(writeto);
 #endif
 	X(read);
-	return primdict;
 }

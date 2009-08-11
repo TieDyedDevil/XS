@@ -170,9 +170,8 @@ PRIM(access) {
 	return result;
 }
 
-extern Dict *initprims_access(Dict *primdict) {
+extern void initprims_access(Prim_dict& primdict) {
 	X(access);
-	return primdict;
 }
 
 extern const char *checkexecutable(const char *file) {

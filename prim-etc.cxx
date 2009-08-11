@@ -267,7 +267,7 @@ PRIM(resetterminal) {
  * initialization
  */
 
-extern Dict *initprims_etc(Dict *primdict) {
+extern void initprims_etc(Prim_dict& primdict) {
 	X(echo);
 	X(count);
 	X(version);
@@ -294,5 +294,4 @@ extern Dict *initprims_etc(Dict *primdict) {
 #if READLINE
 	X(resetterminal);
 #endif
-	return primdict;
 }
