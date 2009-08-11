@@ -66,7 +66,8 @@ AC_PROG_CXX
 AC_PROG_INSTALL
 AC_PROG_YACC
 
-AC_PROG_CC_STDC
+AC_LANG(C++)
+
 
 dnl ----------------------------
 dnl CHECK FOR /dev/fd FILESYSTEM
@@ -109,7 +110,7 @@ dnl Checks for header files.
 AC_HEADER_DIRENT
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS(fcntl.h limits.h sys/ioctl.h sys/time.h unistd.h memory.h stdarg.h sys/cdefs.h)
+AC_CHECK_HEADERS(fcntl.h limits.h sys/ioctl.h sys/time.h unistd.h memory.h stdarg.h sys/cdefs.h tr1/unordered_map)
 
 
 dnl Checks for typedefs, structures, and compiler characteristics.

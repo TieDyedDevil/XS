@@ -2,7 +2,6 @@
 
 #include "es.hxx"
 #include "prim.hxx"
-#include <map>
 
 static Prim_dict prims;
 #include <iostream>

@@ -1,5 +1,4 @@
 /* prim.hxx -- definitions for es primitives ($Revision: 1.1.1.1 $) */
-#include <map>
 #include <string>
 
 #define	PRIM(name)	static Ref<List> CONCAT(prim_,name)( \
@@ -8,7 +7,13 @@
 #define	X(name)		primdict[STRING(name)] = CONCAT(prim_,name)
 
 typedef Ref<List> (*Prim)(Ref<List>, Ref<Binding>, int);
+#ifdef HAVE_TR1_UNORDERED_MAP
+#include <tr1/unordered_map>
+typedef std::tr1::unordered_map<std::string, Prim> Prim_dict;
+#else
+#include <map>
 typedef std::map<std::string, Prim> Prim_dict;
+#endif
 
 extern void initprims_controlflow(Prim_dict& primdict);	/* prim-ctl.c */
 extern void initprims_io(Prim_dict& primdict);		/* prim-io.c */
