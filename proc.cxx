@@ -15,11 +15,11 @@ typedef struct Proc Proc;
 struct Proc {
 	int pid;
 	int status;
-	bool alive, background;
 	Proc *next, *prev;
 #if HAVE_WAIT3
 	struct rusage rusage;
 #endif
+	bool alive, background;
 };
 
 static Proc *proclist = NULL;
