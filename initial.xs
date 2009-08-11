@@ -284,11 +284,7 @@ fn vars {
 		if {!~ $* -[vfs]}	{ * := $* -v }
 		if {!~ $* -[epi]}	{ * := $* -e }
 	}
-	# check args
-	for (i := $*)
-		if {!~ $i -[vfsepi]} {
-			throw error vars illegal option: $i -- usage: vars '-[vfsepia]'
-		}
+
 	let (
 		vars	:= false
 		fns	:= false
@@ -297,19 +293,25 @@ fn vars {
 		priv	:= false
 		intern	:= false
 	) {
-		for (i := $*) if (
-			{~ $i -v}	{vars	:= true}
-			{~ $i -f}	{fns	:= true}
-			{~ $i -s}	{sets	:= true}
-			{~ $i -e}	{export	:= true}
-			{~ $i -p}	{priv	:= true}
-			{~ $i -i}	{intern := true}
-			{throw error vars vars: bad option: $i}
+		for (i := $*) switch $i (
+			-v		{vars	:= true}
+			-f		{fns	:= true}
+			-s		{sets	:= true}
+			-e		{export	:= true}
+			-p		{priv	:= true}
+			-i		{intern := true}
+			{throw error vars vars: illegal option: $i -- usage: vars '-[vfsepia]'}
 		)
+
 		let (
 			dovar := @ var {
 				# print functions and/or settor vars
-				if {if {~ $var fn-*} $fns {~ $var set-*} $sets $vars} {
+				if {
+				    if ( 
+					{~ $var fn-*} $fns 
+				       	{~ $var set-*} $sets 
+				       	$vars)
+				} {
 					echo <={%var $var}
 				}
 			}
