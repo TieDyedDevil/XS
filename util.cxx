@@ -63,7 +63,7 @@ extern bool streq2(const char *s, const char *t1, const char *t2) {
 /* ealloc -- error checked malloc */
 extern void *ealloc(size_t n) {
 	void *p = malloc(n);
-	if (p == NULL) {
+	if (p == NULL && n != 0) {
 		uerror("malloc");
 		exit(1);
 	}
