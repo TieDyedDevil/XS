@@ -41,9 +41,9 @@ extern List *forkexec(const char *file, List *list, bool inchild) {
 	return mklist(mkterm(mkstatus(status), NULL), NULL);
 }
 
-static void assign_helper(Ref<List>& value, Ref<List>& values, Ref<List>& vars) {
+static void assign_helper(Ref<List>& value, Ref<List>& values, void *vars) {
 	if (!values) value = NULL;
-	else if (vars->next == NULL || values->next == NULL) {
+	else if (vars == NULL || values->next == NULL) {
 		value = values;
 		values = NULL;
 	} else {
@@ -54,21 +54,19 @@ static void assign_helper(Ref<List>& value, Ref<List>& values, Ref<List>& vars) 
 
 /* assign -- bind a list of values to a list of variables */
 static List *assign(Ref<Tree> varform, Ref<Tree> valueform, Ref<Binding> binding) {
-	Ref<List> result = NULL;
-
 	Ref<List> vars = glom(varform.release(), binding.uget(), false);
 
 	if (vars == NULL)
 		fail("es:assign", "null variable name");
 
 	Ref<List> values = glom(valueform.release(), binding.uget(), true);
-	result = values;
+	Ref<List> result = values;
 
 	Ref<List> value;
 	Ref<const char> name;
 	for (; vars != NULL; vars = vars->next) {
 		name = getstr(vars->term);
-		assign_helper(value, values, vars);
+		assign_helper(value, values, vars->next);
 		vardef(name.release(), binding.uget(), value.release());
 	}
 
@@ -97,7 +95,7 @@ static Binding *letbindings(Ref<Tree> defn, Ref<Binding> binding,
 
 		for (; vars != NULL; vars = vars->next) {
 			name = getstr(vars->term);
-			assign_helper(value, values, vars);
+			assign_helper(value, values, vars->next);
 			binding = mkbinding(name.release(), value.release(), binding.release());
 		}
 	}
@@ -111,10 +109,8 @@ static List *localbind(Ref<Binding> dynamic, Ref<Binding> lexical,
 	if (!dynamic)
 		return walk(body.uget(), lexical.uget(), evalflags);
 	else {
-		Ref<List> result;
 		Push p(dynamic->name, dynamic->defn);
-		result = localbind(dynamic->next, lexical, body, evalflags);
-		return result.release();
+		return localbind(dynamic->next, lexical, body, evalflags);
 	}
 }
 
@@ -131,7 +127,6 @@ static List *forloop(Ref<Tree> defn, Ref<Tree> body,
 		     Ref<Binding> outer, int evalflags) {
 	static List MULTIPLE = { NULL, NULL };
 
-	Ref<List> result = ltrue;
 	Ref<Binding> looping = NULL;
 	for (; defn != NULL; defn = defn->u[1].p) {
 		assert(defn->kind == nList);
@@ -155,6 +150,7 @@ static List *forloop(Ref<Tree> defn, Ref<Tree> body,
 	bool allnull;
 	Ref<Binding> bp, lp, sequence; 
 	Ref<List> value;
+	Ref<List> result = ltrue;
 
 	try {
 		for (;;) {
@@ -184,7 +180,7 @@ static List *forloop(Ref<Tree> defn, Ref<Tree> body,
 	} catch (List *e) {
 		if (!termeq(e->term, "break"))
 			throwE(e);
-		result = e->next;
+		return e->next;
 	}
 	return result.release();
 }
@@ -204,11 +200,9 @@ static List *matchpattern(Ref<Tree> subjectform, Ref<Tree> patternform,
 static List *extractpattern(Ref<Tree> subjectform, Ref<Tree> patternform,
 			    Ref<Binding> binding) {
 	StrList *quote = NULL;
-	Ref<List> result = NULL;
 	Ref<List> subject = glom(subjectform.uget(), binding.uget(), true);
 	Ref<List> pattern = glom2(patternform.uget(), binding.uget(), &quote);
-	result = (List *) extractmatches(subject.release(), pattern.release(), quote);
-	return result.release();
+	return extractmatches(subject.release(), pattern.release(), quote);
 }
 
 /* walk -- walk through a tree, evaluating nodes */
@@ -257,20 +251,13 @@ top:
 extern Binding *bindargs(Ref<Tree> params, Ref<List> args, Ref<Binding> binding) {
 	if (!params) return mkbinding("*", args.release(), binding.release());
 
+	Ref<List> value;
+	Ref<Tree> param;
 	for (; params; params = params->u[1].p) {
-		Ref<List> value;
 		assert(params->kind == nList);
-		Ref<Tree> param = params->u[0].p;
+		param = params->u[0].p;
 		assert(param->kind == nWord || param->kind == nQword);
-		if (args == NULL)
-			value = NULL;
-		else if (params->u[1].p == NULL || args->next == NULL) {
-			value = args;
-			args = NULL;
-		} else {
-			value = mklist(args->term, NULL);
-			args = args->next;
-		}
+		assign_helper(value, args, params->u[1].p);
 		binding = mkbinding(param->u[0].s, value.release(), binding.release());
 	}
 
@@ -300,13 +287,11 @@ class Depth_tracker {
 
 /* eval -- evaluate a list, producing a list */
 extern List *eval(Ref<List> list, Ref<Binding> binding, int flags) {
-	Closure *volatile cp;
-
 	Depth_tracker t;
 
-	Ref<const char> name;
+	Closure *volatile cp;
 
-	Ref<const char> funcname = NULL;
+	Ref<const char> name, funcname;
 	Ref<List> fn;
 
 restart:
@@ -325,19 +310,20 @@ restart:
 		    case nLambda:
 		    {
 			Ref<Tree> tree = cp->tree;
-			Ref<Binding> context;
 			      
 			try {
-				context =  bindargs(tree->u[0].p,
-						    list->next,
-						     cp->binding);
+				Ref<Binding> context =  bindargs(tree->u[0].p,
+						                 list->next,
+						                 cp->binding);
+#define CALLFN walk(tree->u[1].p, context.uget(), flags)
 				if (funcname) {
 					Push p("0",
 					     mklist(mkterm(funcname.uget(),
 							  NULL),
 					 	    NULL));
-					list = walk(tree->u[1].p, context.uget(), flags);
-				} else list = walk(tree->u[1].p, context.uget(), flags);
+					list = CALLFN;
+				} else list = CALLFN;
+#undef CALLFN
 			} catch (List *e) {
 				if (termeq(e->term, "return")) {
 					list = e->next;
@@ -393,7 +379,3 @@ done:
 	return list.release();
 }
 
-/* eval1 -- evaluate a term, producing a list */
-extern List *eval1(Term *term, int flags) {
-	return eval(mklist(term, NULL), NULL, flags);
-}
