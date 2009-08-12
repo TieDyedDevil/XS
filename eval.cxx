@@ -212,23 +212,16 @@ static List *extractpattern(Ref<Tree> subjectform, Ref<Tree> patternform,
 }
 
 /* walk -- walk through a tree, evaluating nodes */
-extern List *walk(Tree *tree0, Binding *binding0, int flags) {
-	Tree *volatile tree = tree0;
-	Binding *volatile binding = binding0;
-
+extern List *walk(Ref<Tree> tree, Ref<Binding> binding, int flags) {
 	SIGCHK();
 
 top:
-	if (tree == NULL)
-		return ltrue;
+	if (tree == NULL) return ltrue;
 
 	switch (tree->kind) {
-
 	    case nConcat: case nList: case nQword: case nVar: case nVarsub:
 	    case nWord: case nThunk: case nLambda: case nCall: case nPrim: {
-		Ref<Binding> bp = binding;
-		Ref<List> list = glom(tree, bp.uget(), true);
-		binding = bp.release();
+		Ref<List> list = glom(tree, binding, true);
 		return eval(list, binding, flags);
 	    }
 
@@ -236,9 +229,8 @@ top:
 		return assign(tree->u[0].p, tree->u[1].p, binding);
 
 	    case nLet: case nClosure: {
-		Ref<Tree> body = tree->u[1].p;
 		binding = letbindings(tree->u[0].p, binding, binding, flags);
-		tree = body.release();
+		tree = tree->u[1].p;
 	    }
 		goto top;
 

@@ -230,7 +230,7 @@ extern Binding *reversebindings(Binding *binding);
 
 extern Binding *bindargs(Ref<Tree> params, Ref<List> args, Ref<Binding> binding);
 extern List *forkexec(const char *file, List *list, bool inchild);
-extern List *walk(Tree *tree, Binding *binding, int flags);
+extern List *walk(Ref<Tree> tree, Ref<Binding> binding, int flags);
 extern List *eval(Ref<List> list, Ref<Binding> binding, int flags);
 extern List *eval1(Term *term, int flags);
 extern List *pathsearch(Term *term);
