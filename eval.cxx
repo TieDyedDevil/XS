@@ -41,6 +41,17 @@ extern List *forkexec(const char *file, List *list, bool inchild) {
 	return mklist(mkterm(mkstatus(status), NULL), NULL);
 }
 
+static void assign_helper(Ref<List>& value, Ref<List>& values, Ref<List>& vars) {
+	if (!values) value = NULL;
+	else if (vars->next == NULL || values->next == NULL) {
+		value = values;
+		values = NULL;
+	} else {
+		value = mklist(values->term, NULL);
+		values = values->next;
+	}
+}
+
 /* assign -- bind a list of values to a list of variables */
 static List *assign(Ref<Tree> varform, Ref<Tree> valueform, Ref<Binding> binding) {
 	Ref<List> result = NULL;
@@ -53,18 +64,11 @@ static List *assign(Ref<Tree> varform, Ref<Tree> valueform, Ref<Binding> binding
 	Ref<List> values = glom(valueform.release(), binding.uget(), true);
 	result = values;
 
+	Ref<List> value;
+	Ref<const char> name;
 	for (; vars != NULL; vars = vars->next) {
-		Ref<List> value;
-		Ref<const char> name = getstr(vars->term);
-		if (values == NULL)
-			value = NULL;
-		else if (vars->next == NULL || values->next == NULL) {
-			value = values;
-			values = NULL;
-		} else {
-			value = mklist(values->term, NULL);
-			values = values->next;
-		}
+		name = getstr(vars->term);
+		assign_helper(value, values, vars);
 		vardef(name.release(), binding.uget(), value.release());
 	}
 
@@ -74,31 +78,26 @@ static List *assign(Ref<Tree> varform, Ref<Tree> valueform, Ref<Binding> binding
 /* letbindings -- create a new Binding containing let-bound (lexical) variables */
 static Binding *letbindings(Ref<Tree> defn, Ref<Binding> binding,
 			    Ref<Binding> context, int evalflags) {
+	Ref<Tree> assign;
+	Ref<List> vars, values, value;
+	Ref<const char> name;
+
 	for (; defn != NULL; defn = defn->u[1].p) {
 		assert(defn->kind == nList);
 		if (defn->u[0].p == NULL)
 			continue;
 
-		Ref<Tree> assign = defn->u[0].p;
+		assign = defn->u[0].p;
 		assert(assign->kind == nAssign);
-		Ref<List> vars = glom(assign->u[0].p, context.uget(), false);
-		Ref<List> values = glom(assign->u[1].p, context.uget(), true);
+		vars = glom(assign->u[0].p, context.uget(), false);
+		values = glom(assign->u[1].p, context.uget(), true);
 
 		if (vars == NULL)
 			fail("es:let", "null variable name");
 
 		for (; vars != NULL; vars = vars->next) {
-			Ref<List> value;
-			Ref<const char> name = getstr(vars->term);
-			if (values == NULL)
-				value = NULL;
-			else if (vars->next == NULL || values->next == NULL) {
-				value = values;
-				values = NULL;
-			} else {
-				value = mklist(values->term, NULL);
-				values = values->next;
-			}
+			name = getstr(vars->term);
+			assign_helper(value, values, vars);
 			binding = mkbinding(name.release(), value.release(), binding.release());
 		}
 	}
