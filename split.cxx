@@ -36,17 +36,46 @@ extern void startsplit(const char *sep, bool coalescef) {
 	}
 }
 
+static void skipifs(unsigned char*& s, Buffer*& buf, unsigned char * inend) {
+	assert(coalesce);
+	while (s < inend) {
+		int c = *s++;
+		if (!isifs[c]) {
+			buf = bufputc(openbuffer(0), c);
+			return;
+		}
+	}
+	buf = NULL; /* Tell endsplit not to touch buffer */
+}
+
 template <bool coalesce>
-static inline bool handleifs(Buffer*& buf, char c) {
+static inline void newbuf(unsigned char*& s, Buffer*& buf, unsigned char *inend) {
+	if (coalesce) skipifs(s, buf, inend);
+	else buf = openbuffer(0);
+}
+
+template <bool coalesce>
+static inline void handleifs(unsigned char*& s, Buffer*& buf, unsigned char *inend) {
 	Term *term = mkstr(sealcountedbuffer(buf)).get();
 	value = mklist(term, value);
-	buf = coalesce ? NULL : openbuffer(0);
+	newbuf<coalesce>(s, buf, inend);
+}
+
+/* Doesn't handle splitchars case, only coalesce + normal */
+template <bool coalesce>
+static void runsplit(unsigned char*& s, Buffer*& buf, unsigned char * inend) {
+	if (buf == NULL) newbuf<coalesce>(s, buf, inend);
+	while (s < inend) {
+		int c = *s++;
+		if (isifs[c]) handleifs<coalesce>(s, buf, inend);
+		else buf = bufputc(buf, c);
+	}
 }
 
 extern void splitstring(const char *in, size_t len, bool endword) {
 	gcdisable(); /* char *s can't be made gc-safe (unless rewritten to use indices) */
 	Buffer *buf = buffer;
-	unsigned char *s = (unsigned char *) in, *inend = s + len;
+	unsigned char *s = (unsigned char *) in, *const inend = s + len;
 
 	if (splitchars) {
 		assert(buf == NULL);
@@ -56,25 +85,9 @@ extern void splitstring(const char *in, size_t len, bool endword) {
 		}
 		gcenable();
 		return;
-	}
-
-	if (coalesce) {
-		while (s < inend) {
-			int c = *s++;
-			if (buf != NULL) {
-				if (isifs[c]) handleifs<true>(buf, c);
-				else  buf = bufputc(buf, c);
-			} else if (!isifs[c])
-				buf = bufputc(openbuffer(0), c);
-		}
-	} else {
-		if (buf == NULL) buf = openbuffer(0);
-		while (s < inend) {
-			int c = *s++;
-			if (isifs[c]) handleifs<false>(buf, c);
-			else  buf = bufputc(buf, c);
-		}
-	}
+	} 
+	else if (coalesce) runsplit<true>(s, buf, inend);
+	else runsplit<false>(s, buf, inend);
 
 	if (endword && buf != NULL) {
 		Term *term = mkstr(sealcountedbuffer(buf)).get();
