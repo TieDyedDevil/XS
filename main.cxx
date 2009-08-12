@@ -135,7 +135,7 @@ int main(int argc, char **argv) {
 		case 'p':	isprotected = true;		break;
 		case 'o':	keepclosed = true;		break;
 		case 'd':	allowquit = true;		break;
-		case 's':	cmd_stdin = true;			goto getopt_done;
+		case 's':	cmd_stdin = true;		goto getopt_done;
 #if GCVERBOSE
 		case 'G':	gcverbose = true;		break;
 #endif
