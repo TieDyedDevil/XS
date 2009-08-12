@@ -83,9 +83,13 @@
 		 * probably lead to a NULL pointer dereference
 		 */
 		T* release() {
+#ifdef REF_ASSERTIONS
 			T* t = ref;
 			ref = NULL;
 			return t;
+#else
+			return t;
+#endif
 		}
 		T* operator->() const {
 			assert(ref != NULL);
