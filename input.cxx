@@ -86,6 +86,36 @@ static void warn(const char *s) {
  * history
  */
 
+#if READLINE
+static int hist_from = 0;
+
+/* No real need to use the history fd, since it
+ * doesn't consider issues like unsynced output
+ */
+static int lines() {
+	int x = 0;
+	FILE *f = fopen(history, "r");
+	int c;
+	while (c = getc(f), c != EOF) if (c == '\n') ++x;
+	return x;
+}
+
+static void update_hist() {
+	// This tries it's best to load all the changes made to the history file each time
+	// only once
+	// But it may load multiple times, especially if you operate on two interactive
+	// shells at once (on the other hand, how common is that?!?),
+	// or write a very long history file
+	// Also, see the ++hist_from, which isn't even guaranteed to be correct due to sync issues
+	int l = lines();
+	if (l < hist_from) hist_from = 0; // history file was definately truncated/replaced
+	read_history_range(history, hist_from, -1);
+	hist_from = l;
+}
+#endif
+
+
+
 /* loghistory -- write the last command out to a file */
 static void loghistory(const char *cmd, size_t len) {
 	const char *s, *end;
@@ -107,6 +137,10 @@ static void loghistory(const char *cmd, size_t len) {
 		default:		goto writeit;
 		}
 
+
+#if READLINE
+	update_hist();
+#endif
 	/*
 	 * Small unix hack: since read() reads only up to a newline
 	 * from a terminal, then presumably this write() will write at
@@ -114,8 +148,10 @@ static void loghistory(const char *cmd, size_t len) {
 	 */
 writeit:
 	ewrite(historyfd, cmd, len);
+#if READLINE
+	++hist_from;
+#endif
 }
-
 /* sethistory -- change the file for the history log */
 extern void sethistory(const char *file) {
 	if (historyfd != -1) {
@@ -123,6 +159,10 @@ extern void sethistory(const char *file) {
 		historyfd = -1;
 	}
 	history = file;
+#if READLINE
+	hist_from = 0;
+	update_hist();
+#endif
 }
 
 int GETC() {
@@ -225,6 +265,7 @@ static char *callreadline() {
 	interrupted = false;
 	if (!setjmp(slowlabel)) {
 		slow = true;
+		update_hist();
 		r = interrupted ? NULL : readline(continued_input ? prompt2 : prompt);
 	} else  r = NULL;
 	slow = false;
