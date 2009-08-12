@@ -19,8 +19,6 @@ PRIM(primitives) {
 		for (Prim_dict::iterator i = prims.begin(); i != prims.end(); ++i) {
 			Ref<Term> term = mkstr(i->first.c_str());
 			primlist = mklist(term, primlist);
-			// Needed because char* is sorted by pointer, not character
-			primlist = sortlist(primlist).release();
 		}
 	}
 	return primlist;
