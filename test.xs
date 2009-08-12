@@ -77,7 +77,8 @@ let (dir := `pwd
 
     rm -f $logfile
     for (file := $dir/xs_tests/*.xs) {
-        local (FILE := $file; XS := $dir/xs) . $DOTARGS $FILE
+	log2 Running $file
+	local (FILE := $file; XS := $dir/xs) . $DOTARGS $FILE
     }
     cd $dir
 }
