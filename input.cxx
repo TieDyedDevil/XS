@@ -95,12 +95,14 @@ static int hist_from = 0;
 static int lines() {
 	int x = 0;
 	FILE *f = fopen(history, "r");
+	if (!f) return -1; /* see update_hist, this should work */
 	int c;
 	while (c = getc(f), c != EOF) if (c == '\n') ++x;
 	return x;
 }
 
 static void update_hist() {
+	if (historyfd == -1) return;
 	// This tries it's best to load all the changes made to the history file each time
 	// only once
 	// But it may load multiple times, especially if you operate on two interactive
