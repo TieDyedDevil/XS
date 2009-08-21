@@ -315,28 +315,22 @@ static void fdprint(Format *format, int fd, const char *fmt) {
 	gcenable();
 }
 
-extern int fprint (int fd,  const char * fmt, ...) {
-	Format format;
-	va_start(format.args, fmt);
-	fdprint(&format, fd, fmt);
-	va_end(format.args);
+#define FORMATPRINT(fd) Format format; \
+	va_start(format.args, fmt); \
+	fdprint(&format, fd, fmt); \
+	va_end(format.args); \
 	return format.flushed;
+
+extern int fprint (int fd,  const char * fmt, ...) {
+	FORMATPRINT(fd);
 }
 
 extern int print (const char * fmt, ...) {
-	Format format;
-	va_start(format.args, fmt);
-	fdprint(&format, 1, fmt);
-	va_end(format.args);
-	return format.flushed;
+	FORMATPRINT(1);
 }
 
 extern int eprint (const char * fmt, ...) {
-	Format format;
-	va_start(format.args, fmt);
-	fdprint(&format, 2, fmt);
-	va_end(format.args);
-	return format.flushed;
+	FORMATPRINT(2);
 }
 
 extern void panic (const char * fmt, ...) {
