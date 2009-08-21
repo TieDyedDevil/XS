@@ -297,7 +297,7 @@ static char * quote_func(char *text, int match_Type, char *quote_pointer) {
 	return result;
 }
 
-static inline char * basename(char *str) {
+static inline const char * simple_basename(const char *str) {
 	return rindex(str, '/') + 1;
 }
 
@@ -348,7 +348,7 @@ static char ** command_completion(const char *text, int start, int end) {
 			/* Can't directly use gc_string, because readline
 			 * needs to free() the result 
 			 */
-			results[result_p] = strdup(basename(i->term->str));
+			results[result_p] = strdup(simple_basename(i->term->str));
 		}
 	}
 
