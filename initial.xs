@@ -71,7 +71,6 @@ fn-echo		:= $&echo
 fn-exec		:= $&exec
 fn-forever	:= $&forever
 fn-fork		:= $&fork
-fn-if		:= $&if
 fn-newpgrp	:= $&newpgrp
 fn-result	:= $&result
 fn-throw	:= $&throw
@@ -102,10 +101,18 @@ fn-break	:= throw break
 fn-exit		:= throw exit
 fn-return	:= throw return
 
+
+fn-if := $&noreturn @ condition action else actions {
+        $&if ({$condition} {$action}
+              {~ $else else} {$actions}
+              {!~ $actions ()} {throw error if 'if: expected else, got: '^$^actions})
+}
+
 #	unwind-protect is a simple wrapper around catch that is used
 #	to ensure that some cleanup code is run after running a code
 #	fragment.  This function must be written with care to make
 #	sure that the return value is correct.
+
 
 fn-unwind-protect := $&noreturn @ body cleanup {
 	if {!~ $#cleanup 1} {
@@ -188,7 +195,7 @@ fn-while := $&noreturn @ cond body {
 			forever {
 				if {!$cond} {
 					throw break $result
-				} {
+				} else {
 					result := <=$body
 				}
 			}
@@ -243,7 +250,7 @@ fn-omap := $&noreturn @ fn-f list {
 fn cd dir {
 	if {~ $#dir 1} {
 		$&cd $dir
-	} {~ $#dir 0} {
+	} else if {~ $#dir 0} {
 		if {!~ $#home 1} {
 			throw error cd <={
 				if {~ $#home 0} {
@@ -254,7 +261,7 @@ fn cd dir {
 			}
 		}
 		$&cd $home
-	} {
+	} else {
 		throw error cd 'usage: cd [directory]'
 	}
 }
@@ -281,8 +288,8 @@ fn vars {
 	if {~ $* -a} {
 		* := -v -f -s -e -p -i
 	} {
-		if {!~ $* -[vfs]}	{ * := $* -v }
-		if {!~ $* -[epi]}	{ * := $* -e }
+		if {!~ $* -[vfs]} else { * := $* -v }
+		if {!~ $* -[epi]} else { * := $* -e }
 	}
 
 	let (
@@ -307,10 +314,9 @@ fn vars {
 			dovar := @ var {
 				# print functions and/or settor vars
 				if {
-				    if ( 
-					{~ $var fn-*} $fns 
-				       	{~ $var set-*} $sets 
-				       	$vars)
+				    if ({~ $var fn-*} $fns 
+                                        else if {~ $var set-*} $sets 
+                                        else $vars)
 				} {
 					echo <={%var $var}
 				}
@@ -319,7 +325,7 @@ fn vars {
 			if {$export || $priv} {
 				for (var := <= $&vars)
 					# if not exported but in priv
-					if {if {~ $var $noexport} $priv $export} {
+					if {if {~ $var $noexport} else if $priv else $export} {
 						$dovar $var
 					}
 			}
@@ -386,16 +392,16 @@ fn %backquote {
 fn-%seq		:= $&seq
 
 fn-%not := $&noreturn @ cmd {
-	if {$cmd} {false} {true}
+	if {$cmd} {false} else {true}
 }
 
 fn-%and := $&noreturn @ first rest {
 	let (result := <={$first}) {
 		if {~ $#rest 0} {
 			result $result
-		} {result $result} {
+		} else if {result $result} {
 			%and $rest
-		} {
+		} else {
 			result $result
 		}
 	}
@@ -408,9 +414,9 @@ fn-%or := $&noreturn @ first rest {
 		let (result := <={$first}) {
 			if {~ $#rest 0} {
 				result $result
-			} {!result $result} {
+			} else if {!result $result} {
 				%or $rest
-			} {
+			} else {
 				result $result
 			}
 		}
@@ -464,7 +470,7 @@ fn %one {
 		throw error %one <={
 			if {~ $#* 0} {
 				result 'null filename in redirection'
-			} {
+			} else {
 				result 'too many files in redirection: ' $*
 			}
 		}
@@ -550,7 +556,7 @@ if {~ <=$&primitives readfrom} {
 
 if {~ <=$&primitives writeto} {
 	fn-%writeto := $&writeto
-} {
+} else {
 	fn %writeto var output cmd {
 		local ($var := /tmp/es.$var.$pid) {
 			unwind-protect {
@@ -699,20 +705,17 @@ fn-%is-interactive := $&isinteractive
 fn %interactive-loop {
 	let (result := <=true) {
 		catch @ e type msg {
-			if {~ $e eof} {
-				return $result
-			} {~ $e exit} {
-				throw $e $type $msg
-			} {~ $e error} {
-				echo >[1=2] $msg
-				$fn-%dispatch false
-			} {~ $e signal} {
-				if {!~ $type sigint sigterm sigquit} {
-					echo >[1=2] caught unexpected signal: $type
-				}
-			} {
-				echo >[1=2] uncaught exception: $e $type $msg
-			}
+                	switch $e ( 
+				eof {return $result} 
+				exit { throw $e $type $msg} 
+				error { echo >[1=2] $msg
+					$fn-%dispatch false } 
+				signal { if {!~ $type sigint sigterm sigquit} {
+						echo >[1=2] caught unexpected signal: $type
+				         }
+                                }
+				{ echo >[1=2] uncaught exception: $e $type $msg }
+                        )
 			throw retry # restart forever loop
 		} {
 			forever {

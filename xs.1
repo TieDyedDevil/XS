@@ -359,15 +359,17 @@ operation, but it does not remove its definition.
 Since lists can span multiple lines without explicit line
 continuations, they are ideal for long commands. For example:
 .Ds
-.Cr "if \e
-.Cr "   {~ $x *error*} { break } \e"
-.Cr "   {~ $x *good*}  { echo no problem  }"
+.Cr "switch $x \e"
+.Cr "   *error*   { return 1 } \e"
+.Cr "   *warning* { break } \e"
+.Cr "   *good*    { echo no problem  }"
 .De
 .PP is the same as
 .Ds
-.Cr "if (
-.Cr "   {~ $x *error*} { break }" 
-.Cr "   {~ $x *good*}  { echo no problem  }"
+.Cr "switch $x ("
+.Cr "   *error* { break }" 
+.Cr "   *warning* { break }"
+.Cr "   *good*  { echo no problem  }"
 .Cr ")"
 .De
 .SS Concatenation
@@ -1952,7 +1954,7 @@ in the parent directory
 .Rc ( .. ),
 but leaves the shell in the current directory.
 .TP
-.Cr "if \fR[\fP\fItest then\fR]\fP ... \fR[\fPelse\fR]\fP"
+.Cr "if \fR[\fP\fItest then-action\fR]\fP \fR[else \fPelse-action\fR]\fP"
 Evaluates the command
 .IR test .
 If the result is true, the command
@@ -1960,16 +1962,22 @@ If the result is true, the command
 is run and
 .Cr if
 completes.
-If the result of the test is false, the next
-.I "test-then"
-pair is checked, until one where the
-.I test
-is true is found.
-If none of the
-.IR test s
-are true, the
+If the result of the test is false, the 
 .I else
 command is run.
+The else-action doesn't require braces no matter
+the number of actions, so one can write code like:
+.Ds
+.Cr "... } else if {~ $a $b} { ... }"
+.De
+Note that:
+.Ds
+.Cr ...}
+.Cr "else if {~ $a $b} { ... }"
+.De
+, with the else on a seperate line, will only
+work if the if-command has parentheses wrapping it's body
+and else-statements.
 .TP
 .Cr "limit \fR[\fP-h\fR]\fP \fI\fR[\fPresource \fR[\fPvalue\fR]\fP\fR]\fP\fP"
 Similar to the
@@ -2040,12 +2048,6 @@ Since lists auto-expand, list
 contains the rest of the arguments to the command.
 Returns the list of results of each action.
 If action returns a list, it is expanded inside
-the list of results - therefore, the list of results
-can be a different size than list.
-.TP
-.Cr "newpgrp"
-Puts
-.I xs
 into a new process group.
 This builtin is useful for making
 .I xs
@@ -2791,6 +2793,12 @@ starts with a dash
 .Rc ( - ).
 .TP
 .Cr \-e
+Exit if any command (except those executing as the tests of
+conditional statements) returns a non-zero status.
+.TP
+.Cr \-v
+Echo all input to standard error.
+.TP
 Exit if any command (except those executing as the tests of
 conditional statements) returns a non-zero status.
 .TP

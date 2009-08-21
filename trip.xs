@@ -197,4 +197,3 @@ errorcheck 'incomplete heredoc'	{$es -c 'cat<<eof'\n} 'incomplete'
 
 errorcheck 'bad heredoc marker'	{$es -c 'cat<<(eof eof)'} 'not a single literal word'
 errorcheck 'bad heredoc marker'	{$es -c 'cat<<'''\n''''\n} 'contains a newline'
-

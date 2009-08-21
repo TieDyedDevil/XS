@@ -72,7 +72,7 @@ let (dir := `pwd
         echo $msg | tee -a $logfile
     }
     fn log2 msg {
-	if $VERBOSE { log $msg } {echo $msg >> $logfile}
+	if $VERBOSE { log $msg } else {echo $msg >> $logfile}
     }
 
     rm -f $logfile
