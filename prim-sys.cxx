@@ -218,29 +218,33 @@ static void printlimit(const Limit *limit, bool hard) {
 
 static LIMIT_T parselimit(const Limit *limit, const char *s) {
 	LIMIT_T lim;
-	char *t;
 	const Suffix *suf = limit->suffix;
 	if (streq(s, "unlimited"))
 		return RLIM_INFINITY;
 	if (!isdigit(*s))
 		fail("$&limit", "%s: bad limit value", s);
-	if (suf == timesuf && (t = strchr(s, ':')) != NULL) {
+
+	const char *t;
+	if (suf == timesuf && 
+	    (t = strchr(s, ':')) != NULL) {
 		char *u;
 		lim = strtol(s, &u, 0) * 60;
 		if (u != t)
 			fail("$&limit", "%s %s: bad limit value", limit->name, s);
-		lim += strtol(u + 1, &t, 0);
-		if (t != NULL && *t == ':')
-			lim = lim * 60 + strtol(t + 1, &t, 0);
-		if (t != NULL && *t != '\0')
+		char *x;
+		lim += strtol(u + 1, &x, 0);
+		if (x != NULL && *x == ':')
+			lim = lim * 60 + strtol(x + 1, &x, 0);
+		if (x != NULL && *x != '\0')
 			fail("$&limit", "%s %s: bad limit value", limit->name, s);
 	} else {
-		lim = strtol(s, &t, 0);
-		if (t != NULL && *t != '\0')
+		char *x;
+		lim = strtol(s, &x, 0);
+		if (x != NULL && *x != '\0')
 			for (;; suf = suf->next) {
 				if (suf == NULL)
 					fail("$&limit", "%s %s: bad limit value", limit->name, s);
-				if (streq(suf->name, t)) {
+				if (streq(suf->name, x)) {
 					lim *= suf->amount;
 					break;
 				}
