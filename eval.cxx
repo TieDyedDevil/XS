@@ -1,6 +1,8 @@
 /* eval.c -- evaluation of lists and trees ($Revision: 1.2 $) */
 
 #include "es.hxx"
+#include <string>
+#include <term.hxx>
 
 unsigned long evaldepth = 0, maxevaldepth = MAXmaxevaldepth;
 
@@ -41,6 +43,7 @@ extern List *forkexec(const char *file, List *list, bool inchild) {
 	return mklist(mkterm(mkstatus(status), NULL), NULL);
 }
 
+/* Sets each value to each values, with proper semantics for things like (a b) := 1 2 3 */
 static void assign_helper(Ref<List>& value, Ref<List>& values, void *vars) {
 	if (!values) value = NULL;
 	else if (vars == NULL || values->next == NULL) {
@@ -311,22 +314,44 @@ restart:
 		    {
 			Ref<Tree> tree = cp->tree;
 			      
+			/* define a return function */
+
+			static unsigned int retid = 0;
+
+			/* We use string here to work-around the gc's lack of knowledge about id.
+			 * Disabling the gc would work, too, but that would disable gc for a lot of code
+			 */
+			std::string id = str("%ud", retid++);
+			Term id_term = { id.c_str(), NULL };
+			List id_def = { &id_term, NULL };
+
+			static Term return_term = { "return", NULL };
+			List return_def = { &return_term, &id_def };
+
+			static Term throw_term = { "throw", NULL };
+			List throw_def = { &throw_term, &return_def };
+			assert(termeq(&return_term, "return") && return_def.next && termeq(return_def.next->term, id.c_str()));
+
 			try {
 				Ref<Binding> context =  bindargs(tree->u[0].p,
-						                 list->next,
-						                 cp->binding);
-#define CALLFN walk(tree->u[1].p, context.uget(), flags)
+							 list->next,
+							 cp->binding);
+
+				context = mkbinding("fn-return", &throw_def, context);
+
+#define WALKFN walk(tree->u[1].p, context, flags)
 				if (funcname) {
 					Push p("0",
 					     mklist(mkterm(funcname.uget(),
 							  NULL),
 					 	    NULL));
-					list = CALLFN;
-				} else list = CALLFN;
-#undef CALLFN
+
+					list = WALKFN;
+				} else list = WALKFN;
+#undef WALKFN
 			} catch (List *e) {
-				if (termeq(e->term, "return")) {
-					list = e->next;
+				if (termeq(e->term, "return") && e->next && termeq(e->next->term, id.c_str())) {
+					list = e->next->next;
 					goto done;
 				}
 				throwE(e);

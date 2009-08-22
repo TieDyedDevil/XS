@@ -1468,9 +1468,12 @@ causes the body of the
 clause to be run again.
 .TP
 .Cr "return \fIvalue\fP"
-Causes the current function to exit, with
+Causes the lexically-matching function to exit, with
 .I value
-as the return value (exit status).
+as the return value (exit status). This function is somewhat special
+in that it exists only in the scope of it's matching function.
+Also, while it is implemented with exceptions, return is lexically-scoped
+as far as the user is concerned.
 .TP
 .Cr "signal \fIsigname\fP"
 Raised when the shell itself receives a signal,

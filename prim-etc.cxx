@@ -226,18 +226,6 @@ PRIM(isinteractive) {
 	return isinteractive() ? ltrue : lfalse;
 }
 
-PRIM(noreturn) {
-	if (list == NULL)
-		fail("$&noreturn", "usage: $&noreturn lambda args ...");
-	Ref<Closure> closure = getclosure(list->term);
-	if (closure == NULL || closure->tree->kind != nLambda)
-		fail("$&noreturn", "$&noreturn: %E is not a lambda", list->term);
-	Ref<Tree> tree = closure->tree;
-	Ref<Binding> context = bindargs(tree->u[0].p, list->next, closure->binding);
-	list = walk(tree->u[1].p, context.release(), evalflags);
-	return list;
-}
-
 PRIM(setmaxevaldepth) {
 	char *s;
 	long n;
@@ -299,7 +287,6 @@ extern void initprims_etc(Prim_dict& primdict) {
 	X(result);
 	X(isinteractive);
 	X(exitonfalse);
-	X(noreturn);
 	X(setmaxevaldepth);
 #if READLINE
 	X(resetterminal);

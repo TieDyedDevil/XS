@@ -93,13 +93,12 @@ fn-false	:= result 1
 
 #	These functions just generate exceptions for control-flow
 #	constructions.  The for command and the while builtin both
-#	catch the break exception, and lambda-invocation catches
-#	return.  The interpreter main() routine (and nothing else)
+#	catch the break exception.
+#	The interpreter main() routine (and nothing else)
 #	catches the exit exception.
 
 fn-break	:= throw break
 fn-exit		:= throw exit
-fn-return	:= throw return
 
 
 fn-if := @ condition action else actions {
@@ -114,7 +113,7 @@ fn-if := @ condition action else actions {
 #	sure that the return value is correct.
 
 
-fn-unwind-protect := $&noreturn @ body cleanup {
+fn-unwind-protect := @ body cleanup {
 	if {!~ $#cleanup 1} {
 		throw error unwind-protect 'unwind-protect body cleanup'
 	}
@@ -181,10 +180,10 @@ fn whatis {
 }
 
 #	The while function is implemented with the forever looping primitive.
-#	While uses $&noreturn to indicate that, while it is a lambda, it
+#	While uses to indicate that, while it is a lambda, it
 #	does not catch the return exception.  It does, however, catch break.
 
-fn-while := $&noreturn @ cond body {
+fn-while := @ cond body {
 	catch @ e value {
 		if {!~ $e break} {
 			throw $e $value
@@ -202,11 +201,11 @@ fn-while := $&noreturn @ cond body {
 	}
 }
 
-fn-until := $&noreturn @ cond body {
+fn-until := @ cond body {
 	while { ! $cond } $body
 }
 
-fn-switch := $&noreturn @ value args {
+fn-switch := @ value args {
 	if {~ $args ()} {
 		throw error switch 'usage: switch value [case1 action1] [case2 action2]...default'
 	}
@@ -231,14 +230,14 @@ fn-switch := $&noreturn @ value args {
 # it becomes multiple elements in the new list
 # Returns value as list (since last operation is assign, no return needed)
 
-fn-map := $&noreturn @ fn-f list {
+fn-map := @ fn-f list {
 	let (result:=)
 		for (item := $list)
 			result := $result <={f $item}
 }
 
 # Like map, but uses output (without splitting) of f
-fn-omap := $&noreturn @ fn-f list {
+fn-omap := @ fn-f list {
 	map @ x { result `` '' { f $x } } $list
 }
 
@@ -391,11 +390,11 @@ fn %backquote {
 
 fn-%seq		:= $&seq
 
-fn-%not := $&noreturn @ cmd {
+fn-%not := @ cmd {
 	if {$cmd} {false} else {true}
 }
 
-fn-%and := $&noreturn @ first rest {
+fn-%and := @ first rest {
 	let (result := <={$first}) {
 		if {~ $#rest 0} {
 			result $result
@@ -407,7 +406,7 @@ fn-%and := $&noreturn @ first rest {
 	}
 }
 
-fn-%or := $&noreturn @ first rest {
+fn-%or := @ first rest {
 	if {~ $#first 0} {
 		false
 	} else {

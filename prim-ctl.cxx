@@ -58,8 +58,7 @@ PRIM(catch) {
 			blocksignals();
 			try {
 				result
-				  = eval(mklist(mkstr("$&noreturn"),
-					        mklist(list->term, frombody)),
+				  = eval(mklist(list->term, frombody),
 					 NULL,
 					 evalflags);
 				unblocksignals();
