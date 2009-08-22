@@ -410,7 +410,7 @@ fn-%and := $&noreturn @ first rest {
 fn-%or := $&noreturn @ first rest {
 	if {~ $#first 0} {
 		false
-	} {
+	} else {
 		let (result := <={$first}) {
 			if {~ $#rest 0} {
 				result $result
