@@ -210,7 +210,7 @@ static void dumpvar(void *ignore, const char *key, void *value) {
 
 static Buffer *rootbuf = NULL;
 static void rootadd(const char* name) {
-	if (name == "NULL") return;
+	if (strcmp(name,"NULL") == 0) return;
 	if (rootbuf == NULL) rootbuf = openbuffer(2048);
 	rootbuf = bufcat(rootbuf, str("globalroot((void *) &%s);\n", name));
 }
