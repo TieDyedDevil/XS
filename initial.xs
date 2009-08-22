@@ -102,10 +102,10 @@ fn-exit		:= throw exit
 fn-return	:= throw return
 
 
-fn-if := $&noreturn @ condition action else actions {
+fn-if := @ condition action else actions {
         $&if ({$condition} {$action}
               {~ $else else} {$actions}
-              {!~ $actions ()} {throw error if 'if: expected else, got: '^$^actions})
+              {!~ $else ()} {throw error if 'if: expected else, got: '^$else^' '$^actions})
 }
 
 #	unwind-protect is a simple wrapper around catch that is used
