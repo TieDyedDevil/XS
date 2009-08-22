@@ -287,9 +287,9 @@ fn vars {
 	# choose default options
 	if {~ $* -a} {
 		* := -v -f -s -e -p -i
-	} {
-		if {!~ $* -[vfs]} else { * := $* -v }
-		if {!~ $* -[epi]} else { * := $* -e }
+	} else {
+		if {!~ $* -[vfs]} { * := $* -v }
+		if {!~ $* -[epi]} { * := $* -e }
 	}
 
 	let (
@@ -325,7 +325,7 @@ fn vars {
 			if {$export || $priv} {
 				for (var := <= $&vars)
 					# if not exported but in priv
-					if {if {~ $var $noexport} else if $priv else $export} {
+					if {if {~ $var $noexport} $priv else $export} {
 						$dovar $var
 					}
 			}
