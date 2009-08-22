@@ -59,7 +59,7 @@ REDIR(openfile) {
 		{ "r+",	oReadWrite },
 		{ "w+",	oReadCreate },
 		{ "a+",	oReadAppend },
-		{ NULL, }
+		{ NULL, oOpen /* irrelevant */ }
 	};
 
 	assert(length(list) == 3);
