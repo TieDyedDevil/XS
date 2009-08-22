@@ -90,6 +90,8 @@ PRIM(umask) {
 		mask = strtol(s, &t, 8);
 		if ((t != NULL && *t != '\0') || ((unsigned) mask) > 07777)
 			fail("$&umask", "bad umask: %s", s);
+		if (umask(mask) == -1)
+			fail("$&umask", "umask %04o: %s", mask, esstrerror(errno));
 		return ltrue;
 	}
 	fail("$&umask", "usage: umask [mask]");
