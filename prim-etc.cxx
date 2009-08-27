@@ -250,6 +250,7 @@ PRIM(resetterminal) {
 	return ltrue;
 }
 #include <readline/readline.h>
+/* Return strings which you can use to delimit invisible characters in rompts */
 PRIM(promptignore) {
 	static const char s[] = { RL_PROMPT_START_IGNORE, '\0' };
 	return mklist(mkstr(s), NULL);
