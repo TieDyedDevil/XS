@@ -1,4 +1,6 @@
 /* input.h -- definitions for es lexical analyzer ($Revision: 1.1.1.1 $) */
+#ifndef INPUT_HXX
+#define INPUT_HXX
 
 #define	MAXUNGET	2		/* maximum 2 character pushback */
 
@@ -53,3 +55,4 @@ extern void initparse(void);
 /* heredoc.c */
 
 extern void emptyherequeue(void);
+#endif

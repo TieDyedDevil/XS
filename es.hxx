@@ -1,4 +1,6 @@
 /* es.hxx -- definitions for higher order shell ($Revision: 1.2 $) */
+#ifndef ES_HXX
+#define ES_HXX
 
 #include "config.h"
 #include "stdenv.hxx"
@@ -496,3 +498,4 @@ extern void print_exception(List *e);
 
 
 
+#endif
