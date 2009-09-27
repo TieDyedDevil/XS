@@ -6,32 +6,32 @@
 
 unsigned long evaldepth = 0, maxevaldepth = MAXmaxevaldepth;
 
-static void failexec(Ref<const char> file, Ref<List> args) NORETURN;
-static void failexec(Ref<const char> file, Ref<List> args) {
+static void failexec(const char* file, List* args) NORETURN;
+static void failexec(const char* file, List* args) {
 	List *fn;
 	assert(gcisblocked());
 	fn = varlookup("fn-%exec-failure", NULL);
 	if (fn != NULL) {
 		int olderror = errno;
-		Ref<List> list = append(fn, mklist(mkstr(file.release()), args.release()));
-		gcenable();
-		eval(list.release(), NULL, 0);
+		List* list = append(fn, mklist(mkstr(file), args));
+		
+		eval(list, NULL, 0);
 		errno = olderror;
 	}
-	eprint("%s: %s\n", file.uget(), esstrerror(errno));
+	eprint("%s: %s\n", file, esstrerror(errno));
 	exit(1);
 }
 
 /* forkexec -- fork (if necessary) and exec */
 extern List *forkexec(const char *file, List *list, bool inchild) {
-	gcdisable();
-	Ref<Vector> env = mkenv();
+	
+	Vector* env = mkenv();
 	int pid = efork(!inchild, false);
 	if (pid == 0) {
 		execve(file, vectorize(list)->vector, env->vector);
 		failexec(file, list);
 	}
-	gcenable();
+	
 	int status = ewaitfor(pid);
 	if ((status & 0xff) == 0) {
 		sigint_newline = false;
@@ -44,7 +44,7 @@ extern List *forkexec(const char *file, List *list, bool inchild) {
 }
 
 /* Sets each value to each values, with proper semantics for things like (a b) := 1 2 3 */
-static void assign_helper(Ref<List>& value, Ref<List>& values, void *vars) {
+static void assign_helper(List*& value, List*& values, void *vars) {
 	if (!values) value = NULL;
 	else if (vars == NULL || values->next == NULL) {
 		value = values;
@@ -56,32 +56,32 @@ static void assign_helper(Ref<List>& value, Ref<List>& values, void *vars) {
 }
 
 /* assign -- bind a list of values to a list of variables */
-static List *assign(Ref<Tree> varform, Ref<Tree> valueform, Ref<Binding> binding) {
-	Ref<List> vars = glom(varform.release(), binding.uget(), false);
+static List *assign(Tree* varform, Tree* valueform, Binding* binding) {
+	List* vars = glom(varform, binding, false);
 
 	if (vars == NULL)
 		fail("es:assign", "null variable name");
 
-	Ref<List> values = glom(valueform.release(), binding.uget(), true);
-	Ref<List> result = values;
+	List* values = glom(valueform, binding, true);
+	List* result = values;
 
-	Ref<List> value;
-	Ref<const char> name;
+	List* value;
+	const char* name;
 	for (; vars != NULL; vars = vars->next) {
 		name = getstr(vars->term);
 		assign_helper(value, values, vars->next);
-		vardef(name.release(), binding.uget(), value.release());
+		vardef(name, binding, value);
 	}
 
-	return result.release();
+	return result;
 }
 
 /* letbindings -- create a new Binding containing let-bound (lexical) variables */
-static Binding *letbindings(Ref<Tree> defn, Ref<Binding> binding,
-			    Ref<Binding> context, int evalflags) {
-	Ref<Tree> assign;
-	Ref<List> vars, values, value;
-	Ref<const char> name;
+static Binding *letbindings(Tree* defn, Binding* binding,
+			    Binding* context, int evalflags) {
+	Tree* assign;
+	List *vars, *values, *value;
+	const char* name;
 
 	for (; defn != NULL; defn = defn->u[1].p) {
 		assert(defn->kind == nList);
@@ -90,8 +90,8 @@ static Binding *letbindings(Ref<Tree> defn, Ref<Binding> binding,
 
 		assign = defn->u[0].p;
 		assert(assign->kind == nAssign);
-		vars = glom(assign->u[0].p, context.uget(), false);
-		values = glom(assign->u[1].p, context.uget(), true);
+		vars = glom(assign->u[0].p, context, false);
+		values = glom(assign->u[1].p, context, true);
 
 		if (vars == NULL)
 			fail("es:let", "null variable name");
@@ -99,18 +99,18 @@ static Binding *letbindings(Ref<Tree> defn, Ref<Binding> binding,
 		for (; vars != NULL; vars = vars->next) {
 			name = getstr(vars->term);
 			assign_helper(value, values, vars->next);
-			binding = mkbinding(name.release(), value.release(), binding.release());
+			binding = mkbinding(name, value, binding);
 		}
 	}
 
-	return binding.release();
+	return binding;
 }
 
 /* localbind -- recursively convert a Bindings list into dynamic binding */
-static List *localbind(Ref<Binding> dynamic, Ref<Binding> lexical,
-		       Ref<Tree> body, int evalflags) {
+static List *localbind(Binding* dynamic, Binding* lexical,
+		       Tree* body, int evalflags) {
 	if (!dynamic)
-		return walk(body.uget(), lexical.uget(), evalflags);
+		return walk(body, lexical, evalflags);
 	else {
 		Push p(dynamic->name, dynamic->defn);
 		return localbind(dynamic->next, lexical, body, evalflags);
@@ -118,42 +118,42 @@ static List *localbind(Ref<Binding> dynamic, Ref<Binding> lexical,
 }
 
 /* local -- build, recursively, one layer of local assignment */
-static List *local(Tree *defn, Ref<Tree> body,
-		   Ref<Binding> bindings, int evalflags) {
-	Ref<Binding> dynamic =
+static List *local(Tree *defn, Tree* body,
+		   Binding* bindings, int evalflags) {
+	Binding* dynamic =
 	    reversebindings(letbindings(defn, NULL, bindings, evalflags));
 	return localbind(dynamic, bindings, body, evalflags);
 }
 
 /* forloop -- evaluate a for loop */
-static List *forloop(Ref<Tree> defn, Ref<Tree> body,
-		     Ref<Binding> outer, int evalflags) {
+static List *forloop(Tree* defn, Tree* body,
+		     Binding* outer, int evalflags) {
 	static List MULTIPLE = { NULL, NULL };
 
-	Ref<Binding> looping = NULL;
+	Binding* looping = NULL;
 	for (; defn != NULL; defn = defn->u[1].p) {
 		assert(defn->kind == nList);
 		if (defn->u[0].p == NULL)
 			continue;
-		Ref<Tree> assign = defn->u[0].p;
+		Tree* assign = defn->u[0].p;
 		assert(assign->kind == nAssign);
-		Ref<List> vars = glom(assign->u[0].p, outer.uget(), false);
-		Ref<List> list = glom(assign->u[1].p, outer.uget(), true);
+		List* vars = glom(assign->u[0].p, outer, false);
+		List* list = glom(assign->u[1].p, outer, true);
 		if (vars == NULL)
 			fail("es:for", "null variable name");
 		for (; vars != NULL; vars = vars->next) {
-			Ref<const char> var = getstr(vars->term);
-			looping = mkbinding(var.release(), list.uget(), looping.release());
+			const char* var = getstr(vars->term);
+			looping = mkbinding(var, list, looping);
 			list = &MULTIPLE;
 		}
 		SIGCHK();
 	}
-	looping = reversebindings(looping.release());
+	looping = reversebindings(looping);
 
 	bool allnull;
-	Ref<Binding> bp, lp, sequence; 
-	Ref<List> value;
-	Ref<List> result = ltrue;
+	Binding *bp, *lp, *sequence; 
+	List* value;
+	List* result = ltrue;
 
 	try {
 		for (;;) {
@@ -172,12 +172,12 @@ static List *forloop(Ref<Tree> defn, Ref<Tree> body,
 					sequence->defn = sequence->defn->next;
 					allnull = false;
 				}
-				bp = mkbinding(lp->name, value.release(), bp.release());
+				bp = mkbinding(lp->name, value, bp);
 			}
 			if (allnull) {
 				break;
 			}
-			result = walk(body.uget(), bp.uget(), evalflags & eval_exitonfalse);
+			result = walk(body, bp, evalflags & eval_exitonfalse);
 			SIGCHK();
 		}
 	} catch (List *e) {
@@ -185,31 +185,31 @@ static List *forloop(Ref<Tree> defn, Ref<Tree> body,
 			throwE(e);
 		return e->next;
 	}
-	return result.release();
+	return result;
 }
 
 /* matchpattern -- does the text match a pattern? */
-static List *matchpattern(Ref<Tree> subjectform, Ref<Tree> patternform,
-			  Ref<Binding> binding) {
+static List *matchpattern(Tree* subjectform, Tree* patternform,
+			  Binding* binding) {
 	StrList *quote = NULL;
-	Ref<List> subject = glom(subjectform.release(), binding.uget(), true);
-	Ref<List> pattern = glom2(patternform.uget(), binding.uget(), &quote);
-	return listmatch(subject.release(), pattern.release(), quote) 
+	List* subject = glom(subjectform, binding, true);
+	List* pattern = glom2(patternform, binding, &quote);
+	return listmatch(subject, pattern, quote) 
 		? ltrue 
 		: lfalse;
 }
 
 /* extractpattern -- Like matchpattern, but returns matches */
-static List *extractpattern(Ref<Tree> subjectform, Ref<Tree> patternform,
-			    Ref<Binding> binding) {
+static List *extractpattern(Tree* subjectform, Tree* patternform,
+			    Binding* binding) {
 	StrList *quote = NULL;
-	Ref<List> subject = glom(subjectform.uget(), binding.uget(), true);
-	Ref<List> pattern = glom2(patternform.uget(), binding.uget(), &quote);
-	return extractmatches(subject.release(), pattern.release(), quote);
+	List* subject = glom(subjectform, binding, true);
+	List* pattern = glom2(patternform, binding, &quote);
+	return extractmatches(subject, pattern, quote);
 }
 
 /* walk -- walk through a tree, evaluating nodes */
-extern List *walk(Ref<Tree> tree, Ref<Binding> binding, int flags) {
+extern List *walk(Tree* tree, Binding* binding, int flags) {
 	SIGCHK();
 
 top:
@@ -218,7 +218,7 @@ top:
 	switch (tree->kind) {
 	    case nConcat: case nList: case nQword: case nVar: case nVarsub:
 	    case nWord: case nThunk: case nLambda: case nCall: case nPrim: {
-		Ref<List> list = glom(tree, binding, true);
+		List* list = glom(tree, binding, true);
 		return eval(list, binding, flags);
 	    }
 
@@ -251,20 +251,20 @@ top:
 }
 
 /* bindargs -- bind an argument list to the parameters of a lambda */
-extern Binding *bindargs(Ref<Tree> params, Ref<List> args, Ref<Binding> binding) {
-	if (!params) return mkbinding("*", args.release(), binding.release());
+extern Binding *bindargs(Tree* params, List* args, Binding* binding) {
+	if (!params) return mkbinding("*", args, binding);
 
-	Ref<List> value;
-	Ref<Tree> param;
+	List* value;
+	Tree* param;
 	for (; params; params = params->u[1].p) {
 		assert(params->kind == nList);
 		param = params->u[0].p;
 		assert(param->kind == nWord || param->kind == nQword);
 		assign_helper(value, args, params->u[1].p);
-		binding = mkbinding(param->u[0].s, value.release(), binding.release());
+		binding = mkbinding(param->u[0].s, value, binding);
 	}
 
-	return binding.release();
+	return binding;
 }
 
 /* pathsearch -- evaluate fn %pathsearch + some argument */
@@ -289,13 +289,13 @@ class Depth_tracker {
 };
 
 /* eval -- evaluate a list, producing a list */
-extern List *eval(Ref<List> list, Ref<Binding> binding, int flags) {
+extern List *eval(List* list, Binding* binding, int flags) {
 	Depth_tracker t;
 
 	Closure *volatile cp;
 
-	Ref<const char> name, funcname;
-	Ref<List> fn;
+	const char *name, *funcname = NULL;
+	List* fn;
 
 restart:
 	if (list == NULL) return ltrue;
@@ -305,14 +305,14 @@ restart:
 		switch (cp->tree->kind) {
 		    case nPrim:
 			assert(cp->binding == NULL);
-			list = prim(cp->tree->u[0].s, list->next, binding.uget(), flags);
+			list = prim(cp->tree->u[0].s, list->next, binding, flags);
 			break;
 		    case nThunk:
 			list = walk(cp->tree->u[0].p, cp->binding, flags);
 			break;
 		    case nLambda:
 		    {
-			Ref<Tree> tree = cp->tree;
+			Tree* tree = cp->tree;
 			      
 			/* define a return function */
 
@@ -333,7 +333,7 @@ restart:
 			assert(termeq(&return_term, "return") && return_def.next && termeq(return_def.next->term, id.c_str()));
 
 			try {
-				Ref<Binding> context =  bindargs(tree->u[0].p,
+				Binding* context =  bindargs(tree->u[0].p,
 							 list->next,
 							 cp->binding);
 
@@ -342,7 +342,7 @@ restart:
 #define WALKFN walk(tree->u[1].p, context, flags)
 				if (funcname) {
 					Push p("0",
-					     mklist(mkterm(funcname.uget(),
+					     mklist(mkterm(funcname,
 							  NULL),
 					 	    NULL));
 
@@ -373,17 +373,17 @@ restart:
 	/* the logic here is duplicated in $&whatis */
 
 	name = getstr(list->term);
-	fn = varlookup2("fn-", name.uget(), binding.uget());
+	fn = varlookup2("fn-", name, binding);
 	if (fn != NULL) {
 		funcname = name;
 		list = append(fn, list->next);
 		goto restart;
 	}
-	if (isabsolute(name.uget())) {
-		const char *error = checkexecutable(name.uget());
+	if (isabsolute(name)) {
+		const char *error = checkexecutable(name);
 		if (error)
-			fail("$&whatis", "%s: %s", name.uget(), error);
-		list = forkexec(name.uget(), list.release(), flags & eval_inchild);
+			fail("$&whatis", "%s: %s", name, error);
+		list = forkexec(name, list, flags & eval_inchild);
 		goto done;
 	}
 
@@ -391,7 +391,7 @@ restart:
 	if (fn != NULL && fn->next == NULL
 	    && (cp = getclosure(fn->term)) == NULL) {
 		const char *name = getstr(fn->term);
-		list = forkexec(name, list.release(), flags & eval_inchild);
+		list = forkexec(name, list, flags & eval_inchild);
 		goto done;
 	}
 
@@ -399,8 +399,8 @@ restart:
 	goto restart;
 
 done:
-	if ((flags & eval_exitonfalse) && !istrue(list.uget()))
-		exit(exitstatus(list.uget()));
-	return list.release();
+	if ((flags & eval_exitonfalse) && !istrue(list))
+		exit(exitstatus(list));
+	return list;
 }
 

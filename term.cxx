@@ -4,46 +4,44 @@
 #include "gc.hxx"
 #include "term.hxx"
 
-DefineTag(Term, static);
-
-extern Ref<Term> mkterm(Ref<const char> str, Ref<Closure> closure) {
-	Ref<Term> term = gcnew(Term);
-	term->str = str.release();
-	term->closure = closure.release();
+extern Term* mkterm(const char* str, Closure* closure) {
+	Term* term = gcnew(Term);
+	term->str = str;
+	term->closure = closure;
 	return term;
 }
 
-extern Ref<Term> mkstr(Ref<const char> str) {
-	Ref<Term> term = gcnew(Term);
-        term->str = str.release();
+extern Term* mkstr(const char* str) {
+	Term* term = gcnew(Term);
+        term->str = str;
 	term->closure = NULL;
         return term;
 }
 
-extern Closure *getclosure(Ref<Term> term) {
+extern Closure *getclosure(Term* term) {
 	if (term->closure == NULL) {
-		Ref<const char> s = term->str;
+		const char* s = term->str;
 		assert(s);
 		if (
-			((*s == '{' || *s == '@') && s[strlen(s.uget()) - 1] == '}')
+			((*s == '{' || *s == '@') && s[strlen(s) - 1] == '}')
 			|| (*s == '$' && s[1] == '&')
-			|| hasprefix(s.uget(), "%closure")
+			|| hasprefix(s, "%closure")
 		) {
-			Ref<Tree> np = parsestring(s.uget());
+			Tree* np = parsestring(s);
 			if (np == NULL) return NULL;
-			term->closure = extractbindings(np.uget());
+			term->closure = extractbindings(np);
 			term->str = NULL;
 		}
 	}
 	return term->closure;
 }
 
-extern const char *getstr(Ref<Term> term) {
-	Ref<const char> s = term->str;
-	Ref<Closure> closure = term->closure;
+extern const char *getstr(Term* term) {
+	const char* s = term->str;
+	Closure* closure = term->closure;
 	assert((s == NULL) != (closure == NULL));
 	if (s != NULL)
-		return s.release();
+		return s;
 
 #if 0	/* TODO: decide whether getstr() leaves term in closure or string form */
 	s = str("%C", closure);
@@ -51,32 +49,19 @@ extern const char *getstr(Ref<Term> term) {
 	term->closure = NULL;
 	return s;
 #else
-	return str("%C", closure.uget());
+	return str("%C", closure);
 #endif
 }
 
-extern Ref<Term> termcat(Ref<Term> t1, Ref<Term> t2) {
+extern Term* termcat(Term* t1, Term* t2){
 	if (t1 == NULL)
-		return t2.release();
+		return t2;
 	if (t2 == NULL)
-		return t1.release();
+		return t1;
 	return mkstr(
-		str("%s%s", getstr(t1.uget()), getstr(t2.uget())));
+		str("%s%s", getstr(t1), getstr(t2)));
 }
 
-
-static void *TermCopy(void *op) {
-	void *np = gcnew(Term);
-	memcpy(np, op, sizeof (Term));
-	return np;
-}
-
-static size_t TermScan(void *p) {
-	Term *term = reinterpret_cast<Term*>(p);
-	term->closure = forward(term->closure);
-	term->str = forward(const_cast<char*>(term->str));
-	return sizeof (Term);
-}
 
 extern bool termeq(Term *term, const char *s) {
 	assert(term != NULL);

@@ -7,29 +7,13 @@
  * allocation and garbage collector support
  */
 
-DefineTag(List, static);
-
-extern List *mklist(Ref<Term> term, Ref<List> next) {
+extern List *mklist(Term* term, List* next) {
 	assert(term != NULL);
-	Ref<List> list = gcnew(List);
-	list->term = term.release();
-	list->next = next.release();
-	return list.release();
+	List* list = gcnew(List);
+	list->term = term;
+	list->next = next;
+	return list;
 }
-
-static void *ListCopy(void *op) {
-	void *np = gcnew(List);
-	memcpy(np, op, sizeof (List));
-	return np;
-}
-
-static size_t ListScan(void *p) {
-	List *list = reinterpret_cast<List*>(p);
-	list->term = forward(list->term);
-	list->next = forward(list->next);
-	return sizeof (List);
-}
-
 
 /*
  * basic list manipulations
@@ -50,21 +34,20 @@ extern List *reverse(List *list) {
 }
 
 /* append -- merge two lists, non-destructively */
-extern List *append(Ref<List> head, Ref<List> tail) {
+extern List *append(List* head, List* tail) {
 	List *lp, **prevp;
-	gcreserve(40 * sizeof (List));
-	gcdisable();
+	
 
 	for (prevp = &lp; head; head = head->next) {
 		List *np = mklist(head->term, NULL);
 		*prevp = np;
 		prevp = &np->next;
 	}
-	*prevp = tail.release();
+	*prevp = tail;
 
-	Ref<List> result = lp;
-	gcenable();
-	return result.release();
+	List* result = lp;
+	
+	return result;
 }
 
 /* listcopy -- make a copy of a list */
@@ -73,7 +56,7 @@ extern List *listcopy(List *list) {
 }
 
 /* length -- lenth of a list */
-extern int length(Ref<List> list) {
+extern int length(List* list) {
 	int len = 0;
 	for (; list != NULL; list = list->next)
 		++len;
@@ -82,13 +65,13 @@ extern int length(Ref<List> list) {
 
 /* listify -- turn an argc/argv vector into a list */
 extern List *listify(int argc, char **argv) {
-	gcdisable();
+	
 	List *list = NULL;
 	while (argc > 0) {
-		Term *term = mkstr(argv[--argc]).release();
+		Term *term = mkstr(argv[--argc]);
 		list = mklist(term, list);
 	}
-	gcenable();
+	
 	return list;
 }
 
@@ -103,18 +86,18 @@ extern Term *nth(List *list, int n) {
 	return NULL;
 }
 
-static List *listify(Ref<Vector> v) {
-	Ref<List> list;
+static List *listify(Vector* v) {
+	List* list = NULL;
 	while (v->count > 0) {
-		Ref<Term> term = mkstr(v->vector[--v->count]);
+		Term* term = mkstr(v->vector[--v->count]);
 		list = mklist(term, list);
 	}
-	return list.release();
+	return list;
 }
 
 /* sortlist */
-extern Ref<List> sortlist(Ref<List> list) {
-	Ref<Vector> v = vectorize(list);
+extern List* sortlist(List* list) {
+	Vector* v = vectorize(list);
 	sortvector(v);
 	return listify(v);
 }

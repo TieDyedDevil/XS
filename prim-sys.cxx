@@ -301,7 +301,7 @@ PRIM(time) {
 	time_t t0, t1;
 	struct rusage r;
 
-	gc();	/* do a garbage collection first to ensure reproducible results */
+	GC_gcollect();	/* do a garbage collection first to ensure reproducible results */
 	t0 = time(NULL);
 	pid = efork(true, false);
 	if (pid == 0)
@@ -316,7 +316,7 @@ PRIM(time) {
 		(long long) t1 - t0,
 		(long long) r.ru_utime.tv_sec, (long long) (r.ru_utime.tv_usec / 100000),
 		(long long) r.ru_stime.tv_sec, (long long) (r.ru_stime.tv_usec / 100000),
-		list.uget(), " "
+		list, " "
 	);
 
 	return mklist(mkstr(mkstatus(status)), NULL);
@@ -353,7 +353,7 @@ PRIM(time) {
 			(t1 - t0 + ticks / 2) / ticks,
 			tms.tms_cutime / ticks, ((tms.tms_cutime * 10) / ticks) % 10,
 			tms.tms_cstime / ticks, ((tms.tms_cstime * 10) / ticks) % 10,
-			list.uget(), " "
+			list, " "
 		);
 		exit(status);
 	}
@@ -373,20 +373,20 @@ PRIM(execfailure) {
 	int fd, len, argc;
 	char header[1024], *args[10], *s, *end, *file;
 
-	gcdisable();
+	
 	if (list == NULL)
 		fail("$&execfailure", "usage: %%exec-failure name argv");
 
 	file = getstr(list->term);
 	fd = eopen(file, oOpen);
 	if (fd < 0) {
-		gcenable();
+		
 		return NULL;
 	}
 	len = read(fd, header, sizeof header);
 	close(fd);
 	if (len <= 2 || header[0] != '#' || header[1] != '!') {
-		gcenable();
+		
 		return NULL;
 	}
 
@@ -397,7 +397,7 @@ PRIM(execfailure) {
 		int c;
 		while ((c = *s) == ' ' || c == '\t')
 			if (++s >= end) {
-				gcenable();
+				
 				return NULL;
 			}
 		if (c == '\n' || c == '\r')
@@ -405,7 +405,7 @@ PRIM(execfailure) {
 		args[argc++] = s;
 		do
 			if (++s >= end) {
-				gcenable();
+				
 				return NULL;
 			}
 		while (s < end && (c = *s) != ' ' && c != '\t' && c != '\n' && c != '\r');
@@ -414,7 +414,7 @@ PRIM(execfailure) {
 			break;
 	}
 	if (argc == 0) {
-		gcenable();
+		
 		return NULL;
 	}
 
@@ -426,7 +426,7 @@ PRIM(execfailure) {
 		list = mklist(mkstr(args[--argc]), list);
 
 	Ref(List *, lp, list);
-	gcenable();
+	
 	lp = eval(lp, NULL, eval_inchild);
 	RefReturn(lp);
 }

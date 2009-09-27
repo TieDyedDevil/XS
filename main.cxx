@@ -2,13 +2,6 @@
 
 #include "es.hxx"
 
-#if GCVERBOSE
-bool gcverbose	= false;	/* -G */
-#endif
-#if GCINFO
-bool gcinfo		= false;	/* -I */
-#endif
-
 extern int optind;
 extern char *optarg;
 
@@ -30,12 +23,12 @@ static void initpath(void) {
 	int i;
 	static const char * const path[] = { INITIAL_PATH };
 
-	Ref<List> list = NULL;
+	List* list = NULL;
 	for (i = arraysize(path); i-- > 0;) {
-		Ref<Term> t = mkstr((char *) path[i]);
+		Term* t = mkstr((char *) path[i]);
 		list = mklist(t, list);
 	}
-	vardef("path", NULL, list.release());
+	vardef("path", NULL, list);
 }
 
 /* initpid -- set $pid for this shell */
@@ -136,12 +129,6 @@ int main(int argc, char **argv) {
 		case 'o':	keepclosed = true;		break;
 		case 'd':	allowquit = true;		break;
 		case 's':	cmd_stdin = true;		goto getopt_done;
-#if GCVERBOSE
-		case 'G':	gcverbose = true;		break;
-#endif
-#if GCINFO
-		case 'I':	gcinfo = true;			break;
-#endif
 		default:
 			usage();
 		}

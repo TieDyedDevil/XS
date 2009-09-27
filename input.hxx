@@ -49,7 +49,6 @@ extern int passign;
 
 extern Tree *parsetree;
 extern int yyparse(void);
-extern void initparse(void);
 
 
 /* heredoc.c */

@@ -321,7 +321,7 @@ static char ** command_completion(const char *text, int start, int end) {
 	int results_size = 2;
 
 	/* Lookup matching commands */
-	for (Ref<List> paths = varlookup("path", NULL);
+	for (List* paths = varlookup("path", NULL);
 	     paths != NULL;
 	     paths = paths->next)
 	{
@@ -336,7 +336,7 @@ static char ** command_completion(const char *text, int start, int end) {
 		*(glob_string + end - start) = '*';
 		*(glob_string + end - start + 1) = '\0';	
 
-		Ref<List> glob_result = dirmatch(path, path, glob_string, UNQUOTED);
+		List* glob_result = dirmatch(path, path, glob_string, UNQUOTED);
 		efree(path);
 
 		int l = length(glob_result);
@@ -344,7 +344,7 @@ static char ** command_completion(const char *text, int start, int end) {
 		
 		results_size += l;
 		results = reinterpret_cast<char**>(erealloc(results, results_size * sizeof(char*)));
-		for (Ref<List> i = glob_result; i != NULL; i = i->next, ++result_p) {
+		for (List* i = glob_result; i != NULL; i = i->next, ++result_p) {
 			/* Can't directly use gc_string, because readline
 			 * needs to free() the result 
 			 */
@@ -352,17 +352,17 @@ static char ** command_completion(const char *text, int start, int end) {
 		}
 	}
 
-	Ref<List> lvars;
+	List* lvars;
 	dictforall(vars, addtolist, &lvars);
 	/* Match (some) variables - can't easily match lexical/local because that would require partially
 	 * parsing/evaluating the input (which would contain a let/local somewhere in it) */
 	for (; lvars; lvars = lvars->next) {
-		Ref<const char> str = getstr(lvars->term);
-		if (strncmp("fn-", str.uget(), 3) != 0
-		   || strncmp(text, str.uget() + 3, end - start) != 0) continue;
+		const char* str = getstr(lvars->term);
+		if (strncmp("fn-", str, 3) != 0
+		   || strncmp(text, str + 3, end - start) != 0) continue;
 		++results_size;
 		results = reinterpret_cast<char**>(erealloc(results, results_size * sizeof(char*)));
-		results[result_p++] = strdup(str.release() + 3);
+		results[result_p++] = strdup(str + 3);
 	}
 
 	assert (result_p == results_size - 1);
@@ -451,10 +451,8 @@ extern Tree *parse(const char *pr1, const char *pr2) {
 #endif
 	prompt2 = pr2;
 
-	gcreserve(300 * sizeof (Tree));
-	gcdisable();
 	result = yyparse();
-	gcenable();
+	
 
 	if (result || error != NULL) {
 		assert(error != NULL);
@@ -477,8 +475,8 @@ extern void resetparser(void) {
 /* runinput -- run from an input source */
 extern List *runinput(Input *in, int runflags) {
 	int flags = runflags;
-	Ref<List> result;
-	Ref<List> repl, dispatch;
+	List* result;
+	List *repl, *dispatch;
 	const char *dispatcher[] = {
 		"fn-%eval-noprint",
 		"fn-%eval-print",
@@ -500,14 +498,14 @@ extern List *runinput(Input *in, int runflags) {
 		if (flags & eval_exitonfalse)
 			dispatch = mklist(mkstr("%exit-on-false"), dispatch);
 
-		Push push("fn-%dispatch", dispatch.uget());
+		Push push("fn-%dispatch", dispatch);
 
 		repl = varlookup((flags & run_interactive)
 				   ? "fn-%interactive-loop"
 				   : "fn-%batch-loop",
 				 NULL);
 		result = (repl == NULL)
-				? prim("batchloop", NULL, NULL, flags).release()
+				? prim("batchloop", NULL, NULL, flags)
 				: eval(repl, NULL, flags);
 	} catch (List *e) {
 		(*input->cleanup)(input);
@@ -517,7 +515,7 @@ extern List *runinput(Input *in, int runflags) {
 
 	input = in->prev;
 	(*in->cleanup)(in);
-	return result.release();
+	return result;
 }
 
 
@@ -549,9 +547,7 @@ extern List *runfd(int fd, const char *name, int flags) {
 	in.bufend = in.bufbegin;
 	in.name = (name == NULL) ? str("fd %d", fd) : name;
 
-	RefAdd(in.name);
 	result = runinput(&in, flags);
-	RefRemove(in.name);
 
 	return result;
 }
@@ -587,9 +583,7 @@ extern List *runstring(const char *str, const char *name, int flags) {
 	in.bufend = in.buf + in.buflen;
 	in.cleanup = stringcleanup;
 
-	RefAdd(in.name);
 	result = runinput(&in, flags);
-	RefRemove(in.name);
 	return result;
 }
 
@@ -639,9 +633,7 @@ extern Tree *parsestring(const char *str) {
 	in.bufend = in.buf + in.buflen;
 	in.cleanup = stringcleanup;
 
-	RefAdd(in.name);
 	result = parseinput(&in);
-	RefRemove(in.name);
 	return result;
 }
 
@@ -661,17 +653,8 @@ extern void initinput(void) {
 	yylloc.first_line = yylloc.last_line = 1;
 	yylloc.first_column = yylloc.last_column = 0;
 
-	/* declare the global roots */
-	globalroot(&history);		/* history file */
-	globalroot(&error);		/* parse errors */
-	globalroot(&prompt);		/* main prompt */
-	globalroot(&prompt2);		/* secondary prompt */
-
 	/* mark the historyfd as a file descriptor to hold back from forked children */
 	registerfd(&historyfd, true);
-
-	/* call the parser's initialization */
-	initparse();
 
 #if READLINE
 	rl_meta_chars = 0;

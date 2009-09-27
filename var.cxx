@@ -21,16 +21,14 @@ static int envmin;
 static bool isdirty = true;
 static bool rebound = true;
 
-DefineTag(Var, static);
-
 static bool specialvar(const char *name) {
 	return (*name == '*' || *name == '0') && name[1] == '\0';
 }
 
-static bool hasbindings(Ref<List> list) {
+static bool hasbindings(List* list) {
 	for (; list != NULL; list = list->next)
 		if (isclosure(list->term)) {
-			Ref<Closure> closure = getclosure(list->term);
+			Closure* closure = getclosure(list->term);
 			assert(closure != NULL);
 			if (closure->binding != NULL)
 				return true;
@@ -38,25 +36,12 @@ static bool hasbindings(Ref<List> list) {
 	return false;
 }
 
-static Var *mkvar(Ref<List> defn) {
-	Ref<Var> var = gcnew(Var);
+static Var *mkvar(List* defn) {
+	Var* var = gcnew(Var);
 	var->env = NULL;
 	var->flags = hasbindings(defn) ? var_hasbindings : 0;
-	var->defn = defn.release();
-	return var.release();
-}
-
-static void *VarCopy(void *op) {
-	void *np = gcnew(Var);
-	memcpy(np, op, sizeof (Var));
-	return np;
-}
-
-static size_t VarScan(void *p) {
-	Var *var = reinterpret_cast<Var*>(p);
-	var->defn = forward(var->defn);
-	var->env = ((var->flags & var_hasbindings) && rebound) ? NULL : forward(var->env);
-	return sizeof (Var);
+	var->defn = defn;
+	return var;
 }
 
 /* iscounting -- is it a counter number, i.e., an integer > 0 */
@@ -104,29 +89,29 @@ extern void setnoexport(List *list) {
 		noexport = NULL;
 		return;
 	}
-	gcdisable();
+	
 	for (noexport = mkdict(); list != NULL; list = list->next)
 		noexport = dictput(noexport, getstr(list->term), (void *) setnoexport);
-	gcenable();
+	
 }
 
 /* varlookup -- lookup a variable in the current context */
-extern List *varlookup(Ref<const char> name, Ref<Binding> bp) {
-	Ref<Var> var;
+extern List *varlookup(const char* name, Binding* bp) {
+	Var* var;
 
-	if (iscounting(name.uget())) {
-		Ref<Term> term = nth(varlookup("*", bp), strtol(name.uget(), NULL, 10));
+	if (iscounting(name)) {
+		Term* term = nth(varlookup("*", bp), strtol(name, NULL, 10));
 		if (term == NULL)
 			return NULL;
 		return mklist(term, NULL);
 	}
 
-	validatevar(name.uget());
+	validatevar(name);
 	for (; bp != NULL; bp = bp->next)
-		if (streq(name.uget(), bp->name))
+		if (streq(name, bp->name))
 			return bp->defn;
 
-	var = reinterpret_cast<Var*>(dictget(vars, name.uget()));
+	var = reinterpret_cast<Var*>(dictget(vars, name));
 	if (var == NULL)
 		return NULL;
 	return var->defn;
@@ -145,52 +130,50 @@ extern List *varlookup2(const char *name1, const char *name2, Binding *bp) {
 	return var->defn;
 }
 
-static List *callsettor(Ref<const char> name, Ref<List> defn) {
-	Ref<List> settor;
+static List *callsettor(const char* name, List* defn) {
+	List* settor;
 
-	if (specialvar(name.uget()) || (settor = varlookup2("set-", name.uget(), NULL)) == NULL)
-		return defn.release();
+	if (specialvar(name) || (settor = varlookup2("set-", name, NULL)) == NULL)
+		return defn;
 
-	Push p("0", mklist(mkstr(name.uget()), NULL));
+	Push p("0", mklist(mkstr(name), NULL));
 
 	defn = listcopy(eval(append(settor, defn), NULL, 0));
 
-	return defn.release();
+	return defn;
 }
 
-extern void vardef(Ref<const char> name, Ref<Binding> binding, Ref<List> defn) {
-	validatevar(name.uget());
+extern void vardef(const char* name, Binding* binding, List* defn) {
+	validatevar(name);
 	for (; binding != NULL; binding = binding->next)
-		if (streq(name.uget(), binding->name)) {
-			binding->defn = defn.release();
+		if (streq(name, binding->name)) {
+			binding->defn = defn;
 			rebound = true;
 			return;
 		}
 
 	defn = callsettor(name, defn);
-	if (isexported(name.uget()))
+	if (isexported(name))
 		isdirty = true;
 
-	Ref<Var> var = reinterpret_cast<Var*>(dictget(vars, name.uget()));
+	Var* var = reinterpret_cast<Var*>(dictget(vars, name));
 	if (var != NULL) {
 		if (defn != NULL) {
-			var->defn = defn.uget();
+			var->defn = defn;
 			var->env = NULL;
-			var->flags = hasbindings(defn.uget()) ? var_hasbindings : 0;
+			var->flags = hasbindings(defn) ? var_hasbindings : 0;
 		} else
-			vars = dictput(vars, name.uget(), NULL);
+			vars = dictput(vars, name, NULL);
 	} else if (defn != NULL) {
 		var = mkvar(defn);
-		vars = dictput(vars, name.uget(), var.uget());
+		vars = dictput(vars, name, var);
 	}
 }
 
 extern void varpush(Push *push, const char *name, List *defn) {
 	validatevar(name);
 	push->name = name;
-	push->nameroot.next = rootlist;
 	push->nameroot.p = (void **) &push->name;
-	rootlist = &push->nameroot;
 
 	if (isexported(name))
 		isdirty = true;
@@ -210,15 +193,11 @@ extern void varpush(Push *push, const char *name, List *defn) {
 		var->flags	= hasbindings(defn) ? var_hasbindings : 0;
 	}
 
-	push->defnroot.next = rootlist;
 	push->defnroot.p = (void **) &push->defn;
-	rootlist = &push->defnroot;
 }
 
 extern void varpop(Push *push) {
 	Var *var;
-	assert(rootlist == &push->defnroot);
-	assert(rootlist->next == &push->nameroot);
 
 	if (isexported(push->name))
 		isdirty = true;
@@ -239,7 +218,6 @@ extern void varpop(Push *push) {
 		vars = dictput(vars, push->name, var);
 	}
 
-	rootlist = rootlist->next->next;
 }
 
 static void mkenv0(void *dummy, const char *key, void *value) {
@@ -259,24 +237,24 @@ static void mkenv0(void *dummy, const char *key, void *value) {
 	assert(env->count < env->alloclen);
 	env->vector[env->count++] = var->env;
 	if (env->count == env->alloclen) {
-		Ref<Vector> newenv = mkvector(env->alloclen * 2);
+		Vector* newenv = mkvector(env->alloclen * 2);
 		newenv->count = env->count;
 		memcpy(newenv->vector, env->vector, env->count * sizeof *env->vector);
-		env = newenv.release();
+		env = newenv;
 	}
 }
 	
-extern Ref<Vector> mkenv(void) {
+extern Vector* mkenv(void) {
 	if (isdirty || rebound) {
 		env->count = envmin;
-		gcdisable();		/* TODO: make this a good guess */
+				/* TODO: make this a good guess */
 		dictforall(vars, mkenv0, NULL);
-		gcenable();
+		
 		env->vector[env->count] = NULL;
 		isdirty = false;
 		rebound = false;
 		if (sortenv == NULL || env->count > sortenv->alloclen)
-			sortenv = mkvector(env->count * 2).release();
+			sortenv = mkvector(env->count * 2);
 		sortenv->count = env->count;
 		memcpy(sortenv->vector, env->vector, sizeof (char *) * (env->count + 1));
 		sortvector(sortenv);
@@ -287,7 +265,7 @@ extern Ref<Vector> mkenv(void) {
 /* addtolist -- dictforall procedure to create a list */
 extern void addtolist(void *arg, const char *key, void *value) {
 	List **listp = reinterpret_cast<List**>(arg);
-	Ref<Term> term = mkstr(key);
+	Term* term = mkstr(key);
 	*listp = mklist(term, *listp);
 }
 
@@ -303,9 +281,9 @@ static void listinternal(void *arg, const char *key, void *value) {
 
 /* listvars -- return a list of all the (dynamic) variables */
 extern List *listvars(bool internal) {
-	Ref<List> varlist;
+	List* varlist;
 	dictforall(vars, internal ? listinternal : listexternal, &varlist);
-	return (varlist = sortlist(varlist.uget())).release();
+	return (varlist = sortlist(varlist));
 }
 
 /* hide -- worker function for dictforall to hide initial state */
@@ -320,24 +298,20 @@ extern void hidevariables(void) {
 
 /* initvars -- initialize the variable machinery */
 extern void initvars(void) {
-	globalroot(&vars);
-	globalroot(&noexport);
-	globalroot(&env);
-	globalroot(&sortenv);
 	vars = mkdict();
 	noexport = NULL;
-	env = mkvector(10).release();
+	env = mkvector(10);
 }
 
 /* importvar -- import a single environment variable */
-static void importvar(Ref<char> name, Ref<char> value) {
+static void importvar(char* name, char* value) {
 	char sep[2] = { ENV_SEPARATOR, '\0' };
 
-	Ref<List> defn;
-	defn = fsplit(sep, mklist(mkstr(value.uget() + 1), NULL), false);
+	List* defn;
+	defn = fsplit(sep, mklist(mkstr(value + 1), NULL), false);
 
-	if (strchr(value.uget(), ENV_ESCAPE) != NULL) {
-		Ref<List> list;
+	if (strchr(value, ENV_ESCAPE) != NULL) {
+		List* list;
 		for (list = defn; list != NULL; list = list->next) {
 			int offset = 0;
 			const char *word = list->term->str;
@@ -352,9 +326,8 @@ static void importvar(Ref<char> name, Ref<char> value) {
 						  = list->next->term->str;
 						char *str =
 						  reinterpret_cast<char*>(
-						  gcalloc(offset
-							    + strlen(str2) + 1,
-							  &StringTag));
+						  GC_MALLOC(offset
+							    + strlen(str2) + 1));
 						memcpy(str, word, offset - 1);
 						str[offset - 1]
 						  = ENV_SEPARATOR;
@@ -365,8 +338,7 @@ static void importvar(Ref<char> name, Ref<char> value) {
 					break;
 				    case ENV_ESCAPE: {
 				    	char *str = reinterpret_cast<char*>(
-						gcalloc(strlen(word),
-							&StringTag));
+						GC_MALLOC(strlen(word)));
 					memcpy(str, word, offset);
 					strcpy(str + offset, escape + 2);
 					list->term->str = str;
@@ -377,7 +349,7 @@ static void importvar(Ref<char> name, Ref<char> value) {
 			}
 		}
 	}
-	vardef(name.uget(), NULL, defn.uget());
+	vardef(name, NULL, defn);
 }
 
 
@@ -394,11 +366,11 @@ extern void initenv(char **envp, bool isprotected) {
 		if (eq == NULL) {
 			env->vector[env->count++] = envstr;
 			if (env->count == env->alloclen) {
-				Ref<Vector> newenv = mkvector(env->alloclen * 2);
+				Vector* newenv = mkvector(env->alloclen * 2);
 				newenv->count = env->count;
 				memcpy(newenv->vector, env->vector,
 				       env->count * sizeof *env->vector);
-				env = newenv.release();
+				env = newenv;
 			}
 			continue;
 		}

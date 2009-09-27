@@ -1,4 +1,4 @@
-/* dict.c -- hash-table based dictionaries ($Revision: 1.1.1.1 $) */
+
 
 #include "es.hxx"
 #include "gc.hxx"
@@ -58,8 +58,6 @@ static unsigned long strhash(const char *str) {
  * data structures and garbage collection
  */
 
-DefineTag(Dict, static);
-
 typedef struct {
 	const char *name;
 	void *value;
@@ -73,33 +71,12 @@ struct Dict {
 
 static Dict *mkdict0(int size) {
 	size_t len = offsetof(Dict, table[0]) + size * sizeof(Assoc);
-	Dict *dict = reinterpret_cast<Dict*>(gcalloc(len, &DictTag));
+	Dict *dict = reinterpret_cast<Dict*>(GC_MALLOC(len));
 	memzero(dict, len);
 	dict->size = size;
 	dict->remain = remain(size);
 	return dict;
 }
-
-static void *DictCopy(void *op) {
-	Dict *dict = reinterpret_cast<Dict*>(op);
-	size_t len = offsetof(Dict, table[0]) + dict->size * sizeof(Assoc);
-	void *np = gcalloc(len, &DictTag);
-	memcpy(np, op, len);
-	return np;
-}
-
-static size_t DictScan(void *p) {
-	Dict *dict = reinterpret_cast<Dict*>(p);
-	int i;
-	for (i = 0; i < dict->size; i++) {
-		Assoc *ap = &dict->table[i];
-		ap->name  = forward(const_cast<char*>(ap->name));
-		ap->value = forward(ap->value);
-	}
-	return offsetof(Dict, table[0]) + sizeof(Assoc) * dict->size;
-}
-
-
 /*
  * private operations
  */
@@ -114,25 +91,25 @@ static Assoc *get(Dict *dict, const char *name) {
 	return NULL;
 }
 
-static Dict *put(Ref<Dict> dict, Ref<const char> name, Ref<void> value);
+static Dict *put(Dict* dict, const char* name, void* value);
 static void putForAll(void *dict, const char *name, void *value) {
 	put(reinterpret_cast<Dict*>(dict), name, value);
 }
 
-static Dict *put(Ref<Dict> dict, Ref<const char> name, Ref<void> value) {
+static Dict *put(Dict* dict, const char* name, void* value) {
 	unsigned long n, mask;
 	Assoc *ap;
-	assert(get(dict.uget(), name.uget()) == NULL);
+	assert(get(dict, name) == NULL);
 	assert(value != NULL);
 
 	if (dict->remain <= 1) {
-		Ref<Dict> newDict;
+		Dict* newDict;
 		newDict = mkdict0(grow(dict->size));
-		dictforall(dict.uget(), putForAll, newDict.uget());
+		dictforall(dict, putForAll, newDict);
 		dict = newDict;
 	}
 
-	n = strhash(name.uget());
+	n = strhash(name);
 	mask = dict->size - 1;
 	for (; (ap = &dict->table[n & mask])->name != DEAD; n++)
 		if (ap->name == NULL) {
@@ -140,9 +117,9 @@ static Dict *put(Ref<Dict> dict, Ref<const char> name, Ref<void> value) {
 			break;
 		}
 
-	ap->name = name.uget();
-	ap->value = value.uget();
-	return dict.release();
+	ap->name = name;
+	ap->value = value;
+	return dict;
 }
 
 static void rm(Dict *dict, Assoc *ap) {
@@ -190,12 +167,12 @@ extern Dict *dictput(Dict *dict, const char *name, void *value) {
 	return dict;
 }
 
-extern void dictforall(Ref<Dict> dict, void (*proc)(void *, const char *, void *), Ref<void> argp) {
+extern void dictforall(Dict* dict, void (*proc)(void *, const char *, void *), void* argp) {
 	int i;
 	for (i = 0; i < dict->size; i++) {
 		Assoc *ap = &dict->table[i];
 		if (ap->name != NULL && ap->name != DEAD)
-			(*proc)(argp.uget(), ap->name, ap->value);
+			(*proc)(argp, ap->name, ap->value);
 	}
 }
 

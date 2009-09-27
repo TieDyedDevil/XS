@@ -105,8 +105,8 @@ PRIM(access) {
 	const char *suffix = NULL;
 	const char * const usage = "access [-n name] [-1e] [-rwx] [-fdcblsp] path ...";
 
-	gcdisable();
-	esoptbegin(list.uget(), "$&access", usage);
+	
+	esoptbegin(list, "$&access", usage);
 	while ((c = esopt("bcdefln:prswx1")) != EOF)
 		switch (c) {
 		case 'n':	suffix = getstr(esoptarg());	break;
@@ -143,12 +143,12 @@ PRIM(access) {
 
 		if (first) {
 			if (error == 0) {
-				Ref<List> result = 
+				List* result = 
 					mklist(mkstr(suffix == NULL
 							? name
 							: gcdup(name)),
 					       NULL);
-				gcenable();
+				
 				return result;
 			} else if (error != ENOENT)
 				estatus = error;
@@ -158,15 +158,15 @@ PRIM(access) {
 	}
 
 	if (first && exception) {
-		gcenable();
+		
 		if (suffix)
 			fail("$&access", "%s: %s", suffix, esstrerror(estatus));
 		else
 			fail("$&access", "%s", esstrerror(estatus));
 	}
 
-	Ref<List> result = reverse(lp);
-	gcenable();
+	List* result = reverse(lp);
+	
 	return result;
 }
 

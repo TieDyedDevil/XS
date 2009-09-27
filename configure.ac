@@ -68,6 +68,8 @@ AC_PROG_YACC
 
 AC_LANG(C++)
 
+dnl Boehm
+AC_CHECK_LIB(gc, main, , [AC_MSG_ERROR([Boehm GC is not installed])])
 
 dnl ----------------------------
 dnl CHECK FOR /dev/fd FILESYSTEM

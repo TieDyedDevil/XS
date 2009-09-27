@@ -5,30 +5,11 @@
 #include <stdint.h>
 #include <map>
 
-/*
- * Closure garbage collection support
- */
-
-DefineTag(Closure, static);
-
-extern Closure *mkclosure(Ref<Tree> tree, Ref<Binding> binding) {
-	Ref<Closure> closure = gcnew(Closure);
-	closure->tree = tree.release();
-	closure->binding = binding.release();
-	return closure.release();;
-}
-
-static void *ClosureCopy(void *op) {
-	void *np = gcnew(Closure);
-	memcpy(np, op, sizeof (Closure));
-	return np;
-}
-
-static size_t ClosureScan(void *p) {
-	Closure *closure = reinterpret_cast<Closure*>(p);
-	closure->tree = forward(closure->tree);
-	closure->binding = forward(closure->binding);
-	return sizeof (Closure);
+extern Closure *mkclosure(Tree* tree, Binding* binding) {
+	Closure* closure = gcnew(Closure);
+	closure->tree = tree;
+	closure->binding = binding;
+	return closure;;
 }
 
 /* revtree -- destructively reverse a list stored in a tree */
@@ -68,7 +49,7 @@ static Binding *extract(Tree *tree, Binding *bindings) {
 			assert(name->kind == nWord || name->kind == nQword);
 			defn = revtree(defn->u[1].p);
 			for (; defn != NULL; defn = defn->u[1].p) {
-				Ref<Term> term;
+				Term* term;
 				Tree *word = defn->u[0].p;
 				NodeKind k = word->kind;
 				assert(defn->kind == nList);
@@ -122,7 +103,7 @@ extern Closure *extractbindings(Tree *tree0) {
 	Tree *volatile tree = tree0;
 	Binding *volatile bindings = NULL;
 
-	gcdisable();
+	
 
 	if (tree->kind == nList && tree->u[1].p == NULL)
 		tree = tree->u[0].p; 
@@ -145,11 +126,11 @@ extern Closure *extractbindings(Tree *tree0) {
 
 	chain = chain->next;
 
-	Ref<Closure> result = me.closure;
+	Closure* result = me.closure;
 	result->tree = tree;
 	result->binding = bindings;
-	gcenable();
-	return result.release();
+	
+	return result;
 }
 
 
@@ -157,16 +138,14 @@ extern Closure *extractbindings(Tree *tree0) {
  * Binding garbage collection support
  */
 
-DefineTag(Binding, static);
-
-extern Binding *mkbinding(Ref<const char> name, Ref<List> defn, Ref<Binding> next) {
+extern Binding *mkbinding(const char* name, List* defn, Binding* next) {
 	assert(next == NULL || next->name != NULL);
-	validatevar(name.uget());
-	Ref<Binding> binding = gcnew(Binding);
-	binding->name = name.release();
-	binding->defn = defn.release();
-	binding->next = next.release();
-	return binding.release();
+	validatevar(name);
+	Binding* binding = gcnew(Binding);
+	binding->name = name;
+	binding->defn = defn;
+	binding->next = next;
+	return binding;
 }
 
 extern Binding *reversebindings(Binding *binding) {
@@ -182,20 +161,4 @@ extern Binding *reversebindings(Binding *binding) {
 		} while ((binding = next) != NULL);
 		return prev;
 	}
-}
-
-static void *BindingCopy(void *op) {
-	void *np = gcnew(Binding);
-	memcpy(np, op, sizeof (Binding));
-	return np;
-}
-
-static size_t BindingScan(void *p) {
-	Binding *binding = reinterpret_cast<Binding*>(p);
-	/* const_cast needed because forward doesn't know that
-	   what it returns will be kept const */
-	binding->name = forward(const_cast<char*>(binding->name));
-	binding->defn = forward(binding->defn);
-	binding->next = forward(binding->next);
-	return sizeof (Binding);
 }

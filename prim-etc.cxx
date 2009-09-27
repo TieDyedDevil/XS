@@ -18,7 +18,7 @@ PRIM(echo) {
 		} else if (termeq(list->term, "--"))
 			list = list->next;
         }
-	print("%L%s", list.release(), " ", eol);
+	print("%L%s", list, " ", eol);
 	return ltrue;
 }
 
@@ -27,7 +27,7 @@ PRIM(count) {
 }
 
 PRIM(setnoexport) {
-	setnoexport(list.uget());
+	setnoexport(list);
 	return list;
 }
 
@@ -44,7 +44,7 @@ PRIM(dot) {
 	volatile int runflags = (evalflags & eval_inchild);
 	const char * const usage = ". [-einvx] file [arg ...]";
 
-	esoptbegin(list.uget(), "$&dot", usage);
+	esoptbegin(list, "$&dot", usage);
 	while ((c = esopt("einvx")) != EOF)
 		switch (c) {
 		case 'e':	runflags |= eval_exitonfalse;	break;
@@ -54,21 +54,21 @@ PRIM(dot) {
 		case 'x':	runflags |= run_printcmds;	break;
 		}
 
-	Ref<List> result;
-	Ref<List> lp = esoptend();
+	List* result;
+	List* lp = esoptend();
 	if (lp == NULL)
 		fail("$&dot", "usage: %s", usage);
 
-	Ref<const char> file = getstr(lp->term);
+	const char* file = getstr(lp->term);
 	lp = lp->next;
-	fd = eopen(file.uget(), oOpen);
+	fd = eopen(file, oOpen);
 	if (fd == -1)
-		fail("$&dot", "%s: %s", file.uget(), esstrerror(errno));
+		fail("$&dot", "%s: %s", file, esstrerror(errno));
 
 	Push star("0", mklist(mkstr(file), NULL));
-	Push zero("*", lp.uget());
+	Push zero("*", lp);
 
-	result = runfd(fd, file.uget(), runflags);
+	result = runfd(fd, file, runflags);
 
 	return result;
 }
@@ -85,21 +85,21 @@ PRIM(whatis) {
 	/* the logic in here is duplicated in eval() */
 	if (list == NULL || list->next != NULL)
 		fail("$&whatis", "usage: $&whatis program");
-	Ref<Term> term = list->term;
+	Term* term = list->term;
 	if (getclosure(term) == NULL) {
 		List *fn;
-		Ref<const char> prog = getstr(term);
+		const char* prog = getstr(term);
 		assert(prog != NULL);
-		fn = varlookup2("fn-", prog.uget(), binding.uget());
+		fn = varlookup2("fn-", prog, binding);
 		if (fn != NULL)
 			list = fn;
 		else {
-			if (isabsolute(prog.uget())) {
-				const char *error = checkexecutable(prog.uget());
+			if (isabsolute(prog)) {
+				const char *error = checkexecutable(prog);
 				if (error != NULL)
-					fail("$&whatis", "%s: %s", prog.uget(), error);
+					fail("$&whatis", "%s: %s", prog, error);
 			} else
-				list = pathsearch(term.uget());
+				list = pathsearch(term);
 		}
 	}
 	return list;
@@ -108,7 +108,7 @@ PRIM(whatis) {
 PRIM(split) {
 	if (list == NULL)
 		fail("$&split", "usage: %%split separator [args ...]");
-	Ref<List> lp = list;
+	List* lp = list;
 	const char *sep = getstr(lp->term);
 	lp = fsplit(sep, lp->next, true);
 	return lp;
@@ -117,7 +117,7 @@ PRIM(split) {
 PRIM(fsplit) {
 	if (list == NULL)
 		fail("$&fsplit", "usage: %%fsplit separator [args ...]");
-	Ref<List> lp = list;
+	List* lp = list;
 	const char *sep = getstr(lp->term);
 	lp = fsplit(sep, lp->next, false);
 	return lp;
@@ -126,11 +126,11 @@ PRIM(fsplit) {
 PRIM(var) {
 	if (list == NULL)
 		return NULL;
-	Ref<List> rest = list->next;
-	Ref<const char> name = getstr(list->term);
-	Ref<List> defn = varlookup(name, NULL);
+	List* rest = list->next;
+	const char* name = getstr(list->term);
+	List* defn = varlookup(name, NULL);
 	rest = prim_var(rest, NULL, evalflags);
-	Ref<Term> term = mkstr(str("%S = %#L", name.uget(), defn.uget(), " "));
+	Term* term = mkstr(str("%S = %#L", name, defn, " "));
 	list = mklist(term, rest);
 	return list;
 }
@@ -147,14 +147,14 @@ PRIM(sethistory) {
 PRIM(parse) {
 	List *result;
 	Tree *tree;
-	Ref<const char> prompt1 = NULL;
-	Ref<const char> prompt2 = NULL;
+	const char* prompt1 = NULL;
+	const char* prompt2 = NULL;
 	if (list != NULL) {
 		prompt1 = getstr(list->term);
 		if ((list = list->next) != NULL)
 			prompt2 = getstr(list->term);
 	}
-	tree = parse(prompt1.release(), prompt2.release());
+	tree = parse(prompt1, prompt2);
 	result = (tree == NULL)
 		   ? NULL
 		   : mklist(mkterm(NULL, mkclosure(mk(nThunk, tree), NULL)),
@@ -167,8 +167,8 @@ PRIM(exitonfalse) {
 }
 
 PRIM(batchloop) {
-	Ref<List> result = ltrue;
-	Ref<List> dispatch;
+	List* result = ltrue;
+	List* dispatch;
 
 	SIGCHK();
 
@@ -177,7 +177,7 @@ PRIM(batchloop) {
 			List *parser, *cmd;
 			parser = varlookup("fn-%parse", NULL);
 			cmd = (parser == NULL)
-					? prim("parse", NULL, NULL, 0).release()
+					? prim("parse", NULL, NULL, 0)
 					: eval(parser, NULL, 0);
 			SIGCHK();
 			dispatch = varlookup("fn-%dispatch", NULL);
@@ -200,7 +200,7 @@ PRIM(batchloop) {
 }
 
 PRIM(collect) {
-	gc();
+	GC_gcollect();
 	return ltrue;
 }
 

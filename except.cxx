@@ -8,7 +8,6 @@ List *exception = NULL;
 
 /* throwE -- raise an exception */
 extern void throwE(List *e) {
-	assert(!gcisblocked());
 	assert(e != NULL);
 	throw e;
 	NOTREACHED;
@@ -25,13 +24,11 @@ extern void fail (const char * from,  const char * fmt, ...) {
 
 	List *x;
 	{
-		gcdisable();
-		Ref<List> e = mklist(mkstr("error"),
+		
+		List* e = mklist(mkstr("error"),
 			      	mklist(mkstr((char *) from),
 				     	mklist(mkstr(s), NULL)));
-		while (gcisblocked())
-			gcenable();
-		x = e.release();
+		x = e;
 	}
 	throwE(x);
 	NOTREACHED;

@@ -1,6 +1,7 @@
 /* stdenv.hxx -- set up an environment we can use ($Revision: 1.3 $) */
 
 #include "esconfig.hxx"
+#include <gc/gc.h>
 #ifdef HAVE_SYS_CDEFS_H
 # include <sys/cdefs.h>
 #endif

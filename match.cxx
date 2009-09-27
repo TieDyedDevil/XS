@@ -113,7 +113,7 @@ extern bool match(const char *s, const char *p, const char *q) {
  *	() matches (), but otherwise null patterns match nothing.
  */
 
-extern bool listmatch(Ref<List> subject, Ref<List> pattern, Ref<StrList> quote) {
+extern bool listmatch(List* subject, List* pattern, StrList* quote) {
 	if (subject == NULL) {
 		if (pattern == NULL)
 			return true;
@@ -140,12 +140,12 @@ extern bool listmatch(Ref<List> subject, Ref<List> pattern, Ref<StrList> quote) 
 			assert(quote != NULL);
 			assert(pattern->term != NULL);
 			assert(quote->str != NULL);
-			Ref<const char> pw = getstr(pattern->term);
-			Ref<const char> qw = quote->str;
-			Ref<List> t = subject;
+			const char* pw = getstr(pattern->term);
+			const char* qw = quote->str;
+			List* t = subject;
 			for (; t != NULL; t = t->next) {
-				Ref<const char> tw = getstr(t->term);
-				if (match(tw.release(), pw.uget(), qw.uget())) {
+				const char* tw = getstr(t->term);
+				if (match(tw, pw, qw)) {
 					return true;
 				}
 			}
@@ -220,12 +220,11 @@ static List *extractsinglematch(const char *subject, const char *pattern,
  */
 
 extern List *extractmatches(List *subjects, List *patterns, StrList *quotes) {
-	List **prevp;
 	List *subject;
-	Ref<List> result;
-	prevp = result.rget();
+	List *result;
+	List **prevp = &result;
 
-	gcdisable();
+	
 
 	for (subject = subjects; subject != NULL; subject = subject->next) {
 		List *pattern;
@@ -247,6 +246,6 @@ extern List *extractmatches(List *subjects, List *patterns, StrList *quotes) {
 		}
 	}
 
-	gcenable();
-	return result.release();
+	
+	return result;
 }

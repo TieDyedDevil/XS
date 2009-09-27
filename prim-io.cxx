@@ -16,7 +16,7 @@ static int getnumber(const char *s) {
 	return result;
 }
 
-static Ref<List> redir(Ref<List> (*rop)(int *fd, Ref<List> list), Ref<List> list, int evalflags) {
+static List* redir(List* (*rop)(int *fd, List* list), List* list, int evalflags){
 	int destfd, srcfd;
 	volatile int inparent = (evalflags & eval_inchild) == 0;
 	volatile int ticket = UNREGISTERED;
@@ -39,7 +39,7 @@ static Ref<List> redir(Ref<List> (*rop)(int *fd, Ref<List> list), Ref<List> list
 	return list;
 }
 
-#define	REDIR(name)	static Ref<List> CONCAT(redir_,name)(int *srcfdp, Ref<List> list)
+#define	REDIR(name)	static List* CONCAT(redir_,name)(int *srcfdp, List* list)
 
 static void argcount(const char *s) NORETURN;
 static void argcount(const char *s) {
@@ -89,10 +89,10 @@ PRIM(openfile) {
 	if (length(list) != 4)
 		argcount("%openfile mode fd file cmd");
 	/* transpose the first two elements */
-	Ref<List> lp = list->next;
+	List* lp = list->next;
 	list->next = lp->next;
-	lp->next = list.release();
-	return redir(redir_openfile, lp.release(), evalflags);
+	lp->next = list;
+	return redir(redir_openfile, lp, evalflags);
 }
 
 REDIR(dup) {
@@ -109,7 +109,7 @@ PRIM(dup) {
 	caller = "$&dup";
 	if (length(list) != 3)
 		argcount("%dup newfd oldfd cmd");
-	return redir(redir_dup, list.release(), evalflags);
+	return redir(redir_dup, list, evalflags);
 }
 
 REDIR(close) {
@@ -121,7 +121,7 @@ PRIM(close) {
 	caller = "$&close";
 	if (length(list) != 2)
 		argcount("%close fd cmd");
-	return redir(redir_close, list.release(), evalflags);
+	return redir(redir_close, list, evalflags);
 }
 
 
@@ -159,9 +159,9 @@ REDIR(here) {
 	List *doc, *tail, **tailp;
 
 	assert(list != NULL);
-	for (tailp = list.rget(); (tail = *tailp)->next != NULL; tailp = &tail->next)
+	for (tailp = &list; (tail = *tailp)->next != NULL; tailp = &tail->next)
 		;
-	doc = (list == tail) ? NULL : list.uget();
+	doc = (list == tail) ? NULL : list;
 	*tailp = NULL;
 
 	if ((pid = pipefork(p, NULL)) == 0) {		/* child that writes to pipe */
@@ -185,7 +185,7 @@ PRIM(here) {
 	caller = "$&here";
 	if (length(list) < 2)
 		argcount("%here fd [word ...] cmd");
-	return redir(redir_here, list.release(), evalflags);
+	return redir(redir_here, list, evalflags);
 }
 
 PRIM(pipe) {
@@ -240,15 +240,15 @@ PRIM(pipe) {
 		close(p[1]);
 	}
 
-	Ref<List> result;
+	List* result = NULL;
 	do {
 		int status = ewaitfor(pids[--n]);
 		printstatus(0, status);
-		Ref<Term> t = mkstr(mkstatus(status));
+		Term* t = mkstr(mkstatus(status));
 		result = mklist(t, result);
 	} while (0 < n);
 	if (evalflags & eval_inchild)
-		exit(exitstatus(result.uget()));
+		exit(exitstatus(result));
 	return result;
 }
 
@@ -258,17 +258,17 @@ PRIM(readfrom) {
 	caller = "$&readfrom";
 	if (length(list) != 3)
 		argcount("%readfrom var input cmd");
-	Ref<const char> var = getstr(list->term);
+	const char* var = getstr(list->term);
 	list = list->next;
-	Ref<Term> input = list->term;
+	Term* input = list->term;
 	list = list->next;
-	Ref<Term> cmd = list->term;
+	Term* cmd = list->term;
 
 	if ((pid = pipefork(p, NULL)) == 0) {
 		try {
 			close(p[0]);
 			mvfd(p[1], 1);
-			exit(exitstatus(eval1(input.uget(), evalflags &~ eval_inchild)));
+			exit(exitstatus(eval1(input, evalflags &~ eval_inchild)));
 		} catch (List *e) {
 			eprint("Received exception in %%readfrom (<{}) child process:\n");
 			print_exception(e);
@@ -280,8 +280,8 @@ PRIM(readfrom) {
 	list = mklist(mkstr(str(DEVFD_PATH, p[0])), NULL);
 
 	try {
-		Push push(var.release(), list.uget());
-		list = eval1(cmd.uget(), evalflags);
+		Push push(var, list);
+		list = eval1(cmd, evalflags);
 	} catch (List *e) {
 		close(p[0]);
 		ewaitfor(pid);
@@ -300,17 +300,17 @@ PRIM(writeto) {
 	caller = "$&writeto";
 	if (length(list) != 3)
 		argcount("%writeto var output cmd");
-	Ref<const char> var = getstr(list->term);
+	const char* var = getstr(list->term);
 	list = list->next;
-	Ref<Term> output = list->term;
+	Term* output = list->term;
 	list = list->next;
-	Ref<Term> cmd = list->term;
+	Term* cmd = list->term;
 
 	if ((pid = pipefork(p, NULL)) == 0) {
 		try {
 			close(p[1]);
 			mvfd(p[0], 0);
-			exit(exitstatus(eval1(output.uget(), evalflags &~ eval_inchild)));
+			exit(exitstatus(eval1(output, evalflags &~ eval_inchild)));
 		} catch (List *e) {
 			eprint("Received error in %%writeto (>{}) child process:\n");
 			print_exception(e);
@@ -322,8 +322,8 @@ PRIM(writeto) {
 	list = mklist(mkstr(str(DEVFD_PATH, p[1])), NULL);
 
 	try {
-		Push push(var.uget(), list.uget());
-		list = eval1(cmd.uget(), evalflags);
+		Push push(var, list);
+		list = eval1(cmd, evalflags);
 	} catch (List *e) {
 		close(p[1]);
 		ewaitfor(pid);
@@ -354,7 +354,7 @@ restart:
 		close(fd);
 		fail("$&backquote", "backquote read: %s", esstrerror(errno));
 	}
-	return endsplit().release();
+	return endsplit();
 }
 
 PRIM(backquote) {
@@ -364,7 +364,7 @@ PRIM(backquote) {
 	if (list == NULL)
 		fail(caller, "usage: backquote separator command [args ...]");
 
-	Ref<const char> sep = getstr(list->term);
+	const char* sep = getstr(list->term);
 	list = list->next;
 
 	if ((pid = pipefork(p, NULL)) == 0) {
@@ -380,13 +380,13 @@ PRIM(backquote) {
 	}
 
 	close(p[1]);
-	gcdisable();
-	list = bqinput(sep.uget(), p[0]);
+	
+	list = bqinput(sep, p[0]);
 	close(p[0]);
 	status = ewaitfor(pid);
 	printstatus(0, status);
 	list = mklist(mkstr(mkstatus(status)), list);
-	gcenable();
+	
 	SIGCHK();
 	return list;
 }

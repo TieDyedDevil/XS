@@ -231,7 +231,7 @@ extern List *mksiglist(void) {
 	int sig = NSIG;
 	Sigeffect effects[NSIG];
 	getsigeffects(effects);
-	Ref<List> lp = NULL;
+	List* lp = NULL;
 	while (--sig > 0) {
 		int prefix;
 		switch (effects[sig]) {
@@ -242,13 +242,13 @@ extern List *mksiglist(void) {
 		case sig_noop:		prefix = '/';	break;
 		case sig_special:	prefix = '.';	break;
 		}
-		Ref<const char> name = signame(sig);
+		const char* name = signame(sig);
 		if (prefix != '\0')
-			name = str("%c%s", prefix, name.uget());
-		Ref<Term> term = mkstr(name);
+			name = str("%c%s", prefix, name);
+		Term* term = mkstr(name);
 		lp = mklist(term, lp);
 	}
-	return lp.release();
+	return lp;
 }
 
 
@@ -292,14 +292,12 @@ extern void sigchk(void) {
 		}
 	}
 	resetparser();
-	Ref<List> e =
+	List* e =
 	    mklist(mkstr("signal"), mklist(mkstr(signame(sig)), NULL));
 
 	switch (sigeffect[sig]) {
 	case sig_catch:
-		while (gcisblocked())
-			gcenable();
-		throwE(e.release());
+		throwE(e);
 		NOTREACHED;
 	case sig_special:
 		assert(sig == SIGINT);
@@ -307,9 +305,8 @@ extern void sigchk(void) {
 		if (sigint_newline)
 			eprint("\n");
 		sigint_newline = true;
-		while (gcisblocked())
-			gcenable();
-		throwE(e.release());
+			
+		throwE(e);
 		NOTREACHED;
 		break;
 	case sig_noop:

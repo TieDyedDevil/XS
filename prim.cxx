@@ -6,7 +6,7 @@
 static Prim_dict prims;
 #include <iostream>
 
-extern Ref<List> prim(const char *s, Ref<List> list, Ref<Binding> binding, int evalflags) {
+extern List* prim(const char *s, List* list, Binding* binding, int evalflags) {
 	Prim p = prims[s];
 	if (p) return (*prims[s])(list, binding, evalflags);
 	else fail("es:prim", "unknown primitive: %s", s);
@@ -15,9 +15,8 @@ extern Ref<List> prim(const char *s, Ref<List> list, Ref<Binding> binding, int e
 PRIM(primitives) {
 	static List *primlist = NULL;
 	if (primlist == NULL) {
-		globalroot(&primlist);
 		for (Prim_dict::iterator i = prims.begin(); i != prims.end(); ++i) {
-			Ref<Term> term = mkstr(i->first.c_str());
+			Term* term = mkstr(i->first.c_str());
 			primlist = mklist(term, primlist);
 		}
 	}

@@ -17,7 +17,7 @@ static void str_grow(Format *f, size_t more) {
 extern char *strv(const char *fmt, va_list args) {
 	Format format;
 
-	gcdisable();
+	
 	Buffer *buf = openbuffer(0);
 	format.u.p	= buf;
 #if NO_VA_LIST_ASSIGN
@@ -33,7 +33,7 @@ extern char *strv(const char *fmt, va_list args) {
 
 	printfmt(&format, fmt);
 	fmtputc(&format, '\0');
-	gcenable();
+	
 
 	return sealbuffer(reinterpret_cast<Buffer*>(format.u.p));
 }
@@ -88,26 +88,10 @@ extern char *mprint (const char * fmt, ...) {
  *	to even include these is probably a premature optimization
  */
 
-DefineTag(StrList, static);
-
-extern Ref<StrList> mkstrlist(Ref<const char> str, Ref<StrList> next) {
+extern StrList* mkstrlist(const char* str, StrList* next) {
 	assert(str != NULL);
-	Ref<StrList> list = gcnew(StrList);
-	list->str = str.release();
-	list->next = next.release();
-	return list.release();
+	StrList* list = gcnew(StrList);
+	list->str = str;
+	list->next = next;
+	return list;
 }
-
-static void *StrListCopy(void *op) {
-	void *np = gcnew(StrList);
-	memcpy(np, op, sizeof (StrList));
-	return np;
-}
-
-static size_t StrListScan(void *p) {
-	StrList *list = reinterpret_cast<StrList*>(p);
-	list->str = forward(list->str);
-	list->next = forward(list->next);
-	return sizeof (StrList);
-}
-

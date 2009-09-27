@@ -12,12 +12,6 @@ static bool ifsvalid = false;
 static char ifs[10], isifs[256];
 
 extern void startsplit(const char *sep, bool coalescef) {
-	static bool initialized = false;
-	if (!initialized) {
-		initialized = true;
-		globalroot(&value);
-	}
-
 	value = NULL;
 	buffer = NULL;
 	coalesce = coalescef;
@@ -56,7 +50,7 @@ static inline void newbuf(unsigned char*& s, Buffer*& buf, unsigned char *inend)
 
 template <bool coalesce>
 static inline void handleifs(unsigned char*& s, Buffer*& buf, unsigned char *inend) {
-	Term *term = mkstr(sealcountedbuffer(buf)).get();
+	Term *term = mkstr(sealcountedbuffer(buf));
 	value = mklist(term, value);
 	newbuf<coalesce>(s, buf, inend);
 }
@@ -73,47 +67,47 @@ static void runsplit(unsigned char*& s, Buffer*& buf, unsigned char * inend) {
 }
 
 extern void splitstring(const char *in, size_t len, bool endword) {
-	gcdisable(); /* char *s can't be made gc-safe (unless rewritten to use indices) */
+	 /* char *s can't be made gc-safe (unless rewritten to use indices) */
 	Buffer *buf = buffer;
 	unsigned char *s = (unsigned char *) in, *const inend = s + len;
 
 	if (splitchars) {
 		assert(buf == NULL);
 		while (s < inend) {
-			Term *term = mkstr(gcndup((char *) s++, 1)).get();
+			Term *term = mkstr(gcndup((char *) s++, 1));
 			value = mklist(term, value);
 		}
-		gcenable();
+		
 		return;
 	} 
 	else if (coalesce) runsplit<true>(s, buf, inend);
 	else runsplit<false>(s, buf, inend);
 
 	if (endword && buf != NULL) {
-		Term *term = mkstr(sealcountedbuffer(buf)).get();
+		Term *term = mkstr(sealcountedbuffer(buf));
 		value = mklist(term, value);
 		buf = NULL;
 	}
 	buffer = buf;
-	gcenable();
+	
 }
 
-extern Ref<List> endsplit(void) {
+extern List* endsplit(void) {
 	if (buffer != NULL) {
-		Ref<Term> term = mkstr(sealcountedbuffer(buffer));
+		Term* term = mkstr(sealcountedbuffer(buffer));
 		value = mklist(term, value);
 		buffer = NULL;
 	}
-	Ref<List> result = reverse(value);
+	List* result = reverse(value);
 	value = NULL;
 	return result;
 }
 
-extern Ref<List> fsplit(const char *sep, Ref<List> list, bool coalesce) {
+extern List* fsplit(const char *sep, List* list, bool coalesce) {
 	startsplit(sep, coalesce);
 	for (; list; list = list->next) {
-		Ref<const char> s = getstr(list->term);
-		splitstring(s.uget(), strlen(s.uget()), true);
+		const char* s = getstr(list->term);
+		splitstring(s, strlen(s), true);
 	}
 	return endsplit();
 }

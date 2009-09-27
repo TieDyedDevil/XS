@@ -167,14 +167,14 @@ top:
 
 PRIM(apids) {
 	Proc *p;
-	Ref<List> lp;
+	List* lp = NULL;
 	for (p = proclist; p != NULL; p = p->next)
 		if (p->background && p->alive) {
-			Ref<Term> t = mkstr(str("%d", p->pid));
+			Term* t = mkstr(str("%d", p->pid));
 			lp = mklist(t, lp);
 		}
 	/* TODO: sort the return value, but by number? */
-	return lp.release();
+	return lp;
 }
 
 PRIM(wait) {

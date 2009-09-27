@@ -132,7 +132,6 @@ static const char *dumptree(Tree *tree) {
 	return name;
 }
 
-static void rootadd(const char *name);
 static const char *dumpbinding(Binding *binding) {
 	char *name;
 	if (binding == NULL)
@@ -146,9 +145,6 @@ static const char *dumpbinding(Binding *binding) {
 			dumplist(binding->defn),
 			dumpbinding(binding->next)
 		);
-		rootadd(str("%s.name", name + 1));
-		rootadd(str("%s.defn", name + 1));
-		rootadd(str("%s.next", name + 1));
 		cvars = dictput(cvars, name, binding);
 	}
 	return name;
@@ -208,13 +204,6 @@ static void dumpvar(void *ignore, const char *key, void *value) {
 	dumplist(var->defn);
 }
 
-static Buffer *rootbuf = NULL;
-static void rootadd(const char* name) {
-	if (strcmp(name,"NULL") == 0) return;
-	if (rootbuf == NULL) rootbuf = openbuffer(2048);
-	rootbuf = bufcat(rootbuf, str("globalroot((void *) &%s);\n", name));
-}
-
 static Buffer *varbuf = NULL;
 
 static void dumpdef(const char *name, Var *var) {
@@ -259,7 +248,7 @@ static void printheader(List *title) {
 extern void runinitial(void) {
 	List *title = runfd(0, "initial.xs", 0);
 
-	gcdisable();
+	
 
 	cvars = mkdict();
 	strings = mkdict();
@@ -282,8 +271,6 @@ extern void runinitial(void) {
 	print("\tint i;\n");
 	print("\tfor (i = 0; defs[i].name != NULL; i++)\n");
 	print("\t\tvardef(defs[i].name, NULL, defs[i].value);\n");
-	bufputc(rootbuf, '\0');
-	print(sealbuffer(rootbuf));
 	print("}\n");
 
 	exit(0);

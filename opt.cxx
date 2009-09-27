@@ -8,14 +8,6 @@ static Term *termarg;
 static int nextchar;
 
 extern void esoptbegin(List *list, const char *caller, const char *usagemsg) {
-	static bool initialized = false;
-	if (!initialized) {
-		initialized = true;
-		globalroot(&usage);
-		globalroot(&invoker);
-		globalroot(&args);
-		globalroot(&termarg);
-	}
 	assert(usage == NULL);
 	usage = usagemsg;
 	invoker = caller;
@@ -71,7 +63,7 @@ extern int esopt(const char *options) {
 		}
 		termarg = (nextchar == 0)
 				? args->term
-				: mkstr(gcdup(arg + nextchar)).release();
+				: mkstr(gcdup(arg + nextchar));
 		nextchar = 0;
 		args = args->next;
 	}

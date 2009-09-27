@@ -309,10 +309,10 @@ static void fdprint(Format *format, int fd, const char *fmt) {
 	format->flushed	= 0;
 	format->u.n	= fdmap(fd);
 
-	gcdisable();
+	
 	printfmt(format, fmt);
 	fprint_flush(format, 0);
-	gcenable();
+	
 }
 
 #define FORMATPRINT(fd) Format format; \
@@ -335,7 +335,7 @@ extern int eprint (const char * fmt, ...) {
 
 extern void panic (const char * fmt, ...) {
 	Format format;
-	gcdisable();
+	
 	va_start(format.args, fmt);
 	eprint("es panic: ");
 	fdprint(&format, 2, fmt);

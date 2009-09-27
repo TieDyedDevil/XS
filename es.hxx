@@ -106,69 +106,18 @@ extern Root *rootlist;
 #define	refassert(e)	NOP
 #endif
 
-extern bool gcisblocked();			/* is collection disabled? */
+#define	gcnew(type)	(reinterpret_cast<type *>(GC_MALLOC(sizeof (type))))
 
-#include "gc_ptr.hxx"
+extern char *gcndup(const char* s, size_t n);	/* copy a counted string into gc space */
 
-typedef struct Tag Tag;
-#define	gcnew(type)	(reinterpret_cast<type *>(gcalloc(sizeof (type), &(CONCAT(type,Tag)))))
-
-extern void *gcalloc(size_t n, Tag *t);		/* allocate n with collection tag t */
-extern char *gcdup(const char *s);		/* copy a 0-terminated string into gc space */
-extern char *gcndup(Ref<const char> s, size_t n);	/* copy a counted string into gc space */
-
-extern void initgc(void);			/* must be called at the dawn of time */
-extern void gc(void);				/* provoke a collection, if enabled */
-extern void gcreserve(size_t nbytes);		/* provoke a collection, if enabled and not enough space */
-extern void gcenable();				/* enable collections */
-/* disable collections */
-inline void gcdisable() {
-	extern int gcblocked;
-	assert(gcblocked >= 0);
-	++gcblocked;
+/* copy a 0-terminated string into gc space */
+inline char *gcdup(const char *s) {
+	return gcndup(s, strlen(s));
 }
-
-/* gcisblocked -- is collection disabled? */
-inline bool gcisblocked() {
-	extern int gcblocked;
-	assert(gcblocked >= 0);
-	return gcblocked != 0;
-}
-
-
-/*
- * garbage collector tags
- */
-#define	RefAdd(e) \
-	{ \
-		Root __root__; \
-		__root__.p = (void **) &e; \
-		__root__.next = rootlist; \
-		rootlist = &__root__; \
-	try {
-
-#define	RefRemove(e) \
-		refassert(rootlist == &__root__); \
-		refassert(rootlist->p == (void **) &e); \
-		rootlist = rootlist->next; \
-	} catch (List *t) { \
-		refassert(rootlist == &__root__); \
-		refassert(rootlist->p == (void **) &e); \
-		rootlist = rootlist->next; \
-		throwE(t); \
-	} \
-	}
-
-
+inline void initgc(void) {
+    GC_init();    
+}/* must be called at the dawn of time */
 /* main.c */
-
-#if GCVERBOSE
-extern bool gcverbose;		/* -G */
-#endif
-#if GCINFO
-extern bool gcinfo;			/* -I */
-#endif
-
 
 /* initial.c (for es) or dump.c (for esdump) */
 
@@ -194,25 +143,25 @@ extern void undefer(int ticket);
 
 /* term.c */
 
-extern Ref<Term> mkterm(Ref<const char> str, Ref<Closure> closure);
-extern Ref<Term> mkstr(Ref<const char> str);
-extern const char *getstr(Ref<Term> term);
-extern Closure *getclosure(Ref<Term> term);
-extern Ref<Term> termcat(Ref<Term> t1, Ref<Term> t2);
+extern Term* mkterm(const char* str, Closure* closure);
+extern Term* mkstr(const char* str);
+extern const char *getstr(Term* term);
+extern Closure *getclosure(Term* term);
+extern Term* termcat(Term* t1, Term*t2);
 extern bool termeq(Term *term, const char *s);
 extern bool isclosure(Term *term);
 
 
 /* list.c */
 
-extern List *mklist(Ref<Term> term, Ref<List> next);
+extern List *mklist(Term* term, List* next);
 extern List *reverse(List *list);
-extern List *append(Ref<List> head, Ref<List> tail);
+extern List *append(List* head, List* tail);
 extern List *listcopy(List *list);
-extern int length(Ref<List> list);
+extern int length(List* list);
 extern List *listify(int argc, char **argv);
 extern Term *nth(List *list, int n);
-extern Ref<List> sortlist(Ref<List> list);
+extern List* sortlist(List* list);
 
 
 /* tree.c */
@@ -222,18 +171,18 @@ extern Tree *mk(NodeKind , ...);
 
 /* closure.c */
 
-extern Closure *mkclosure(Ref<Tree> tree, Ref<Binding> binding);
+extern Closure *mkclosure(Tree* tree, Binding* binding);
 extern Closure *extractbindings(Tree *tree);
-extern Binding *mkbinding(Ref<const char> name, Ref<List> defn, Ref<Binding> next);
+extern Binding *mkbinding(const char* name, List* defn, Binding* next);
 extern Binding *reversebindings(Binding *binding);
 
 
 /* eval.c */
 
-extern Binding *bindargs(Ref<Tree> params, Ref<List> args, Ref<Binding> binding);
+extern Binding *bindargs(Tree* params, List* args, Binding* binding);
 extern List *forkexec(const char *file, List *list, bool inchild);
-extern List *walk(Ref<Tree> tree, Ref<Binding> binding, int flags);
-extern List *eval(Ref<List> list, Ref<Binding> binding, int flags);
+extern List *walk(Tree* tree, Binding* binding, int flags);
+extern List *eval(List* list, Binding* binding, int flags);
 extern List *pathsearch(Term *term);
 
 /* eval1 -- evaluate a term, producing a list */
@@ -252,26 +201,26 @@ extern unsigned long evaldepth, maxevaldepth;
 
 /* glom.c */
 
-extern Ref<List> glom(Ref<Tree> tree, Ref<Binding> binding, bool globit);
-extern List *glom2(Ref<Tree> tree, Ref<Binding> binding, StrList **quotep);
+extern List* glom(Tree* tree, Binding* binding, bool globit);
+extern List *glom2(Tree* tree, Binding* binding, StrList **quotep);
 
 
 /* glob.c */
 
 extern const char *QUOTED, *UNQUOTED;
 
-extern Ref<List> glob(Ref<List> list, Ref<StrList> quote);
+extern List* glob(List* list, StrList* quote);
 extern bool haswild(const char *pattern, const char *quoting);
 /* Needed for some of the readline tab-completion */
-extern Ref<List> dirmatch(Ref<const char> prefix, 
-		      Ref<const char> dirname,
-		      Ref<const char> pattern, 
-		      Ref<const char> quote);
+extern List* dirmatch(const char* prefix, 
+		      const char* dirname,
+		      const char* pattern, 
+		      const char* quote);
 
 
 /* match.c */
 extern bool match(const char *subject, const char *pattern, const char *quote);
-extern bool listmatch(Ref<List> subject, Ref<List> pattern, Ref<StrList> quote);
+extern bool listmatch(List* subject, List* pattern, StrList* quote);
 extern List *extractmatches(List *subjects, List *patterns, StrList *quotes);
 
 
@@ -281,10 +230,10 @@ extern void initvars(void);
 extern void initenv(char **envp, bool isprotected);
 extern void hidevariables(void);
 extern void validatevar(const char *var);
-extern List *varlookup(Ref<const char> name, Ref<Binding> binding);
+extern List *varlookup(const char* name, Binding* binding);
 extern List *varlookup2(const char *name1, const char *name2, Binding *binding);
-extern void vardef(Ref<const char>, Ref<Binding>, Ref<List>);
-extern Ref<Vector> mkenv(void);
+extern void vardef(const char*, Binding*, List*);
+extern Vector* mkenv(void);
 extern void setnoexport(List *list);
 extern void addtolist(void *arg, const char *key, void *value);
 extern List *listvars(bool internal);
@@ -320,7 +269,7 @@ extern int ewait(int pid, bool interruptible, void *rusage);
 
 typedef struct Dict Dict;
 extern Dict *mkdict(void);
-extern void dictforall(Ref<Dict> dict, void (*proc)(void *, const char *, void *), Ref<void> arg);
+extern void dictforall(Dict* dict, void (*proc)(void *, const char *, void *), void* arg);
 extern void *dictget(Dict *dict, const char *name);
 extern Dict *dictput(Dict *dict, const char *name, void *value);
 extern void *dictget2(Dict *dict, const char *name1, const char *name2);
@@ -336,14 +285,14 @@ extern void initconv(void);
 
 extern char *str(const char *fmt, ...);	/* create a gc space string by printing */
 extern char *mprint(const char *fmt, ...);	/* create an ealloc space string by printing */
-extern Ref<StrList> mkstrlist(Ref<const char> str, Ref<StrList> next);
+extern StrList* mkstrlist(const char* str, StrList* next);
 
 
 /* vec.c */
 
-extern Ref<Vector> mkvector(int n);
-extern Ref<Vector> vectorize(Ref<List> list);
-extern void sortvector(Ref <Vector> v);
+extern Vector* mkvector(int n);
+extern Vector* vectorize(List* list);
+extern void sortvector(Vector* v);
 
 
 /* util.c */
@@ -402,7 +351,7 @@ extern List *esoptend(void);
 
 /* prim.c */
 
-extern Ref<List> prim(const char *s, Ref<List> list, Ref<Binding> binding, int evalflags);
+extern List* prim(const char *s, List* list, Binding* binding, int evalflags);
 extern void initprims(void);
 
 
@@ -410,8 +359,8 @@ extern void initprims(void);
 
 extern void startsplit(const char *sep, bool coalesce);
 extern void splitstring(const char *in, size_t len, bool endword);
-extern Ref<List> endsplit(void);
-extern Ref<List> fsplit(const char *sep, Ref<List> list, bool coalesce);
+extern List* endsplit(void);
+extern List* fsplit(const char *sep, List* list, bool coalesce);
 
 
 /* signal.c */
@@ -449,8 +398,6 @@ extern int eopen(const char *name, OpenKind k);
 
 extern const char * const version;
 
-
-extern void globalroot(void *addr);
 
 /* struct Push -- varpush() placeholder */
 

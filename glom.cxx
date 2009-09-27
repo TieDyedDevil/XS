@@ -4,24 +4,24 @@
 #include "gc.hxx"
 
 /* concat -- cartesion cross product concatenation */
-static List *concat(Ref<List> list1,Ref<List> list2) {
-	Ref<List> result = NULL;
+static List *concat(List* list1,List* list2) {
+	List* result = NULL;
 
-	for (List **p = result.rget(); list1 != NULL; list1 = list1->next) {
-		for (Ref<List> lp = list2;
+	for (List **p = &result; list1 != NULL; list1 = list1->next) {
+		for (List* lp = list2;
 		     lp != NULL;
 		     p = &(*p)->next, lp = lp->next)
 		
 			*p = mklist(termcat(list1->term, lp->term), NULL);
 	}
-	return result.release();
+	return result;
 }
 
 /* qcat -- concatenate two quote flag terms */
-static const char *qcat(Ref<const char> q1,
-			Ref<const char> q2,
-			Ref<Term> t1,
-			Ref<Term> t2)
+static const char *qcat(const char* q1,
+			const char* q2,
+			Term* t1,
+			Term* t2)
 {
 	if (q1 == QUOTED && q2 == QUOTED)
 		return QUOTED;
@@ -29,67 +29,67 @@ static const char *qcat(Ref<const char> q1,
 		return UNQUOTED;
 
 	size_t len1 = (q1 == QUOTED || q1 == UNQUOTED)
-		? strlen(getstr(t1.uget()))
-		: strlen(q1.uget());
+		? strlen(getstr(t1))
+		: strlen(q1);
 	size_t len2 = (q2 == QUOTED || q2 == UNQUOTED)
-		? strlen(getstr(t2.uget()))
-		: strlen(q2.uget());
-	Ref<char> s = reinterpret_cast<char*>(gcalloc(len1 + len2 + 1, &StringTag));
+		? strlen(getstr(t2))
+		: strlen(q2);
+	char* s = reinterpret_cast<char*>(GC_MALLOC(len1 + len2 + 1));
 
 	if (q1 == QUOTED)
-		memset(s.uget(), 'q', len1);
+		memset(s, 'q', len1);
 	else if (q1 == UNQUOTED)
-		memset(s.uget(), 'r', len1);
+		memset(s, 'r', len1);
 	else
-		memcpy(s.uget(), q1.uget(), len1);
+		memcpy(s, q1, len1);
 		
 	if (q2 == QUOTED)
 		memset(&s[len1], 'q', len2);
 	else if (q2 == UNQUOTED)
 		memset(&s[len1], 'r', len2);
 	else
-		memcpy(&s[len1], q2.uget(), len2);
+		memcpy(&s[len1], q2, len2);
 	s[len1 + len2] = '\0';
 
-	return s.release();
+	return s;
 }
 
 /* qconcat -- cartesion cross product concatenation; also produces a quote list */
-static List *qconcat(Ref<List> list1, Ref<List> list2,
-		     Ref<StrList> ql1, Ref<StrList> ql2, 
+static List *qconcat(List* list1, List* list2,
+		     StrList* ql1, StrList* ql2, 
 		     StrList **quotep) 
 {
-	Ref<List> result; 
+	List* result; 
 	List **p;
 	StrList **qp;
 
-	for (p = result.rget(), qp = quotep; list1 != NULL; list1 = list1->next, ql1 = ql1->next) {
-		Ref<List> lp;
-		Ref<StrList> qlp;
+	for (p = &result, qp = quotep; list1 != NULL; list1 = list1->next, ql1 = ql1->next) {
+		List* lp;
+		StrList* qlp;
 		for (lp = list2, qlp = ql2; lp != NULL; lp = lp->next, qlp = qlp->next) {
 			*p = mklist(termcat(list1->term, lp->term), NULL);
 			p = &(*p)->next;
 			*qp = mkstrlist(
 				qcat(ql1->str, qlp->str, list1->term, lp->term),
-				NULL).release();
+				NULL);
 			qp = &(*qp)->next;
 		}
 	}
-	return result.release();
+	return result;
 }
 
 /* subscript -- variable subscripting */
-static List *subscript(Ref<List> list, Ref<List> subs) {
-	int lo, hi, len = length(list.uget()), counter = 1;
-	Ref<List> result, current = list;
-	List **prevp = result.rget();
+static List *subscript(List* list, List* subs) {
+	int lo, hi, len = length(list), counter = 1;
+	List *result, *current = list;
+	List **prevp = &result;
 
 	if (subs != NULL && streq(getstr(subs->term), "...")) {
 		lo = 1;
 		goto mid_range;
 	}
 
-	gcdisable(); /* prevp could point to pointer in structure which is forwarded */
+	 /* prevp could point to pointer in structure which is forwarded */
 	while (subs != NULL) {
 		lo = atoi(getstr(subs->term));
 		if (lo < 1) {
@@ -122,20 +122,18 @@ static List *subscript(Ref<List> list, Ref<List> subs) {
 			prevp = &(*prevp)->next;
 		}
 	}
-	gcenable();
+	
 
-	return result.release();
+	return result;
 }
 
 /* glom1 -- glom when we don't need to produce a quote list */
-static List *glom1(Ref<Tree> tree, Ref<Binding> binding) {
-	Ref<List> result;
-	Ref<List> tail;
-
-	assert(!gcisblocked());
+static List *glom1(Tree* tree, Binding* binding) {
+	List* result = NULL;
+	List* tail = NULL;
 
 	while (tree != NULL) {
-		Ref<List> list;
+		List* list = NULL;
 
 		switch (tree->kind) {
 		case nQword:
@@ -156,7 +154,7 @@ static List *glom1(Ref<Tree> tree, Ref<Binding> binding) {
 			tree = NULL;
 			break;
 		case nVar: {
-			Ref<List> var = glom1(tree->u[0].p, binding);
+			List* var = glom1(tree->u[0].p, binding);
 			tree = NULL;
 			for (; var != NULL; var = var->next) {
 				list = listcopy(varlookup(getstr(var->term), binding));
@@ -164,7 +162,7 @@ static List *glom1(Ref<Tree> tree, Ref<Binding> binding) {
 					if (result == NULL)
 						tail = result = list;
 					else
-						tail->next = list.uget();
+						tail->next = list;
 					for (; tail->next != NULL; tail = tail->next)
 						;
 				}
@@ -178,15 +176,15 @@ static List *glom1(Ref<Tree> tree, Ref<Binding> binding) {
 			if (list->next != NULL) fail("es:glom", "multi-word variable name in subscript");
 
 			{
-				Ref<const char> name = getstr(list->term);
+				const char* name = getstr(list->term);
 				list = varlookup(name, binding);
-				Ref<List> sub = glom1(tree->u[1].p, binding);
+				List* sub = glom1(tree->u[1].p, binding);
 				tree = NULL;
-				list = subscript(list.uget(), sub.uget());
+				list = subscript(list, sub);
 			}
 			break;
 		case nCall:
-			list = listcopy(walk(tree->u[0].p, binding.uget(), 0));
+			list = listcopy(walk(tree->u[0].p, binding, 0));
 			tree = NULL;
 			break;
 		case nList:
@@ -194,8 +192,8 @@ static List *glom1(Ref<Tree> tree, Ref<Binding> binding) {
 			tree = tree->u[1].p;
 			break;
 		case nConcat: {
-			Ref<List> l = glom1(tree->u[0].p, binding);
-			Ref<List> r = glom1(tree->u[1].p, binding);
+			List* l = glom1(tree->u[0].p, binding);
+			List* r = glom1(tree->u[1].p, binding);
 			tree = NULL;
 			list = concat(l, r);
 			break;
@@ -206,19 +204,19 @@ static List *glom1(Ref<Tree> tree, Ref<Binding> binding) {
 
 		if (list != NULL) {
 			if (result == NULL) 	tail = result = list;
-			else			tail->next = list.uget();
+			else			tail->next = list;
 			while(tail->next != NULL) tail = tail->next;
 		}
 	}
 
-	return result.release();
+	return result;
 }
 
 /* glom2 -- glom and produce a quoting list */
-extern List *glom2(Ref<Tree> tree, Ref<Binding> binding, StrList **quotep) {
-	Ref<List> result;
-	Ref<List> tail;
-	Ref<StrList> qtail;
+extern List *glom2(Tree* tree, Binding* binding, StrList **quotep) {
+	List* result = NULL;
+	List* tail = NULL;
+	StrList* qtail = NULL;
 
 	assert(!gcisblocked());
 	assert(quotep != NULL);
@@ -230,8 +228,8 @@ extern List *glom2(Ref<Tree> tree, Ref<Binding> binding, StrList **quotep) {
 	 */
 
 	while (tree != NULL) {
-		Ref<List> list;
-		Ref<StrList> qlist;
+		List* list;
+		StrList* qlist;
 
 		switch (tree->kind) {
 		case nWord:
@@ -240,23 +238,23 @@ extern List *glom2(Ref<Tree> tree, Ref<Binding> binding, StrList **quotep) {
 			tree = NULL;
 			break;
 		case nList:
-			list = glom2(tree->u[0].p, binding, qlist.rget());
+			list = glom2(tree->u[0].p, binding, &qlist);
 			tree = tree->u[1].p;
 			break;
 		case nConcat: {
-			Ref<StrList> ql, qr;
-			Ref<List> l = glom2(tree->u[0].p, binding, ql.rget()),
-				   r = glom2(tree->u[1].p, binding, qr.rget());
+			StrList *ql, *qr;
+			List *l = glom2(tree->u[0].p, binding, &ql),
+				   *r = glom2(tree->u[1].p, binding, &qr);
 			{
-				list = qconcat(l, r, ql, qr, qlist.rget());
+				list = qconcat(l, r, ql, qr, &qlist);
 			}
 			tree = NULL;
 			break;
 		}
 		default:
-			list = glom1(tree.uget(), binding.uget());
-			for (Ref<List> lp = list; lp != NULL; lp = lp->next)
-				qlist = mkstrlist(QUOTED, qlist.release());
+			list = glom1(tree, binding);
+			for (List* lp = list; lp != NULL; lp = lp->next)
+				qlist = mkstrlist(QUOTED, qlist);
 			tree = NULL;
 			break;
 		}
@@ -265,11 +263,11 @@ extern List *glom2(Ref<Tree> tree, Ref<Binding> binding, StrList **quotep) {
 			if (result == NULL) {
 				assert(*quotep == NULL);
 				result = tail = list;
-				*quotep = (qtail = qlist).uget();
+				*quotep = (qtail = qlist);
 			} else {
 				assert(*quotep != NULL);
-				tail->next = list.uget();
-				qtail->next = qlist.uget();
+				tail->next = list;
+				qtail->next = qlist;
 			}
 			for (; tail->next != NULL; tail = tail->next, qtail = qtail->next)
 				;
@@ -277,14 +275,14 @@ extern List *glom2(Ref<Tree> tree, Ref<Binding> binding, StrList **quotep) {
 		}
 	}
 
-	return result.release();
+	return result;
 }
 
 /* glom -- top level glom dispatching */
-extern Ref<List> glom(Ref<Tree> tree, Ref<Binding> binding, bool globit) {
+extern List* glom(Tree* tree, Binding* binding, bool globit) {
 	if (globit) {
-		Ref<StrList> quote;
-		Ref<List> list = glom2(tree.release(), binding.release(), quote.rget());
+		StrList* quote;
+		List* list = glom2(tree, binding, &quote);
 		return glob(list, quote);
-	} else return glom1(tree.release(), binding.release());
+	} else return glom1(tree, binding);
 }

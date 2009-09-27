@@ -3,50 +3,47 @@
 #include "es.hxx"
 #include "gc.hxx"
 
-DefineTag(Tree1, static);
-DefineTag(Tree2, static);
-
-static Tree* tgcalloc(size_t s, Tag *t) {
-	return reinterpret_cast<Tree*>(gcalloc(s,t));
+static Tree* tGC_MALLOC(size_t s) {
+	return reinterpret_cast<Tree*>(GC_MALLOC(s));
 }
 
 /* mk -- make a new node; used to generate the parse tree */
 extern Tree *mk (NodeKind  t, ...) {
 	va_list ap;
-	Ref<Tree> n;
+	Tree* n;
 
 	/* There is no way to make this gc-safe
 	 * because var-args are inherently
 	 * not gc-safe (can't pass
 	 * Ref's through them)
 	 */
-	gcdisable();
+	
 	va_start(ap, t);
 	switch (t) {
 	    default:
 		panic("mk: bad node kind %d", t);
 	    case nWord: case nQword: case nPrim:
-		n = tgcalloc(offsetof(Tree, u[1]), &Tree1Tag);
+		n = tGC_MALLOC(offsetof(Tree, u[1]));
 		n->u[0].s = va_arg(ap, char *);
 		break;
 	    case nCall: case nThunk: case nVar:
-		n = tgcalloc(offsetof(Tree, u[1]), &Tree1Tag);
+		n = tGC_MALLOC(offsetof(Tree, u[1]));
 		n->u[0].p = va_arg(ap, Tree *);
 		break;
 	    case nAssign:  case nConcat: case nClosure: case nFor:
 	    case nLambda: case nLet: case nList:  case nLocal:
 	    case nVarsub: case nMatch: case nExtract:
-		n = tgcalloc(offsetof(Tree, u[2]), &Tree2Tag);
+		n = tGC_MALLOC(offsetof(Tree, u[2]));
 		n->u[0].p = va_arg(ap, Tree *);
 		n->u[1].p = va_arg(ap, Tree *);
 		break;
 	    case nRedir:
-		n = tgcalloc(offsetof(Tree, u[2]), NULL);
+		n = tGC_MALLOC(offsetof(Tree, u[2]));
 		n->u[0].p = va_arg(ap, Tree *);
 		n->u[1].p = va_arg(ap, Tree *);
 		break;
 	    case nPipe:
-		n = tgcalloc(offsetof(Tree, u[2]), NULL);
+		n = tGC_MALLOC(offsetof(Tree, u[2]));
 		n->u[0].i = va_arg(ap, int);
 		n->u[1].i = va_arg(ap, int);
 		break;
@@ -54,55 +51,6 @@ extern Tree *mk (NodeKind  t, ...) {
 	n->kind = t;
 	va_end(ap);
 
-	gcenable();
-	return n.release();
-}
-
-
-/*
- * garbage collection functions
- *	these are segregated by size so copy doesn't have to check
- *	the type to figure out size.
- */
-
-static void *Tree1Copy(void *op) {
-	void *np = gcalloc(offsetof(Tree, u[1]), &Tree1Tag);
-	memcpy(np, op, offsetof(Tree, u[1]));
-	return np;
-}
-
-static void *Tree2Copy(void *op) {
-	void *np = gcalloc(offsetof(Tree, u[2]), &Tree2Tag);
-	memcpy(np, op, offsetof(Tree, u[2]));
-	return np;
-}
-
-static size_t Tree1Scan(void *p) {
-	Tree *n = reinterpret_cast<Tree*>(p);
-	switch (n->kind) {
-	    default:
-		panic("Tree1Scan: bad node kind %d", n->kind);
-	    case nPrim: case nWord: case nQword:
-	    	n->u[0].s = forward(const_cast<char*>(n->u[0].s));
-		break;
-	    case nCall: case nThunk: case nVar:
-	    	n->u[0].p = forward(n->u[0].p);
-		break;
-	} 
-	return offsetof(Tree, u[1]);
-}
-
-static size_t Tree2Scan(void *p) {
-	Tree *n = reinterpret_cast<Tree*>(p);
-	switch (n->kind) {
-	    case nAssign:  case nConcat: case nClosure: case nFor:
-	    case nLambda: case nLet: case nList:  case nLocal:
-	    case nVarsub: case nMatch: case nExtract:
-	    	n->u[0].p = forward(n->u[0].p);
-		n->u[1].p = forward(n->u[1].p);
-		break;
-	    default:
-		panic("Tree2Scan: bad node kind %d", n->kind);
-	} 
-	return offsetof(Tree, u[2]);
+	
+	return n;
 }
