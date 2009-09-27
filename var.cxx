@@ -222,7 +222,6 @@ extern void varpop(Push *push) {
 
 static void mkenv0(void *dummy, const char *key, void *value) {
 	Var *var = reinterpret_cast<Var*>(value);
-	assert(gcisblocked());
 	if (
 		   var == NULL
 		|| var->defn == NULL

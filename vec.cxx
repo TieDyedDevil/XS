@@ -24,13 +24,8 @@ extern Vector* vectorize(List* list) {
 	int n = length(list);
 	Vector* v = mkvector(n);
 	v->count = n; /* GC may forward extra NULL pointers, no matter */
-	for (int i = 0; list != NULL; list = list->next, i++) {
-		/* gcdup() must occur _before_ v->vector[i] because
-		 * otherwise v may be forwarded
-		 */
-		char *t = gcdup(getstr(list->term));
-		v->vector[i] = t;
-	}
+	for (int i = 0; list != NULL; list = list->next, i++)
+		v->vector[i] = gcdup(getstr(list->term));
 
 	return v;
 }

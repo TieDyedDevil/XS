@@ -287,13 +287,12 @@ static char * quote_func(char *text, int match_Type, char *quote_pointer) {
 		int hLen = strlen(home);
 		int len = strlen(text) + hLen +1;
 		/* consider gc usage here? */
-		newHome = reinterpret_cast<char*>(ealloc(len));
+		newHome = reinterpret_cast<char*>(GC_MALLOC(len));
 		strcpy(newHome, home);
 		strcpy(newHome + hLen, pos + 1);
 		text = newHome;
 	}
         char *result = default_quote_function(text, match_Type, quote_pointer);
-	if (newHome) efree(newHome);
 	return result;
 }
 
@@ -345,7 +344,7 @@ static char ** command_completion(const char *text, int start, int end) {
 		results_size += l;
 		results = reinterpret_cast<char**>(erealloc(results, results_size * sizeof(char*)));
 		for (List* i = glob_result; i != NULL; i = i->next, ++result_p) {
-			/* Can't directly use gc_string, because readline
+			/* Can't directly use basename, because readline
 			 * needs to free() the result 
 			 */
 			results[result_p] = strdup(simple_basename(i->term->str));

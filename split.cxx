@@ -67,7 +67,6 @@ static void runsplit(unsigned char*& s, Buffer*& buf, unsigned char * inend) {
 }
 
 extern void splitstring(const char *in, size_t len, bool endword) {
-	 /* char *s can't be made gc-safe (unless rewritten to use indices) */
 	Buffer *buf = buffer;
 	unsigned char *s = (unsigned char *) in, *const inend = s + len;
 

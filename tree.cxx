@@ -12,12 +12,6 @@ extern Tree *mk (NodeKind  t, ...) {
 	va_list ap;
 	Tree* n;
 
-	/* There is no way to make this gc-safe
-	 * because var-args are inherently
-	 * not gc-safe (can't pass
-	 * Ref's through them)
-	 */
-	
 	va_start(ap, t);
 	switch (t) {
 	    default:

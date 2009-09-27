@@ -325,7 +325,7 @@ PRIM(time) {
 
 	int pid, status;
 
-	gc();	/* do a garbage collection first to ensure reproducible results */
+	GC_gcollect();	/* do a garbage collection first to ensure reproducible results */
 	pid = efork(true, false);
 	if (pid == 0) {
 		clock_t t0, t1;
