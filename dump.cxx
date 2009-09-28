@@ -5,6 +5,7 @@
 #include "term.hxx"
 #include "gc.hxx"
 #include "print.hxx"
+#include <sstream>
 
 #define	MAXVARNAME 20
 
@@ -204,10 +205,10 @@ static void dumpvar(void *ignore, const char *key, void *value) {
 	dumplist(var->defn);
 }
 
-static Buffer *varbuf = NULL;
+static std::stringstream varbuf;
 
 static void dumpdef(const char *name, Var *var) {
-	varbuf = bufcat(varbuf, str("\t{ %s, (List *) %s },\n", dumpstring(name), dumplist(var->defn)));
+	varbuf << str("\t{ %s, (List *) %s },\n", dumpstring(name), dumplist(var->defn));
 }
 
 static void dumpfunctions(void *ignore, const char *key, void *value) {
@@ -256,16 +257,14 @@ extern void runinitial(void) {
 	printheader(title);
 	dictforall(vars, dumpvar, NULL);
 
-	varbuf = openbuffer(1024);
 	/* these must be assigned in this order, or things just won't work */
-	bufcat(varbuf, "\nstatic const struct { const char *name; List *value; } defs[] = {\n");
+	varbuf << "\nstatic const struct { const char *name; List *value; } defs[] = {\n";
 	dictforall(vars, dumpfunctions, NULL);
 	dictforall(vars, dumpsettors, NULL);
 	dictforall(vars, dumpvariables, NULL);
-	bufcat(varbuf, "\t{ NULL, NULL }\n");
-	bufcat(varbuf, "};\n\n");
-	bufputc(varbuf, '\0');
-	print(sealbuffer(varbuf));
+	varbuf << "\t{ NULL, NULL }\n"
+		  "};\n\n";
+	print(varbuf.str().c_str());
 
 	print("\nextern void runinitial(void) {\n");
 	print("\tint i;\n");
