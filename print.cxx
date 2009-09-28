@@ -282,26 +282,22 @@ extern int fmtprint (Format * format,  const char * fmt, ...) {
 	return n + format->flushed;
 }
 
-static void fprint_flush(Format *format, size_t more) {
-	size_t n = format->buf - format->bufbegin;
-	char *buf = format->bufbegin;
-
-	format->flushed += n;
-	format->buf = format->bufbegin;
-	while (n != 0) {
-		int written = write(format->u.n, buf, n);
-		if (written == -1) {
-			if (format->u.n != 2)
-				uerror("write");
-			exit(1);
-		}
-		n -= written;
-	}
-}
-
 struct FD_format : public Format {
 	void grow(size_t s) {
-		fprint_flush(this, s);
+		size_t n = buf - bufbegin;
+		char *obuf = bufbegin;
+	
+		flushed += n;
+		buf = bufbegin;
+		while (n != 0) {
+			int written = write(u.n, obuf, n);
+			if (written == -1) {
+				if (u.n != 2)
+					uerror("write");
+				exit(1);
+			}
+			n -= written;
+		}
 	}
 };
 
@@ -316,7 +312,7 @@ static void fdprint(FD_format *format, int fd, const char *fmt) {
 
 	
 	printfmt(format, fmt);
-	fprint_flush(format, 0);
+	format->grow(0);
 	
 }
 
