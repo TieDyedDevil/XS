@@ -17,12 +17,12 @@ struct Input {
 	const char *name;
 	unsigned char *buf, *bufend, *bufbegin, *rbuf;
 	size_t buflen;
-	bool unget_fill;
 	int unget[MAXUNGET];
 	int ungot;
 	int lineno;
 	int fd;
 	int runflags;
+	bool unget_fill;
 };
 extern Input *input;
 

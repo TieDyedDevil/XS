@@ -97,8 +97,6 @@ extern void setnoexport(List *list) {
 
 /* varlookup -- lookup a variable in the current context */
 extern List *varlookup(const char* name, Binding* bp) {
-	Var* var;
-
 	if (iscounting(name)) {
 		Term* term = nth(varlookup("*", bp), strtol(name, NULL, 10));
 		if (term == NULL)
@@ -111,7 +109,7 @@ extern List *varlookup(const char* name, Binding* bp) {
 		if (streq(name, bp->name))
 			return bp->defn;
 
-	var = reinterpret_cast<Var*>(dictget(vars, name));
+	Var *var = reinterpret_cast<Var*>(dictget(vars, name));
 	if (var == NULL)
 		return NULL;
 	return var->defn;
