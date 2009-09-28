@@ -1,6 +1,7 @@
 /* print.hxx -- interface to formatted printing routines ($Revision: 1.1.1.1 $) */
 
 struct Format {
+public:
     /* for the formatting routines */
 	va_list args;
 	long flags, f1, f2;
@@ -8,7 +9,7 @@ struct Format {
     /* for the buffer maintainence routines */
 	char *buf, *bufbegin, *bufend;
 	int flushed;
-	void (*grow)(Format *, size_t);
+	virtual void grow(size_t)=0;
 	union { int n; void *p; } u;
 };
 
@@ -48,6 +49,6 @@ inline void fmtcat(Format *format, const char *s) {
 
 inline void fmtputc(Format *f, char c) {
 	if (f->buf >= f->bufend)
-		(*f->grow)(f, (size_t)32); 
+		f->grow(32); 
 	*f->buf++ = c;
 }

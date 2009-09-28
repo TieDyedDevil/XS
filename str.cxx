@@ -4,20 +4,20 @@
 #include "gc.hxx"
 #include "print.hxx"
 
-/* grow -- buffer grow function for str() */
-static void str_grow(Format *f, size_t more) {
-	Buffer *buf = expandbuffer(reinterpret_cast<Buffer*>(f->u.p), more);
-	f->u.p		= buf;
-	f->buf		= buf->str + (f->buf - f->bufbegin);
-	f->bufbegin	= buf->str;
-	f->bufend	= buf->str + buf->len;
-}
+struct Str_format : public Format {
+	void grow(size_t more) {
+		Buffer *newbuf = expandbuffer(reinterpret_cast<Buffer*>(u.p), more);
+		u.p		= newbuf;
+		buf		= newbuf->str + (buf - bufbegin);
+		bufbegin	= newbuf->str;
+		bufend		= newbuf->str + newbuf->len;
+	}
+};
 
 /* strv -- print a formatted string into gc space */
 extern char *strv(const char *fmt, va_list args) {
-	Format format;
+	Str_format format;
 
-	
 	Buffer *buf = openbuffer(0);
 	format.u.p	= buf;
 #if NO_VA_LIST_ASSIGN
@@ -28,7 +28,6 @@ extern char *strv(const char *fmt, va_list args) {
 	format.buf	= buf->str;
 	format.bufbegin	= buf->str;
 	format.bufend	= buf->str + buf->len;
-	format.grow	= str_grow;
 	format.flushed	= 0;
 
 	printfmt(&format, fmt);
@@ -47,41 +46,6 @@ extern char *str (const char * fmt, ...) {
 	va_end(args);
 	return s;
 }
-
-
-#define	PRINT_ALLOCSIZE	64
-
-/* mprint_grow -- buffer grow function for mprint() */
-static void mprint_grow(Format *format, size_t more) {
-	char *buf;
-	size_t len = format->bufend - format->bufbegin + 1;
-	len = (len >= more)
-		? len * 2
-		: ((len + more) + PRINT_ALLOCSIZE) &~ (PRINT_ALLOCSIZE - 1);
-	buf = reinterpret_cast<char*>(erealloc(format->bufbegin, len));
-	format->buf	 = buf + (format->buf - format->bufbegin);
-	format->bufbegin = buf;
-	format->bufend	 = buf + len - 1;
-}
-
-/* mprint -- create a string in ealloc space by printing to it */
-extern char *mprint (const char * fmt, ...) {
-	Format format;
-	format.u.n = 1;
-	va_start(format.args, fmt);
-
-	format.buf	= reinterpret_cast<char*>(ealloc(PRINT_ALLOCSIZE));
-	format.bufbegin	= format.buf;
-	format.bufend	= format.buf + PRINT_ALLOCSIZE - 1;
-	format.grow	= mprint_grow;
-	format.flushed	= 0;
-
-	printfmt(&format, fmt);
-	*format.buf = '\0';
-	va_end(format.args);
-	return format.bufbegin;
-}
-
 
 /*
  * StrList -- lists of strings

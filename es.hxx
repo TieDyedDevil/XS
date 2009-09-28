@@ -284,7 +284,6 @@ extern void initconv(void);
 /* str.c */
 
 extern char *str(const char *fmt, ...);	/* create a gc space string by printing */
-extern char *mprint(const char *fmt, ...);	/* create an ealloc space string by printing */
 extern StrList* mkstrlist(const char* str, StrList* next);
 
 

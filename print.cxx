@@ -224,7 +224,7 @@ extern void fmtappend(Format *format, const char *s, size_t len) {
 		format->buf += split;
 		s += split;
 		len -= split;
-		(*format->grow)(format, len);
+		format->grow(len);
 	}
 	memcpy(format->buf, s, len);
 	format->buf += len;
@@ -299,13 +299,18 @@ static void fprint_flush(Format *format, size_t more) {
 	}
 }
 
-static void fdprint(Format *format, int fd, const char *fmt) {
+struct FD_format : public Format {
+	void grow(size_t s) {
+		fprint_flush(this, s);
+	}
+};
+
+static void fdprint(FD_format *format, int fd, const char *fmt) {
 	char buf[FPRINT_BUFSIZ];
 
 	format->buf	= buf;
 	format->bufbegin = buf;
 	format->bufend	= buf + sizeof buf;
-	format->grow	= fprint_flush;
 	format->flushed	= 0;
 	format->u.n	= fdmap(fd);
 
@@ -315,7 +320,7 @@ static void fdprint(Format *format, int fd, const char *fmt) {
 	
 }
 
-#define FORMATPRINT(fd) Format format; \
+#define FORMATPRINT(fd) FD_format format; \
 	va_start(format.args, fmt); \
 	fdprint(&format, fd, fmt); \
 	va_end(format.args); \
@@ -334,7 +339,7 @@ extern int eprint (const char * fmt, ...) {
 }
 
 extern void panic (const char * fmt, ...) {
-	Format format;
+	FD_format format;
 	
 	va_start(format.args, fmt);
 	eprint("es panic: ");
