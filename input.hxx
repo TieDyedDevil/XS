@@ -4,15 +4,20 @@
 
 #define	MAXUNGET	2		/* maximum 2 character pushback */
 
-typedef struct Input Input;
 struct Input {
-	int (*get)(Input *self);
-	int (*fill)(Input *self), (*rfill)(Input *self);
-	void (*cleanup)(Input *self);
+	Input() : prev(NULL), name(NULL), buf(NULL), bufend(NULL),
+		  bufbegin(NULL), rbuf(NULL), buflen(0),
+		  ungot(0), lineno(0), fd(-3), runflags(0),
+		  unget_fill(false) 
+	{memzero(unget, sizeof(int) * MAXUNGET);}
+	int get();
+	virtual int fill()=0;
+	virtual void cleanup()=0;
 	Input *prev;
 	const char *name;
 	unsigned char *buf, *bufend, *bufbegin, *rbuf;
 	size_t buflen;
+	bool unget_fill;
 	int unget[MAXUNGET];
 	int ungot;
 	int lineno;
@@ -22,7 +27,7 @@ struct Input {
 extern Input *input;
 
 inline int RGETC() {
-	return (*input->get)(input);
+	return input->get();
 }
 
 int GETC();

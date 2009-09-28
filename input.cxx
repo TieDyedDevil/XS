@@ -17,8 +17,8 @@
 /*
  * macros
  */
-
-#define	ISEOF(in)	((in)->fill == eoffill)
+#define EOF_FD -4
+#define	ISEOF(in)	((in)->fd == EOF_FD)
 
 
 /*
@@ -168,7 +168,7 @@ extern void sethistory(const char *file) {
 }
 
 int GETC() {
-	int c = (*input->get)(input);
+	int c = input->get();
 	switch (c) {
 	case '\t': yylloc.last_column = (yylloc.last_column / 8 + 1) * 8; break;
 	case '\n':
@@ -190,9 +190,7 @@ static int ungetfill(Input *in) {
 	assert(in->ungot > 0);
 	c = in->unget[--in->ungot];
 	if (in->ungot == 0) {
-		assert(in->rfill != NULL);
-		in->fill = in->rfill;
-		in->rfill = NULL;
+		in->unget_fill = false;
 		assert(in->rbuf != NULL);
 		in->buf = in->rbuf;
 		in->rbuf = NULL;
@@ -211,9 +209,7 @@ extern void unget(Input *in, int c) {
 	} else if (in->bufbegin < in->buf && in->buf[-1] == c && (input->runflags & run_echoinput) == 0)
 		--in->buf;
 	else {
-		assert(in->rfill == NULL);
-		in->rfill = in->fill;
-		in->fill = ungetfill;
+		in->unget_fill = true;
 		assert(in->rbuf == NULL);
 		in->rbuf = in->buf;
 		in->buf = in->bufend;
@@ -229,31 +225,21 @@ extern void unget(Input *in, int c) {
  */
 
 /* get -- get a character, filter out nulls */
-static int get(Input *in) {
+int Input::get() {
 	int c;
-	while ((c = (in->buf < in->bufend ? *in->buf++ : (*in->fill)(in))) == '\0')
+	while ((c = (buf < bufend ? *buf++ : fill())) == '\0')
 		warn("null character ignored");
 	return c;
 }
 
 /* getverbose -- get a character, print it to standard error */
 static int getverbose(Input *in) {
-	if (in->fill == ungetfill)
-		return get(in);
-	else {
-		int c = get(in);
-		if (c != EOF) {
-			char buf = c;
-			ewrite(2, &buf, 1);
-		}
-		return c;
+	int c = in->get();
+	if (c != EOF) {
+		char buf = c;
+		ewrite(2, &buf, 1);
 	}
-}
-
-/* eoffill -- report eof when called to fill input buffer */
-static int eoffill(Input *in) {
-	assert(in->fd == -1);
-	return EOF;
+	return c;
 }
 
 #if READLINE
@@ -308,13 +294,13 @@ static char ** command_completion(const char *text, int start, int end) {
 		while (isspace(text[i])) ++i;
 		if (start > i) {
 			if (text[start] == '$') puts("$ completion concept");
-			/* Only for first word on line */	
+			/* Only for first word on line */
 			return NULL;
 		}
 		else text += i;
 	}
 	char **results = NULL;
-	
+
 	/* Leave room for \0, and special first element */
 	int result_p = 1;
 	int results_size = 2;
@@ -329,23 +315,23 @@ static char ** command_completion(const char *text, int start, int end) {
 		strcpy(path, paths->term->str);
 		path[l_path] = '/';
 		path[l_path + 1] = '\0';
-	
+
 		char * glob_string = reinterpret_cast<char*>(ealloc(sizeof(char) * (end - start + 2)));
 		memcpy(glob_string, text, (end - start) * sizeof(char));
 		*(glob_string + end - start) = '*';
-		*(glob_string + end - start + 1) = '\0';	
+		*(glob_string + end - start + 1) = '\0';
 
 		List* glob_result = dirmatch(path, path, glob_string, UNQUOTED);
 		efree(path);
 
 		int l = length(glob_result);
 		if (l == 0) continue;
-		
+
 		results_size += l;
 		results = reinterpret_cast<char**>(erealloc(results, results_size * sizeof(char*)));
 		for (List* i = glob_result; i != NULL; i = i->next, ++result_p) {
 			/* Can't directly use basename, because readline
-			 * needs to free() the result 
+			 * needs to free() the result
 			 */
 			results[result_p] = strdup(simple_basename(i->term->str));
 		}
@@ -366,7 +352,7 @@ static char ** command_completion(const char *text, int start, int end) {
 
 	assert (result_p == results_size - 1);
 	int num_results = results_size - 2;
-	
+
 	if (num_results > 0) {
 		results[results_size - 1] = NULL;
 		results[0] = strdup(num_results == 1 ? results[1] : text) ;
@@ -410,8 +396,7 @@ static int fdfill(Input *in) {
 
 	if (nread <= 0) {
 		close(in->fd);
-		in->fd = -1;
-		in->fill = eoffill;
+		in->fd = EOF_FD;
 		in->runflags &= ~run_interactive;
 		if (nread == -1)
 			fail("$&parse", "%s: %s", in->name == NULL ? "es" : in->name, esstrerror(errno));
@@ -451,7 +436,7 @@ extern Tree *parse(const char *pr1, const char *pr2) {
 	prompt2 = pr2;
 
 	result = yyparse();
-	
+
 
 	if (result || error != NULL) {
 		assert(error != NULL);
@@ -485,7 +470,6 @@ extern List *runinput(Input *in, int runflags) {
 
 	flags &= ~eval_inchild;
 	in->runflags = flags;
-	in->get = (flags & run_echoinput) ? getverbose : get;
 	in->prev = input;
 	input = in;
 
@@ -507,13 +491,13 @@ extern List *runinput(Input *in, int runflags) {
 				? prim("batchloop", NULL, NULL, flags)
 				: eval(repl, NULL, flags);
 	} catch (List *e) {
-		(*input->cleanup)(input);
+		input->cleanup();
 		input = input->prev;
 		throwE(e);
 	}
 
 	input = in->prev;
-	(*in->cleanup)(in);
+	in->cleanup();
 	return result;
 }
 
@@ -522,23 +506,27 @@ extern List *runinput(Input *in, int runflags) {
  * pushing new input sources
  */
 
-/* fdcleanup -- cleanup after running from a file descriptor */
-static void fdcleanup(Input *in) {
-	unregisterfd(&in->fd);
-	if (in->fd != -1)
-		close(in->fd);
-	efree(in->bufbegin);
-}
+
+struct FD_input : public Input {
+	int fill() {
+		if (unget_fill) return ungetfill(this);
+		else if (fd == EOF_FD) return EOF;
+		else return fdfill(this);
+	}
+	void cleanup() {
+		unregisterfd(&fd);
+		if (fd >= 0)
+			close(fd);
+		efree(bufbegin);
+	}
+};
 
 /* runfd -- run commands from a file descriptor */
 extern List *runfd(int fd, const char *name, int flags) {
-	Input in;
+	FD_input in;
 	List *result;
 
-	memzero(&in, sizeof (Input));
 	in.lineno = 1;
-	in.fill = fdfill;
-	in.cleanup = fdcleanup;
 	in.fd = fd;
 	registerfd(&in.fd, true);
 	in.buflen = BUFSIZE;
@@ -556,31 +544,35 @@ static void stringcleanup(Input *in) {
 	efree(in->bufbegin);
 }
 
-/* stringfill -- placeholder than turns into EOF right away */
-static int stringfill(Input *in) {
-	in->fill = eoffill;
-	return EOF;
-}
+struct String_input : public Input {
+	int fill() {
+		if (unget_fill) return ungetfill(this);
+		else {
+			fd = EOF_FD;
+			return EOF;
+		}
+	}
+	void cleanup() {
+		stringcleanup(this);
+	}
+};
 
 /* runstring -- run commands from a string */
 extern List *runstring(const char *str, const char *name, int flags) {
-	Input in;
+	String_input in;
 	List *result;
 	unsigned char *buf;
 
 	assert(str != NULL);
 
-	memzero(&in, sizeof (Input));
-	in.fd = -1;
+	in.fd = -2;
 	in.lineno = 1;
 	in.name = (name == NULL) ? str : name;
-	in.fill = stringfill;
 	in.buflen = strlen(str);
 	buf = reinterpret_cast<unsigned char*>(ealloc(in.buflen + 1));
 	memcpy(buf, str, in.buflen);
 	in.bufbegin = in.buf = buf;
 	in.bufend = in.buf + in.buflen;
-	in.cleanup = stringcleanup;
 
 	result = runinput(&in, flags);
 	return result;
@@ -592,27 +584,28 @@ extern Tree *parseinput(Input *in) {
 
 	in->prev = input;
 	in->runflags = 0;
-	in->get = get;
 	input = in;
 
 	try {
 		result = parse(NULL, NULL);
-		if (get(in) != EOF)
+		if (in->get() != EOF)
 			fail("$&parse", "more than one value in term");
 	} catch (List *e) {
-		(*input->cleanup)(input);
+		input->cleanup();
 		input = input->prev;
 		throwE(e);
 	}
 
 	input = in->prev;
-	(*in->cleanup)(in);
+	in->cleanup();
 	return result;
 }
 
+
+
 /* parsestring -- turn a string into a tree; must be exactly one tree */
 extern Tree *parsestring(const char *str) {
-	Input in;
+	String_input in;
 	Tree *result;
 	unsigned char *buf;
 
@@ -620,17 +613,14 @@ extern Tree *parsestring(const char *str) {
 
 	/* TODO: abstract out common code with runstring */
 
-	memzero(&in, sizeof (Input));
-	in.fd = -1;
+	in.fd = -2;
 	in.lineno = 1;
 	in.name = str;
-	in.fill = stringfill;
 	in.buflen = strlen(str);
 	buf = reinterpret_cast<unsigned char*>(ealloc(in.buflen + 1));
 	memcpy(buf, str, in.buflen);
 	in.bufbegin = in.buf = buf;
 	in.bufend = in.buf + in.buflen;
-	in.cleanup = stringcleanup;
 
 	result = parseinput(&in);
 	return result;

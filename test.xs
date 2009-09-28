@@ -65,9 +65,10 @@ fn match_re result {
     log2 Match_re....
     eval '~ `` '''' output *'^$^result^'*'
 }
-let (dir := `pwd 
+let (dir := `pwd
      logfile := `pwd^/xs.log) 
 {
+    echo $dir
     fn log msg {
         echo $msg | tee -a $logfile
     }

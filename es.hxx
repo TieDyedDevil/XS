@@ -115,7 +115,7 @@ inline char *gcdup(const char *s) {
 	return gcndup(s, strlen(s));
 }
 inline void initgc(void) {
-    GC_init();    
+    GC_init();
 }/* must be called at the dawn of time */
 /* main.c */
 
@@ -212,9 +212,9 @@ extern const char *QUOTED, *UNQUOTED;
 extern List* glob(List* list, StrList* quote);
 extern bool haswild(const char *pattern, const char *quoting);
 /* Needed for some of the readline tab-completion */
-extern List* dirmatch(const char* prefix, 
+extern List* dirmatch(const char* prefix,
 		      const char* dirname,
-		      const char* pattern, 
+		      const char* pattern,
 		      const char* quote);
 
 
