@@ -12,7 +12,7 @@ struct Input {
 	{memzero(unget, sizeof(int) * MAXUNGET);}
 	int get();
 	virtual int fill()=0;
-	virtual void cleanup()=0;
+	virtual ~Input(){}
 	Input *prev;
 	const char *name;
 	unsigned char *buf, *bufend, *bufbegin, *rbuf;

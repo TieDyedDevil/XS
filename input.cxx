@@ -67,12 +67,7 @@ static const char *error = NULL;
 
 /* yyerror -- yacc error entry point */
 extern void yyerror(const char *s) {
-#if sgi
-	/* this is so that trip.es works */
-	if (streq(s, "Syntax error"))
-		s = "syntax error";
-#endif
-	if (error == NULL)	/* first error is generally the most informative */
+	if (error == NULL)   /* first error is generally the most informative */
 		error = locate(input, s);
 }
 
@@ -229,15 +224,9 @@ int Input::get() {
 	int c;
 	while ((c = (buf < bufend ? *buf++ : fill())) == '\0')
 		warn("null character ignored");
-	return c;
-}
-
-/* getverbose -- get a character, print it to standard error */
-static int getverbose(Input *in) {
-	int c = in->get();
-	if (c != EOF) {
-		char buf = c;
-		ewrite(2, &buf, 1);
+	if ((runflags & run_echoinput) && c != EOF) {
+		char buffer = c;
+		ewrite(2, &buffer, 1);
 	}
 	return c;
 }
@@ -491,13 +480,11 @@ extern List *runinput(Input *in, int runflags) {
 				? prim("batchloop", NULL, NULL, flags)
 				: eval(repl, NULL, flags);
 	} catch (List *e) {
-		input->cleanup();
 		input = input->prev;
 		throwE(e);
 	}
 
 	input = in->prev;
-	in->cleanup();
 	return result;
 }
 
@@ -513,7 +500,7 @@ struct FD_input : public Input {
 		else if (fd == EOF_FD) return EOF;
 		else return fdfill(this);
 	}
-	void cleanup() {
+	~FD_input() {
 		unregisterfd(&fd);
 		if (fd >= 0)
 			close(fd);
@@ -539,11 +526,6 @@ extern List *runfd(int fd, const char *name, int flags) {
 	return result;
 }
 
-/* stringcleanup -- cleanup after running from a string */
-static void stringcleanup(Input *in) {
-	efree(in->bufbegin);
-}
-
 struct String_input : public Input {
 	int fill() {
 		if (unget_fill) return ungetfill(this);
@@ -552,8 +534,8 @@ struct String_input : public Input {
 			return EOF;
 		}
 	}
-	void cleanup() {
-		stringcleanup(this);
+	~String_input() {
+		efree(bufbegin);
 	}
 };
 
@@ -591,13 +573,11 @@ extern Tree *parseinput(Input *in) {
 		if (in->get() != EOF)
 			fail("$&parse", "more than one value in term");
 	} catch (List *e) {
-		input->cleanup();
 		input = input->prev;
 		throwE(e);
 	}
 
 	input = in->prev;
-	in->cleanup();
 	return result;
 }
 
