@@ -2,6 +2,13 @@
 
 #include "esconfig.hxx"
 #include <gc/gc.h>
+
+#ifdef NO_GC /* Only way to satisfy valgrind */
+#define GC_init()
+#define GC_MALLOC(x) malloc(x)
+#endif
+
+
 #ifdef HAVE_SYS_CDEFS_H
 # include <sys/cdefs.h>
 #endif
