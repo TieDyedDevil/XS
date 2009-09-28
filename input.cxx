@@ -29,7 +29,6 @@ Input *input;
 const char *prompt, *prompt2;
 
 bool disablehistory = false;
-bool resetterminal = false;
 static const char *history;
 static int historyfd = -1;
 
@@ -39,15 +38,6 @@ static int historyfd = -1;
 #include <readline/history.h>
 bool continued_input = false;
 int rl_meta_chars;	/* for editline; ignored for gnu readline */
-
-#if 0 /* Add support for using this when header is unavailable? */
-extern char *readline(char *);
-extern void add_history(char *);
-extern void rl_reset_terminal(char *);
-extern char *rl_basic_word_break_characters;
-extern char *rl_completer_quote_characters;
-#endif
-
 
 #endif
 
@@ -235,10 +225,6 @@ int Input::get() {
 /* callreadline -- readline wrapper */
 static char *callreadline() {
 	char *r;
-	if (resetterminal) {
-		rl_reset_terminal(NULL);
-		resetterminal = false;
-	}
 	interrupted = false;
 	if (!setjmp(slowlabel)) {
 		slow = true;
@@ -361,7 +347,6 @@ static int fdfill(Input *in) {
 	if (in->runflags & run_interactive && in->fd == 0) {
 		char *rlinebuf = callreadline();
 		if (rlinebuf == NULL)
-
 			nread = 0;
 		else {
 			if (*rlinebuf != '\0')
