@@ -3,7 +3,7 @@ run 'fsplit' {
 		echo $#x $^x
 	}
 }
-conds { match '8 a b d cc c' }
+conds { match '7 a b d cc c' }
 
 run 'split' {
 	let (x := <={%split ':./' a.b/c.d//efg}) {

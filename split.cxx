@@ -2,10 +2,12 @@
 
 #include "es.hxx"
 #include "gc.hxx"
+#include <sstream>
+using std::stringstream;
 
 static bool coalesce;
 static bool splitchars;
-static Buffer *buffer;
+static stringstream buf;
 static List *value;
 
 static bool ifsvalid = false;
@@ -13,65 +15,64 @@ static char ifs[10], isifs[256];
 
 extern void startsplit(const char *sep, bool coalescef) {
 	value = NULL;
-	buffer = NULL;
+	buf.str("");
 	coalesce = coalescef;
 	splitchars = !coalesce && *sep == '\0';
 
 	if (!ifsvalid || !streq(sep, ifs)) {
-		int c;
 		if (strlen(sep) + 1 < sizeof ifs) {
 			strcpy(ifs, sep);
 			ifsvalid = true;
-		} else
-			ifsvalid = false;
+		} else ifsvalid = false;
+
 		memzero(isifs, sizeof isifs);
-		for (isifs['\0'] = true; (c = (*(unsigned const char *)sep)) != '\0'; sep++)
+
+		isifs['\0'] = true;
+		for (int c; (c = (*(unsigned const char *)sep)) != '\0'; sep++)
 			isifs[c] = true;
 	}
 }
 
-static void skipifs(unsigned char*& s, Buffer*& buf, unsigned char * inend) {
+static void skipifs(unsigned char*& s, unsigned char * inend) {
 	assert(coalesce);
 	while (s < inend) {
 		int c = *s++;
 		if (!isifs[c]) {
-			buf = bufputc(openbuffer(0), c);
+			buf.put(c);
 			return;
 		}
 	}
-	buf = NULL; /* Tell endsplit not to touch buffer */
+	buf.str(""); /* Tell endsplit not to touch buf */
 }
 
 template <bool coalesce>
-static inline void newbuf(unsigned char*& s, Buffer*& buf, unsigned char *inend) {
-	if (coalesce) skipifs(s, buf, inend);
-	else buf = openbuffer(0);
+static inline void newbuf(unsigned char*& s, unsigned char *inend) {
+	buf.str("");
+	if (coalesce) skipifs(s, inend);
 }
 
 template <bool coalesce>
-static inline void handleifs(unsigned char*& s, Buffer*& buf, unsigned char *inend) {
-	Term *term = mkstr(sealcountedbuffer(buf));
+static inline void handleifs(unsigned char*& s, unsigned char *inend) {
+	Term *term = mkstr(gcdup(buf.str().c_str()));
 	value = mklist(term, value);
-	newbuf<coalesce>(s, buf, inend);
+	newbuf<coalesce>(s, inend);
 }
 
 /* Doesn't handle splitchars case, only coalesce + normal */
 template <bool coalesce>
-static void runsplit(unsigned char*& s, Buffer*& buf, unsigned char * inend) {
-	if (buf == NULL) newbuf<coalesce>(s, buf, inend);
+static void runsplit(unsigned char*& s, unsigned char * inend) {
+	if (coalesce) skipifs(s, inend);
 	while (s < inend) {
 		int c = *s++;
-		if (isifs[c]) handleifs<coalesce>(s, buf, inend);
-		else buf = bufputc(buf, c);
+		if (isifs[c]) handleifs<coalesce>(s, inend);
+		else buf.put(c);
 	}
 }
 
 extern void splitstring(const char *in, size_t len, bool endword) {
-	Buffer *buf = buffer;
 	unsigned char *s = (unsigned char *) in, *const inend = s + len;
 
 	if (splitchars) {
-		assert(buf == NULL);
 		while (s < inend) {
 			Term *term = mkstr(gcndup((char *) s++, 1));
 			value = mklist(term, value);
@@ -79,23 +80,21 @@ extern void splitstring(const char *in, size_t len, bool endword) {
 		
 		return;
 	} 
-	else if (coalesce) runsplit<true>(s, buf, inend);
-	else runsplit<false>(s, buf, inend);
+	else if (coalesce) runsplit<true>(s, inend);
+	else runsplit<false>(s, inend);
 
-	if (endword && buf != NULL) {
-		Term *term = mkstr(sealcountedbuffer(buf));
+	if (endword && buf.str() != "") {
+		Term *term = mkstr(gcdup(buf.str().c_str()));
 		value = mklist(term, value);
-		buf = NULL;
+		buf.str("");
 	}
-	buffer = buf;
-	
 }
 
 extern List* endsplit(void) {
-	if (buffer != NULL) {
-		Term* term = mkstr(sealcountedbuffer(buffer));
+	if (buf.str() != "") {
+		Term* term = mkstr(gcdup(buf.str().c_str()));
 		value = mklist(term, value);
-		buffer = NULL;
+		buf.str("");
 	}
 	List* result = reverse(value);
 	value = NULL;
