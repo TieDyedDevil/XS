@@ -4,6 +4,9 @@
 #include "gc.hxx"
 #include "prim.hxx"
 #include <stdio.h>
+#include <sstream>
+
+using std::stringstream;
 
 static const char *caller;
 
@@ -414,23 +417,14 @@ PRIM(read) {
 	int c;
 	int fd = fdmap(0);
 
-	static Buffer *buffer = NULL;
-	if (buffer != NULL)
-		freebuffer(buffer);
-	buffer = openbuffer(0);
+	stringstream buffer;
 
 	while ((c = read1(fd)) != EOF && c != '\n')
-		buffer = bufputc(buffer, c);
+		buffer.put(c);
 
-	if (c == EOF && buffer->current == 0) {
-		freebuffer(buffer);
-		buffer = NULL;
-		return NULL;
-	} else {
-		List *result = mklist(mkstr(sealcountedbuffer(buffer)), NULL);
-		buffer = NULL;
-		return result;
-	}
+	return c == EOF && buffer.str() == ""
+		? NULL
+		: mklist(mkstr(gcdup(buffer.str().c_str())), NULL);
 }
 
 extern void initprims_io(Prim_dict& primdict) {

@@ -4,6 +4,9 @@
 #include "gc.hxx"
 #include "input.hxx"
 #include "syntax.hxx"
+#include <sstream>
+
+using std::stringstream;
 
 typedef struct Here Here;
 struct Here {
@@ -17,14 +20,14 @@ static Here *hereq;
 extern Tree *getherevar(void) {
 	int c;
 	char *s;
-	Buffer *buf = openbuffer(0);
+	stringstream buf;
 	while (!dnw[c = GETC()])
-		buf = bufputc(buf, c);
-	if (buf->len == 0) {
+		buf.put(c);
+	if (buf.str() == "") {
 		yyerror("null variable name in here document");
 		return NULL;
 	}
-	s = sealcountedbuffer(buf);
+	s = gcdup(buf.str().c_str());
 	if (c != '^')
 		UNGETC(c);
 	return flatten(mk(nVar, mk(nWord, s)), " ");
