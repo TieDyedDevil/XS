@@ -83,7 +83,7 @@ extern void splitstring(const char *in, size_t len, bool endword) {
 	else if (coalesce) runsplit<true>(s, inend);
 	else runsplit<false>(s, inend);
 
-	if (endword && buf.str() != "") {
+	if (endword && buf.tellp() > 0) {
 		Term *term = mkstr(gcdup(buf.str().c_str()));
 		value = mklist(term, value);
 		buf.str("");
@@ -91,7 +91,7 @@ extern void splitstring(const char *in, size_t len, bool endword) {
 }
 
 extern List* endsplit(void) {
-	if (buf.str() != "") {
+	if (buf.tellp() > 0) {
 		Term* term = mkstr(gcdup(buf.str().c_str()));
 		value = mklist(term, value);
 		buf.str("");
