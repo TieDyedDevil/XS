@@ -10,9 +10,7 @@ public:
 	virtual void put(char c)=0;
 	int flushed;
 	virtual void append(const char *s, size_t len)=0;
-	virtual void grow(size_t)=0;
 	virtual int size() const=0;
-	union { int n; void *p; } u;
 };
 
 

@@ -266,6 +266,7 @@ extern int fmtprint (Format * format,  const char * fmt, ...) {
 
 struct FD_format : public Format {
 	char *buf, *bufbegin, *bufend;
+	int fd;
 	void put(char c) {
 		if (buf >= bufend)
 			grow(32);
@@ -294,9 +295,9 @@ struct FD_format : public Format {
 		flushed += n;
 		buf = bufbegin;
 		while (n != 0) {
-			int written = write(u.n, obuf, n);
+			int written = write(fd, obuf, n);
 			if (written == -1) {
-				if (u.n != 2)
+				if (fd != 2)
 					uerror("write");
 				exit(1);
 			}
@@ -312,7 +313,7 @@ static void fdprint(FD_format *format, int fd, const char *fmt) {
 	format->bufbegin = buf;
 	format->bufend	= buf + sizeof buf;
 	format->flushed	= 0;
-	format->u.n	= fdmap(fd);
+	format->fd	= fdmap(fd);
 
 	
 	printfmt(format, fmt);

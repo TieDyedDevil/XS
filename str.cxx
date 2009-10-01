@@ -20,7 +20,6 @@ public:
 	}
 
 	// Growth, size already handled
-	void grow(size_t more) {}
 	int size() const {
 		return std::numeric_limits<int>::max();
 	}
