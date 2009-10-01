@@ -3,38 +3,46 @@
 #include "es.hxx"
 #include "gc.hxx"
 #include "print.hxx"
+#include <sstream>
+#include <limits>
+using std::stringstream;
 
-struct Str_format : public Format {
-	void grow(size_t more) {
-		Buffer *newbuf = expandbuffer(reinterpret_cast<Buffer*>(u.p), more);
-		u.p		= newbuf;
-		buf		= newbuf->str + (buf - bufbegin);
-		bufbegin	= newbuf->str;
-		bufend		= newbuf->str + newbuf->len;
+class Str_format : public Format {
+public:
+	void put(char c) {
+		sstream.put(c);
 	}
+	void append(const char *s, size_t len) {
+		sstream.write(s, len);
+	}
+	char *gcstr() {
+		return gcdup(sstream.str().c_str());
+	}
+
+	// Growth, size already handled
+	void grow(size_t more) {}
+	int size() const {
+		return std::numeric_limits<int>::max();
+	}
+private:
+	stringstream sstream;
 };
 
 /* strv -- print a formatted string into gc space */
 extern char *strv(const char *fmt, va_list args) {
 	Str_format format;
 
-	Buffer *buf = openbuffer(0);
-	format.u.p	= buf;
 #if NO_VA_LIST_ASSIGN
 	memcpy(format.args, args, sizeof(va_list));
 #else
 	format.args	= args;
 #endif
-	format.buf	= buf->str;
-	format.bufbegin	= buf->str;
-	format.bufend	= buf->str + buf->len;
 	format.flushed	= 0;
 
 	printfmt(&format, fmt);
-	fmtputc(&format, '\0');
-	
+	format.put('\0');
 
-	return sealbuffer(reinterpret_cast<Buffer*>(format.u.p));
+	return format.gcstr();
 }
 
 /* str -- create a string (in garbage collection space) by printing to it */

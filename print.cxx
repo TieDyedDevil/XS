@@ -44,7 +44,7 @@ static bool zeroconv(Format *format) {
 }
 
 static void pad(Format *format, long len, int c) {
-	while (len-- > 0) fmtputc(format, c);
+	while (len-- > 0) format->put(c);
 }
 
 static bool sconv(Format *format) {
@@ -54,11 +54,11 @@ static bool sconv(Format *format) {
 	else {
 		size_t len = strlen(s), width = format->f1 - len;
 		if (format->flags & FMT_leftside) {
-			fmtappend(format, s, len);
+			format->append(s, len);
 			pad(format, width, ' ');
 		} else {
 			pad(format, width, ' ');
-			fmtappend(format, s, len);
+			format->append(s, len);
 		}
 	}
 	return false;
@@ -131,15 +131,15 @@ static void intconv(Format *format, unsigned int radix, int upper, const char *a
 
 	if ((flags & FMT_leftside) == 0)
 		pad(format, padding, padchar);
-	fmtappend(format, prefix, pre);
+	format->append(prefix, pre);
 	pad(format, zeroes, '0');
-	fmtappend(format, number, len);
+	format->append(number, len);
 	if (flags & FMT_leftside)
 		pad(format, padding, padchar);
 }
 
 static bool cconv(Format *format) {
-	fmtputc(format, va_arg(format->args, int));
+	format->put(va_arg(format->args, int));
 	return false;
 }
 
@@ -159,7 +159,7 @@ static bool xconv(Format *format) {
 }
 
 static bool pctconv(Format *format) {
-	fmtputc(format, '%');
+	format->put('%');
 	return false;
 }
 
@@ -212,24 +212,6 @@ Conv fmtinstall(int c, Conv f) {
 	return oldf;
 }
 
-
-/*
- * functions for inserting strings in the format buffer
- */
-
-extern void fmtappend(Format *format, const char *s, size_t len) {
-	while (format->buf + len > format->bufend) {
-		size_t split = format->bufend - format->buf;
-		memcpy(format->buf, s, split);
-		format->buf += split;
-		s += split;
-		len -= split;
-		format->grow(len);
-	}
-	memcpy(format->buf, s, len);
-	format->buf += len;
-}
-
 /*
  * printfmt -- the driver routine
  */
@@ -250,9 +232,9 @@ extern int printfmt(Format *format, const char *fmt) {
 			while ((*fmttab[c])(format));
 			break;
 		case '\0':
-			return format->buf - format->bufbegin + format->flushed;
+			return format->size() + format->flushed;
 		default:
-			fmtputc(format, c);
+			format->put(c);
 			break;
 		}
 	}
@@ -283,6 +265,28 @@ extern int fmtprint (Format * format,  const char * fmt, ...) {
 }
 
 struct FD_format : public Format {
+	char *buf, *bufbegin, *bufend;
+	void put(char c) {
+		if (buf >= bufend)
+			grow(32);
+		*buf++ = c;
+	}
+	void append(const char *s, size_t len) {
+		while (buf + len > bufend) {
+			size_t split = bufend - buf;
+			memcpy(buf, s, split);
+			buf += split;
+			s += split;
+			len -= split;
+			grow(len);
+		}
+		memcpy(buf, s, len);
+		buf += len;
+	}
+	int size() const {
+		return buf - bufbegin;
+	}
+
 	void grow(size_t s) {
 		size_t n = buf - bufbegin;
 		char *obuf = bufbegin;

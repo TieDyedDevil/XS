@@ -7,9 +7,11 @@ public:
 	long flags, f1, f2;
 	int invoker;
     /* for the buffer maintainence routines */
-	char *buf, *bufbegin, *bufend;
+	virtual void put(char c)=0;
 	int flushed;
+	virtual void append(const char *s, size_t len)=0;
 	virtual void grow(size_t)=0;
+	virtual int size() const=0;
 	union { int n; void *p; } u;
 };
 
@@ -31,7 +33,6 @@ typedef bool (*Conv)(Format *);
 extern Conv fmtinstall(int, Conv);
 extern int printfmt(Format *, const char *);
 extern int fmtprint(Format *, const char *, ...);
-extern void fmtappend(Format *, const char *, size_t);
 
 extern int print(const char *fmt, ...);
 extern int eprint(const char *fmt, ...);
@@ -42,13 +43,5 @@ extern char *strv(const char *fmt, va_list args);	/* varargs interface to str() 
 #define	FPRINT_BUFSIZ	1024
 
 inline void fmtcat(Format *format, const char *s) {
-	fmtappend(format, s, strlen(s));
-}
-
-
-
-inline void fmtputc(Format *f, char c) {
-	if (f->buf >= f->bufend)
-		f->grow(32); 
-	*f->buf++ = c;
+	format->append(s, strlen(s));
 }

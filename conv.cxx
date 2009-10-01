@@ -125,7 +125,7 @@ top:
 	}
 
 	case nVar:
-		fmtputc(f, '$');
+		f->put('$');
 		n = n->u[0].p;
 		if (n == NULL || n->kind == nWord || n->kind == nQword)
 			goto top;
@@ -161,7 +161,7 @@ top:
 				assert(n->kind == nList);
 				fmtprint(f, " %T", n->u[0].p);
 			}
-			fmtputc(f, ')');
+			f->put(')');
 		}
 		return false;
 
@@ -270,9 +270,9 @@ quoteit:
 	for (t = s; (c = *t); t++)
 		if (!isprint(c)) {
 			if (state == Quoted)
-				fmtputc(f, '\'');
+				f->put('\'');
 			if (state != Begin)
-				fmtputc(f, '^');
+				f->put('^');
 			switch (c) {
 			    case '\a':	fmtprint(f, "\\a");	break;
 			    case '\b':	fmtprint(f, "\\b");	break;
@@ -286,12 +286,12 @@ quoteit:
 			state = Unquoted;
 		} else {
 			if (state == Unquoted)
-				fmtputc(f, '^');
+				f->put('^');
 			if (state != Quoted)
-				fmtputc(f, '\'');
+				f->put('\'');
 			if (c == '\'')
-				fmtputc(f, '\'');
-			fmtputc(f, c);
+				f->put('\'');
+			f->put(c);
 			state = Quoted;
 		}
 
@@ -300,7 +300,7 @@ quoteit:
 		fmtprint(f, "''");
 		break;
 	    case Quoted:
-		fmtputc(f, '\'');
+		f->put('\'');
 		break;
 	    case Unquoted:
 		break;
@@ -327,7 +327,7 @@ static bool Fconv(Format *f) {
 	for (unsigned char *s = name; (c = *s) != '\0'; s++)
 		if ((s == name ? isalpha(c) : isalnum(c))
 		    || (c == '_' && s[1] != '_'))
-			fmtputc(f, c);
+			f->put(c);
 		else
 			fmtprint(f, "__%02x", c);
 	return false;
@@ -348,7 +348,7 @@ static bool Nconv(Format *f) {
 				s += 3;
 			}
 		}
-		fmtputc(f, c);
+		f->put(c);
 	}
 	return false;
 }
@@ -362,12 +362,12 @@ static bool Wconv(Format *f) {
 		const char *s;
 		for (s = getstr(lp->term); (c = *s) != '\0'; s++) {
 			if (c == ENV_ESCAPE || c == ENV_SEPARATOR)
-				fmtputc(f, ENV_ESCAPE);
-			fmtputc(f, c);
+				f->put(ENV_ESCAPE);
+			f->put(c);
 		}
 		next = lp->next;
 		if (next != NULL)
-			fmtputc(f, ENV_SEPARATOR);
+			f->put(ENV_SEPARATOR);
 	}
 	return false;
 }

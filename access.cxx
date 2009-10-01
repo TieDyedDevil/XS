@@ -74,7 +74,6 @@ static int testfile(const char *path, int perm, mode_t type) {
 
 static const char *pathcat(const char *prefix, const char *suffix) {
 	char *s;
-	size_t plen, slen, len;
 	static char *pathbuf = NULL;
 	static size_t pathlen = 0;
 
@@ -83,9 +82,9 @@ static const char *pathcat(const char *prefix, const char *suffix) {
 	if (*suffix == '\0')
 		return prefix;
 
-	plen = strlen(prefix);
-	slen = strlen(suffix);
-	len = plen + slen + 2;		/* one for '/', one for '\0' */
+	size_t plen = strlen(prefix),
+			 slen = strlen(suffix),
+			 len = plen + slen + 2;		/* one for '/', one for '\0' */
 	if (pathlen < len) {
 		pathlen = len;
 		pathbuf = reinterpret_cast<char*>(erealloc(pathbuf, pathlen));
@@ -165,9 +164,7 @@ PRIM(access) {
 			fail("$&access", "%s", esstrerror(estatus));
 	}
 
-	List* result = reverse(lp);
-	
-	return result;
+	return reverse(lp);
 }
 
 extern void initprims_access(Prim_dict& primdict) {
