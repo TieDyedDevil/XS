@@ -36,7 +36,7 @@ extern Tree *getherevar(void) {
 /* snarfheredoc -- read a heredoc until the eof marker */
 extern Tree *snarfheredoc(const char *eof, bool quoted) {
 	Tree *tree, **tailp;
-	Buffer *buf;
+	stringstream buf;
 	unsigned char *s;
 
 	assert(quoted || strchr(eof, '$') == NULL);	/* can never be typed (whew!) */
@@ -46,48 +46,42 @@ extern Tree *snarfheredoc(const char *eof, bool quoted) {
 	}
 	disablehistory = true;
 
-	for (tree = NULL, tailp = &tree, buf = openbuffer(0);;) {
+	for (tree = NULL, tailp = &tree;;) {
 		int c;
 		print_prompt2();
 		for (s = (unsigned char *) eof; (c = GETC()) == *s; s++)
 			;
 		if (*s == '\0' && (c == '\n' || c == EOF)) {
-			if (buf->current == 0 && tree != NULL)
-				freebuffer(buf);
-			else
-				*tailp = treecons(mk(nQword, sealcountedbuffer(buf)), NULL);
+			if (!(buf.tellp() == 0 && tree != NULL))
+				*tailp = treecons(mk(nQword, gcdup(buf.str().c_str())), NULL);
 			break;
 		}
 		if (s != (unsigned char *) eof)
-			buf = bufncat(buf, eof, s - (unsigned char *) eof);
+			buf.write(eof, s - (unsigned char *) eof);
 		for (;; c = GETC()) {
 			if (c == EOF) {
 				yyerror("incomplete here document");
-				freebuffer(buf);
 				disablehistory = false;
 				return NULL;
 			}
 			if (c == '$' && !quoted && (c = GETC()) != '$') {
 				Tree *var;
 				UNGETC(c);
-				if (buf->current == 0)
-					freebuffer(buf);
-				else {
-					*tailp = treecons(mk(nQword, sealcountedbuffer(buf)), NULL);
+				if (buf.str() != "") {
+					*tailp = treecons(mk(nQword, gcdup(buf.str().c_str())), NULL);
 					tailp = &(*tailp)->CDR;
 				}
 				var = getherevar();
 				if (var == NULL) {
-					freebuffer(buf);
 					disablehistory = false;
 					return NULL;
 				}
 				*tailp = treecons(var, NULL);
 				tailp = &(*tailp)->CDR;
-				buf = openbuffer(0);
+				buf.str("");
 				continue;
 			}
-			buf = bufputc(buf, c);
+			buf.put(c);
 			if (c == '\n')
 				break;
 		}
