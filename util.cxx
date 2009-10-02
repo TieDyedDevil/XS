@@ -106,6 +106,11 @@ extern void ewrite(int fd, const char *buf, size_t n) {
 	SIGCHK();
 }
 
+/* qstrcmp -- a strcmp wrapper for sort */
+extern int qstrcmp(const char *s1, const char *s2) {
+	return strcmp(s1, s2) < 0;
+}
+
 extern long eread(int fd, char *buf, size_t n) {
 	long r;
 	interrupted = false;

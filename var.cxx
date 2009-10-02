@@ -3,6 +3,9 @@
 #include "es.hxx"
 #include "var.hxx"
 #include "term.hxx"
+#include <vector>
+#include <algorithm>
+using std::vector;
 
 #if PROTECT_ENV
 #define	ENV_FORMAT	"%F=%W"
@@ -15,8 +18,7 @@
 
 Dict *vars;
 static Dict *noexport;
-static Vector *env, *sortenv;
-static int envmin;
+static Vector env, sortenv;
 static bool isdirty = true;
 static bool rebound = true;
 
@@ -228,32 +230,20 @@ static void mkenv0(void *dummy, const char *key, void *value) {
 		char *envstr = str(ENV_FORMAT, key, var->defn);
 		var->env = envstr;
 	}
-	assert(env->count < env->alloclen);
-	env->vector[env->count++] = var->env;
-	if (env->count == env->alloclen) {
-		Vector* newenv = mkvector(env->alloclen * 2);
-		newenv->count = env->count;
-		memcpy(newenv->vector, env->vector, env->count * sizeof *env->vector);
-		env = newenv;
-	}
+	env.push_back(var->env);
 }
-	
+
+
 extern Vector* mkenv(void) {
 	if (isdirty || rebound) {
-		env->count = envmin;
-				/* TODO: make this a good guess */
 		dictforall(vars, mkenv0, NULL);
 		
-		env->vector[env->count] = NULL;
 		isdirty = false;
 		rebound = false;
-		if (sortenv == NULL || env->count > sortenv->alloclen)
-			sortenv = mkvector(env->count * 2);
-		sortenv->count = env->count;
-		memcpy(sortenv->vector, env->vector, sizeof (char *) * (env->count + 1));
-		sortvector(sortenv);
+		sortenv = env;
+		std::sort(sortenv.begin(), sortenv.end(), qstrcmp);
 	}
-	return sortenv;
+	return &sortenv;
 }
 
 /* addtolist -- dictforall procedure to create a list */
@@ -294,7 +284,6 @@ extern void hidevariables(void) {
 extern void initvars(void) {
 	vars = mkdict();
 	noexport = NULL;
-	env = mkvector(10);
 }
 
 /* importvar -- import a single environment variable */
@@ -358,14 +347,7 @@ extern void initenv(char **envp, bool isprotected) {
 		char *eq = strchr(envstr, '=');
 		char *name;
 		if (eq == NULL) {
-			env->vector[env->count++] = envstr;
-			if (env->count == env->alloclen) {
-				Vector* newenv = mkvector(env->alloclen * 2);
-				newenv->count = env->count;
-				memcpy(newenv->vector, env->vector,
-				       env->count * sizeof *env->vector);
-				env = newenv;
-			}
+			env.push_back(envstr);
 			continue;
 		}
 		for (nlen = eq - envstr; nlen >= bufsize; bufsize *= 2)
@@ -378,6 +360,5 @@ extern void initenv(char **envp, bool isprotected) {
 			importvar(name, eq);
 	}
 
-	envmin = env->count;
 	efree(buf);
 }

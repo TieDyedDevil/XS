@@ -18,7 +18,7 @@ COMMON_FILES	= access.cxx closure.cxx conv.cxx dict.cxx eval.cxx except.cxx fd.c
 	  glom.cxx input.cxx heredoc.cxx list.cxx match.cxx opt.cxx \
 	  prim-ctl.cxx prim-etc.cxx prim-io.cxx prim-sys.cxx prim.cxx print.cxx proc.cxx \
 	  sigmsgs.cxx signal.cxx split.cxx syntax.cxx status.cxx str.cxx term.cxx \
-	  token.cxx tree.cxx util.cxx var.cxx vec.cxx version.cxx parse.yxx
+	  token.cxx tree.cxx util.cxx var.cxx version.cxx parse.yxx
 OTHER	= Makefile parse.yxx mksignal
 GEN	= parse.h parse.cxx parse.output sigmsgs.cxx initial.cxx
 

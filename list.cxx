@@ -1,6 +1,7 @@
 /* list.c -- operations on lists ($Revision: 1.1.1.1 $) */
 
 #include "es.hxx"
+#include <algorithm>
 
 /*
  * allocation and garbage collector support
@@ -87,16 +88,24 @@ extern Term *nth(List *list, int n) {
 
 static List *listify(Vector* v) {
 	List* list = NULL;
-	while (v->count > 0) {
-		Term* term = mkstr(v->vector[--v->count]);
-		list = mklist(term, list);
-	}
+	for (Vector::reverse_iterator i = v->rbegin();
+		i != v->rend();
+		++i)
+			list = mklist(mkstr(*i), list);
 	return list;
 }
 
 /* sortlist */
 extern List* sortlist(List* list) {
 	Vector* v = vectorize(list);
-	sortvector(v);
+	std::sort(v->begin(), v->end(), qstrcmp);
 	return listify(v);
+}
+
+extern Vector* vectorize(List* list) {
+	Vector* v = new (UseGC) Vector;
+	for (; list != NULL; list = list->next)
+		v->push_back(gcdup(getstr(list->term)));
+
+	return v;
 }

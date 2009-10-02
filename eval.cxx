@@ -28,7 +28,7 @@ extern List *forkexec(const char *file, List *list, bool inchild) {
 	Vector* env = mkenv();
 	int pid = efork(!inchild, false);
 	if (pid == 0) {
-		execve(file, vectorize(list)->vector, env->vector);
+		execve(file, &(*vectorize(list))[0], &(*env)[0]);
 		failexec(file, list);
 	}
 	

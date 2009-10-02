@@ -1,12 +1,22 @@
 /* stdenv.hxx -- set up an environment we can use ($Revision: 1.3 $) */
 
 #include "esconfig.hxx"
+#include <vector>
+
+#ifndef NO_GC
 #include <gc/gc.h>
+#include <gc/gc_cpp.h>
+#include <gc/gc_allocator.h>
+#endif
 
 #ifdef NO_GC /* Only way to satisfy valgrind */
+#define UseGC /* Ignore this flag */
 #define GC_init()
 #define GC_MALLOC(x) malloc(x)
 #endif
+
+#include <boost/foreach.hpp>
+#define foreach BOOST_FOREACH
 
 
 #ifdef HAVE_SYS_CDEFS_H
