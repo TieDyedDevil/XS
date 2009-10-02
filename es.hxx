@@ -70,7 +70,8 @@ struct StrList {
 /* environment or arguments */
 // Inherit from gc_cleanup so if the collector ever collects the vector,
 // the internal memory is cleaned up too.
-class Vector : public std::vector< char*, gc_allocator<char*> >, public gc_cleanup {};
+class Vector : public std::vector< char*, gc_allocator<char*> >, 
+	       public gc_cleanup {};
 
 
 /*
@@ -86,7 +87,7 @@ extern void panic(const char *fmt, ...) NORETURN;
 
 /* GC-related convenience functions */
 
-#define	gcnew(type)	(reinterpret_cast<type *>(GC_MALLOC(sizeof (type))))
+#define	gcnew(type)	new (UseGC) type
 
 extern char *gcndup(const char* s, size_t n);	/* util.c: copy a counted string into gc space */
 

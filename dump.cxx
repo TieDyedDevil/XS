@@ -5,6 +5,12 @@
 #include "term.hxx"
 #include "print.hxx"
 #include <sstream>
+#include <map>
+#include <set>
+#include <string>
+using std::map;
+using std::set;
+using std::string;
 
 #define	MAXVARNAME 20
 
@@ -34,7 +40,8 @@
  * is disabled during the dumping process.
  */
 
-static Dict *cvars, *strings;
+static set<string> cvars; 
+static map<string, string> strings;
 
 static bool allprintable(const char *s) {
 	int c;
@@ -47,9 +54,8 @@ static bool allprintable(const char *s) {
 static const char *dumpstring(const char *string) {
 	if (string == NULL)
 		return "NULL";
-	const char *name = reinterpret_cast<const char*>(dictget(strings, string));
-	if (name == NULL) {
-		name = str("S_%F", string);
+	if (strings.count(string) == 0) {
+		const char *name = str("S_%F", string);
 		if (strlen(name) > MAXVARNAME)
 			name = str("X_%ulx", (long long) string);
 		print("static const char %s[] = ", name);
@@ -74,9 +80,9 @@ static const char *dumpstring(const char *string) {
 			}
 			print("'\\0', };\n");
 		}
-		strings = dictput(strings, string, (void *) name);
-	}
-	return name;
+		strings[string] = name;
+		return name;
+	} else return strings[string].c_str();
 }
 
 static const char *dumplist(List *list);
@@ -109,7 +115,7 @@ static const char *dumptree(Tree *tree) {
 	if (tree == NULL)
 		return "NULL";
 	const char *name = str("&T_%ulx", (long long) tree);
-	if (dictget(cvars, name) == NULL) {
+	if (cvars.count(name) == 0) {
 		switch (tree->kind) {
 		    default:
 			panic("dumptree: bad node kind %d", tree->kind);
@@ -127,7 +133,7 @@ static const char *dumptree(Tree *tree) {
 			print("static Tree_pp %s = { n%s, { { (Tree *) %s }, { (Tree *) %s } } };\n",
 			      name + 1, nodename(tree->kind), dumptree(tree->u[0].p), dumptree(tree->u[1].p));
 		}
-		cvars = dictput(cvars, name, tree);
+		cvars.insert(name);
 	}
 	return name;
 }
@@ -137,7 +143,7 @@ static const char *dumpbinding(Binding *binding) {
 	if (binding == NULL)
 		return "NULL";
 	name = str("&B_%ulx", (long long) binding);
-	if (dictget(cvars, name) == NULL) {
+	if (cvars.count(name) == 0) {
 		print(
 			"static Binding %s = { %s, %s, %s };\n",
 			name + 1,
@@ -145,7 +151,7 @@ static const char *dumpbinding(Binding *binding) {
 			dumplist(binding->defn),
 			dumpbinding(binding->next)
 		);
-		cvars = dictput(cvars, name, binding);
+		cvars.insert(name);
 	}
 	return name;
 }
@@ -154,14 +160,14 @@ static const char *dumpclosure(Closure *closure) {
 	if (closure == NULL)
 		return "NULL";
 	const char *name = str("&C_%ulx",  (long long) closure);
-	if (dictget(cvars, name) == NULL) {
+	if (cvars.count(name) == 0) {
 		print(
 			"static Closure %s = { (Binding *) %s, (Tree *) %s };\n",
 			name + 1,
 			dumpbinding(closure->binding),
 			dumptree(closure->tree)
 		);
-		cvars = dictput(cvars, name, closure);
+		cvars.insert(name);
 	}
 	return name;
 }
@@ -170,14 +176,14 @@ static const char *dumpterm(Term *term) {
 	if (term == NULL)
 		return "NULL";
 	const char *name = str("&E_%ulx", (long long) term);
-	if (dictget(cvars, name) == NULL) {
+	if (cvars.count(name) == 0) {
 		print(
 			"static Term %s = { %s, (Closure *) %s };\n",
 			name + 1,
 			dumpstring(term->str),
 			dumpclosure(term->closure)
 		);
-		cvars = dictput(cvars, name, term);
+		cvars.insert(name);
 	}
 	return name;
 }
@@ -186,14 +192,14 @@ static const char *dumplist(List *list) {
 	if (list == NULL)
 		return "NULL";
 	const char *name = str("&L_%ulx", (long long) list);
-	if (dictget(cvars, name) == NULL) {
+	if (cvars.count(name) == 0) {
 		print(
 			"static List %s = { %s, %s };\n",
 			name + 1,
 			dumpterm(list->term),
 			dumplist(list->next)
 		);
-		cvars = dictput(cvars, name, list);
+		cvars.insert(name);
 	}
 	return name;
 }
@@ -247,9 +253,6 @@ static void printheader(List *title) {
 
 extern void runinitial(void) {
 	List *title = runfd(0, "initial.xs", 0);
-
-	cvars = mkdict();
-	strings = mkdict();
 
 	printheader(title);
 	dictforall(vars, dumpvar, NULL);
