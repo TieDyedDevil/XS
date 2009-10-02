@@ -17,11 +17,7 @@
  * the fundamental es data structures.
  */
 
-typedef struct Tree Tree;
-typedef struct Term Term;
-typedef struct List List;
-typedef struct Binding Binding;
-typedef struct Closure Closure;
+struct Term;
 
 struct List {
 	Term *term;
@@ -34,6 +30,8 @@ struct Binding {
 	Binding *next;
 };
 
+struct Tree;
+
 struct Closure {
 	Binding	*binding;
 	Tree *tree;
@@ -44,11 +42,11 @@ struct Closure {
  * parse trees
  */
 
-typedef enum {
+enum NodeKind {
 	nAssign, nCall, nClosure, nConcat, nFor, nLambda, nLet, nList, nLocal,
 	nMatch, nExtract, nPrim, nQword, nThunk, nVar, nVarsub, nWord,
 	nRedir, nPipe		/* only appear during construction */
-} NodeKind;
+};
 
 struct Tree {
 	NodeKind kind;
@@ -64,17 +62,15 @@ struct Tree {
  * miscellaneous data structures
  */
 
-typedef struct StrList StrList;
 struct StrList {
 	const char *str;
 	StrList *next;
 };
 
-typedef struct {
-	int alloclen, count;
-	/* Variable size */
-	char *vector[1];
-} Vector;			/* environment or arguments */
+/* environment or arguments */
+// Inherit from gc_cleanup so if the collector ever collects the vector,
+// the internal memory is cleaned up too.
+class Vector : public std::vector< char*, gc_allocator<char*> >, public gc_cleanup {};
 
 
 /*
@@ -268,13 +264,11 @@ extern StrList* mkstrlist(const char* str, StrList* next);
 
 /* vec.c */
 
-extern Vector* mkvector(int n);
 extern Vector* vectorize(List* list);
-extern void sortvector(Vector* v);
-
 
 /* util.c */
 
+extern int qstrcmp(const char *, const char *);
 extern const char *esstrerror(int err);
 extern void uerror(const char *msg);
 extern void *ealloc(size_t n);
