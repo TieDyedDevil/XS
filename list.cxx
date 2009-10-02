@@ -1,7 +1,6 @@
 /* list.c -- operations on lists ($Revision: 1.1.1.1 $) */
 
 #include "es.hxx"
-#include "gc.hxx"
 
 /*
  * allocation and garbage collector support

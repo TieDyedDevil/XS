@@ -1,7 +1,6 @@
 /* term.c -- operations on terms ($Revision: 1.1.1.1 $) */
 
 #include "es.hxx"
-#include "gc.hxx"
 #include "term.hxx"
 
 extern Term* mkterm(const char* str, Closure* closure) {

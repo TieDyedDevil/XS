@@ -3,7 +3,6 @@
 #include "es.hxx"
 #include "var.hxx"
 #include "term.hxx"
-#include "gc.hxx"
 #include "print.hxx"
 #include <sstream>
 

@@ -1,7 +1,6 @@
 /* glom.c -- walk parse tree to produce list ($Revision: 1.1.1.1 $) */
 
 #include "es.hxx"
-#include "gc.hxx"
 
 /* concat -- cartesion cross product concatenation */
 static List *concat(List* list1,List* list2) {

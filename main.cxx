@@ -89,6 +89,7 @@ static void usage(void) {
 
 /* main -- initialize, parse command arguments, and start running */
 int main(int argc, char **argv) {
+	GC_init();
 	int c;
 	volatile int ac;
 	char **volatile av;
@@ -101,7 +102,6 @@ int main(int argc, char **argv) {
 	bool keepclosed = false;		/* -o */
 	const char *volatile cmd = NULL;	/* -c */
 
-	initgc();
 	initconv();
 
 	if (argc == 0) {

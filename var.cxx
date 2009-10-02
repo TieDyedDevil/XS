@@ -1,7 +1,6 @@
 /* var.c -- es variables ($Revision: 1.1.1.1 $) */
 
 #include "es.hxx"
-#include "gc.hxx"
 #include "var.hxx"
 #include "term.hxx"
 
@@ -171,7 +170,6 @@ extern void vardef(const char* name, Binding* binding, List* defn) {
 extern void varpush(Push *push, const char *name, List *defn) {
 	validatevar(name);
 	push->name = name;
-	push->nameroot.p = (void **) &push->name;
 
 	if (isexported(name))
 		isdirty = true;
@@ -191,7 +189,6 @@ extern void varpush(Push *push, const char *name, List *defn) {
 		var->flags	= hasbindings(defn) ? var_hasbindings : 0;
 	}
 
-	push->defnroot.p = (void **) &push->defn;
 }
 
 extern void varpop(Push *push) {

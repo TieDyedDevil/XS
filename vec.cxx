@@ -1,7 +1,6 @@
 /* vec.c -- argv[] and envp[] vectors ($Revision: 1.1.1.1 $) */
 
 #include "es.hxx"
-#include "gc.hxx"
 #include <iostream>
 #include <algorithm>
 

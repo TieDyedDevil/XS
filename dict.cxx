@@ -1,7 +1,6 @@
 
 
 #include "es.hxx"
-#include "gc.hxx"
 
 static const int INIT_DICT_SIZE = 2;
 inline static int remain(int n)	{

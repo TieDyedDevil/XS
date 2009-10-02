@@ -88,37 +88,16 @@ extern int eprint(const char *fmt, ...);
 extern int fprint(int fd, const char *fmt, ...);
 extern void panic(const char *fmt, ...) NORETURN;
 
-
-
-/* gc.cxx -- see gc.hxx for more */
-
-
-typedef struct Root Root;
-struct Root {
-	void **p;
-	Root *next;
-};
-
-extern Root *rootlist;
-#if REF_ASSERTIONS
-#define	refassert(e)	assert(e)
-#else
-#define	refassert(e)	NOP
-#endif
+/* GC-related convenience functions */
 
 #define	gcnew(type)	(reinterpret_cast<type *>(GC_MALLOC(sizeof (type))))
 
-extern char *gcndup(const char* s, size_t n);	/* copy a counted string into gc space */
+extern char *gcndup(const char* s, size_t n);	/* util.c: copy a counted string into gc space */
 
 /* copy a 0-terminated string into gc space */
 inline char *gcdup(const char *s) {
 	return gcndup(s, strlen(s));
 }
-inline void initgc(void) {
-    GC_init();
-}/* must be called at the dawn of time */
-/* main.c */
-
 /* initial.c (for es) or dump.c (for esdump) */
 
 extern void runinitial(void);
@@ -411,37 +390,10 @@ struct Push {
 	const char *name;
 	List *defn;
 	int flags;
-	Root nameroot, defnroot;
 };
 
-
-/*
- * exception handling
- *
- *	ExceptionHandler
- *		... body ...
- *	CatchException (e)
- *		... catching code using e ...
- *	EndExceptionHandler
- *
- */
-
-typedef struct Handler Handler;
-struct Handler {
-	Handler *up;
-	Root *rootlist;
-	Push *pushlist;
-	unsigned long evaldepth;
-	jmp_buf label;
-};
-
-extern Handler *tophandler, *roothandler;
-extern List *exception;
-extern void pophandler(Handler *handler);
 extern void throwE(List *exc) NORETURN;
 extern void fail(const char *from, const char *name, ...) NORETURN;
 extern void print_exception(List *e);
-
-
 
 #endif

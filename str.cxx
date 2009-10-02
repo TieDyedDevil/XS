@@ -1,7 +1,6 @@
 /* str.c -- es string operations ($Revision: 1.1.1.1 $) */
 
 #include "es.hxx"
-#include "gc.hxx"
 #include "print.hxx"
 #include <sstream>
 #include <limits>

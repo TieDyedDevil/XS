@@ -146,3 +146,12 @@ extern int eopen(const char *name, OpenKind k) {
 	assert((unsigned) k < arraysize(mode_masks));
 	return open(name, mode_masks[k], 0666);
 }
+
+extern char *gcndup(const char* s, size_t n) {
+	char* ns = reinterpret_cast<char*>(GC_MALLOC((n + 1) * sizeof (char)));
+	memcpy(ns, s, n);
+	ns[n] = '\0';
+	assert(strlen(ns) == n);
+
+	return ns;
+}

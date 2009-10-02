@@ -1,7 +1,6 @@
 /* tree.c -- functions for manipulating parse-trees. (create, copy, scan) ($Revision: 1.1.1.1 $) */
 
 #include "es.hxx"
-#include "gc.hxx"
 
 static Tree* tGC_MALLOC(size_t s) {
 	return reinterpret_cast<Tree*>(GC_MALLOC(s));

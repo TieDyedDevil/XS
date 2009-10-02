@@ -4,7 +4,6 @@
 #define	REQUIRE_DIRENT	1
 
 #include "es.hxx"
-#include "gc.hxx"
 #include "term.hxx"
 
 const char *QUOTED = "QUOTED", *UNQUOTED = "RAW";
