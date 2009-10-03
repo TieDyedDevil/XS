@@ -70,7 +70,7 @@ List* dirmatch(const char* prefix,
 	if (dirp == NULL)
 		return NULL;
 
-	List* list; 
+	List* list = NULL; 
 	 /* The structure containing t->next could be forwarded, making prevp a bad pointer */
 	List **prevp = &list;
 	Dirent *dp;
