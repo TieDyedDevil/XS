@@ -217,7 +217,6 @@ extern List *glom2(Tree* tree, Binding* binding, StrList **quotep) {
 	List* tail = NULL;
 	StrList* qtail = NULL;
 
-	assert(!gcisblocked());
 	assert(quotep != NULL);
 
 	/*

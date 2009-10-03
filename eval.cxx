@@ -9,7 +9,6 @@ unsigned long evaldepth = 0, maxevaldepth = MAXmaxevaldepth;
 static void failexec(const char* file, List* args) NORETURN;
 static void failexec(const char* file, List* args) {
 	List *fn;
-	assert(gcisblocked());
 	fn = varlookup("fn-%exec-failure", NULL);
 	if (fn != NULL) {
 		int olderror = errno;

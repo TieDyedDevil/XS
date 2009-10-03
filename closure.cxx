@@ -34,7 +34,6 @@ struct Chain {
 static Chain *chain = NULL;
 
 static Binding *extract(Tree *tree, Binding *bindings) {
-	assert(gcisblocked());
 	static std::map<uint64_t, Binding *> bindmap;
 
 	for (; tree != NULL; tree = tree->u[1].p) {
