@@ -268,7 +268,7 @@ static char ** command_completion(const char *text, int start, int end) {
 		int i = 0;
 		while (isspace(text[i])) ++i;
 		if (start > i) {
-			if (text[start] == '$') puts("$ completion concept");
+			//if (text[start] == '$') puts("$ completion concept");
 			/* Only for first word on line */
 			return NULL;
 		}
