@@ -5,6 +5,10 @@
 #include "term.hxx"
 #include <vector>
 #include <algorithm>
+#include <set>
+#include <string>
+using std::string;
+using std::set;
 using std::vector;
 
 #if PROTECT_ENV
@@ -17,7 +21,7 @@ using std::vector;
 
 
 Dict *vars;
-static Dict *noexport;
+static set<string> noexport;
 static Vector env, sortenv;
 static bool isdirty = true;
 static bool rebound = true;
@@ -78,22 +82,19 @@ extern void validatevar(const char *var) {
 static bool isexported(const char *name) {
 	if (specialvar(name))
 		return false;
-	if (noexport == NULL)
+	if (noexport.empty())
 		return true;
-	return dictget(noexport, name) == NULL;
+	return noexport.count(name) == 0;
 }
 
 /* setnoexport -- mark a list of variable names not for export */
 extern void setnoexport(List *list) {
 	isdirty = true;
-	if (list == NULL) {
-		noexport = NULL;
-		return;
-	}
+	noexport.clear();
+	if (list == NULL) return;
 	
-	for (noexport = mkdict(); list != NULL; list = list->next)
-		noexport = dictput(noexport, getstr(list->term), (void *) setnoexport);
-	
+	for (; list != NULL; list = list->next)
+		noexport.insert(getstr(list->term));
 }
 
 /* varlookup -- lookup a variable in the current context */
@@ -283,7 +284,6 @@ extern void hidevariables(void) {
 /* initvars -- initialize the variable machinery */
 extern void initvars(void) {
 	vars = mkdict();
-	noexport = NULL;
 }
 
 /* importvar -- import a single environment variable */
