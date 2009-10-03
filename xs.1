@@ -360,16 +360,16 @@ Since lists can span multiple lines without explicit line
 continuations, they are ideal for long commands. For example:
 .Ds
 .Cr "switch $x \e"
-.Cr "   *error*   { return 1 } \e"
-.Cr "   *warning* { break } \e"
-.Cr "   *good*    { echo no problem  }"
+.Cr "   error   { return 1 } \e"
+.Cr "   warning { break } \e"
+.Cr "   good    { echo no problem  }"
 .De
 .PP is the same as
 .Ds
 .Cr "switch $x ("
-.Cr "   *error* { break }" 
-.Cr "   *warning* { break }"
-.Cr "   *good*  { echo no problem  }"
+.Cr "   error   { break }" 
+.Cr "   warning { break }"
+.Cr "   goo*    { echo no problem  }"
 .Cr ")"
 .De
 .SS Concatenation
