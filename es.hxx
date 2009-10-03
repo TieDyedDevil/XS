@@ -202,7 +202,6 @@ extern List *extractmatches(List *subjects, List *patterns, StrList *quotes);
 
 /* var.c */
 
-extern void initvars(void);
 extern void initenv(char **envp, bool isprotected);
 extern void hidevariables(void);
 extern void validatevar(const char *var);
@@ -243,14 +242,25 @@ extern int ewait(int pid, bool interruptible, void *rusage);
 
 /* dict.c */
 
-typedef struct Dict Dict;
-extern Dict *mkdict(void);
+struct Var;
+typedef map<
+		std::string, Var*, 
+		std::less<std::string>, 
+		gc_allocator< std::pair<std::string, Var*> > >
+        Dict_map;
+class Dict : public Dict_map,
+	     public gc_cleanup
+{
+public:
+    Var*& operator[](std::string index) {
+        int icount = count(index);
+        Var*& res = Dict_map::operator[](index);
+        assert (res != NULL || icount == 0);
+        return res;
+    }
+};
+
 extern void dictforall(Dict* dict, void (*proc)(void *, const char *, void *), void* arg);
-extern void *dictget(Dict *dict, const char *name);
-extern Dict *dictput(Dict *dict, const char *name, void *value);
-extern void *dictget2(Dict *dict, const char *name1, const char *name2);
-
-
 /* conv.c */
 
 extern void initconv(void);

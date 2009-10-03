@@ -2,6 +2,8 @@
 
 #include "esconfig.hxx"
 #include <vector>
+#include <map>
+using std::map;
 
 #ifndef NO_GC
 #include <gc/gc.h>

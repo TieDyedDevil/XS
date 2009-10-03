@@ -19,15 +19,15 @@ using std::vector;
 #define	ENV_DECODE	"%s"
 #endif
 
-
-Dict *vars;
 static set<string> noexport;
+Dict vars;
+
 static Vector env, sortenv;
 static bool isdirty = true;
 static bool rebound = true;
 
-static bool specialvar(const char *name) {
-	return (*name == '*' || *name == '0') && name[1] == '\0';
+static bool specialvar(string name) {
+	return (name[0] == '*' || name[0] == '0') && name[1] == '\0';
 }
 
 static bool hasbindings(List* list) {
@@ -79,7 +79,7 @@ extern void validatevar(const char *var) {
 }
 
 /* isexported -- is a variable exported? */
-static bool isexported(const char *name) {
+static bool isexported(string name) {
 	if (specialvar(name))
 		return false;
 	if (noexport.empty())
@@ -91,8 +91,6 @@ static bool isexported(const char *name) {
 extern void setnoexport(List *list) {
 	isdirty = true;
 	noexport.clear();
-	if (list == NULL) return;
-	
 	for (; list != NULL; list = list->next)
 		noexport.insert(getstr(list->term));
 }
@@ -111,23 +109,14 @@ extern List *varlookup(const char* name, Binding* bp) {
 		if (streq(name, bp->name))
 			return bp->defn;
 
-	Var *var = reinterpret_cast<Var*>(dictget(vars, name));
-	if (var == NULL)
-		return NULL;
-	return var->defn;
+	return vars.count(name) == 0
+		? NULL
+		: vars[name]->defn;
 }
 
 extern List *varlookup2(const char *name1, const char *name2, Binding *bp) {
-	Var *var;
-	
-	for (; bp != NULL; bp = bp->next)
-		if (streq2(bp->name, name1, name2))
-			return bp->defn;
-
-	var = reinterpret_cast<Var*>(dictget2(vars, name1, name2));
-	if (var == NULL)
-		return NULL;
-	return var->defn;
+	string name = string(name1) + name2;
+        return varlookup(name.c_str(), bp);
 }
 
 static List *callsettor(const char* name, List* defn) {
@@ -156,17 +145,15 @@ extern void vardef(const char* name, Binding* binding, List* defn) {
 	if (isexported(name))
 		isdirty = true;
 
-	Var* var = reinterpret_cast<Var*>(dictget(vars, name));
-	if (var != NULL) {
+	if (vars.count(name) != 0) {
 		if (defn != NULL) {
+			Var* var = vars[name];
 			var->defn = defn;
 			var->env = NULL;
 			var->flags = hasbindings(defn) ? var_hasbindings : 0;
-		} else
-			vars = dictput(vars, name, NULL);
+		} else vars.erase(name);
 	} else if (defn != NULL) {
-		var = mkvar(defn);
-		vars = dictput(vars, name, var);
+		vars[name] = mkvar(defn);
 	}
 }
 
@@ -178,13 +165,13 @@ extern void varpush(Push *push, const char *name, List *defn) {
 		isdirty = true;
 	defn = callsettor(name, defn);
 
-	Var *var = reinterpret_cast<Var*>(dictget(vars, push->name));
-	if (var == NULL) {
+	if (vars.count(push->name) == 0) {
 		push->defn	= NULL;
 		push->flags	= 0;
-		var		= mkvar(defn);
-		vars		= dictput(vars, push->name, var);
+		vars[push->name] = mkvar(defn);
 	} else {
+		Var *var = vars[push->name];
+                assert (var != NULL);
 		push->defn	= var->defn;
 		push->flags	= var->flags;
 		var->defn	= defn;
@@ -195,40 +182,38 @@ extern void varpush(Push *push, const char *name, List *defn) {
 }
 
 extern void varpop(Push *push) {
-	Var *var;
-
 	if (isexported(push->name))
 		isdirty = true;
 	push->defn = callsettor(push->name, push->defn);
-	var = reinterpret_cast<Var*>(dictget(vars, push->name));
 
-	if (var != NULL)
+	if (vars.count(push->name) != 0)
 		if (push->defn != NULL) {
+			Var *var = vars[push->name];
+                        assert (var != NULL);
 			var->defn = push->defn;
 			var->flags = push->flags;
 			var->env = NULL;
-		} else
-			vars = dictput(vars, push->name, NULL);
+		} else vars.erase(push->name);
 	else if (push->defn != NULL) {
-		var = mkvar(NULL);
+		Var *var = mkvar(NULL);
 		var->defn = push->defn;
 		var->flags = push->flags;
-		vars = dictput(vars, push->name, var);
+		vars[push->name] = var;
 	}
 
 }
 
-static void mkenv0(void *dummy, const char *key, void *value) {
-	Var *var = reinterpret_cast<Var*>(value);
+static void mkenv0(Dict::value_type pair) {
+	Var *var = pair.second;
 	if (
 		   var == NULL
 		|| var->defn == NULL
 		|| (var->flags & var_isinternal)
-		|| !isexported(key)
+		|| !isexported(pair.first)
 	)
 		return;
 	if (var->env == NULL || (rebound && (var->flags & var_hasbindings))) {
-		char *envstr = str(ENV_FORMAT, key, var->defn);
+		char *envstr = str(ENV_FORMAT, pair.first.c_str(), var->defn);
 		var->env = envstr;
 	}
 	env.push_back(var->env);
@@ -237,7 +222,7 @@ static void mkenv0(void *dummy, const char *key, void *value) {
 
 extern Vector* mkenv(void) {
 	if (isdirty || rebound) {
-		dictforall(vars, mkenv0, NULL);
+		std::for_each(vars.begin(), vars.end(), mkenv0);
 		
 		isdirty = false;
 		rebound = false;
@@ -247,27 +232,19 @@ extern Vector* mkenv(void) {
 	return &sortenv;
 }
 
-/* addtolist -- dictforall procedure to create a list */
-extern void addtolist(void *arg, const char *key, void *value) {
-	List **listp = reinterpret_cast<List**>(arg);
-	Term* term = mkstr(key);
-	*listp = mklist(term, *listp);
-}
-
-static void listexternal(void *arg, const char *key, void *value) {
-	if ((((Var *) value)->flags & var_isinternal) == 0 && !specialvar(key))
-		addtolist(arg, key, value);
-}
-
-static void listinternal(void *arg, const char *key, void *value) {
-	if (((Var *) value)->flags & var_isinternal)
-		addtolist(arg, key, value);
-}
-
 /* listvars -- return a list of all the (dynamic) variables */
 extern List *listvars(bool internal) {
-	List* varlist;
-	dictforall(vars, internal ? listinternal : listexternal, &varlist);
+	List* varlist = NULL;
+	if (internal) {
+		foreach (Dict::value_type x, vars)
+			if (x.second->flags & var_isinternal)
+				varlist = mklist(mkstr(x.first.c_str()), varlist);
+	} else { // external only
+		foreach (Dict::value_type x, vars)
+			if (x.second->flags & var_isinternal == 0 && !specialvar(x.first))
+				varlist = mklist(mkstr(x.first.c_str()), varlist);
+	}
+	
 	return (varlist = sortlist(varlist));
 }
 
@@ -278,12 +255,7 @@ static void hide(void *dummy, const char *key, void *value) {
 
 /* hidevariables -- mark all variables as internal */
 extern void hidevariables(void) {
-	dictforall(vars, hide, NULL);
-}
-
-/* initvars -- initialize the variable machinery */
-extern void initvars(void) {
-	vars = mkdict();
+	foreach (Dict::value_type x, vars) x.second->flags |= var_isinternal;
 }
 
 /* importvar -- import a single environment variable */

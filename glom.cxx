@@ -227,7 +227,7 @@ extern List *glom2(Tree* tree, Binding* binding, StrList **quotep) {
 
 	while (tree != NULL) {
 		List* list;
-		StrList* qlist;
+		StrList* qlist = NULL;
 
 		switch (tree->kind) {
 		case nWord:
@@ -240,7 +240,7 @@ extern List *glom2(Tree* tree, Binding* binding, StrList **quotep) {
 			tree = tree->u[1].p;
 			break;
 		case nConcat: {
-			StrList *ql, *qr;
+			StrList *ql = NULL, *qr = NULL;
 			List *l = glom2(tree->u[0].p, binding, &ql),
 				   *r = glom2(tree->u[1].p, binding, &qr);
 			{
@@ -279,7 +279,7 @@ extern List *glom2(Tree* tree, Binding* binding, StrList **quotep) {
 /* glom -- top level glom dispatching */
 extern List* glom(Tree* tree, Binding* binding, bool globit) {
 	if (globit) {
-		StrList* quote;
+		StrList* quote = NULL;
 		List* list = glom2(tree, binding, &quote);
 		return glob(list, quote);
 	} else return glom1(tree, binding);

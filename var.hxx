@@ -10,4 +10,4 @@ struct Var {
 #define	var_hasbindings		1
 #define	var_isinternal		2
 
-extern Dict *vars;
+extern Dict vars;

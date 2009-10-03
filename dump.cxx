@@ -204,8 +204,7 @@ static const char *dumplist(List *list) {
 	return name;
 }
 
-static void dumpvar(void *ignore, const char *key, void *value) {
-	Var *var = reinterpret_cast<Var*>(value);
+static void dumpvar(const char *key, Var *var) {
 	dumpstring(key);
 	dumplist(var->defn);
 }
@@ -216,17 +215,17 @@ static void dumpdef(const char *name, Var *var) {
 	varbuf << str("\t{ %s, (List *) %s },\n", dumpstring(name), dumplist(var->defn));
 }
 
-static void dumpfunctions(void *ignore, const char *key, void *value) {
-	if (hasprefix(key, "fn-")) dumpdef(key, reinterpret_cast<Var*>(value));
+static void dumpfunctions(const char *key, Var *value) {
+	if (hasprefix(key, "fn-")) dumpdef(key, value);
 }
 
-static void dumpsettors(void *ignore, const char *key, void *value) {
-	if (hasprefix(key, "set-")) dumpdef(key, reinterpret_cast<Var*>(value));
+static void dumpsettors(const char *key, Var *value) {
+	if (hasprefix(key, "set-")) dumpdef(key, value);
 }
 
-static void dumpvariables(void *ignore, const char *key, void *value) {
+static void dumpvariables(const char *key, Var *value) {
 	if (!hasprefix(key, "fn-") && !hasprefix(key, "set-"))
-		dumpdef(key, reinterpret_cast<Var*>(value));
+		dumpdef(key, value);
 }
 
 #define TreeTypes \
@@ -255,13 +254,13 @@ extern void runinitial(void) {
 	List *title = runfd(0, "initial.xs", 0);
 
 	printheader(title);
-	dictforall(vars, dumpvar, NULL);
+	foreach (Dict::value_type var, vars) dumpvar(var.first.c_str(), var.second);
 
 	/* these must be assigned in this order, or things just won't work */
 	varbuf << "\nstatic const struct { const char *name; List *value; } defs[] = {\n";
-	dictforall(vars, dumpfunctions, NULL);
-	dictforall(vars, dumpsettors, NULL);
-	dictforall(vars, dumpvariables, NULL);
+	foreach (Dict::value_type var, vars) dumpfunctions(var.first.c_str(), var.second);
+	foreach (Dict::value_type var, vars) dumpsettors(var.first.c_str(), var.second);
+	foreach (Dict::value_type var, vars) dumpvariables(var.first.c_str(), var.second);
 	varbuf << "\t{ NULL, NULL }\n"
 		  "};\n\n";
 	print(varbuf.str().c_str());

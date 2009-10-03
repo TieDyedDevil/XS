@@ -159,7 +159,6 @@ getopt_done:
 	try {
 		initinput();
 		initprims();
-		initvars();
 
 		runinitial();
 
