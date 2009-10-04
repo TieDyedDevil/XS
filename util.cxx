@@ -3,6 +3,7 @@
 #include "es.hxx"
 #include <stdlib.h>
 #include <fcntl.h>
+#include "print.hxx"
 
 #if !HAVE_STRERROR
 /* strerror -- turn an error code into a string */
@@ -159,4 +160,18 @@ extern char *gcndup(const char* s, size_t n) {
 	assert(strlen(ns) == n);
 
 	return ns;
+}
+
+/* fail -- pass a user catchable error up the exception chain */
+extern void fail (const char * from,  const char * fmt, ...) {
+	char *s;
+	va_list args;
+
+	va_start(args, fmt);
+	s = strv(fmt, args);
+	va_end(args);
+
+	throw mklist(mkstr("error"),
+		      	mklist(mkstr((char *) from),
+			     	mklist(mkstr(s), NULL)));
 }

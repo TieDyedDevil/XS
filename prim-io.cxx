@@ -35,7 +35,7 @@ static List* redir(List* (*rop)(int *fd, List* list), List* list, int evalflags)
 		undefer(ticket);
 	} catch (List *e) {
 		undefer(ticket);
-		throwE(e);
+		throw e;
 	}
 
 	return list;
@@ -146,7 +146,7 @@ static int pipefork(int p[2], int *extra) {
 		unregisterfd(&p[1]);
 		if (extra != NULL)
 			unregisterfd(extra);
-		throwE(e);
+		throw e;
 	}
 
 	unregisterfd(&p[0]);
@@ -287,7 +287,7 @@ PRIM(readfrom) {
 	} catch (List *e) {
 		close(p[0]);
 		ewaitfor(pid);
-		throwE(e);
+		throw e;
 	}
 
 	close(p[0]);
@@ -329,7 +329,7 @@ PRIM(writeto) {
 	} catch (List *e) {
 		close(p[1]);
 		ewaitfor(pid);
-		throwE(e);
+		throw e;
 	}
 
 	close(p[1]);

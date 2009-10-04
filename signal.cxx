@@ -297,7 +297,7 @@ extern void sigchk(void) {
 
 	switch (sigeffect[sig]) {
 	case sig_catch:
-		throwE(e);
+		throw e;
 		NOTREACHED;
 	case sig_special:
 		assert(sig == SIGINT);
@@ -306,7 +306,7 @@ extern void sigchk(void) {
 			eprint("\n");
 		sigint_newline = true;
 			
-		throwE(e);
+		throw e;
 		NOTREACHED;
 		break;
 	case sig_noop:

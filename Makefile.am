@@ -14,7 +14,7 @@ noinst_PROGRAMS = xsdump
 VPATH = $(srcdir) 
 HFILES	= config.hxx es.hxx gc.hxx input.hxx prim.hxx print.hxx sigmsgs.hxx \
 	  stdenv.hxx syntax.hxx term.hxx var.hxx
-COMMON_FILES	= access.cxx closure.cxx conv.cxx eval.cxx except.cxx fd.cxx glob.cxx \
+COMMON_FILES	= access.cxx closure.cxx conv.cxx eval.cxx fd.cxx glob.cxx \
 	  glom.cxx input.cxx heredoc.cxx list.cxx match.cxx opt.cxx \
 	  prim-ctl.cxx prim-etc.cxx prim-io.cxx prim-sys.cxx prim.cxx print.cxx proc.cxx \
 	  sigmsgs.cxx signal.cxx split.cxx syntax.cxx status.cxx str.cxx term.cxx \

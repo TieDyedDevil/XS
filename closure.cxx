@@ -119,7 +119,7 @@ extern Closure *extractbindings(Tree *tree0) {
 		}
 	} catch (List *e) {
 		chain = chain->next;
-		throwE(e);
+		throw e;
 	}
 
 	chain = chain->next;

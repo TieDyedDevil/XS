@@ -191,7 +191,7 @@ PRIM(batchloop) {
 	} catch (List *e) {
 
 		if (!termeq(e->term, "eof"))
-			throwE(e);
+			throw e;
 		return result;
 
 	}

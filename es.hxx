@@ -397,8 +397,9 @@ struct Push {
 	int flags;
 };
 
-extern void throwE(List *exc) NORETURN;
 extern void fail(const char *from, const char *name, ...) NORETURN;
-extern void print_exception(List *e);
+inline void print_exception(List *e) {
+	eprint("%L\n", e, " ");
+}
 
 #endif

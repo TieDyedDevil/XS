@@ -34,7 +34,7 @@ PRIM(forever) {
 PRIM(throw) {
 	if (list == NULL)
 		fail("$&throw", "usage: throw exception [args ...]");
-	throwE(list);
+	throw list;
 	NOTREACHED;
 }
 
@@ -68,7 +68,7 @@ PRIM(catch) {
 					retry = true;
 					unblocksignals();
 				} else
-					throwE(fromcatcher);
+					throw fromcatcher;
 			}
 
 		}

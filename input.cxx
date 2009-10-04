@@ -401,7 +401,7 @@ extern Tree *parse(const char *pr1, const char *pr2) {
 	emptyherequeue();
 
 	if (ISEOF(input))
-		throwE(mklist(mkstr("eof"), NULL));
+		throw mklist(mkstr("eof"), NULL);
 
 #if READLINE
 	prompt = (pr1 == NULL) ? "" : pr1;
@@ -468,7 +468,7 @@ extern List *runinput(Input *in, int runflags) {
 				: eval(repl, NULL, flags);
 	} catch (List *e) {
 		input = input->prev;
-		throwE(e);
+		throw e;
 	}
 
 	input = in->prev;
@@ -561,7 +561,7 @@ extern Tree *parseinput(Input *in) {
 			fail("$&parse", "more than one value in term");
 	} catch (List *e) {
 		input = input->prev;
-		throwE(e);
+		throw e;
 	}
 
 	input = in->prev;

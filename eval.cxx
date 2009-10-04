@@ -181,7 +181,7 @@ static List *forloop(Tree* defn, Tree* body,
 		}
 	} catch (List *e) {
 		if (!termeq(e->term, "break"))
-			throwE(e);
+			throw e;
 		return e->next;
 	}
 	return result;
@@ -353,7 +353,7 @@ restart:
 					list = e->next->next;
 					goto done;
 				}
-				throwE(e);
+				throw e;
 			}	
 		    }
 		    break;
