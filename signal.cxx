@@ -203,7 +203,7 @@ extern void initsignals(bool interactive, bool allowdumps) {
 	}
 
 	/* here's the end-run around set-signals */
-	Push settor("set-signals", NULL);
+	Dyvar settor("set-signals", NULL);
 	vardef("signals", NULL, mksiglist());
 }
 

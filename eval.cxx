@@ -111,7 +111,7 @@ static const List *localbind(Binding* dynamic, Binding* lexical,
 	if (!dynamic)
 		return walk(body, lexical, evalflags);
 	else {
-		Push p(dynamic->name, dynamic->defn);
+		Dyvar p(dynamic->name, dynamic->defn);
 		return localbind(dynamic->next, lexical, body, evalflags);
 	}
 }
@@ -340,7 +340,7 @@ restart:
 
 #define WALKFN walk(tree->u[1].p, context, flags)
 				if (funcname) {
-					Push p("0",
+					Dyvar p("0",
 					     mklist(mkterm(funcname,
 							  NULL),
 					 	    NULL));

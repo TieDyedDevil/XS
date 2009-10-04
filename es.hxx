@@ -213,10 +213,18 @@ extern void setnoexport(List *list);
 extern void addtolist(void *arg, const char *key, void *value);
 extern List *listvars(bool internal);
 
-typedef struct Push Push;
-extern void varpush(Push *, const char *, List *);
-extern void varpop(Push *);
+/* struct Push -- varpush() placeholder */
 
+class Dyvar {
+public:
+	Dyvar(const char *name, List *defn);
+	~Dyvar();
+private:
+	Dyvar *next;
+	const char *name;
+	List *defn;
+	int flags;
+};
 
 /* status.c */
 
@@ -384,20 +392,6 @@ extern int eopen(const char *name, OpenKind k);
 extern const char * const version;
 
 
-/* struct Push -- varpush() placeholder */
-
-struct Push {
-	Push(const char *name, List *defn) {
-		varpush(this, name, defn);
-	}
-	~Push() {
-		varpop(this);
-	}
-	Push *next;
-	const char *name;
-	List *defn;
-	int flags;
-};
 
 extern void fail(const char *from, const char *name, ...) NORETURN;
 inline void print_exception(List *e) {

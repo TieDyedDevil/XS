@@ -286,7 +286,7 @@ PRIM(readfrom) {
         const List *result;
 
 	try {
-		Push push(var, list);
+		Dyvar push(var, list);
 		result = eval1(cmd, evalflags);
 	} catch (List *e) {
 		close(p[0]);
@@ -328,7 +328,7 @@ PRIM(writeto) {
 	list = mklist(mkstr(str(DEVFD_PATH, p[1])), NULL);
         const List *result;
 	try {
-		Push push(var, list);
+		Dyvar push(var, list);
 		result = eval1(cmd, evalflags);
 	} catch (List *e) {
 		close(p[1]);

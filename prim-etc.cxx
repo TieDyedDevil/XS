@@ -64,8 +64,8 @@ PRIM(dot) {
 	if (fd == -1)
 		fail("$&dot", "%s: %s", file, esstrerror(errno));
 
-	Push star("0", mklist(mkstr(file), NULL));
-	Push zero("*", lp);
+	Dyvar star("0", mklist(mkstr(file), NULL));
+	Dyvar zero("*", lp);
 
 	return runfd(fd, file, runflags);
 }

@@ -457,7 +457,7 @@ extern const List *runinput(Input *in, int runflags) {
 		if (flags & eval_exitonfalse)
 			dispatch = mklist(mkstr("%exit-on-false"), dispatch);
 
-		Push push("fn-%dispatch", dispatch);
+		Dyvar push("fn-%dispatch", dispatch);
 
 		repl = varlookup((flags & run_interactive)
 				   ? "fn-%interactive-loop"

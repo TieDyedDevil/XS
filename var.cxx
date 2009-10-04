@@ -125,7 +125,7 @@ static List *callsettor(const char* name, List* defn) {
 	if (specialvar(name) || (settor = varlookup2("set-", name, NULL)) == NULL)
 		return defn;
 
-	Push p("0", mklist(mkstr(name), NULL));
+	Dyvar p("0", mklist(mkstr(name), NULL));
 
 	defn = listcopy(eval(append(settor, defn), NULL, 0));
 
@@ -157,48 +157,48 @@ extern void vardef(const char* name, Binding* binding, List* defn) {
 	}
 }
 
-extern void varpush(Push *push, const char *name, List *defn) {
-	validatevar(name);
-	push->name = name;
+extern Dyvar::Dyvar(const char *_name, List *vardefn) {
+	validatevar(_name);
+	name = _name;
 
 	if (isexported(name))
 		isdirty = true;
-	defn = callsettor(name, defn);
+	defn = callsettor(name, vardefn);
 
-	if (vars.count(push->name) == 0) {
-		push->defn	= NULL;
-		push->flags	= 0;
-		vars[push->name] = mkvar(defn);
+	if (vars.count(name) == 0) {
+		defn	= NULL;
+		flags	= 0;
+		vars[name] = mkvar(vardefn);
 	} else {
-		Var *var = vars[push->name];
+		Var *var = vars[name];
                 assert (var != NULL);
-		push->defn	= var->defn;
-		push->flags	= var->flags;
-		var->defn	= defn;
+		defn		= var->defn;
+		flags		= var->flags;
+		var->defn	= vardefn;
 		var->env	= NULL;
-		var->flags	= hasbindings(defn) ? var_hasbindings : 0;
+		var->flags	= hasbindings(vardefn) ? var_hasbindings : 0;
 	}
 
 }
 
-extern void varpop(Push *push) {
-	if (isexported(push->name))
+extern Dyvar::~Dyvar() {
+	if (isexported(name))
 		isdirty = true;
-	push->defn = callsettor(push->name, push->defn);
+	defn = callsettor(name, defn);
 
-	if (vars.count(push->name) != 0)
-		if (push->defn != NULL) {
-			Var *var = vars[push->name];
+	if (vars.count(name) != 0)
+		if (defn != NULL) {
+			Var *var = vars[name];
                         assert (var != NULL);
-			var->defn = push->defn;
-			var->flags = push->flags;
+			var->defn = defn;
+			var->flags = flags;
 			var->env = NULL;
-		} else vars.erase(push->name);
-	else if (push->defn != NULL) {
+		} else vars.erase(name);
+	else if (defn != NULL) {
 		Var *var = mkvar(NULL);
-		var->defn = push->defn;
-		var->flags = push->flags;
-		vars[push->name] = var;
+		var->defn = defn;
+		var->flags = flags;
+		vars[name] = var;
 	}
 
 }

@@ -11,7 +11,6 @@
 
 bool hasforked = false;
 
-typedef struct Proc Proc;
 struct Proc {
 	int pid;
 	int status;
@@ -20,9 +19,7 @@ struct Proc {
 	struct rusage rusage;
 #endif
 	bool alive, background;
-};
-
-static Proc *proclist = NULL;
+} *proclist = NULL;
 
 /* mkproc -- create a Proc structure */
 extern Proc *mkproc(int pid, bool background) {
