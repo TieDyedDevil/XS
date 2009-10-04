@@ -4,7 +4,7 @@
 #include "prim.hxx"
 
 PRIM(seq) {
-	List* result = ltrue;
+	const List* result = ltrue;
 	for (; list; list = list->next)
 		result = eval1(list->term, evalflags &~ (list->next == NULL ? 0 : eval_inchild));
 	return result;
@@ -12,23 +12,22 @@ PRIM(seq) {
 
 PRIM(if) {
 	for (; list != NULL; list = list->next) {
-		List *cond = eval1(list->term, evalflags & (list->next == NULL ? eval_inchild : 0));
+		const List *cond = eval1(list->term, 
+                        evalflags & (list->next == NULL ? eval_inchild : 0));
 		list = list->next;
-		if (list == NULL) {
+		if (list == NULL)
 			return cond;
-		}
-		if (istrue(cond)) {
-			List *result = eval1(list->term, evalflags);
-			return result;
-		}
+                else if (istrue(cond))
+			return eval1(list->term, evalflags);
 	}
 	return ltrue;
 }
 
 PRIM(forever) {
 	List* body = list;
-	for (;;) list = eval(body, NULL, evalflags & eval_exitonfalse);
-	return list;
+        const List *result = list;
+	for (;;) result = eval(body, NULL, evalflags & eval_exitonfalse);
+	return result;
 }
 
 PRIM(throw) {
@@ -44,15 +43,13 @@ PRIM(catch) {
 	if (list == NULL)
 		fail("$&catch", "usage: catch catcher body");
 
-	List* result = NULL;
+	const List* result = NULL;
 
 	do {
 		retry = false;
 
 		try {
-
 			result = eval(list->next, NULL, evalflags);
-
 		} catch (List *frombody) {
 
 			blocksignals();

@@ -34,9 +34,8 @@ extern List *reverse(List *list) {
 }
 
 /* append -- merge two lists, non-destructively */
-extern List *append(List* head, List* tail) {
+extern List *append(const List* head, List* tail) {
 	List *lp, **prevp;
-	
 
 	for (prevp = &lp; head; head = head->next) {
 		List *np = mklist(head->term, NULL);
@@ -45,13 +44,11 @@ extern List *append(List* head, List* tail) {
 	}
 	*prevp = tail;
 
-	List* result = lp;
-	
-	return result;
+	return lp;
 }
 
 /* listcopy -- make a copy of a list */
-extern List *listcopy(List *list) {
+extern List *listcopy(const List *list) {
 	return append(list, NULL);
 }
 
@@ -102,7 +99,7 @@ extern List* sortlist(List* list) {
 	return listify(v);
 }
 
-extern Vector* vectorize(List* list) {
+extern Vector* vectorize(const List* list) {
 	Vector* v = new (UseGC) Vector;
 	for (; list != NULL; list = list->next)
 		v->push_back(gcdup(getstr(list->term)));

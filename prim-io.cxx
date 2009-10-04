@@ -18,7 +18,9 @@ static int getnumber(const char *s) {
 	return result;
 }
 
-static List* redir(List* (*rop)(int *fd, List* list), List* list, int evalflags){
+static const List* redir(List* (*rop)(int *fd, List* list), 
+                         List* list, 
+                         int evalflags){
 	int destfd, srcfd;
 	volatile int inparent = (evalflags & eval_inchild) == 0;
 	volatile int ticket = UNREGISTERED;
@@ -26,19 +28,20 @@ static List* redir(List* (*rop)(int *fd, List* list), List* list, int evalflags)
 	assert(list != NULL);
 	destfd = getnumber(getstr(list->term));
 	list = (*rop)(&srcfd, list->next);
+        const List *result = list;
 
 	try {
 		ticket = (srcfd == -1)
 			   ? defer_close(inparent, destfd)
 			   : defer_mvfd(inparent, srcfd, destfd);
-		list = eval(list, NULL, evalflags);
+		result = eval(list, NULL, evalflags);
 		undefer(ticket);
 	} catch (List *e) {
 		undefer(ticket);
 		throw e;
 	}
 
-	return list;
+	return result;
 }
 
 #define	REDIR(name)	static List* CONCAT(redir_,name)(int *srcfdp, List* list)
@@ -280,10 +283,11 @@ PRIM(readfrom) {
 
 	close(p[1]);
 	list = mklist(mkstr(str(DEVFD_PATH, p[0])), NULL);
+        const List *result;
 
 	try {
 		Push push(var, list);
-		list = eval1(cmd, evalflags);
+		result = eval1(cmd, evalflags);
 	} catch (List *e) {
 		close(p[0]);
 		ewaitfor(pid);
@@ -293,7 +297,7 @@ PRIM(readfrom) {
 	close(p[0]);
 	status = ewaitfor(pid);
 	printstatus(0, status);
-	return list;
+	return result;
 }
 
 PRIM(writeto) {
@@ -322,10 +326,10 @@ PRIM(writeto) {
 
 	close(p[0]);
 	list = mklist(mkstr(str(DEVFD_PATH, p[1])), NULL);
-
+        const List *result;
 	try {
 		Push push(var, list);
-		list = eval1(cmd, evalflags);
+		result = eval1(cmd, evalflags);
 	} catch (List *e) {
 		close(p[1]);
 		ewaitfor(pid);
@@ -335,7 +339,7 @@ PRIM(writeto) {
 	close(p[1]);
 	status = ewaitfor(pid);
 	printstatus(0, status);
-	return list;
+	return result;
 }
 #endif
 

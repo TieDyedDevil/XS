@@ -54,7 +54,6 @@ PRIM(dot) {
 		case 'x':	runflags |= run_printcmds;	break;
 		}
 
-	List* result;
 	List* lp = esoptend();
 	if (lp == NULL)
 		fail("$&dot", "usage: %s", usage);
@@ -68,9 +67,7 @@ PRIM(dot) {
 	Push star("0", mklist(mkstr(file), NULL));
 	Push zero("*", lp);
 
-	result = runfd(fd, file, runflags);
-
-	return result;
+	return runfd(fd, file, runflags);
 }
 
 PRIM(flatten) {
@@ -91,15 +88,13 @@ PRIM(whatis) {
 		const char* prog = getstr(term);
 		assert(prog != NULL);
 		fn = varlookup2("fn-", prog, binding);
-		if (fn != NULL)
-			list = fn;
+		if (fn != NULL) return fn;
 		else {
 			if (isabsolute(prog)) {
 				const char *error = checkexecutable(prog);
 				if (error != NULL)
 					fail("$&whatis", "%s: %s", prog, error);
-			} else
-				list = pathsearch(term);
+			} else return pathsearch(term);
 		}
 	}
 	return list;
@@ -126,13 +121,11 @@ PRIM(fsplit) {
 PRIM(var) {
 	if (list == NULL)
 		return NULL;
-	List* rest = list->next;
 	const char* name = getstr(list->term);
 	List* defn = varlookup(name, NULL);
-	rest = prim_var(rest, NULL, evalflags);
+	const List *rest = prim_var(list->next, NULL, evalflags);
 	Term* term = mkstr(str("%S = %#L", name, defn, " "));
-	list = mklist(term, rest);
-	return list;
+	return mklist(term, const_cast<List*>(rest));
 }
 
 PRIM(sethistory) {
@@ -167,23 +160,23 @@ PRIM(exitonfalse) {
 }
 
 PRIM(batchloop) {
-	List* result = ltrue;
+	const List* result = ltrue;
 	List* dispatch;
 
 	SIGCHK();
 
 	try {
 		for (;;) {
-			List *parser, *cmd;
-			parser = varlookup("fn-%parse", NULL);
-			cmd = (parser == NULL)
+			List *parser = varlookup("fn-%parse", NULL);
+			const List *cmd = (parser == NULL)
 					? prim("parse", NULL, NULL, 0)
 					: eval(parser, NULL, 0);
 			SIGCHK();
 			dispatch = varlookup("fn-%dispatch", NULL);
 			if (cmd != NULL) {
 				if (dispatch != NULL)
-					cmd = append(dispatch, cmd);
+					cmd = append
+                                            (dispatch, const_cast<List*>(cmd));
 				result = eval(cmd, NULL, evalflags);
 				SIGCHK();
 			}

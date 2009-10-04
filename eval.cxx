@@ -6,13 +6,13 @@
 
 unsigned long evaldepth = 0, maxevaldepth = MAXmaxevaldepth;
 
-static void failexec(const char* file, List* args) NORETURN;
-static void failexec(const char* file, List* args) {
+static void failexec(const char* file, const List* args) NORETURN;
+static void failexec(const char* file, const List* args) {
 	List *fn;
 	fn = varlookup("fn-%exec-failure", NULL);
 	if (fn != NULL) {
 		int olderror = errno;
-		List* list = append(fn, mklist(mkstr(file), args));
+		const List* list = append(fn, mklist(mkstr(file), const_cast<List*>(args)));
 		
 		eval(list, NULL, 0);
 		errno = olderror;
@@ -22,7 +22,7 @@ static void failexec(const char* file, List* args) {
 }
 
 /* forkexec -- fork (if necessary) and exec */
-extern List *forkexec(const char *file, List *list, bool inchild) {
+extern List *forkexec(const char *file, const List *list, bool inchild) {
 	
 	Vector* env = mkenv();
 	int pid = efork(!inchild, false);
@@ -106,7 +106,7 @@ static Binding *letbindings(Tree* defn, Binding* binding,
 }
 
 /* localbind -- recursively convert a Bindings list into dynamic binding */
-static List *localbind(Binding* dynamic, Binding* lexical,
+static const List *localbind(Binding* dynamic, Binding* lexical,
 		       Tree* body, int evalflags) {
 	if (!dynamic)
 		return walk(body, lexical, evalflags);
@@ -117,7 +117,7 @@ static List *localbind(Binding* dynamic, Binding* lexical,
 }
 
 /* local -- build, recursively, one layer of local assignment */
-static List *local(Tree *defn, Tree* body,
+const static List *local(Tree *defn, Tree* body,
 		   Binding* bindings, int evalflags) {
 	Binding* dynamic =
 	    reversebindings(letbindings(defn, NULL, bindings, evalflags));
@@ -125,7 +125,7 @@ static List *local(Tree *defn, Tree* body,
 }
 
 /* forloop -- evaluate a for loop */
-static List *forloop(Tree* defn, Tree* body,
+const static List *forloop(Tree* defn, Tree* body,
 		     Binding* outer, int evalflags) {
 	static List MULTIPLE = { NULL, NULL };
 
@@ -152,7 +152,7 @@ static List *forloop(Tree* defn, Tree* body,
 	bool allnull;
 	Binding *bp, *lp, *sequence; 
 	List* value;
-	List* result = ltrue;
+	const List* result = ltrue;
 
 	try {
 		for (;;) {
@@ -188,7 +188,7 @@ static List *forloop(Tree* defn, Tree* body,
 }
 
 /* matchpattern -- does the text match a pattern? */
-static List *matchpattern(Tree* subjectform, Tree* patternform,
+static const List *matchpattern(Tree* subjectform, Tree* patternform,
 			  Binding* binding) {
 	StrList *quote = NULL;
 	List* subject = glom(subjectform, binding, true);
@@ -208,7 +208,7 @@ static List *extractpattern(Tree* subjectform, Tree* patternform,
 }
 
 /* walk -- walk through a tree, evaluating nodes */
-extern List *walk(Tree* tree, Binding* binding, int flags) {
+extern const List *walk(Tree* tree, Binding* binding, int flags) {
 	SIGCHK();
 
 top:
@@ -267,7 +267,7 @@ extern Binding *bindargs(Tree* params, List* args, Binding* binding) {
 }
 
 /* pathsearch -- evaluate fn %pathsearch + some argument */
-extern List *pathsearch(Term *term) {
+extern const List *pathsearch(Term *term) {
 	List *search, *list;
 	search = varlookup("fn-%pathsearch", NULL);
 	if (search == NULL)
@@ -288,13 +288,13 @@ class Depth_tracker {
 };
 
 /* eval -- evaluate a list, producing a list */
-extern List *eval(List* list, Binding* binding, int flags) {
+extern const List *eval(const List* list, Binding* binding, int flags) {
 	Depth_tracker t;
 
 	Closure *volatile cp;
 
 	const char *name, *funcname = NULL;
-	List* fn;
+	const List* fn;
 
 restart:
 	if (list == NULL) return ltrue;
@@ -358,8 +358,8 @@ restart:
 		    }
 		    break;
 		    case nList: {
-			list = glom(cp->tree, cp->binding, true);
-			list = append(list, list->next);
+			List *t = glom(cp->tree, cp->binding, true);
+			list = append(t, t->next);
 			goto restart;
 		    }
 		    default:

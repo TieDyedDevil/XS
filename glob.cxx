@@ -229,11 +229,11 @@ static char *expandhome(char* string, StrList* quote) {
 	for (slash = 1; (c = string[slash]) != '/' && c != '\0'; slash++)
 		;
 
-	List* list = NULL;
+	const List* list = NULL;
 	if (slash > 1)
 		list = mklist(mkstr(gcndup(string + 1, slash - 1)), NULL);
 
-	list = eval(append(fn, list), NULL, 0);
+	list = eval(append(fn, const_cast<List*>(list)), NULL, 0);
 
 	if (list != NULL) {
 		if (list->next != NULL)

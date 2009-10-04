@@ -9,12 +9,12 @@ static const Term
 static const List
 	truelist	= { (Term *) &trueterm, NULL },
 	falselist	= { (Term *) &falseterm, NULL };
-List
-	*ltrue		= (List *) &truelist,
-	*lfalse		= (List *) &falselist;
+const List
+	*ltrue		= &truelist,
+	*lfalse		= &falselist;
 
 /* istrue -- is this status list true? */
-extern bool istrue(List *status) {
+extern bool istrue(const List *status) {
 	for (; status != NULL; status = status->next) {
 		Term *term = status->term;
 		if (term->closure != NULL)
@@ -30,7 +30,7 @@ extern bool istrue(List *status) {
 }
 
 /* exitstatus -- turn a status list into an exit(2) value */
-extern int exitstatus(List *status) {
+extern int exitstatus(const List *status) {
 	Term *term;
 	const char *s;
 	unsigned long n;

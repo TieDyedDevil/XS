@@ -433,9 +433,9 @@ extern void resetparser(void) {
 }
 
 /* runinput -- run from an input source */
-extern List *runinput(Input *in, int runflags) {
+extern const List *runinput(Input *in, int runflags) {
 	int flags = runflags;
-	List* result;
+	const List* result;
 	List *repl, *dispatch;
 	const char *dispatcher[] = {
 		"fn-%eval-noprint",
@@ -496,9 +496,8 @@ struct FD_input : public Input {
 };
 
 /* runfd -- run commands from a file descriptor */
-extern List *runfd(int fd, const char *name, int flags) {
+extern const List *runfd(int fd, const char *name, int flags) {
 	FD_input in;
-	List *result;
 
 	in.lineno = 1;
 	in.fd = fd;
@@ -508,9 +507,7 @@ extern List *runfd(int fd, const char *name, int flags) {
 	in.bufend = in.bufbegin;
 	in.name = (name == NULL) ? str("fd %d", fd) : name;
 
-	result = runinput(&in, flags);
-
-	return result;
+	return runinput(&in, flags);
 }
 
 struct String_input : public Input {
@@ -527,9 +524,8 @@ struct String_input : public Input {
 };
 
 /* runstring -- run commands from a string */
-extern List *runstring(const char *str, const char *name, int flags) {
+extern const List *runstring(const char *str, const char *name, int flags) {
 	String_input in;
-	List *result;
 	unsigned char *buf;
 
 	assert(str != NULL);
@@ -543,8 +539,7 @@ extern List *runstring(const char *str, const char *name, int flags) {
 	in.bufbegin = in.buf = buf;
 	in.bufend = in.buf + in.buflen;
 
-	result = runinput(&in, flags);
-	return result;
+	return runinput(&in, flags);
 }
 
 /* parseinput -- turn an input source into a tree */

@@ -1,12 +1,12 @@
 /* prim.hxx -- definitions for es primitives ($Revision: 1.1.1.1 $) */
 #include <string>
 
-#define	PRIM(name)	static List* CONCAT(prim_,name)( \
+#define	PRIM(name)	static const List* CONCAT(prim_,name)( \
 				List* list, Binding* binding, int evalflags \
 			)
 #define	X(name)		primdict[STRING(name)] = CONCAT(prim_,name)
 
-typedef List* (*Prim)(List*, Binding*, int);
+typedef const List* (*Prim)(List*, Binding*, int);
 #ifdef HAVE_TR1_UNORDERED_MAP
 #include <tr1/unordered_map>
 typedef std::tr1::unordered_map<std::string, Prim> Prim_dict;

@@ -235,7 +235,7 @@ static void dumpvariables(const char *key, Var *value) {
 TreeTypes
 #define	PPSTRING(s)	STRING(s)
 
-static void printheader(List *title) {
+static void printheader(const List *title) {
 	if (
 		   offsetof(Tree, u[0].s) != offsetof(Tree_s,  u[0].s)
 		|| offsetof(Tree, u[0].p) != offsetof(Tree_p,  u[0].p)
@@ -251,7 +251,7 @@ static void printheader(List *title) {
 
 
 extern void runinitial(void) {
-	List *title = runfd(0, "initial.xs", 0);
+	const List *title = runfd(0, "initial.xs", 0);
 
 	printheader(title);
 	foreach (Dict::value_type var, vars) dumpvar(var.first.c_str(), var.second);

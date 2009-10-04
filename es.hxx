@@ -132,8 +132,8 @@ extern bool isclosure(Term *term);
 
 extern List *mklist(Term* term, List* next);
 extern List *reverse(List *list);
-extern List *append(List* head, List* tail);
-extern List *listcopy(List *list);
+extern List *append(const List* head, List* tail);
+extern List *listcopy(const List *list);
 extern int length(List* list);
 extern List *listify(int argc, char **argv);
 extern Term *nth(List *list, int n);
@@ -156,13 +156,13 @@ extern Binding *reversebindings(Binding *binding);
 /* eval.c */
 
 extern Binding *bindargs(Tree* params, List* args, Binding* binding);
-extern List *forkexec(const char *file, List *list, bool inchild);
-extern List *walk(Tree* tree, Binding* binding, int flags);
-extern List *eval(List* list, Binding* binding, int flags);
-extern List *pathsearch(Term *term);
+extern List *forkexec(const char *file, const List *list, bool inchild);
+extern const List *walk(Tree* tree, Binding* binding, int flags);
+extern const List *eval(const List* list, Binding* binding, int flags);
+extern const List *pathsearch(Term *term);
 
 /* eval1 -- evaluate a term, producing a list */
-inline List *eval1(Term *term, int flags) {
+inline const List *eval1(Term *term, int flags) {
 	return eval(mklist(term, NULL), NULL, flags);
 }
 
@@ -220,9 +220,9 @@ extern void varpop(Push *);
 
 /* status.c */
 
-extern List *ltrue, *lfalse;
-extern bool istrue(List *status);
-extern int exitstatus(List *status);
+extern const List *ltrue, *lfalse;
+extern bool istrue(const List *status);
+extern int exitstatus(const List *status);
 extern char *mkstatus(int status);
 extern void printstatus(int pid, int status);
 
@@ -275,7 +275,7 @@ extern StrList* mkstrlist(const char* str, StrList* next);
 
 /* vec.c */
 
-extern Vector* vectorize(List* list);
+extern Vector* vectorize(const List* list);
 
 /* util.c */
 
@@ -309,8 +309,8 @@ extern bool isinteractive(void);
 extern void initinput(void);
 extern void resetparser(void);
 
-extern List *runfd(int fd, const char *name, int flags);
-extern List *runstring(const char *str, const char *name, int flags);
+extern const List *runfd(int fd, const char *name, int flags);
+extern const List *runstring(const char *str, const char *name, int flags);
 
 /* eval_* flags are also understood as runflags */
 #define	run_interactive		 4	/* -i or $0[0] = '-' */
@@ -334,7 +334,9 @@ extern List *esoptend(void);
 
 /* prim.c */
 
-extern List* prim(const char *s, List* list, Binding* binding, int evalflags);
+extern const List* 
+prim(const char *s, List* list, Binding* binding, int evalflags);
+
 extern void initprims(void);
 
 
