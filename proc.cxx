@@ -1,6 +1,8 @@
 /* proc.c -- process control system calls ($Revision: 1.2 $) */
 
 #include "es.hxx"
+#include <list>
+using std::list;
 
 /* TODO: the rusage code for the time builtin really needs to be cleaned up */
 
@@ -14,30 +16,21 @@ bool hasforked = false;
 struct Proc {
 	int pid;
 	int status;
-	Proc *next, *prev;
 #if HAVE_WAIT3
 	struct rusage rusage;
 #endif
 	bool alive, background;
-} *proclist = NULL;
+};
+list<Proc> proclist;
 
 /* mkproc -- create a Proc structure */
 extern Proc *mkproc(int pid, bool background) {
-	Proc *proc;
-	for (proc = proclist; proc != NULL; proc = proc->next)
-		if (proc->pid == pid) {		/* are we recycling pids? */
-			assert(!proc->alive);	/* if false, violates unix semantics */
-			break;
-		}
-	if (proc == NULL) {
-		proc = reinterpret_cast<Proc*>(ealloc(sizeof (Proc)));
-		proc->next = proclist;
-	}
-	proc->pid = pid;
-	proc->alive = true;
-	proc->background = background;
-	proc->prev = NULL;
-	return proc;
+	Proc proc;
+	proc.pid = pid;
+	proc.alive = true;
+	proc.background = background;
+	proclist.push_front(proc);
+	return &*proclist.begin();
 }
 
 /* efork -- fork (if necessary) and clean up as appropriate */
@@ -45,15 +38,11 @@ extern int efork(bool parent, bool background) {
 	if (parent) {
 		int pid = fork();
 		switch (pid) {
-		default: {	/* parent */
-			Proc *proc = mkproc(pid, background);
-			if (proclist != NULL)
-				proclist->prev = proc;
-			proclist = proc;
+		default:	/* parent */
+			mkproc(pid, background);
 			return pid;
-		}
 		case 0:		/* child */
-			proclist = NULL;
+			proclist.clear();
 			hasforked = true;
 			break;
 		case -1:
@@ -93,14 +82,13 @@ static int dowait(int *statusp) {
 
 /* reap -- mark a process as dead and attach its exit status */
 static void reap(int pid, int status) {
-	Proc *proc;
-	for (proc = proclist; proc != NULL; proc = proc->next)
-		if (proc->pid == pid) {
-			assert(proc->alive);
-			proc->alive = false;
-			proc->status = status;
+	foreach (Proc &proc, proclist)
+		if (proc.pid == pid) {
+			assert(proc.alive);
+			proc.alive = false;
+			proc.status = status;
 #if HAVE_WAIT3
-			proc->rusage = wait_rusage;
+			proc.rusage = wait_rusage;
 #endif
 			return;
 		}
@@ -108,9 +96,8 @@ static void reap(int pid, int status) {
 
 /* ewait -- wait for a specific process to die, or any process if pid == 0 */
 extern int ewait(int pid, bool interruptible, void *rusage) {
-	Proc *proc;
 top:
-	for (proc = proclist; proc != NULL; proc = proc->next)
+	for (list<Proc>::iterator proc = proclist.begin(); proc != proclist.end(); ++proc)
 		if (proc->pid == pid || (pid == 0 && !proc->alive)) {
 			int status;
 			if (proc->alive) {
@@ -127,22 +114,16 @@ top:
 				proc->rusage = wait_rusage;
 #endif
 			}
-			if (proc->next != NULL)
-				proc->next->prev = proc->prev;
-			if (proc->prev != NULL)
-				proc->prev->next = proc->next;
-			else
-				proclist = proc->next;
 			status = proc->status;
 			if (proc->background)
 				printstatus(proc->pid, status);
-			efree(proc);
 #if HAVE_WAIT3
 			if (rusage != NULL)
 				memcpy(rusage, &proc->rusage, sizeof (struct rusage));
 #else
 			assert(rusage == NULL);
 #endif
+			proclist.erase(proc);
 			return status;
 		}
 	if (pid == 0) {
@@ -163,11 +144,10 @@ top:
 #include "prim.hxx"
 
 PRIM(apids) {
-	Proc *p;
 	List* lp = NULL;
-	for (p = proclist; p != NULL; p = p->next)
-		if (p->background && p->alive) {
-			Term* t = mkstr(str("%d", p->pid));
+	foreach (Proc &p, proclist)
+		if (p.background && p.alive) {
+			Term* t = mkstr(str("%d", p.pid));
 			lp = mklist(t, lp);
 		}
 	/* TODO: sort the return value, but by number? */
