@@ -3,9 +3,6 @@
 #include "es.hxx"
 #include "print.hxx"
 
-/* globals */
-List *exception = NULL;
-
 /* throwE -- raise an exception */
 extern void throwE(List *e) {
 	assert(e != NULL);
