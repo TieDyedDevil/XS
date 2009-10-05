@@ -90,10 +90,9 @@ List* dirmatch(const char* prefix,
 }
 
 /* listglob -- glob a directory plus a filename pattern into a list of names */
-static List* listglob(List* list, char *pattern, char *quote, size_t slashcount) {
+static List* listglob(List* list, const char *pattern, const char *quote, size_t slashcount) {
 	List* result; 
 	List **prevp;
-	
 
 	for (prevp = &result; 
 			list != NULL; 
@@ -125,58 +124,37 @@ static List* listglob(List* list, char *pattern, char *quote, size_t slashcount)
 
 /* glob1 -- glob pattern path against the file system */
 static List* glob1(const char* pattern, const char* quote) {
-	size_t psize;
-	static char *dir = NULL, *pat = NULL, *qdir = NULL, *qpat = NULL, *raw = NULL;
-	static size_t dsize = 0;
-
 	assert(quote != QUOTED);
 
-	if ((psize = strlen(pattern) + 1) > dsize || pat == NULL) {
-		pat = reinterpret_cast<char*>(erealloc(pat, psize));
-		raw = reinterpret_cast<char*>(erealloc(raw, psize));
-		dir = reinterpret_cast<char*>(erealloc(dir, psize));
-		qpat = reinterpret_cast<char*>(erealloc(qpat, psize));
-		qdir = reinterpret_cast<char*>(erealloc(qdir, psize));
-		dsize = psize;
-		memset(raw, 'r', psize);
-	}
-
-	char *d, *p, *qd, *qp;
-	d = dir;
-	qd = qdir;
-	
-	const char *q = (quote == UNQUOTED) ? raw : quote;
+	std::string dir, qdir;
+	const char *q = quote;
 	const char *s = pattern;
 	if (*s == '/')
 		while (*s == '/')
-			*d++ = *s++, *qd++ = *q++;
+			dir.push_back(*s++), qdir.push_back(quote == UNQUOTED ? 'r' : *q++);
 	else
 		while (*s != '/' && *s != '\0')
-			*d++ = *s++, *qd++ = *q++; /* get first directory component */
-	*d = '\0';
+			dir.push_back(*s++), qdir.push_back(quote == UNQUOTED ? 'r' : *q++); /* get first directory component */
 
 	/*
 	 * Special case: no slashes in the pattern, i.e., open the current directory.
 	 * Remember that w cannot consist of slashes alone (the other way *s could be
 	 * zero) since doglob gets called iff there's a metacharacter to be matched
 	 */
-	if (*s == '\0') {
-		
-		return dirmatch("", ".", dir, qdir);
-	}
+	if (*s == '\0') return dirmatch("", ".", dir.c_str(), qdir.c_str());
 
-	List* matched = (*pattern == '/')
-			? mklist(mkstr(dir), NULL)
-			: dirmatch("", ".", dir, qdir);
+	List* matched = *pattern == '/'
+			? mklist(mkstr(dir.c_str()), NULL)
+			: dirmatch("", ".", dir.c_str(), qdir.c_str());
 	do {
-		size_t slashcount;
 		SIGCHK();
-		for (slashcount = 0; *s == '/'; s++, q++)
+		size_t slashcount = 0;
+		for (; *s == '/'; s++, q++)
 			slashcount++; /* skip slashes */
-		for (p = pat, qp = qpat; *s != '/' && *s != '\0';)
-			*p++ = *s++, *qp++ = *q++; /* get pat */
-		*p = '\0';
-		matched = listglob(matched, pat, qpat, slashcount);
+		std::string pat, qpat;
+		while (*s != '/' && *s != '\0')
+			pat.push_back(*s++), qpat.push_back(quote == UNQUOTED ? 'r' : *q++); /* get pat */
+		matched = listglob(matched, pat.c_str(), qpat.c_str(), slashcount);
 	} while (*s != '\0' && matched != NULL);
 
 	
