@@ -87,14 +87,13 @@ then
 	dnl AC_CHECK_LIB(terminfo, main)
 	dnl AC_CHECK_LIB(termcap, main)
     AC_CHECK_LIB(ncurses, initscr)
-	if test "$use_readline" = yes
-	then
-		AC_CHECK_LIB(readline, readline)
-	elif test "$use_editline" = yes
-	then
-		AC_CHECK_LIB(edit, readline)
-	fi
-
+    if test "$use_readline" = yes
+    then
+    	AC_CHECK_LIB(readline, readline)
+    elif test "$use_editline" = yes
+    then
+    	AC_CHECK_LIB(edit, readline)
+    fi
 fi
 
 
@@ -156,8 +155,6 @@ egrep '^#[ 	]+1[	 ]+' | sed 's/.*"\(.*\)".*/\1/' |sort -u |
 grep '^/' |tr '\012' ' ' 
 changequote([,])],
 [#include <signal.h>], /usr/include/signal.h))
-
-
 SIGFILES=$es_cv_sigfiles
 AC_SUBST(SIGFILES)
 
