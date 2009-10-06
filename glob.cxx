@@ -225,14 +225,14 @@ static char *expandhome(char* string, StrList* quote) {
 			size_t homelen = strlen(home);
 			size_t len = pathlen - slash + homelen;
 			{
-				char* t = reinterpret_cast<char*>(GC_MALLOC(len + 1));
+				char* t = reinterpret_cast<char*>(galloc(len + 1));
 				memcpy(t, home, homelen);
 				memcpy(&t[homelen], &string[slash], pathlen - slash);
 				t[len] = '\0';
 				string = t;
 			}
 			if (quote->str == UNQUOTED) {
-				char *q = reinterpret_cast<char*>(GC_MALLOC(len + 1));
+				char *q = reinterpret_cast<char*>(galloc(len + 1));
 				memset(q, 'q', homelen);
 				memset(&q[homelen], 'r', pathlen - slash);
 				q[len] = '\0';
@@ -240,7 +240,7 @@ static char *expandhome(char* string, StrList* quote) {
 			} else if (strchr(quote->str, 'r') == NULL)
 				quote->str = QUOTED;
 			else {
-				char *q = reinterpret_cast<char*>(GC_MALLOC(len + 1));
+				char *q = reinterpret_cast<char*>(galloc(len + 1));
 				memset(q, 'q', homelen);
 				memcpy(&q[homelen], &quote->str[slash], pathlen - slash);
 				q[len] = '\0';

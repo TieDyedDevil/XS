@@ -2,8 +2,8 @@
 
 #include "es.hxx"
 
-static Tree* tGC_MALLOC(size_t s) {
-	return reinterpret_cast<Tree*>(GC_MALLOC(s));
+static Tree* tgalloc(size_t s) {
+	return reinterpret_cast<Tree*>(galloc(s));
 }
 
 /* mk -- make a new node; used to generate the parse tree */
@@ -16,27 +16,27 @@ extern Tree *mk (NodeKind  t, ...) {
 	    default:
 		panic("mk: bad node kind %d", t);
 	    case nWord: case nQword: case nPrim:
-		n = tGC_MALLOC(offsetof(Tree, u[1]));
+		n = tgalloc(offsetof(Tree, u[1]));
 		n->u[0].s = va_arg(ap, char *);
 		break;
 	    case nCall: case nThunk: case nVar:
-		n = tGC_MALLOC(offsetof(Tree, u[1]));
+		n = tgalloc(offsetof(Tree, u[1]));
 		n->u[0].p = va_arg(ap, Tree *);
 		break;
 	    case nAssign:  case nConcat: case nClosure: case nFor:
 	    case nLambda: case nLet: case nList:  case nLocal:
 	    case nVarsub: case nMatch: case nExtract:
-		n = tGC_MALLOC(offsetof(Tree, u[2]));
+		n = tgalloc(offsetof(Tree, u[2]));
 		n->u[0].p = va_arg(ap, Tree *);
 		n->u[1].p = va_arg(ap, Tree *);
 		break;
 	    case nRedir:
-		n = tGC_MALLOC(offsetof(Tree, u[2]));
+		n = tgalloc(offsetof(Tree, u[2]));
 		n->u[0].p = va_arg(ap, Tree *);
 		n->u[1].p = va_arg(ap, Tree *);
 		break;
 	    case nPipe:
-		n = tGC_MALLOC(offsetof(Tree, u[2]));
+		n = tgalloc(offsetof(Tree, u[2]));
 		n->u[0].i = va_arg(ap, int);
 		n->u[1].i = va_arg(ap, int);
 		break;

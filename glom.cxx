@@ -33,7 +33,7 @@ static const char *qcat(const char* q1,
 	size_t len2 = (q2 == QUOTED || q2 == UNQUOTED)
 		? strlen(getstr(t2))
 		: strlen(q2);
-	char* s = reinterpret_cast<char*>(GC_MALLOC(len1 + len2 + 1));
+	char* s = reinterpret_cast<char*>(galloc(len1 + len2 + 1));
 
 	if (q1 == QUOTED)
 		memset(s, 'q', len1);

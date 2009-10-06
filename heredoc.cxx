@@ -125,7 +125,7 @@ extern bool queueheredoc(Tree *t) {
 		return false;
 	}
 
-	here = reinterpret_cast<Here*>(GC_MALLOC(sizeof(Here)));
+	here = reinterpret_cast<Here*>(galloc(sizeof(Here)));
 	here->next = hereq;
 	here->marker = eof;
 	hereq = here;

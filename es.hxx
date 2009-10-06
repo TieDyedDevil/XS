@@ -88,6 +88,7 @@ extern void panic(const char *fmt, ...) NORETURN;
 /* GC-related convenience functions */
 
 #define	gcnew(type)	new (UseGC) type
+#define galloc	GC_MALLOC
 
 extern char *gcndup(const char* s, size_t n);	/* util.c: copy a counted string into gc space */
 

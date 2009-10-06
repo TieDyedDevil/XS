@@ -281,7 +281,7 @@ static void importvar(char* name, char* value) {
 						  = list->next->term->str;
 						char *str =
 						  reinterpret_cast<char*>(
-						  GC_MALLOC(offset
+						  galloc(offset
 							    + strlen(str2) + 1));
 						memcpy(str, word, offset - 1);
 						str[offset - 1]
@@ -293,7 +293,7 @@ static void importvar(char* name, char* value) {
 					break;
 				    case ENV_ESCAPE: {
 				    	char *str = reinterpret_cast<char*>(
-						GC_MALLOC(strlen(word)));
+						galloc(strlen(word)));
 					memcpy(str, word, offset);
 					strcpy(str + offset, escape + 2);
 					list->term->str = str;

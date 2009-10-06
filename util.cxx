@@ -154,7 +154,7 @@ extern int eopen(const char *name, OpenKind k) {
 }
 
 extern char *gcndup(const char* s, size_t n) {
-	char* ns = reinterpret_cast<char*>(GC_MALLOC((n + 1) * sizeof (char)));
+	char* ns = reinterpret_cast<char*>(galloc((n + 1) * sizeof (char)));
 	memcpy(ns, s, n);
 	ns[n] = '\0';
 	assert(strlen(ns) == n);

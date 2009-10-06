@@ -248,7 +248,7 @@ static char * quote_func(char *text, int match_Type, char *quote_pointer) {
 		int hLen = strlen(home);
 		int len = strlen(text) + hLen +1;
 		/* consider gc usage here? */
-		newHome = reinterpret_cast<char*>(GC_MALLOC(len));
+		newHome = reinterpret_cast<char*>(galloc(len));
 		strcpy(newHome, home);
 		strcpy(newHome + hLen, pos + 1);
 		text = newHome;
