@@ -20,7 +20,6 @@ using std::map;
 #include <boost/foreach.hpp>
 #define foreach BOOST_FOREACH
 
-
 #ifdef HAVE_SYS_CDEFS_H
 # include <sys/cdefs.h>
 #endif
@@ -199,8 +198,3 @@ enum { UNREACHABLE = 0 };
 #if !HAVE_LSTAT
 #define	lstat	stat
 #endif
-
-#ifndef LISPTREES
-#define LISPTREES 1
-#endif
-
