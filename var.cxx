@@ -99,9 +99,9 @@ extern void setnoexport(List *list) {
 extern List *varlookup(const char* name, Binding* bp) {
 	if (iscounting(name)) {
 		Term* term = nth(varlookup("*", bp), strtol(name, NULL, 10));
-		if (term == NULL)
-			return NULL;
-		return mklist(term, NULL);
+                return term == NULL
+                    ? NULL
+                    : mklist(term, NULL);
 	}
 
 	validatevar(name);
@@ -182,8 +182,7 @@ extern Dyvar::Dyvar(const char *_name, List *vardefn) {
 }
 
 extern Dyvar::~Dyvar() {
-	if (isexported(name))
-		isdirty = true;
+	if (isexported(name)) isdirty = true;
 	defn = callsettor(name, defn);
 
 	if (vars.count(name) != 0)
@@ -246,11 +245,6 @@ extern List *listvars(bool internal) {
 	}
 	
 	return (varlist = sortlist(varlist));
-}
-
-/* hide -- worker function for dictforall to hide initial state */
-static void hide(void *dummy, const char *key, void *value) {
-	reinterpret_cast<Var *>(value)->flags |= var_isinternal;
 }
 
 /* hidevariables -- mark all variables as internal */
