@@ -37,7 +37,6 @@ using std::map;
 #include <unistd.h>
 #endif
 
-
 #include <string.h>
 #include <stddef.h>
 
@@ -88,17 +87,7 @@ typedef struct direct Dirent;
 
 /* stdlib */
 
-#if STDC_HEADERS
-# include <stdlib.h>
-#else
-extern exit(int) NORETURN;
-extern abort(void) NORETURN;
-extern long strtol(const char *num, char **end, int base);
-extern void *qsort(
-	void *base, size_t nmemb, size_t size,
-	int (*compar)(const void *, const void *)
-);
-#endif /* !STDC_HEADERS */
+#include <stdlib.h>
 
 /*
  * things that should be defined by header files but might not have been
@@ -184,48 +173,15 @@ enum { UNREACHABLE = 0 };
 
 #define	NOTREACHED	STMT(assert(UNREACHABLE))
 
-/*
- * system calls -- can we get these from some standard header uniformly?
- */
-
-#if !HAVE_UNISTD_H
-extern int chdir(const char *dirname);
-extern int close(int fd);
-extern int dup(int fd);
-extern int dup2(int srcfd, int dstfd);
-extern int execve(char *name, char **argv, char **envp);
-extern int fork(void);
-extern int getegid(void);
-extern int geteuid(void);
-extern int getpagesize(void);
-extern int getpid(void);
-extern int pipe(int p[2]);
-extern int read(int fd, void *buf, size_t n);
-extern int setpgrp(int pid, int pgrp);
-extern int umask(int mask);
-extern int write(int fd, const void *buf, size_t n);
-
-#if REQUIRE_IOCTL
-extern int ioctl(int fd, int cmd, void *arg);
-#endif
-
-#if REQUIRE_STAT
-extern int stat(const char *, struct stat *);
-#endif
-
-#ifdef NGROUPS
-extern int getgroups(int, int *);
-#endif
-#endif	/* !HAVE_UNISTD_H */
-
 
 /*
  * hacks to present a standard system call interface
  */
 
 #ifdef HAVE_SETSID
-# define setpgrp(a, b)	setsid()
+# define setpgrp(a, b) setsid()
 #else
+
 #ifdef linux
 #include "unistd.h"
 #define setpgrp(a, b)	setpgid(a, b)
