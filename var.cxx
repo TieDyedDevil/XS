@@ -259,7 +259,7 @@ extern void hidevariables(void) {
 }
 
 /* importvar -- import a single environment variable */
-static void importvar(char* name, char* value) {
+static void importvar(const char* name, const char* value) {
 	char sep[2] = { ENV_SEPARATOR, '\0' };
 
 	List* defn;
@@ -310,27 +310,18 @@ static void importvar(char* name, char* value) {
 
 /* initenv -- load variables from the environment */
 extern void initenv(char **envp, bool isprotected) {
-	char *envstr;
-	size_t bufsize = 1024;
-	char *buf = reinterpret_cast<char*>(ealloc(bufsize));
-
-	for (; (envstr = *envp) != NULL; envp++) {
-		size_t nlen;
-		char *eq = strchr(envstr, '=');
-		char *name;
-		if (eq == NULL) {
-			env.push_back(envstr);
+	for (std::string envstr; *envp != NULL ; envp++) {
+		envstr = *envp;
+		size_t eq_index = envstr.find('=');
+		if (eq_index == -1) {
+			env.push_back(*envp);
 			continue;
 		}
-		for (nlen = eq - envstr; nlen >= bufsize; bufsize *= 2)
-			buf = reinterpret_cast<char*>(erealloc(buf, bufsize));
-		memcpy(buf, envstr, nlen);
-		buf[nlen] = '\0';
-		name = str(ENV_DECODE, buf);
+		string name_raw = envstr.substr(0,eq_index);
+		string eq = envstr.substr(eq_index);
+		char *name = str(ENV_DECODE, name_raw.c_str());
 		if (!isprotected
 		    || (!hasprefix(name, "fn-") && !hasprefix(name, "set-")))
-			importvar(name, eq);
+			importvar(name, eq.c_str());
 	}
-
-	efree(buf);
 }
