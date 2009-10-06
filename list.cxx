@@ -21,10 +21,9 @@ extern List *mklist(Term* term, List* next) {
 
 /* reverse -- destructively reverse a list */
 extern List *reverse(List *list) {
-	List *prev, *next;
 	if (list == NULL)
 		return NULL;
-	prev = NULL;
+	List *prev = NULL, *next;
 	do {
 		next = list->next;
 		list->next = prev;
@@ -62,7 +61,6 @@ extern int length(List* list) {
 
 /* listify -- turn an argc/argv vector into a list */
 extern List *listify(int argc, char **argv) {
-	
 	List *list = NULL;
 	while (argc > 0) {
 		Term *term = mkstr(argv[--argc]);
@@ -95,7 +93,7 @@ static List *listify(Vector* v) {
 /* sortlist */
 extern List* sortlist(List* list) {
 	Vector* v = vectorize(list);
-	std::sort(v->begin(), v->end(), qstrcmp);
+        v->sort();
 	return listify(v);
 }
 

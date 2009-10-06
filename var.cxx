@@ -226,7 +226,7 @@ extern Vector* mkenv(void) {
 		isdirty = false;
 		rebound = false;
 		sortenv = env;
-		std::sort(sortenv.begin(), sortenv.end(), qstrcmp);
+                sortenv.sort();
 	}
 	return &sortenv;
 }

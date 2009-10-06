@@ -4,6 +4,7 @@
 
 #include "config.h"
 #include "stdenv.hxx"
+#include <algorithm>
 
 /*
  * meta-information for exported environment strings
@@ -71,7 +72,13 @@ struct StrList {
 // Inherit from gc_cleanup so if the collector ever collects the vector,
 // the internal memory is cleaned up too.
 class Vector : public std::vector< char*, gc_allocator<char*> >, 
-	       public gc_cleanup {};
+	       public gc_cleanup 
+{
+public: void sort() {
+        extern int qstrcmp(const char *, const char *);
+        std::sort(begin(), end(), qstrcmp);
+    }
+};
 
 
 /*
@@ -288,7 +295,6 @@ extern Vector* vectorize(const List* list);
 
 /* util.c */
 
-extern int qstrcmp(const char *, const char *);
 extern const char *esstrerror(int err);
 extern void uerror(const char *msg);
 extern void *ealloc(size_t n);
