@@ -708,7 +708,7 @@ fn %interactive-loop {
 		catch @ e type msg {
                 	switch $e ( 
 				eof {return $result} 
-				exit { throw $e $type $msg} 
+				exit {throw $e $type $msg} 
 				error { echo >[1=2] $msg
 					$fn-%dispatch false } 
 				signal { if {!~ $type sigint sigterm sigquit} {
