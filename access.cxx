@@ -5,6 +5,7 @@
 
 #include "es.hxx"
 #include "prim.hxx"
+#include <string>
 
 #define	READ	4
 #define	WRITE	2
@@ -73,29 +74,10 @@ static int testfile(const char *path, int perm, mode_t type) {
 }
 
 static const char *pathcat(const char *prefix, const char *suffix) {
-	char *s;
-	static char *pathbuf = NULL;
-	static size_t pathlen = 0;
-
-	if (*prefix == '\0')
-		return suffix;
-	if (*suffix == '\0')
-		return prefix;
-
-	size_t plen = strlen(prefix),
-			 slen = strlen(suffix),
-			 len = plen + slen + 2;		/* one for '/', one for '\0' */
-	if (pathlen < len) {
-		pathlen = len;
-		pathbuf = reinterpret_cast<char*>(erealloc(pathbuf, pathlen));
-	}
-
-	memcpy(pathbuf, prefix, plen);
-	s = pathbuf + plen;
-	if (s[-1] != '/')
-		*s++ = '/';
-	memcpy(s, suffix, slen + 1);
-	return pathbuf;
+	std::string result = std::string(prefix);
+	if (*result.rbegin() != '/') result.push_back('/');
+	result += suffix;
+	return gcdup(result.c_str());
 }
 
 PRIM(access) {
@@ -157,7 +139,6 @@ PRIM(access) {
 	}
 
 	if (first && exception) {
-		
 		if (suffix)
 			fail("$&access", "%s: %s", suffix, esstrerror(estatus));
 		else
