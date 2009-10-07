@@ -56,21 +56,17 @@ static int rangematch(const char *p, const char *q, char c) {
 
 /* match -- match a single pattern against a single string. */
 extern bool match(const char *s, const char *p, const char *q) {
-	int i;
-	if (q == QUOTED)
-		return streq(s, p);
-	for (i = 0;;) {
+	if (q == QUOTED) return streq(s, p);
+	for (int i = 0 ;;) {
 		int c = p[i++];
 		if (c == '\0')
 			return *s == '\0';
 		else if (q == UNQUOTED || q[i - 1] == 'r') {
 			switch (c) {
 			case '?':
-				if (*s++ == '\0')
-					return false;
-				break;
+				if (*s++ == '\0') return false;
 			case '*':
-				while (p[i] == '*' && (q == UNQUOTED || q[i] == 'r'))	/* collapse multiple stars */
+				while (p[i] == '*' && (q == UNQUOTED || q[i] == 'r'))	// collapse multiple stars
 					i++;
 				if (p[i] == '\0') 	/* star at end of pattern? */
 					return true;
@@ -79,9 +75,9 @@ extern bool match(const char *s, const char *p, const char *q) {
 						return true;
 				return false;
 			case '[': {
-				int j;
 				if (*s == '\0')
 					return false;
+				int j;
 				switch (j = rangematch(p + i, TAILQUOTE(q, i), *s)) {
 				default:
 					i += j;
@@ -220,13 +216,10 @@ static List *extractsinglematch(const char *subject, const char *pattern,
  */
 
 extern List *extractmatches(List *subjects, List *patterns, StrList *quotes) {
-	List *subject;
 	List *result;
 	List **prevp = &result;
 
-	
-
-	for (subject = subjects; subject != NULL; subject = subject->next) {
+	for (List *subject = subjects; subject != NULL; subject = subject->next) {
 		List *pattern;
 		StrList *quote;
 		for (pattern = patterns, quote = quotes;
