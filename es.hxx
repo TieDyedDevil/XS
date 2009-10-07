@@ -192,6 +192,7 @@ extern List *glom2(Tree* tree, Binding* binding, StrList **quotep);
 /* glob.c */
 
 extern const char *QUOTED, *UNQUOTED;
+#define IS_RAW(q) *q == 'r'
 
 extern List* glob(List* list, StrList* quote);
 extern bool haswild(const char *pattern, const char *quoting);

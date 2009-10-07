@@ -6,11 +6,11 @@
 #include "es.hxx"
 #include "term.hxx"
 
-const char *QUOTED = "QUOTED", *UNQUOTED = "RAW";
+const char *QUOTED = "QUOTED", *UNQUOTED = "r";
 
 /* hastilde -- true iff the first character is a ~ and it is not quoted */
 static bool hastilde(const char *s, const char *q) {
-	return *s == '~' && (q == UNQUOTED || *q == 'r');
+	return *s == '~' && IS_RAW(q);
 }
 
 /* haswild -- true iff some unquoted character is a wildcard character */
@@ -199,7 +199,7 @@ static char *expandhome(char* string, StrList* quote) {
 	List* fn = varlookup("fn-%home", NULL);
 
 	assert(*string == '~');
-	assert(quote->str == UNQUOTED || *quote->str == 'r');
+	assert(IS_RAW(quote->str));
 
 	if (fn == NULL) return string;
 	
