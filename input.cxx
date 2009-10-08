@@ -49,8 +49,11 @@ int rl_meta_chars;	/* for editline; ignored for gnu readline */
 /* locate -- identify where an error came from */
 static const char *locate(Input *in, const char *s) {
 	return (in->runflags & run_interactive)
-		? str("columns %d-%d %s", yylloc.first_column, yylloc.last_column, s)
-		: str("%s:%d-%d:%d-%d %s", in->name,  yylloc.first_line, yylloc.last_line, yylloc.first_column, yylloc.last_column, s);
+		? str("columns %d-%d %s", 
+			yylloc.first_column, yylloc.last_column, s)
+		: str("%s:%d-%d:%d-%d %s", in->name,  
+			yylloc.first_line, yylloc.last_line, 
+			yylloc.first_column, yylloc.last_column, s);
 }
 
 static const char *error = NULL;
@@ -191,7 +194,8 @@ extern void unget(Input *in, int c) {
 	if (in->ungot > 0) {
 		assert(in->ungot < MAXUNGET);
 		in->unget[in->ungot++] = c;
-	} else if (in->bufbegin < in->buf && in->buf[-1] == c && (input->runflags & run_echoinput) == 0)
+	} else if (in->bufbegin < in->buf && in->buf[-1] == c 
+			&& (input->runflags & run_echoinput) == 0)
 		--in->buf;
 	else {
 		in->unget_fill = true;
@@ -394,7 +398,6 @@ static int fdfill(Input *in) {
 
 /* parse -- call yyparse(), but disable garbage collection and catch errors */
 extern Tree *parse(const char *pr1, const char *pr2) {
-	int result;
 	assert(error == NULL);
 
 	inityy();
@@ -411,7 +414,7 @@ extern Tree *parse(const char *pr1, const char *pr2) {
 #endif
 	prompt2 = pr2;
 
-	result = yyparse();
+	int result = yyparse();
 
 
 	if (result || error != NULL) {

@@ -1,7 +1,8 @@
 /* fd.c -- file descriptor manipulations ($Revision: 1.2 $) */
 
 #include "es.hxx"
-
+#include <vector>
+using std::vector;
 
 /* mvfd -- duplicate a fd and close the old */
 extern void mvfd(int old, int newFd) {
@@ -23,12 +24,20 @@ extern void mvfd(int old, int newFd) {
  *	are actually done at closefds() time.
  */
 
-typedef struct {
+struct Defer {
+	Defer(int _realfd, int _userfd) : realfd(_realfd), userfd(_userfd) {
+		registerfd(&realfd, true);
+	}
+	Defer(const Defer& old) : realfd(old.realfd), userfd(old.userfd) {
+		registerfd(&realfd, true);
+	}
+	~Defer() {
+		unregisterfd(&realfd);
+	}
 	int realfd, userfd;
-} Defer;
+};
 
-static Defer *deftab;
-static int defcount = 0, defmax = 0;
+static vector<Defer> deftab;
 
 static void dodeferred(int realfd, int userfd) {
 	assert(userfd >= 0);
@@ -44,21 +53,9 @@ static void dodeferred(int realfd, int userfd) {
 
 static int pushdefer(bool parent, int realfd, int userfd) {
 	if (parent) {
-		Defer *defer;
-		if (defcount >= defmax) {
-			int i;
-			for (i = 0; i < defcount; i++)
-				unregisterfd(&deftab[i].realfd);
-			defmax += 10;
-			deftab = reinterpret_cast<Defer*>(erealloc(deftab, defmax * sizeof (Defer)));
-			for (i = 0; i < defcount; i++)
-				registerfd(&deftab[i].realfd, true);
-		}
-		defer = &deftab[defcount++];
-		defer->realfd = realfd;
-		defer->userfd = userfd;
-		registerfd(&defer->realfd, true);
-		return defcount - 1;
+		Defer d(realfd, userfd);
+		deftab.push_back(d);
+		return deftab.size() - 1;
 	} else {
 		dodeferred(realfd, userfd);
 		return UNREGISTERED;
@@ -78,22 +75,21 @@ extern int defer_close(bool parent, int fd) {
 
 extern void undefer(int ticket) {
 	if (ticket != UNREGISTERED) {
-		Defer *defer;
 		assert(ticket >= 0);
 		assert(defcount > 0);
-		defer = &deftab[--defcount];
-		assert(ticket == defcount);
-		unregisterfd(&defer->realfd);
-		if (defer->realfd != -1)
-			close(defer->realfd);
+		assert(ticket == deftab.size() - 1);
+		if (deftab.rbegin()->realfd != -1)
+			close(deftab.rbegin()->realfd);
+		deftab.pop_back();
 	}
 }
 
 /* fdmap -- turn a deferred (user) fd into a real fd */
 extern int fdmap(int fd) {
-	int i = defcount;
-	while (--i >= 0) {
-		Defer *defer = &deftab[i];
+	for(vector<Defer>::reverse_iterator defer = deftab.rbegin(); 
+	    defer != deftab.rend();
+	    ++defer) 
+	{
 		if (fd == defer->userfd) {
 			fd = defer->realfd;
 			if (fd == -1)
@@ -105,12 +101,9 @@ extern int fdmap(int fd) {
 
 /* remapfds -- apply the fd map to the current file descriptor table */
 static void remapfds(void) {
-	Defer *defer, *defend = &deftab[defcount];
-	for (defer = deftab; defer < defend; defer++) {
-		unregisterfd(&defer->realfd);
-		dodeferred(defer->realfd, defer->userfd);
-	}
-	defcount = 0;
+	foreach (Defer& defer, deftab)
+		dodeferred(defer.realfd, defer.userfd);
+	deftab.clear();
 }
 
 
@@ -195,9 +188,8 @@ extern void releasefd(int n) {
 
 /* isdeferred -- is this file descriptor on the deferral list */
 static bool isdeferred(int fd) {
-	Defer *defer, *defend = &deftab[defcount];
-	for (defer = deftab; defer < defend; defer++)
-		if (defer->userfd == fd)
+	foreach (Defer& defer, deftab)
+		if (defer.userfd == fd)
 			return true;
 	return false;
 }
