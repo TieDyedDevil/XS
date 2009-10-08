@@ -5,13 +5,16 @@
 
 PRIM(seq) {
 	const List* result = ltrue;
-	for (; list; list = list->next)
-		result = eval1(list->term, evalflags &~ (list->next == NULL ? 0 : eval_inchild));
+	iterate(list)
+		result = eval1(list->term, evalflags &~ 
+			(list->next == NULL 
+			? 0 
+			: eval_inchild));
 	return result;
 }
 
 PRIM(if) {
-	for (; list != NULL; list = list->next) {
+	iterate(list) {
 		const List *cond = eval1(list->term, 
                         evalflags & (list->next == NULL ? eval_inchild : 0));
 		list = list->next;

@@ -31,7 +31,7 @@ static bool specialvar(string name) {
 }
 
 static bool hasbindings(List* list) {
-	for (; list != NULL; list = list->next)
+	iterate (list)
 		if (isclosure(list->term)) {
 			Closure* closure = getclosure(list->term);
 			assert(closure != NULL);
@@ -91,7 +91,7 @@ static bool isexported(string name) {
 extern void setnoexport(List *list) {
 	isdirty = true;
 	noexport.clear();
-	for (; list != NULL; list = list->next)
+	iterate (list)
 		noexport.insert(getstr(list->term));
 }
 
@@ -105,7 +105,7 @@ extern List *varlookup(const char* name, Binding* bp) {
 	}
 
 	validatevar(name);
-	for (; bp != NULL; bp = bp->next)
+	iterate (bp)
 		if (streq(name, bp->name))
 			return bp->defn;
 
@@ -134,7 +134,7 @@ static List *callsettor(const char* name, List* defn) {
 
 extern void vardef(const char* name, Binding* binding, List* defn) {
 	validatevar(name);
-	for (; binding != NULL; binding = binding->next)
+	iterate (binding)
 		if (streq(name, binding->name)) {
 			binding->defn = defn;
 			rebound = true;
@@ -260,8 +260,8 @@ static void importvar(const char* name, const char* value) {
 	defn = fsplit(sep, mklist(mkstr(value + 1), NULL), false);
 
 	if (strchr(value, ENV_ESCAPE) != NULL) {
-		List* list;
-		for (list = defn; list != NULL; list = list->next) {
+		List* list = defn;
+		iterate (list) {
 			int offset = 0;
 			const char *word = list->term->str;
 			const char *escape;

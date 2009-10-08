@@ -92,7 +92,7 @@ extern Tree *snarfheredoc(const char *eof, bool quoted) {
 
 /* readheredocs -- read all the heredocs at the end of a line (or fail if at end of file) */
 extern bool readheredocs(bool endfile) {
-	for (; hereq != NULL; hereq = hereq->next) {
+	iterate (hereq) {
 		Tree *marker, *eof;
 		if (endfile) {
 			yyerror("end of file with pending here documents");

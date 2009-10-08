@@ -5,13 +5,13 @@
 /* concat -- cartesion cross product concatenation */
 static List *concat(List* list1,List* list2) {
 	List* result = NULL;
-
-	for (List **p = &result; list1 != NULL; list1 = list1->next) {
-		for (List* lp = list2;
-		     lp != NULL;
-		     p = &(*p)->next, lp = lp->next)
-		
+	List **lp = &result;
+	iterate (list1) {
+		List *lp = list2;
+		iterate (lp) {
 			*p = mklist(termcat(list1->term, lp->term), NULL);
+			p = &(*p)->next;
+		}
 	}
 	return result;
 }
@@ -53,19 +53,21 @@ static const char *qcat(const char* q1,
 	return s;
 }
 
+#define DUAL_ITERATE(list, quote) for(; list != NULL; list = list->next, quote = quote->next)
+
 /* qconcat -- cartesion cross product concatenation; also produces a quote list */
 static List *qconcat(List* list1, List* list2,
 		     StrList* ql1, StrList* ql2, 
 		     StrList **quotep) 
 {
 	List* result; 
-	List **p;
-	StrList **qp;
+	List **p = &result;
+	StrList **qp = quotep;
 
-	for (p = &result, qp = quotep; list1 != NULL; list1 = list1->next, ql1 = ql1->next) {
-		List* lp;
-		StrList* qlp;
-		for (lp = list2, qlp = ql2; lp != NULL; lp = lp->next, qlp = qlp->next) {
+	DUAL_ITERATE(list1, ql1) {
+		List* lp = list2;
+		StrList* qlp = ql2;
+		DUAL_ITERATE(lp, qlp) {
 			*p = mklist(termcat(list1->term, lp->term), NULL);
 			p = &(*p)->next;
 			*qp = mkstrlist(

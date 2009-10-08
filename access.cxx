@@ -115,8 +115,8 @@ PRIM(access) {
 		}
 	list = esoptend();
 
-	List *lp;
-	for (lp = NULL; list != NULL; list = list->next) {
+	List *lp = NULL;
+	iterate (list) {
 		const char *name = gcdup(getstr(list->term));
 		if (suffix != NULL)
 			name = pathcat(name, suffix);

@@ -54,7 +54,7 @@ extern List *listcopy(const List *list) {
 /* length -- lenth of a list */
 extern int length(List* list) {
 	int len = 0;
-	for (; list != NULL; list = list->next)
+	iterate (list)
 		++len;
 	return len;
 }
@@ -73,7 +73,7 @@ extern List *listify(int argc, char **argv) {
 /* nth -- return nth element of a list, indexed from 1 */
 extern Term *nth(List *list, int n) {
 	assert(n > 0);
-	for (; list != NULL; list = list->next) {
+	iterate (list) {
 		assert(list->term != NULL);
 		if (--n == 0)
 			return list->term;
@@ -99,7 +99,7 @@ extern List* sortlist(List* list) {
 
 extern Vector* vectorize(const List* list) {
 	Vector* v = new (UseGC) Vector;
-	for (; list != NULL; list = list->next)
+	iterate (list)
 		v->push_back(gcdup(getstr(list->term)));
 
 	return v;

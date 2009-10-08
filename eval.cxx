@@ -66,7 +66,7 @@ static List *assign(Tree* varform, Tree* valueform, Binding* binding) {
 
 	List* value;
 	const char* name;
-	for (; vars != NULL; vars = vars->next) {
+	iterate (vars) {
 		name = getstr(vars->term);
 		assign_helper(value, values, vars->next);
 		vardef(name, binding, value);

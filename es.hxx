@@ -6,6 +6,8 @@
 #include "stdenv.hxx"
 #include <algorithm>
 
+#define iterate(list) for (; list != NULL; list = list->next)
+
 /*
  * meta-information for exported environment strings
  */

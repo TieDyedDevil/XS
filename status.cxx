@@ -15,7 +15,7 @@ const List
 
 /* istrue -- is this status list true? */
 extern bool istrue(const List *status) {
-	for (; status != NULL; status = status->next) {
+	iterate (status) {
 		Term *term = status->term;
 		if (term->closure != NULL)
 			return false;

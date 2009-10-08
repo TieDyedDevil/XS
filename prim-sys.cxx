@@ -111,7 +111,7 @@ PRIM(setsignals) {
 	Sigeffect effects[NSIG];
 	for (i = 0; i < NSIG; i++)
 		effects[i] = sig_default;
-	for (; list != NULL; list = list->next) {
+	iterate (list) {
 		int sig;
 		const char *s = getstr(list->term);
 		Sigeffect effect = sig_catch;
@@ -204,9 +204,9 @@ static void printlimit(const Limit *limit, bool hard) {
 	if (lim == (LIMIT_T) RLIM_INFINITY)
 		print("%-8s\tunlimited\n", limit->name);
 	else {
-		const Suffix *suf;
+		const Suffix *suf = limit->suffix;
 
-		for (suf = limit->suffix; suf != NULL; suf = suf->next)
+		iterate (suf)
 			if (lim % suf->amount == 0 && (lim != 0 || suf->amount > 1)) {
 				lim /= suf->amount;
 				break;

@@ -12,7 +12,7 @@ static bool Lconv(Format *f) {
 	char *sep = va_arg(f->args, char *);
 	List *next;
 
-	for (; lp != NULL; lp = next) {
+	iterate (lp) {
 		next = lp->next;
 		fmtprint(f, fmt, getstr(lp->term), next == NULL ? "" : sep);
 	}
