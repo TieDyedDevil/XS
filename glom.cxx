@@ -5,7 +5,7 @@
 /* concat -- cartesion cross product concatenation */
 static List *concat(List* list1,List* list2) {
 	List* result = NULL;
-	List **lp = &result;
+	List **p = &result;
 	iterate (list1) {
 		List *lp = list2;
 		iterate (lp) {
