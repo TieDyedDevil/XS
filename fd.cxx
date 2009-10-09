@@ -76,7 +76,7 @@ extern int defer_close(bool parent, int fd) {
 extern void undefer(int ticket) {
 	if (ticket != UNREGISTERED) {
 		assert(ticket >= 0);
-		assert(defcount > 0);
+		assert (not deftab.empty());
 		assert(ticket == deftab.size() - 1);
 		if (deftab.rbegin()->realfd != -1)
 			close(deftab.rbegin()->realfd);

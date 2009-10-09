@@ -105,7 +105,7 @@ extern bool readheredocs(bool endfile) {
 
 /* queueheredoc -- add a heredoc to the queue to process at the end of the line */
 extern bool queueheredoc(Tree *t) {
-	assert(hereq.empty() || hereq[0]->marker->kind == nList);
+	assert(hereq.empty() || hereq[0]->kind == nList);
 	assert(t->kind == nList);
 	assert(t->CAR->kind == nWord);
 	assert(streq(t->CAR->u[0].s, "%heredoc"));
