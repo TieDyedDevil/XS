@@ -54,8 +54,7 @@ extern List *listcopy(const List *list) {
 /* length -- lenth of a list */
 extern int length(List* list) {
 	int len = 0;
-	iterate (list)
-		++len;
+	iterate (list) ++len;
 	return len;
 }
 
