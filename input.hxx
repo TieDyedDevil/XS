@@ -43,7 +43,7 @@ extern void yyerror(const char *s);
 
 /* token.c */
 
-extern char dnw[];
+extern const char dnw[];
 extern int yylex(void);
 extern void inityy(void);
 extern void print_prompt2(void);
