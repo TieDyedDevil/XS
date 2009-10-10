@@ -6,7 +6,7 @@
 #include "parse.h"
 
 
-inline bool isodigit(char c) {
+static inline bool isodigit(char c) {
 	return '0' <= c && c < '8';
 }
 
@@ -146,10 +146,16 @@ static bool getfds(int fd[2], int c, int default0, int default1) {
 	return true;
 }
 
+inline void bufput(int pos, char val) {
+	if (pos >= bufsize)
+		buf = reinterpret_cast<char*>(
+			erealloc(buf, bufsize *= 2));
+	buf[pos] = val;
+}
+
 int yylex(void) {
 	static bool dollar = false;
 	int c;
-	const char *meta;		
 
 	if (goterror) {
 		goterror = false;
@@ -157,7 +163,7 @@ int yylex(void) {
 	}
 
 	/* rc variable-names may contain only alnum, '*' and '_', so use dnw if we are scanning one. */
-	meta = (dollar ? dnw : nw);
+	const char *meta = (dollar ? dnw : nw);
 	dollar = false;
 	if (newline) {
 		newline = false;
@@ -166,22 +172,20 @@ int yylex(void) {
 		 */
 		yylloc.first_line = yylloc.last_line; 
 	}
-top:	while ((c = GETC()) == ' ' || c == '\t')
+
+top:	while (c = GETC(), c == ' ' || c == '\t')
 		w = NW;
 	yylloc.first_column = yylloc.last_column;
 	
 	if (c == EOF)
 		return ENDFILE;
-	if (!meta[(unsigned char) c]) {	/* it's a word or keyword. */
+	if (!meta[c]) {	/* it's a word or keyword. */
 		InsertFreeCaret();
 		w = RW;
 		size_t i = 0;
 		do {
-			buf[i++] = c;
-			if (i >= bufsize)
-				buf = reinterpret_cast<char*>(
-					erealloc(buf, bufsize *= 2));
-		} while ((c = GETC()) != EOF && !meta[(unsigned char) c]);
+			bufput(i++, c);
+		} while (c = GETC(), c != EOF && !meta[c]);
 		UNGETC(c);
 		buf[i] = '\0';
 		w = KW;
@@ -229,7 +233,7 @@ top:	while ((c = GETC()) == ' ' || c == '\t')
 		w = RW;
 		size_t i = 0;
 		while ((c = GETC()) != '\'' || (c = GETC()) == '\'') {
-			buf[i++] = c;
+			bufput(i++, c);
 			if (c == '\n')
 				print_prompt2();
 			if (c == EOF) {
@@ -237,9 +241,6 @@ top:	while ((c = GETC()) == ' ' || c == '\t')
 				scanerror("eof in quoted string");
 				return ERROR;
 			}
-			if (i >= bufsize)
-				buf = reinterpret_cast<char*>(
-					erealloc(buf, bufsize *= 2));
 		}
 		UNGETC(c);
 		buf[i] = '\0';
