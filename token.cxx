@@ -146,8 +146,8 @@ static bool getfds(int fd[2], int c, int default0, int default1) {
 	return true;
 }
 
-inline void bufput(int pos, char val) {
-	if (pos >= bufsize)
+static inline void bufput(int pos, char val) {
+	while (pos >= bufsize)
 		buf = reinterpret_cast<char*>(
 			erealloc(buf, bufsize *= 2));
 	buf[pos] = val;
@@ -187,7 +187,7 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 			bufput(i++, c);
 		} while (c = GETC(), c != EOF && !meta[c]);
 		UNGETC(c);
-		buf[i] = '\0';
+		bufput(i, '\0');
 		w = KW;
 		if (buf[1] == '\0') {
 			int k = *buf;
@@ -243,7 +243,7 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 			}
 		}
 		UNGETC(c);
-		buf[i] = '\0';
+		bufput(i, '\0');
 		yylval.str = gcdup(buf);
 		return QWORD;
 	}
