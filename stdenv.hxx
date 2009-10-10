@@ -15,6 +15,9 @@ using std::map;
 #define UseGC /* Ignore this flag */
 #define GC_init()
 #define GC_MALLOC(x) malloc(x)
+#define gc_allocator std::allocator
+#define GC_gcollect()
+class gc_cleanup {};
 #endif
 
 #include <boost/foreach.hpp>
