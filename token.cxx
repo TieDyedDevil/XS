@@ -149,7 +149,6 @@ static bool getfds(int fd[2], int c, int default0, int default1) {
 int yylex(void) {
 	static bool dollar = false;
 	int c;
-	size_t i;			 
 	const char *meta;		
 
 	if (goterror) {
@@ -176,7 +175,7 @@ top:	while ((c = GETC()) == ' ' || c == '\t')
 	if (!meta[(unsigned char) c]) {	/* it's a word or keyword. */
 		InsertFreeCaret();
 		w = RW;
-		i = 0;
+		size_t i = 0;
 		do {
 			buf[i++] = c;
 			if (i >= bufsize)
@@ -226,9 +225,9 @@ top:	while ((c = GETC()) == ' ' || c == '\t')
 		case '&':	return PRIM;
 		default:	UNGETC(c); return '$';
 		}
-	case '\'':
+	case '\'': {
 		w = RW;
-		i = 0;
+		size_t i = 0;
 		while ((c = GETC()) != '\'' || (c = GETC()) == '\'') {
 			buf[i++] = c;
 			if (c == '\n')
@@ -246,6 +245,7 @@ top:	while ((c = GETC()) == ' ' || c == '\t')
 		buf[i] = '\0';
 		yylval.str = gcdup(buf);
 		return QWORD;
+	}
 	case '\\':
 		if ((c = GETC()) == '\n') {
 			print_prompt2();
