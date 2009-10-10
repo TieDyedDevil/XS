@@ -158,7 +158,9 @@ extern void sethistory(const char *file) {
 int GETC() {
 	int c = input->get();
 	switch (c) {
-	case '\t': yylloc.last_column = (yylloc.last_column / 8 + 1) * 8; break;
+	case '\t': 
+		yylloc.last_column = (yylloc.last_column / 8 + 1) * 8; 
+		break;
 	case '\n':
 		yylloc.first_column = yylloc.last_column = 0;
 		++yylloc.last_line;
@@ -174,9 +176,8 @@ int GETC() {
 
 /* ungetfill -- input->fill routine for ungotten characters */
 static int ungetfill(Input *in) {
-	int c;
 	assert(in->ungot > 0);
-	c = in->unget[--in->ungot];
+	int c = in->unget[--in->ungot];
 	if (in->ungot == 0) {
 		in->unget_fill = false;
 		assert(in->rbuf != NULL);
@@ -248,14 +249,10 @@ static char * quote_func(char *text, int match_Type, char *quote_pointer) {
 	char *newHome = NULL;
 	if ((pos = strstr(text, "~"))) {
 		/* Expand ~, otherwise quoting will make the filename invalid */
-		const char *home = varlookup("HOME", NULL)->term->str;
-		int hLen = strlen(home);
-		int len = strlen(text) + hLen +1;
+		std::string home = varlookup("HOME", NULL)->term->str;
+		home += (pos + 1); // Add rest of path
 		/* consider gc usage here? */
-		newHome = reinterpret_cast<char*>(galloc(len));
-		strcpy(newHome, home);
-		strcpy(newHome + hLen, pos + 1);
-		text = newHome;
+		text = gcdup(home.c_str());
 	}
         char *result = default_quote_function(text, match_Type, quote_pointer);
 	return result;
