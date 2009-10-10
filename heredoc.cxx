@@ -4,12 +4,12 @@
 #include "input.hxx"
 #include "syntax.hxx"
 #include <sstream>
-#include <deque>
+#include <stack>
 
 using std::stringstream;
-using std::deque;
+using std::stack;
 
-static deque<Tree*> hereq;
+static stack<Tree*> hereq;
 
 /* getherevar -- read a variable from a here doc */
 extern Tree *getherevar(void) {
@@ -87,10 +87,9 @@ extern Tree *snarfheredoc(const char *eof, bool quoted) {
 
 /* readheredocs -- read all the heredocs at the end of a line (or fail if at end of file) */
 extern bool readheredocs(bool endfile) {
-	deque<Tree*> tmphere;
-	swap(hereq, tmphere); // Clears hereq
-	
-	foreach (Tree* marker, tmphere) {
+	while (!hereq.empty()) {
+		Tree *marker = hereq.top();
+		hereq.pop();
 		if (endfile) {
 			yyerror("end of file with pending here documents");
 			return false;
@@ -105,7 +104,7 @@ extern bool readheredocs(bool endfile) {
 
 /* queueheredoc -- add a heredoc to the queue to process at the end of the line */
 extern bool queueheredoc(Tree *t) {
-	assert(hereq.empty() || hereq[0]->kind == nList);
+	assert(hereq.empty() || hereq.top()->kind == nList);
 	assert(t->kind == nList);
 	assert(t->CAR->kind == nWord);
 	assert(streq(t->CAR->u[0].s, "%heredoc"));
@@ -120,11 +119,11 @@ extern bool queueheredoc(Tree *t) {
 		return false;
 	}
 	
-	hereq.push_front(eof);
+	hereq.push(eof);
 	return true;
 }
 
 extern void emptyherequeue(void) {
-	hereq.clear();
+	while (not hereq.empty()) hereq.pop();
 	disablehistory = false;
 }
