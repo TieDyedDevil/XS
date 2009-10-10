@@ -1333,7 +1333,7 @@ Function (lambda) parameters are lexically bound to their values.
 .SS "For loops"
 The command
 .Ds
-.Cr "for (\fIvar\fP := \fIlist\fP) \fIcommand\fP
+.Cr "for \fIvar\fP : \fIlist\fP { \fIcommand\fP }
 .De
 .PP
 Runs the
@@ -1352,7 +1352,7 @@ the corresponding variable is bound to the empty list
 for the remaining iterations.
 Thus the loop
 .Ds
-.Cr "for (i := a b c; j := x y) echo $#i $i $#j $j"
+.Cr "for i : a b c; j : x y { echo $#i $i $#j $j" }
 .De
 .PP
 produces the output

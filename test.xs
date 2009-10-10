@@ -17,9 +17,9 @@ let (TMPOUT := /dev/shm/xs.$pid.testout) {
 	log2 Running $name...
         RETURNVALUE := <={fork {$code >$TMPOUT >[2=1]}}
 	log2 Done running $name....
-	log2 $TESTNAME produced output:
+	log2 $TESTNAME produced output\:
 	log2 `output
-	log2 $TESTNAME exited:
+	log2 $TESTNAME exited\:
 	log2 $RETURNVALUE
     }
 }
@@ -43,7 +43,7 @@ let (passes := 0
     }
 }
 fn conds requirements {
-    for (req := $requirements) {
+    for req : $requirements {
     	if {! eval $req} { 
     	    fail
     	    return
@@ -77,7 +77,7 @@ let (dir := `pwd
     }
 
     rm -f $logfile
-    for (file := $dir/xs_tests/*.xs) {
+    for file : $dir/xs_tests/*.xs {
 	log2 Running $file
 	local (FILE := $file; XS := $dir/xs) . $DOTARGS $FILE
     }

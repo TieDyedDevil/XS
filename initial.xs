@@ -161,11 +161,11 @@ fn-%whatis	:= $&whatis
 #	users don't have to type the infamous <= (nee <>) operator.
 #	Whatis also protects the used from exceptions raised by %whatis.
 
-fn var		{ for (i := $*) echo <={%var $i} }
+fn var		{ for i : $* { echo <={%var $i} } }
 
 fn whatis {
 	let (result := ) {
-		for (i := $*) {
+		for i : $* {
 			catch @ e from message {
 				if {!~ $e error} {
 					throw $e $from $message
@@ -217,7 +217,7 @@ fn-switch := @ value args {
 		}
 		result $value
 	} {
-		for ((cond action) := $args) {
+		for (cond action) : $args {
 			if {~ $action ()} { 
 				# Code for default action
 				break <={$cond}
@@ -234,8 +234,9 @@ fn-switch := @ value args {
 
 fn-map := @ fn-f list {
 	let (result:=)
-		for (item := $list)
+		for item : $list {
 			result := $result <={f $item}
+		}
 }
 
 # Like map, but uses output (without splitting) of f
@@ -301,15 +302,16 @@ fn vars {
 		priv	:= false
 		intern	:= false
 	) {
-		for (i := $*) switch $i (
-			-v		{vars	:= true}
-			-f		{fns	:= true}
-			-s		{sets	:= true}
-			-e		{export	:= true}
-			-p		{priv	:= true}
-			-i		{intern := true}
-			{throw error vars vars: illegal option: $i -- usage: vars '-[vfsepia]'}
-		)
+		for i : $* {( 
+			switch $i 
+				-v		{vars	:= true}
+				-f		{fns	:= true}
+				-s		{sets	:= true}
+				-e		{export	:= true}
+				-p		{priv	:= true}
+				-i		{intern := true}
+				{throw error vars 'vars: illegal option:' $i '-- usage: vars -[vfsepia]'}
+		)}
 
 		let (
 			dovar := @ var {
@@ -324,15 +326,17 @@ fn vars {
 			}
 		) {
 			if {$export || $priv} {
-				for (var := <= $&vars)
+				for var : <= $&vars {
 					# if not exported but in priv
 					if {if {~ $var $noexport} $priv else $export} {
 						$dovar $var
 					}
+				}
 			}
 			if {$intern} {
-				for (var := <= $&internals)
+				for var : <= $&internals {
 					$dovar $var
+				}
 			}
 		}
 	}
@@ -712,10 +716,10 @@ fn %interactive-loop {
 				error { echo >[1=2] $msg
 					$fn-%dispatch false } 
 				signal { if {!~ $type sigint sigterm sigquit} {
-						echo >[1=2] caught unexpected signal: $type
+						echo >[1=2] 'caught unexpected signal:' $type
 				         }
                                 }
-				{ echo >[1=2] uncaught exception: $e $type $msg }
+				{ echo >[1=2] 'uncaught exception:' $e $type $msg }
                         )
 			throw retry # restart forever loop
 		} {
@@ -770,8 +774,8 @@ fn-%exit-on-false := $&exitonfalse		# -e
 set-home := @ { local (set-HOME := ) HOME := $*; result $* }
 set-HOME := @ { local (set-home := ) home := $*; result $* }
 
-set-path := @ { local (set-PATH := ) PATH := <={%flatten : $*}; result $* }
-set-PATH := @ { local (set-path := ) path := <={%fsplit  : $*}; result $* }
+set-path := @ { local (set-PATH := ) PATH := <={%flatten ':' $*}; result $* }
+set-PATH := @ { local (set-path := ) path := <={%fsplit  ':' $*}; result $* }
 
 #	These settor functions call primitives to set data structures used
 #	inside of es.
@@ -787,8 +791,7 @@ set-max-eval-depth	:= $&setmaxevaldepth
 
 if {~ <=$&primitives resetterminal} {
 	set-TERM	:= @ { $&resetterminal; result $* }
-	set-TERMCAP	:= @ { $&resetterminal; result $* }
-}
+	set-TERMCAP	:= @ { $&resetterminal; result $* } }
 
 #
 # Variables

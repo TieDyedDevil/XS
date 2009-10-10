@@ -11,7 +11,7 @@ tmp:=/tmp/trip.$pid
 rm -f $tmp
 
 fn fail {
-	echo >[1=2] test failed: $*
+	echo >[1=2] 'test failed:' $*
 	exit 1
 }
 
@@ -27,10 +27,10 @@ fn check {
 
 fn errorcheck {
 	if {!~ $#* 3} {
-		fail usage: errorcheck testname expected command
+		fail 'usage: errorcheck testname expected command'
 	}
 	if {!~ `` '' {$2>[2=1]} *^$3^*} {
-		fail error message on $1: $2
+		fail error message on $1':' $2
 	}
 }
 
@@ -80,18 +80,18 @@ if {
 umask 0
 > $tmp
 x := `{ls -l $tmp}
-if {!~ $x(1) *-rw-rw-rw-*} { fail umask 0 produced incorrect result: $x(1) }
+if {!~ $x(1) *-rw-rw-rw-*} { fail umask 0 'produced incorrect result:' $x(1) }
 rm -f $tmp
 umask 027
 > $tmp
 y:=`{ls -l $tmp}
-if {!~ $y(1) *-rw-r-----*} { fail umask 027 produced incorrect file: $y(1) }
+if {!~ $y(1) *-rw-r-----*} { fail umask 027 'produced incorrect file:' $y(1) }
 rm -f $tmp
-if {!~ `umask 027 0027} { fail umask reported bad value: `umask }
+if {!~ `umask 027 0027} { fail umask 'reported bad value:' `umask }
 
-errorcheck 'bad umask'	{umask bad} 'bad umask'
-errorcheck 'bad umask'	{umask -027} 'bad umask'
-errorcheck 'bad umask'	{umask 999999} 'bad umask'
+errorcheck 'bad umask' {umask bad} 'bad umask'
+errorcheck 'bad umask' {umask -027} 'bad umask'
+errorcheck 'bad umask' {umask 8} 'bad umask'
 
 if {!~ `umask 027 0027} {
 	fail bad umask changed umask value to `umask
@@ -101,15 +101,15 @@ if {!~ `umask 027 0027} {
 # redirections
 #
 
-fn bytes { for (i := $*) let(x := `{wc -c $i}) echo $x(1) }
+fn bytes { for i : $* { let(x := `{wc -c $i}) echo $x(1) } }
 echo foo > foo > bar
 if {!~ `{bytes foo} 0} { fail double redirection created non-empty empty file }
-if {!~ `{bytes bar} 4} { fail double redirection created wrong sized file: `{bytes bar} }
+if {!~ `{bytes bar} 4} { fail 'double redirection created wrong sized file:' `{bytes bar} }
 rm -f foo bar
 echo -n >1 >[2]2 >[1=2] foo
 x := `` '' {cat 1}
-if {!~ $#x 0} { fail dup created non-empty empty file: `` '' {cat 1} }
-if {!~ `` '' {cat 2} foo} { fail dup put wrong contents in file : `` '' {cat 2} }
+if {!~ $#x 0} { fail 'dup created non-empty empty file:' `` '' {cat 1} }
+if {!~ `` '' {cat 2} foo} { fail 'dup put wrong contents in file :' `` '' {cat 2} }
 rm -f 1 2
 
 expect error from cat, closing stdin

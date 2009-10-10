@@ -323,21 +323,12 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 		return NL;
 	case ':':
 		c = GETC();
+		w = NW;
 		if (c == '=') {
-			w = NW;
 			return ASSIGN;
-		}
-		else {
-			/* Treat : as if normal char
-			   Code similar to \: */
+		} else {
 			UNGETC(c);
-			c = ':';
-			InsertFreeCaret();
-			w = RW;
-			*buf = ':';
-			buf[1] = 0;
-			yylval.str = gcdup(buf);
-			return QWORD;
+			return ':'; 
 		}
 	case '(':
 		if (w == RW)	/* not keywords, so let & friends work */
