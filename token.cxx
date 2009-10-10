@@ -19,7 +19,7 @@ static State w = NW;
 static bool newline = false; 
 static bool goterror = false;
 static size_t bufsize = 0;
-static char *tokenbuf = NULL;
+static char *buf = NULL;
 
 #define	InsertFreeCaret()	STMT(if (w != NW) { w = NW; UNGETC(c); return '^'; })
 
@@ -149,10 +149,8 @@ static bool getfds(int fd[2], int c, int default0, int default1) {
 int yylex(void) {
 	static bool dollar = false;
 	int c;
-	size_t i;			        /* The purpose of all these local assignments is to	*/
-	const char *meta;		        /* allow optimizing compilers like gcc to load these	*/
-	char *buf = tokenbuf;		        /* values into registers. On a sparc this is a		*/
-	YYSTYPE *y = &yylval;		        /* win, in code size *and* execution time		*/
+	size_t i;			 
+	const char *meta;		
 
 	if (goterror) {
 		goterror = false;
@@ -182,7 +180,7 @@ top:	while ((c = GETC()) == ' ' || c == '\t')
 		do {
 			buf[i++] = c;
 			if (i >= bufsize)
-				buf = tokenbuf = reinterpret_cast<char*>(
+				buf = reinterpret_cast<char*>(
 					erealloc(buf, bufsize *= 2));
 		} while ((c = GETC()) != EOF && !meta[(unsigned char) c]);
 		UNGETC(c);
@@ -203,7 +201,7 @@ top:	while ((c = GETC()) == ' ' || c == '\t')
 		else if (streq(buf, "%closure"))
 			return CLOSURE;
 		w = RW;
-		y->str = gcdup(buf);
+		yylval.str = gcdup(buf);
 		return WORD;
 	}
 	if (c == '`' || c == '!' || c == '$' || c == '\'') {
@@ -241,12 +239,12 @@ top:	while ((c = GETC()) == ' ' || c == '\t')
 				return ERROR;
 			}
 			if (i >= bufsize)
-				buf = tokenbuf = reinterpret_cast<char*>(
+				buf = reinterpret_cast<char*>(
 					erealloc(buf, bufsize *= 2));
 		}
 		UNGETC(c);
 		buf[i] = '\0';
-		y->str = gcdup(buf);
+		yylval.str = gcdup(buf);
 		return QWORD;
 	case '\\':
 		if ((c = GETC()) == '\n') {
@@ -309,7 +307,7 @@ top:	while ((c = GETC()) == ' ' || c == '\t')
 			break;
 		}
 		buf[1] = 0;
-		y->str = gcdup(buf);
+		yylval.str = gcdup(buf);
 		return QWORD;
 	case '#':
 		while ((c = GETC()) != '\n') /* skip comment until newline */
@@ -337,7 +335,7 @@ top:	while ((c = GETC()) == ' ' || c == '\t')
 			w = RW;
 			*buf = ':';
 			buf[1] = 0;
-			y->str = gcdup(buf);
+			yylval.str = gcdup(buf);
 			return QWORD;
 		}
 	case '(':
@@ -370,7 +368,7 @@ top:	while ((c = GETC()) == ' ' || c == '\t')
 			scanerror("expected digit after '='");	/* can't close a pipe */
 			return ERROR;
 		}
-		y->tree = mk(nPipe, p[0], p[1]);
+		yylval.tree = mk(nPipe, p[0], p[1]);
 		return PIPE;
 	}
 
@@ -415,12 +413,12 @@ top:	while ((c = GETC()) == ' ' || c == '\t')
 		if (!getfds(fd, c, fd[0], DEFAULT))
 			return ERROR;
 		if (fd[1] != DEFAULT) {
-			y->tree = (fd[1] == CLOSED)
+			yylval.tree = (fd[1] == CLOSED)
 					? mkclose(fd[0])
 					: mkdup(fd[0], fd[1]);
 			return DUP;
 		}
-		y->tree = mkredircmd(cmd, fd[0]);
+		yylval.tree = mkredircmd(cmd, fd[0]);
 		return REDIR;
 	}
 
@@ -437,11 +435,11 @@ extern void inityy(void) {
 #endif
 	w = NW;
 	if (bufsize > BUFMAX) {		/* return memory to the system if the buffer got too large */
-		efree(tokenbuf);
-		tokenbuf = NULL;
+		efree(buf);
+		buf = NULL;
 	}
-	if (tokenbuf == NULL) {
+	if (buf == NULL) {
 		bufsize = BUFSIZE;
-		tokenbuf = reinterpret_cast<char*>(ealloc(bufsize));
+		buf = reinterpret_cast<char*>(ealloc(bufsize));
 	}
 }
