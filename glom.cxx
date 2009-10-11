@@ -60,7 +60,7 @@ static List *qconcat(List* list1, List* list2,
 		     StrList* ql1, StrList* ql2, 
 		     StrList **quotep) 
 {
-	List* result; 
+	List* result = NULL; 
 	List **p = &result;
 	StrList **qp = quotep;
 
@@ -228,7 +228,7 @@ extern List *glom2(Tree* tree, Binding* binding, StrList **quotep) {
 	 */
 
 	while (tree != NULL) {
-		List* list;
+		List* list = NULL;
 		StrList* qlist = NULL;
 
 		switch (tree->kind) {
@@ -244,10 +244,8 @@ extern List *glom2(Tree* tree, Binding* binding, StrList **quotep) {
 		case nConcat: {
 			StrList *ql = NULL, *qr = NULL;
 			List *l = glom2(tree->u[0].p, binding, &ql),
-				   *r = glom2(tree->u[1].p, binding, &qr);
-			{
-				list = qconcat(l, r, ql, qr, &qlist);
-			}
+			     *r = glom2(tree->u[1].p, binding, &qr);
+			list = qconcat(l, r, ql, qr, &qlist);
 			tree = NULL;
 			break;
 		}
@@ -263,7 +261,7 @@ extern List *glom2(Tree* tree, Binding* binding, StrList **quotep) {
 			if (result == NULL) {
 				assert(*quotep == NULL);
 				result = tail = list;
-				*quotep = (qtail = qlist);
+				*quotep = qtail = qlist;
 			} else {
 				assert(*quotep != NULL);
 				tail->next = list;
