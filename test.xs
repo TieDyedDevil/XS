@@ -1,5 +1,6 @@
 #!./xs
 VERBOSE := false
+FORK := true
 if $VERBOSE { DOTARGS := -v }
 
 let (TMPOUT := /dev/shm/xs.$pid.testout) {
@@ -15,7 +16,11 @@ let (TMPOUT := /dev/shm/xs.$pid.testout) {
 	}
         TESTNAME := $name
 	log2 Running $name...
-        RETURNVALUE := <={fork {$code >$TMPOUT >[2=1]}}
+	if $FORK {
+        	RETURNVALUE := <={fork {$code >$TMPOUT >[2=1]}}
+	} else {
+		RETURNVALUE := <={$code > $TMPOUT >[2=1]}
+	}
 	log2 Done running $name....
 	log2 $TESTNAME produced output\:
 	log2 `output
