@@ -119,8 +119,8 @@ fn-unwind-protect := @ body cleanup {
 	if {!~ $#cleanup 1} {
 		throw error unwind-protect 'unwind-protect body cleanup'
 	}
-	let (exception := ) {
-		let (
+	let (exception) {
+		let (result) {
 			result := <={
 				catch @ e {
 					exception := caught $e
@@ -128,7 +128,6 @@ fn-unwind-protect := @ body cleanup {
 					$body
 				}
 			}
-		) {
 			$cleanup
 			if {~ $exception(1) caught} {
 				throw $exception(2 ...)
@@ -164,7 +163,7 @@ fn-%whatis	:= $&whatis
 fn var		{ for i : $* { echo <={%var $i} } }
 
 fn whatis {
-	let (result := ) {
+	let (result) {
 		for i : $* {
 			catch @ e from message {
 				if {!~ $e error} {
@@ -233,7 +232,7 @@ fn-switch := @ value args {
 # Returns value as list (since last operation is assign, no return needed)
 
 fn-map := @ fn-f list {
-	let (result:=)
+	let (result)
 		for item : $list {
 			result := $result <={f $item}
 		}
@@ -294,8 +293,7 @@ fn vars {
 		if {!~ $* -[epi]} { * := $* -e }
 	}
 
-	let (
-		vars	:= false
+	let (   vars	:= false
 		fns	:= false
 		sets	:= false
 		export	:= false
@@ -313,7 +311,7 @@ fn vars {
 				{throw error vars 'vars: illegal option:' $i '-- usage: vars -[vfsepia]'}
 		)}
 
-		let (
+		let (dovar) {
 			dovar := @ var {
 				# print functions and/or settor vars
 				if {
@@ -324,7 +322,6 @@ fn vars {
 					echo <={%var $var}
 				}
 			}
-		) {
 			if {$export || $priv} {
 				for var : <= $&vars {
 					# if not exported but in priv
@@ -606,7 +603,7 @@ if {~ <=$&primitives writeto} {
 
 # Directory push, pretty similar to other pushds (perhaps simpler though)
 # Relies on pwd
-let (dlist:=.) {
+let (dlist := .) {
 	fn pushd dir {
 		~ $dir () && dir := `/bin/pwd
 		!~ $#dir 1 && throw error pushd ( 
@@ -621,7 +618,7 @@ let (dlist:=.) {
 		echo $dlist
 	}
 	fn popd {
-		let (dir:=) {
+		let (dir) {
 			(dir dlist) := $dlist
 			~ $dlist () && dlist := .
 			cd $dir
