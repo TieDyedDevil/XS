@@ -53,9 +53,6 @@ errorcheck 'tokenizer error'	{$es -c 'echo ''hi'} 'eof in quoted string'
 # blow the input stack
 #
 
-# NOTE: this will take a _painfully_ long time to run on GC_ALWAYS
-# At least several minutes (have never bothered to see it terminate)
-
 if {
 	!~ hi `{
 		eval eval eval eval eval eval eval eval eval eval eval eval eval \
