@@ -392,7 +392,7 @@ fn %backquote {
 fn-%seq		:= $&seq
 
 fn-%not := @ cmd {
-	if {$cmd} {false} else {true}
+	$&if $cmd false true
 }
 
 fn-%and := @ first rest {
@@ -604,10 +604,9 @@ if {~ <=$&primitives writeto} {
 let (dlist := .) {
 	fn pushd dir {
 		~ $dir () && dir := `/bin/pwd
-		!~ $#dir 1 && throw error pushd ( 
+		!~ $#dir 1 && (throw error pushd 
 				Wrong number of arguments '('$#dir, should be 0 or 1')'
-				\n'Usage: pushd [directory]'
-			)
+				\n'Usage: pushd [directory]')
 
 		# If the directory is not absolute, we need to make it so
 		~ $dir [~/]* && dir := `/bin/pwd^/^$dir
@@ -705,7 +704,7 @@ fn-%is-interactive := $&isinteractive
 fn %interactive-loop {
 	let (result := <=true) {
 		catch @ e type msg {
-                	switch $e ( 
+                	(switch $e  
 				eof {return $result} 
 				exit {throw $e $type $msg} 
 				error { echo >[1=2] $msg
@@ -714,8 +713,7 @@ fn %interactive-loop {
 						echo >[1=2] 'caught unexpected signal:' $type
 				         }
                                 }
-				{ echo >[1=2] 'uncaught exception:' $e $type $msg }
-                        )
+				{ echo >[1=2] 'uncaught exception:' $e $type $msg })
 			throw retry # restart forever loop
 		} {
 			forever {
