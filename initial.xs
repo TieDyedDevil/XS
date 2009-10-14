@@ -318,9 +318,7 @@ fn vars {
 				    if ({~ $var fn-*} $fns 
                                         else if {~ $var set-*} $sets 
                                         else $vars)
-				} {
-					echo <={%var $var}
-				}
+				} { echo <={%var $var} }
 			}
 			if {$export || $priv} {
 				for var : <= $&vars {
@@ -542,7 +540,7 @@ fn-%pipe	:= $&pipe
 
 if {~ <=$&primitives readfrom} {
 	fn-%readfrom := $&readfrom
-} {
+} else {
 	fn %readfrom var input cmd {
 		local ($var := /tmp/es.$var.$pid) {
 			unwind-protect {
@@ -768,11 +766,11 @@ fn-%exit-on-false := $&exitonfalse		# -e
 #	because otherwise there would be an infinite recursion.  So too for
 #	all the other shadowing variables.
 
-set-home := @ { local (set-HOME := ) HOME := $*; result $* }
-set-HOME := @ { local (set-home := ) home := $*; result $* }
+set-home := @ { local (set-HOME) HOME := $*; result $* }
+set-HOME := @ { local (set-home) home := $*; result $* }
 
-set-path := @ { local (set-PATH := ) PATH := <={%flatten ':' $*}; result $* }
-set-PATH := @ { local (set-path := ) path := <={%fsplit  ':' $*}; result $* }
+set-path := @ { local (set-PATH) PATH := <={%flatten ':' $*}; result $* }
+set-PATH := @ { local (set-path) path := <={%fsplit  ':' $*}; result $* }
 
 #	These settor functions call primitives to set data structures used
 #	inside of es.
