@@ -23,11 +23,11 @@ static void failexec(const char* file, const List* args) {
 
 /* forkexec -- fork (if necessary) and exec */
 extern List *forkexec(const char *file, const List *list, bool inchild) {
-	
-	Vector* env = mkenv();
+	Vector *env = mkenv(),
+	       *args = vectorize(list);
 	int pid = efork(!inchild, false);
 	if (pid == 0) {
-		execve(file, &(*vectorize(list))[0], &(*env)[0]);
+		execve(file, &(*args)[0], &(*env)[0]);
 		failexec(file, list);
 	}
 	
