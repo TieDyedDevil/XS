@@ -1147,7 +1147,7 @@ A
 is a variant on a program fragment which takes arguments.
 A lambda has the form
 .Ds
-.Ci @ " parameters " { " commands " }
+.Ci "{ | " parameters " | " commands " }"
 .De
 .PP
 The
@@ -1173,7 +1173,7 @@ so it must be separated by whitespace from other words.
 .PP
 As a small example,
 .Ds
-.Cr "@ { echo $* } hi"
+.Cr "{ || echo $* } hi"
 .De
 .PP
 is a complicated way of producing the output
@@ -1185,7 +1185,7 @@ arguments, and the second word is the argument to the function, the word
 Lambdas, like other program fragments, can appear anywhere in a list.
 A more complicated example in the same spirit:
 .Ds
-.Cr "@ cmd arg { $cmd $arg } @ { echo $* } hi"
+.Cr "{ |cmd arg| $cmd $arg } { || echo $* } hi"
 .De
 .PP
 This command executes a lambda which runs its first argument, named
@@ -1199,8 +1199,8 @@ seen previously, and the second argument is the word
 .PP
 These lambda expressions
 .Ds
-.Cr "@ a b c { echo $c $b $a } 1 2"
-.Cr "@ a b c { echo $c $b $a } 1 2 3 4 5"
+.Cr "{ |a b c| echo $c $b $a } 1 2"
+.Cr "{ |a b c| echo $c $b $a } 1 2 3 4 5"
 .De
 .PP
 produce this output:
@@ -1232,7 +1232,7 @@ the value of the variable is substituted for the first word.
 The above syntax for creating functions is equivalent to the
 variable assignment
 .Ds
-.Ci fn\- name " := @" " parameters " "{ \fIcommands\fP }"
+.Ci fn\- name " := { | " parameters " | \fIcommands\fP }"
 .De
 .PP
 Functions may be deleted with the syntax
@@ -1387,7 +1387,7 @@ and
 .Cr HOME
 synchronized.
 .Ds
-.Cr "set-HOME := @ {"
+.Cr "set-HOME := { ||"
 .Cr "    local (set-home := )"
 .Cr "        home := $*"
 .Cr "    result $*"
@@ -1653,7 +1653,7 @@ is called even if the user interrupts or disconnects during the script,
 one can use the form:
 .Ds
 .Cr "local (signals := $signals sighup sigint) {"
-.Cr "     catch @ e {"
+.Cr "     catch { |e|"
 .Cr "          cleanup"
 .Cr "          throw $e"
 .Cr "     } {"
@@ -1742,7 +1742,7 @@ rather than executing them.
 \fIcmd1\fP ; \fIcmd2\fP	%seq {\fIcmd1\fP} {\fIcmd2\fP}
 \fIcmd1\fP && \fIcmd2\fP	%and {\fIcmd1\fP} {\fIcmd2\fP}
 \fIcmd1\fP || \fIcmd2\fP	%or {\fIcmd1\fP} {\fIcmd2\fP}
-fn \fIname\fP \fIargs\fP { \fIcmd\fP }	fn-^\fIname\fP := @ \fIargs\fP {\fIcmd\fP}
+fn \fIname\fP \fIargs\fP { \fIcmd\fP }	fn-^\fIname\fP := { |\fIargs\fP| \fIcmd\fP}
 .ft R
 .De
 .SS "Input/Output Commands"

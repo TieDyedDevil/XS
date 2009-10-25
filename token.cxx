@@ -53,7 +53,7 @@ const char dnw[] = {
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/*  16 -  32 */
 	1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1,		/* ' ' - '/' */
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,		/* '0' - '?' */
-	1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,		/* '@' - 'O' */
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,		/* '@' - 'O' */
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0,		/* 'P' - '_' */
 	1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,		/* '`' - 'o' */
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,		/* 'p' - DEL */
@@ -155,6 +155,8 @@ static inline void bufput(int pos, char val) {
 
 int yylex(void) {
 	static bool dollar = false;
+	static bool begin_block = false;
+	static bool param_block = false;
 	int c;
 
 	if (goterror) {
@@ -175,6 +177,7 @@ int yylex(void) {
 
 top:	while (c = GETC(), c == ' ' || c == '\t')
 		w = NW;
+	if (c != '\n' && c != '|') begin_block = false;
 	yylloc.first_column = yylloc.last_column;
 	
 	if (c == EOF)
@@ -191,7 +194,7 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 		w = KW;
 		if (buf[1] == '\0') {
 			int k = *buf;
-			if (k == '@' || k == '~')
+			if (k == '~')
 				return k;
 		} else if (*buf == 'f') {
 			if (streq(buf + 1, "n"))	return FN;
@@ -338,7 +341,9 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 	case ';':
 	case '^':
 	case ')':
-	case '{': case '}':
+	case '{': 
+		begin_block = true;
+	case '}':
 		w = NW;
 		return c;
 	case '&':
@@ -349,7 +354,16 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 		UNGETC(c);
 		return '&';
 
-	case '|': {
+	case '|': 
+	if (begin_block) {
+		begin_block = false;
+		param_block = true;
+		return PARAM_BEGIN;
+	} else if (param_block) {
+		param_block = false;
+		return PARAM_END;
+	}
+	{
 		int p[2];
 		w = NW;
 		c = GETC();

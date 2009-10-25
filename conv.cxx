@@ -133,12 +133,10 @@ top:
 		return false;
 
 	case nLambda:
-		fmtprint(f, "@ ");
-		if (n->u[0].p == NULL)
-			fmtprint(f, "* ");
-		else
+		fmtprint(f, "{|");
+		if (n->u[0].p != NULL)
 			fmtprint(f, "%T", n->u[0].p);
-		fmtprint(f, "{%T}", n->u[1].p);
+		fmtprint(f, "|%T}", n->u[1].p);
 		return false;
 
 	case nList:

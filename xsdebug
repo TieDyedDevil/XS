@@ -62,7 +62,7 @@ _debug-retry	:= throw retry
 _debug-return	:= throw return
 _debug-throw	:= throw break throw
 
-_debug-trace	:= @ functions {
+_debug-trace	:= { |functions|
 	for (func := $functions) {
 		let (old := $(fn-$func)) {
 			$&if {!~ $#(_untraced-$func) 0} {
@@ -79,7 +79,7 @@ _debug-trace	:= @ functions {
 						$&seq {
 							_print $func $args
 						} {
-							catch @ e {
+							catch { |e|
 								_print $func raised exception: $e
 							} {
 								let (result := <={$old $args}) {
@@ -98,7 +98,7 @@ _debug-trace	:= @ functions {
 	}
 }
 
-_debug-untrace	:= @ functions {
+_debug-untrace	:= { |functions|
 	for (func := $functions) {
 		let (old := $(_untraced-$func)) {
 			$&if {~ $#old 0} {
@@ -110,7 +110,7 @@ _debug-untrace	:= @ functions {
 	}
 }
 
-_debug-break	:= @ functions {
+_debug-break	:= { |functions|
 	for (func := $functions) {
 		let (old := $(fn-$func)) {
 			$&if {!~ $#(_unbroken-$func) 0} {
@@ -130,7 +130,7 @@ _debug-break	:= @ functions {
 							local (* := $args)
 								_debug break
 						} {
-							catch @ e {
+							catch { |e|
 								$&seq {
 									_print $func raised exception: $e
 								} {
@@ -155,7 +155,7 @@ _debug-break	:= @ functions {
 	}
 }
 
-_debug-unbreak	:= @ functions {
+_debug-unbreak	:= { |functions|
 	for (func := $functions) {
 		let (old := $(_unbroken-$func)) {
 			$&if {~ $#old 0} {
@@ -167,9 +167,9 @@ _debug-unbreak	:= @ functions {
 	}
 }
 
-_debug-watch	:= @ vars {
+_debug-watch	:= { |vars|
 	for (var := $vars) {
-		set-$var := @ {
+		set-$var := { ||
 			$&seq {
 				_print old $var ':=' $$var
 			} {
@@ -181,15 +181,15 @@ _debug-watch	:= @ vars {
 	}
 }
 
-_debug-unwatch	:= @ vars {
+_debug-unwatch	:= { |vars|
 	for (var := $vars) {
 		set-$var :=
 	}
 }
 
-_debug-trap	:= @ vars {
+_debug-trap	:= { |vars|
 	for (var := $vars) {
-		set-$var := @ {
+		set-$var := { ||
 			$&seq {
 				_print old $var ':=' $$var
 			} {
@@ -204,13 +204,13 @@ _debug-trap	:= @ vars {
 	}
 }
 
-_debug-untrap	:= @ vars {
+_debug-untrap	:= { |vars|
 	for (var := $vars) {
 		set-$var :=
 	}
 }
 
-_debug-help	:= @ {
+_debug-help	:= { ||
 	cat << 'END-OF-HELP'
 command		description (abbreviations)
 
@@ -260,7 +260,7 @@ let (commands :=) {
 # the main debugger loop
 #
 
-fn-_debug := $&noreturn @ {
+fn-_debug := { ||
 	$&if {~ $1 break || $_stepping} {
 		<= {
 			while {
@@ -293,7 +293,7 @@ fn-_debug := $&noreturn @ {
 history :=
 fn %interactive-loop dispatch {
 	let (result := <= true) {
-		catch @ e type msg {
+		catch { |e type msg|
 			$&if {~ $e eof} {
 				$&seq {
 					_print exiting with exit status $result
@@ -348,7 +348,7 @@ noexport := (
 _stepping := true
 
 if ($trapall) {
-	fn-%seq := $&noreturn @ {
+	fn-%seq := { ||
 		for (i := $*) {
 			$&seq {_print %seq $i} {_debug} $i
 		}

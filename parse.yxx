@@ -24,12 +24,13 @@ typedef struct yyltype
  * or the for-loop
  */
 %glr-parser
-%expect 24
+%expect 23
 
 %token	WORD QWORD
 %token	LOCAL LET FOR CLOSURE FN
 %token	ANDAND BACKBACK EXTRACT CALL COUNT DUP FLAT OROR PRIM REDIR SUB ASSIGN
 %token	NL ENDFILE ERROR 
+%token  PARAM_BEGIN PARAM_END
 
 %left	LOCAL LET FOR CLOSURE ')'
 %left	ANDAND OROR NL
@@ -131,7 +132,7 @@ word	: sword				{ $$ = $1; }
 comword	: param				{ $$ = $1; }
 	| '(' nlwords ')'		{ $$ = $2; }
 	| '{' body '}'			{ $$ = thunkify($2); }
-	| '@' params '{' body '}'	{ $$ = mklambda($2, $4); }
+	| '{' PARAM_BEGIN params PARAM_END body '}'	{ $$ = mklambda($3, $5); }
 	| '$' sword			{ $$ = mk(nVar, $2); }
 	| '$' sword SUB words ')'	{ $$ = mk(nVarsub, $2, $4); }
 	| CALL sword			{ $$ = mk(nCall, $2); }

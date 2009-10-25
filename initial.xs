@@ -101,7 +101,7 @@ fn-break	:= throw break
 fn-exit		:= throw exit
 
 
-fn-if := @ condition action else actions {
+fn-if := { |condition action else actions|
         ($&if {$condition}   {$action}
               {~ $else else} {$actions}
               {!~ $else ()} {
@@ -115,14 +115,14 @@ fn-if := @ condition action else actions {
 #	sure that the return value is correct.
 
 
-fn-unwind-protect := @ body cleanup {
+fn-unwind-protect := { |body cleanup|
 	if {!~ $#cleanup 1} {
 		throw error unwind-protect 'unwind-protect body cleanup'
 	}
 	let (exception) {
 		let (result) {
 			result := <={
-				catch @ e {
+				catch { |e|
 					exception := caught $e
 				} {
 					$body
@@ -165,7 +165,7 @@ fn var		{ for i : $* { echo <={%var $i} } }
 fn whatis {
 	let (result) {
 		for i : $* {
-			catch @ e from message {
+			catch { |e from message|
 				if {!~ $e error} {
 					throw $e $from $message
 				}
@@ -184,8 +184,8 @@ fn whatis {
 #	While uses to indicate that, while it is a lambda, it
 #	does not catch the return exception.  It does, however, catch break.
 
-fn-while := @ cond body {
-	catch @ e value {
+fn-while := { |cond body|
+	catch { |e value|
 		if {!~ $e break} {
 			throw $e $value
 		}
@@ -202,15 +202,15 @@ fn-while := @ cond body {
 	}
 }
 
-fn-until := @ cond body {
+fn-until := { |cond body|
 	while { ! $cond } $body
 }
 
-fn-switch := @ value args {
+fn-switch := { |value args|
 	if {~ $args ()} {
 		throw error switch 'usage: switch value [case1 action1] [case2 action2]...default'
 	}
-	catch @ e value {
+	catch { |e value|
 		if {!~ $e break} {
 			throw $e $value
 		}
@@ -231,7 +231,7 @@ fn-switch := @ value args {
 # it becomes multiple elements in the new list
 # Returns value as list (since last operation is assign, no return needed)
 
-fn-map := @ fn-f list {
+fn-map := { |fn-f list|
 	let (result)
 		for item : $list {
 			result := $result <={f $item}
@@ -239,8 +239,8 @@ fn-map := @ fn-f list {
 }
 
 # Like map, but uses output (without splitting) of f
-fn-omap := @ fn-f list {
-	map @ x { result `` '' { f $x } } $list
+fn-omap := { |fn-f list|
+	map { |x| result `` '' { f $x } } $list
 }
 
 #	The cd builtin provides a friendlier veneer over the cd primitive:
@@ -312,7 +312,7 @@ fn vars {
 		)}
 
 		let (dovar) {
-			dovar := @ var {
+			dovar := { |var|
 				# print functions and/or settor vars
 				if {
 				    if ({~ $var fn-*} $fns 
@@ -320,7 +320,7 @@ fn vars {
                                         else $vars)
 				} { echo <={%var $var} }
 			}
-			if {$export || $priv} {
+			if {$export|| $priv} {
 				for var : <= $&vars {
 					# if not exported but in priv
 					if {if {~ $var $noexport} $priv else $export} {
@@ -350,7 +350,7 @@ fn vars {
 
 #	One piece of syntax rewriting invokes no hook functions:
 #
-#		fn name args { cmd }	fn-^name=@ args{cmd}
+#		fn name args { cmd }	fn-^name={ |args| cmd}
 
 #	The following expressions are rewritten:
 #
@@ -379,7 +379,7 @@ fn %backquote {
 #		! cmd			%not {cmd}
 #		cmd1; cmd2		%seq {cmd1} {cmd2}
 #		cmd1 && cmd2		%and {cmd1} {cmd2}
-#		cmd1 || cmd2		%or {cmd1} {cmd2}
+#		cmd1|| cmd2		%or {cmd1} {cmd2}
 #
 #	Note that %seq is also used for newline-separated commands within
 #	braces.  The logical operators are implemented in terms of if.
@@ -391,11 +391,11 @@ fn %backquote {
 
 fn-%seq		:= $&seq
 
-fn-%not := @ cmd {
+fn-%not := { |cmd|
 	$&if $cmd false true
 }
 
-fn-%and := @ first rest {
+fn-%and := { |first rest|
 	let (result := <={$first}) {
 		if {~ $#rest 0} {
 			result $result
@@ -407,7 +407,7 @@ fn-%and := @ first rest {
 	}
 }
 
-fn-%or := @ first rest {
+fn-%or := { |first rest|
 	if {~ $#first 0} {
 		false
 	} else {
@@ -491,8 +491,8 @@ fn-%here	:= $&here
 #
 #		cmd >[n=]		%close n {cmd}
 #		cmd >[m=n]		%dup m n {cmd}
-#		cmd1 | cmd2		%pipe {cmd1} 1 0 {cmd2}
-#		cmd1 |[m=n] cmd2	%pipe {cmd1} m n {cmd2}
+#		cmd1|cmd2		%pipe {cmd1} 1 0 {cmd2}
+#		cmd1|[m=n] cmd2	%pipe {cmd1} m n {cmd2}
 
 fn-%close	:= $&close
 fn-%dup		:= $&dup
@@ -506,7 +506,7 @@ fn-%pipe	:= $&pipe
 #	The /tmp versions of the functions are straightforward es code,
 #	and should be easy to follow if you understand the rewriting that
 #	goes on.  First, an example.  The pipe
-#		ls | wc
+#		ls|wc
 #	can be simulated with the input/output substitutions
 #		cp <{ls} >{wc}
 #	which gets rewritten as (formatting added):
@@ -703,7 +703,7 @@ fn-%is-interactive := $&isinteractive
 
 fn %interactive-loop {
 	let (result := <=true) {
-		catch @ e type msg {
+		catch { |e type msg|
                 	(switch $e  
 				eof {return $result} 
 				exit {throw $e $type $msg} 
@@ -764,11 +764,11 @@ fn-%exit-on-false := $&exitonfalse		# -e
 #	because otherwise there would be an infinite recursion.  So too for
 #	all the other shadowing variables.
 
-set-home := @ { local (set-HOME) HOME := $*; result $* }
-set-HOME := @ { local (set-home) home := $*; result $* }
+set-home := { || local (set-HOME) HOME := $*; result $* }
+set-HOME := { || local (set-home) home := $*; result $* }
 
-set-path := @ { local (set-PATH) PATH := <={%flatten ':' $*}; result $* }
-set-PATH := @ { local (set-path) path := <={%fsplit  ':' $*}; result $* }
+set-path := { || local (set-PATH) PATH := <={%flatten ':' $*}; result $* }
+set-PATH := { || local (set-path) path := <={%fsplit  ':' $*}; result $* }
 
 #	These settor functions call primitives to set data structures used
 #	inside of es.
@@ -783,8 +783,8 @@ set-max-eval-depth	:= $&setmaxevaldepth
 #	should notify the line editor library.
 
 if {~ <=$&primitives resetterminal} {
-	set-TERM	:= @ { $&resetterminal; result $* }
-	set-TERMCAP	:= @ { $&resetterminal; result $* } }
+	set-TERM	:= { || $&resetterminal; result $* }
+	set-TERMCAP	:= { || $&resetterminal; result $* } }
 
 #
 # Variables
