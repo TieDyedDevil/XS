@@ -226,6 +226,15 @@ fn-switch := { |value args|
 	}
 }
 
+# Somewhat like bash's alias, but simpler
+# Create's new method named aliasname which
+# calls program with defaultargs first and then
+# other args. Whatis prevents infinite recursion.
+fn-alias := { |aliasname program defaultargs|
+    let (prog := `{whatis $program})
+	fn-$aliasname := { || $prog $defaultargs $* }
+}
+
 # Like map from functional programming, alt. to loop structures
 # Different in that if f returns a list,
 # it becomes multiple elements in the new list

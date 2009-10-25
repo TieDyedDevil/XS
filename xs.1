@@ -1863,6 +1863,24 @@ Is the file a socket?
 .Cr \-p
 Is the file a named pipe (FIFO)?
 .IE
+.TP 
+.Cr "alias \fIalias-name\fP \fIexpansion...\fP"
+Define a new function, 
+.I alias-name
+, which calls 
+.I expansion
+.
+The first command in
+.I expansion
+is replaced with it's whatis value
+to prevent recursion.
+This can be used to serve a somewhat similar purpose as in bash.
+For example, the following will force ls to use color,
+and make l be ls in long form, with color (due to previous alias):
+.Ds
+.Cr "alias ls ls --color=yes"
+.Cr "alias l ls -l"
+.De
 .TP
 .Cr "break \fIvalue\fP"
 Exits the current loop.
