@@ -726,11 +726,11 @@ fn %interactive-loop {
 			throw retry # restart forever loop
 		} {
 			forever {
-				if {!~ $#fn-%prompt 0} {
+				$&if {!~ $#fn-%prompt 0} {
 					%prompt
 				}
 				let (code := <={%parse $prompt}) {
-					if {!~ $#code 0} {
+					$&if {!~ $#code 0} {
 						result := <={$fn-%dispatch $code}
 					}
 				}
