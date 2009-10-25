@@ -24,7 +24,7 @@ typedef struct yyltype
  * or the for-loop
  */
 %glr-parser
-%expect 23
+%expect 3
 
 %token	WORD QWORD
 %token	LOCAL LET FOR CLOSURE FN
@@ -112,8 +112,7 @@ bindnoassigns : bindnoassigns bindnoassign { $$ = treeconsend2($1, $2); }
 	
 bindnoassign : word 			{ $$ = mk(nAssign, $1, NULL); }
 
-binding	: fn				{ $$ = $1; }
-	| word assign			{ $$ = mk(nAssign, $1, $2); }
+binding	: word assign			{ $$ = mk(nAssign, $1, $2); }
 
 assign	: caret ASSIGN caret words	{ $$ = $4; }
 
