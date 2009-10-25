@@ -86,6 +86,7 @@ static int lines() {
 	if (!f) return -1; /* see update_hist, this should work */
 	int c;
 	while (c = getc(f), c != EOF) if (c == '\n') ++x;
+	fclose(f);
 	return x;
 }
 
