@@ -764,11 +764,11 @@ fn-%exit-on-false := $&exitonfalse		# -e
 #	because otherwise there would be an infinite recursion.  So too for
 #	all the other shadowing variables.
 
-set-home := { || local (set-HOME) HOME := $*; result $* }
-set-HOME := { || local (set-home) home := $*; result $* }
+set-home := { |x| local (set-HOME) HOME := $x; result $x }
+set-HOME := { |x| local (set-home) home := $x; result $x }
 
-set-path := { || local (set-PATH) PATH := <={%flatten ':' $*}; result $* }
-set-PATH := { || local (set-path) path := <={%fsplit  ':' $*}; result $* }
+set-path := { |x| local (set-PATH) PATH := <={%flatten ':' $x}; result $x }
+set-PATH := { |x| local (set-path) path := <={%fsplit  ':' $x}; result $x }
 
 #	These settor functions call primitives to set data structures used
 #	inside of es.
@@ -783,8 +783,8 @@ set-max-eval-depth	:= $&setmaxevaldepth
 #	should notify the line editor library.
 
 if {~ <=$&primitives resetterminal} {
-	set-TERM	:= { || $&resetterminal; result $* }
-	set-TERMCAP	:= { || $&resetterminal; result $* } }
+	set-TERM	:= { |x| $&resetterminal; result $x }
+	set-TERMCAP	:= { |x| $&resetterminal; result $x } }
 
 #
 # Variables
