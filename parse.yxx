@@ -24,7 +24,7 @@ typedef struct yyltype
  * or the for-loop
  */
 %glr-parser
-%expect 22
+%expect 24
 
 %token	WORD QWORD
 %token	LOCAL LET FOR CLOSURE FN
@@ -172,4 +172,5 @@ keyword	: '!'		{ $$ = "!"; }
 	| FOR		{ $$ = "for"; }
 	| FN		{ $$ = "fn"; }
 	| CLOSURE	{ $$ = "%closure"; }
+	| ':'		{ $$ = ":"; }
 

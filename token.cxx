@@ -322,6 +322,7 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 		w = NW;
 		return NL;
 	case ':':
+		InsertFreeCaret();
 		c = GETC();
 		w = NW;
 		if (c == '=') {

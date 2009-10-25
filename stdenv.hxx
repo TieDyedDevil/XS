@@ -9,12 +9,10 @@ using std::map;
 #include <gc/gc.h>
 #include <gc/gc_cpp.h>
 #include <gc/gc_allocator.h>
-#endif
-
-#ifdef NO_GC /* Only way to satisfy valgrind */
-#define UseGC /* Ignore this flag */
+#else
+#define UseGC (void*) new int[1000] 
 #define GC_init()
-#define GC_MALLOC(x) malloc(x)
+#define GC_MALLOC malloc
 #define gc_allocator std::allocator
 #define GC_gcollect()
 class gc_cleanup {};
