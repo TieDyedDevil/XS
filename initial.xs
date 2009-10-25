@@ -320,7 +320,7 @@ fn vars {
                                         else $vars)
 				} { echo <={%var $var} }
 			}
-			if {$export|| $priv} {
+			if {$export || $priv} {
 				for var : <= $&vars {
 					# if not exported but in priv
 					if {if {~ $var $noexport} $priv else $export} {
@@ -379,7 +379,7 @@ fn %backquote {
 #		! cmd			%not {cmd}
 #		cmd1; cmd2		%seq {cmd1} {cmd2}
 #		cmd1 && cmd2		%and {cmd1} {cmd2}
-#		cmd1|| cmd2		%or {cmd1} {cmd2}
+#		cmd1 || cmd2		%or {cmd1} {cmd2}
 #
 #	Note that %seq is also used for newline-separated commands within
 #	braces.  The logical operators are implemented in terms of if.
