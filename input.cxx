@@ -247,7 +247,6 @@ static char *callreadline() {
 static rl_quote_func_t * default_quote_function ;
 static char * quote_func(char *text, int match_Type, char *quote_pointer) {
 	char *pos;
-	char *newHome = NULL;
 	if ((pos = strstr(text, "~"))) {
 		/* Expand ~, otherwise quoting will make the filename invalid */
 		std::string home = varlookup("HOME", NULL)->term->str;
