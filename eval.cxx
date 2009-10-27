@@ -317,26 +317,34 @@ restart:
 
 			static unsigned int retid = 0;
 
-			/* We use string here to work-around the gc's lack of knowledge about id.
-			 * Disabling the gc would work, too, but that would disable gc for a lot of code
-			 */
-			std::string id = str("%ud", retid++);
-			Term id_term = { id.c_str(), NULL };
-			List id_def = { &id_term, NULL };
+			const char *id = str("%ud", retid++);
+			Term *id_term = gcnew(Term);
+			id_term->str = id;
+			id_term->closure = NULL;
+
+			List *id_def = gcnew(List);
+			id_def->term = id_term;
+			id_def->next = NULL;
 
 			static Term return_term = { "return", NULL };
-			List return_def = { &return_term, &id_def };
+			List *return_def = gcnew(List);
+			return_def->term = &return_term; 
+			return_def->next = id_def;
 
 			static Term throw_term = { "throw", NULL };
-			List throw_def = { &throw_term, &return_def };
-			assert(termeq(&return_term, "return") && return_def.next && termeq(return_def.next->term, id.c_str()));
+			List *throw_def = gcnew(List);
+			throw_def->term = &throw_term;
+			throw_def->next = return_def;
+			assert(termeq(&return_term, "return"));
+			assert(return_def->next);
+			assert(termeq(return_def->next->term, id_term->str));
 
 			try {
 				Binding* context =  bindargs(tree->u[0].p,
 							 list->next,
 							 cp->binding);
 
-				context = mkbinding("fn-return", &throw_def, context);
+				context = mkbinding("fn-return", throw_def, context);
 
 #define WALKFN walk(tree->u[1].p, context, flags)
 				if (funcname) {
@@ -349,7 +357,7 @@ restart:
 				} else list = WALKFN;
 #undef WALKFN
 			} catch (List *e) {
-				if (termeq(e->term, "return") && e->next && termeq(e->next->term, id.c_str())) {
+				if (termeq(e->term, "return") && e->next && termeq(e->next->term, id)) {
 					list = e->next->next;
 					goto done;
 				}

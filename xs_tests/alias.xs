@@ -18,3 +18,9 @@ run 'Temporary alias disappears' {
     echo NOALIAS
 }
 conds {match 'ALIASED: TESTNOALIAS'}
+
+run 'Alias print' {
+    alias x ls
+    echo $fn-x
+}
+conds expect-success
