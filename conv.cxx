@@ -14,6 +14,7 @@ static bool Lconv(Format *f) {
 
 	iterate (lp) {
 		next = lp->next;
+		assert(lp->term != NULL);
 		fmtprint(f, fmt, getstr(lp->term), next == NULL ? "" : sep);
 	}
 	return false;
@@ -173,7 +174,8 @@ top:
 /* enclose -- build up a closure */
 static void enclose(Format *f, Binding *binding, const char *sep) {
 	// Map of bindings in closures to ids
-	static std::map<Binding*, uint64_t> closure_bindings;
+	static std::map<Binding*, uint64_t, std::less<Binding*>,
+	    traceable_allocator< std::pair<Binding*, uint64_t> > > closure_bindings;
 	if (binding != NULL) {
 		Binding *next = binding->next;
 		enclose(f, next, ";");

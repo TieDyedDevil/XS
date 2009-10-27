@@ -36,6 +36,7 @@ extern Closure *getclosure(Term* term) {
 }
 
 extern const char *getstr(Term* term) {
+	assert (term != NULL);
 	const char* s = term->str;
 	Closure* closure = term->closure;
 	assert((s == NULL) != (closure == NULL));

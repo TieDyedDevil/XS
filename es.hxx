@@ -5,6 +5,7 @@
 #include "config.h"
 #include "stdenv.hxx"
 #include <algorithm>
+#include <functional>
 
 #define iterate(list) for (; list != NULL; list = list->next)
 
@@ -173,6 +174,7 @@ extern const List *pathsearch(Term *term);
 
 /* eval1 -- evaluate a term, producing a list */
 inline const List *eval1(Term *term, int flags) {
+	assert (term != NULL);
 	return eval(mklist(term, NULL), NULL, flags);
 }
 

@@ -9,7 +9,6 @@
 #include <string>
 using std::string;
 using std::set;
-using std::vector;
 
 #if PROTECT_ENV
 #define	ENV_FORMAT	"%F=%W"
@@ -240,7 +239,7 @@ extern List *listvars(bool internal) {
 				varlist = mklist(mkstr(x.first.c_str()), varlist);
 	} else { // external only
 		foreach (Dict::value_type x, vars)
-			if (x.second->flags & var_isinternal == 0 && !specialvar(x.first))
+			if ((x.second->flags & var_isinternal) == 0 && !specialvar(x.first))
 				varlist = mklist(mkstr(x.first.c_str()), varlist);
 	}
 	

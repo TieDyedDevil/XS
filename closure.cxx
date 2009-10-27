@@ -34,7 +34,8 @@ struct Chain {
 static Chain *chain = NULL;
 
 static Binding *extract(Tree *tree, Binding *bindings) {
-	static std::map<uint64_t, Binding *> bindmap;
+	static std::map<uint64_t, Binding *, std::less<uint64_t>,
+	    traceable_allocator< std::pair<const uint64_t, Binding*> > > bindmap;
 
 	for (; tree != NULL; tree = tree->u[1].p) {
 		Tree *iddefn = tree->u[0].p;
@@ -47,7 +48,7 @@ static Binding *extract(Tree *tree, Binding *bindings) {
 			assert(name->kind == nWord || name->kind == nQword);
 			defn = revtree(defn->u[1].p);
 			for (; defn != NULL; defn = defn->u[1].p) {
-				Term* term;
+				Term *term = NULL;
 				Tree *word = defn->u[0].p;
 				NodeKind k = word->kind;
 				assert(defn->kind == nList);
@@ -56,7 +57,6 @@ static Binding *extract(Tree *tree, Binding *bindings) {
 					const char *prim = word->u[0].s;
 					if (streq(prim, "nestedbinding")) {
 						int i, count;
-						Chain *cp;
 						if (
 							(defn = defn->u[1].p) == NULL
 						     || defn->u[0].p->kind != nWord
@@ -65,6 +65,7 @@ static Binding *extract(Tree *tree, Binding *bindings) {
 							fail("$&parse", "improper use of $&nestedbinding");
 							NOTREACHED;
 						}
+						Chain *cp;
 						for (cp = chain, i = 0;; cp = cp->next, i++) {
 							if (cp == NULL) {
 								fail("$&parse", "bad count in $&nestedbinding: %d", count);

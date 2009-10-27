@@ -232,7 +232,7 @@ fn-switch := { |value args|
 # other args. Whatis prevents infinite recursion.
 fn-alias := { |aliasname program defaultargs|
     let (prog := `{whatis $program})
-	fn-$aliasname := { || $prog $defaultargs $* }
+	fn $aliasname { $prog $defaultargs $* }
 }
 
 # Like map from functional programming, alt. to loop structures
