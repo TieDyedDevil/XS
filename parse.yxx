@@ -131,7 +131,8 @@ word	: sword				{ $$ = $1; }
 comword	: param				{ $$ = $1; }
 	| '(' nlwords ')'		{ $$ = $2; }
 	| '{' body '}'			{ $$ = thunkify($2); }
-	| '{' PARAM_BEGIN params PARAM_END body '}'	{ $$ = mklambda($3, $5); }
+	| '{' caret PARAM_BEGIN params caret PARAM_END caret body '}'	
+					{ $$ = mklambda($4, $8); }
 	| '$' sword			{ $$ = mk(nVar, $2); }
 	| '$' sword SUB words ')'	{ $$ = mk(nVarsub, $2, $4); }
 	| CALL sword			{ $$ = mk(nCall, $2); }
