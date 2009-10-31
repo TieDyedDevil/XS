@@ -84,18 +84,16 @@ PRIM(whatis) {
 		fail("$&whatis", "usage: $&whatis program");
 	Term* term = list->term;
 	if (getclosure(term) == NULL) {
-		List *fn;
 		const char* prog = getstr(term);
 		assert(prog != NULL);
-		fn = varlookup2("fn-", prog, binding);
+		List *fn = varlookup2("fn-", prog, binding);
 		if (fn != NULL) return fn;
-		else {
-			if (isabsolute(prog)) {
+		else if (isabsolute(prog)) {
 				const char *error = checkexecutable(prog);
 				if (error != NULL)
 					fail("$&whatis", "%s: %s", prog, error);
-			} else return pathsearch(term);
 		}
+		else return pathsearch(term);
 	}
 	return list;
 }
