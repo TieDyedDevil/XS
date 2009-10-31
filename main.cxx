@@ -109,20 +109,21 @@ int main(int argc, char **argv) {
 
 	while ((c = getopt(argc, argv, "eilxvnpodsc:?GIL")) != EOF)
 		switch (c) {
-		case 'c':	cmd = optarg;			break;
-		case 'e':	runflags |= eval_exitonfalse;	break;
-		case 'i':	runflags |= run_interactive;	break;
-		case 'n':	runflags |= run_noexec;		break;
-		case 'v':	runflags |= run_echoinput;	break;
-		case 'x':	runflags |= run_printcmds;	break;
+#define FLAG(x, action) case x: action; break; 
+		FLAG('c', cmd = optarg);
+		FLAG('e', runflags |= eval_exitonfalse);
+		FLAG('i', runflags |= run_interactive);
+		FLAG('n', runflags |= run_noexec);
+		FLAG('v', runflags |= run_echoinput);
+		FLAG('x', runflags |= run_printcmds);
 #if LISPTREES
-		case 'L':	runflags |= run_lisptrees;	break;
+		FLAG('L', runflags |= run_lisptrees);
 #endif
-		case 'l':	loginshell = true;		break;
-		case 'p':	isprotected = true;		break;
-		case 'o':	keepclosed = true;		break;
-		case 'd':	allowquit = true;		break;
-		case 's':	cmd_stdin = true;		goto getopt_done;
+		FLAG('l', loginshell = true);
+		FLAG('p', isprotected = true);
+		FLAG('o', keepclosed = true);
+		FLAG('d', allowquit = true);
+		FLAG('s', cmd_stdin = true; goto getopt_done);
 		default:
 			usage();
 		}
