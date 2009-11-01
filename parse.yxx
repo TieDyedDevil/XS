@@ -19,9 +19,11 @@ typedef struct yyltype
 %error-verbose
 %locations
 
-/* No parens on for means that '{' could 
- * legitimately be part of a variable binding
- * or the for-loop
+/* 
+ * Conflicts:
+ * 1: In for-binding, ^: could mean the variable has a colon in it or that colon is part of for-statement
+ * 2: In for-binding, { could be part of for-binding or of word list (work-around by sharing rule?)
+ * 3: In non-for-binding, newline before paren can be confused with newline in binding list
  */
 %glr-parser
 %expect 3
@@ -100,7 +102,7 @@ forbindings: forbinding			{ $$ = treecons2($1, NULL); }
 	   | forbindings ';' forbinding	{ $$ = treeconsend2($1, $3); }
 	   | forbindings NL forbinding  { $$ = treeconsend2($1, $3); }
 
-forbinding: word caret ':' caret words  { $$ = mk(nAssign, $1, $5); }
+forbinding: word caret ':' caret words 	{ $$ = mk(nAssign, $1, $5); }
 
 bindings: binding			{ $$ = treecons2($1, NULL); }
 	| bindnoassigns			{ $$ = $1; }
