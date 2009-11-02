@@ -48,6 +48,7 @@ extern const char nw[] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,		/* 240 - 255 */
 };
 
+/* Non-words for variable names */
 const char dnw[] = {
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/*   0 -  15 */
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/*  16 -  32 */
@@ -66,6 +67,27 @@ const char dnw[] = {
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/* 224 - 239 */
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/* 240 - 255 */
 };
+
+/* Non-words for aithmetic variables */
+const char adnw[] = {
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/*   0 -  15 */
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/*  16 -  32 */
+	1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/* ' ' - '/' */
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,		/* '0' - '?' */
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,		/* '@' - 'O' */
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0,		/* 'P' - '_' */
+	1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,		/* '`' - 'o' */
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,		/* 'p' - DEL */
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/* 128 - 143 */
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/* 144 - 159 */
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/* 160 - 175 */
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/* 176 - 191 */
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/* 192 - 207 */
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/* 208 - 223 */
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/* 224 - 239 */
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/* 240 - 255 */
+};
+	
 
 
 /* print_prompt2 -- called before all continuation lines */
@@ -153,16 +175,74 @@ static inline void bufput(int pos, char val) {
 	buf[pos] = val;
 }
 
-int yylex(void) {
+static int yylex_arithmetic();
+static int yylex_normal();
+int (*yylex_fun)() = yylex_normal;
+int yylex() {
+	if (goterror) {
+		goterror = false;
+		return NL;
+	}
+	return yylex_fun();
+}
+
+static int yylex_arithmetic() {
+	static int paren_count = 1;
+	int c;
+	while (c = GETC(), c == ' ' || c == '\t' || c == '\n');
+
+	if (isdigit(c) || c == '.') {
+		bool floating = false;
+		size_t i = 0;
+		do {
+		    	if (c == '.') floating = true;  // TODO: Does this work with other localities?
+		    	bufput(i++, c);
+		} while (c = GETC(), isdigit(c) || c =='.');
+		UNGETC(c);
+		bufput(i, '\0');
+
+		yylval.str = gcdup(buf);
+		return floating ? FLOAT : INT;
+	}
+	switch (c) {
+	case '(': 
+		++paren_count; 
+		// FALLTHROUGH
+	case '+': case '-': case '/': case '*': 
+		return c;
+	case ')': 
+		--paren_count;
+		if (paren_count == 0) {
+			paren_count = 1;
+			yylex_fun = yylex_normal;
+		}
+		return c;
+	case '$': {
+		size_t i = 0;
+		while (c = GETC(), c != EOF && !adnw[c])
+			bufput(i++, c);
+		UNGETC(c);
+		if (i == 0) {
+			scanerror("Variable with no name inside arithmetic expression");
+			return ERROR;
+		}
+
+		bufput(i, '\0');
+		yylval.str = gcdup(buf);
+		return ARITH_VAR;
+	}
+	default: 
+		scanerror("Invalid token in arithmetic expression");
+		return ERROR;
+	}
+}
+
+static int yylex_normal() {
 	static bool dollar = false;
 	static bool begin_block = false;
 	static bool param_block = false;
 	int c;
 
-	if (goterror) {
-		goterror = false;
-		return NL;
-	}
 
 	/* rc variable-names may contain only alnum, '*' and '_', so use dnw if we are scanning one. */
 	const char *meta = (dollar ? dnw : nw);
@@ -330,6 +410,9 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 		w = NW;
 		if (c == '=') {
 			return ASSIGN;
+		} else if (c == '(') {
+			yylex_fun = yylex_arithmetic;
+			return ARITH_BEGIN;
 		} else {
 			UNGETC(c);
 			return ':'; 
@@ -440,6 +523,7 @@ extern void inityy(void) {
 #if READLINE
 	continued_input = false;
 #endif
+	yylex_fun = yylex_normal;
 	w = NW;
 	if (bufsize > BUFMAX) {		/* return memory to the system if the buffer got too large */
 		efree(buf);

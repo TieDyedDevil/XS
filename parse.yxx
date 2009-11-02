@@ -33,6 +33,7 @@ typedef struct yyltype
 %token	ANDAND BACKBACK EXTRACT CALL COUNT DUP FLAT OROR PRIM REDIR SUB ASSIGN
 %token	NL ENDFILE ERROR 
 %token  PARAM_BEGIN PARAM_END
+%token  INT FLOAT ARITH_BEGIN ARITH_VAR
 
 %left	LOCAL LET FOR CLOSURE ')'
 %left	ANDAND OROR NL
@@ -41,17 +42,21 @@ typedef struct yyltype
 %right	'$' 
 %left	SUB
 
+%left '+' '-'
+%left '*' '/'
+
 %union {
 	Tree *tree;
 	const char *str;
 	NodeKind kind;
 }
 
-%type <str>	WORD QWORD keyword
+%type <str>	ARITH_VAR WORD QWORD INT FLOAT keyword
 %type <tree>	REDIR PIPE DUP
 		body cmd cmdsa cmdsan comword first fn line word param assign
 		binding bindings params nlwords words simple redir sword
 		forbinding forbindings bindnoassigns bindnoassign
+		arith
 %type <kind>	binder
 
 %start es
@@ -137,12 +142,22 @@ comword	: param				{ $$ = $1; }
 					{ $$ = mklambda($4, $8); }
 	| '$' sword			{ $$ = mk(nVar, $2); }
 	| '$' sword SUB words ')'	{ $$ = mk(nVarsub, $2, $4); }
+	| ARITH_BEGIN arith ')'		{ $$ = mk(nArith, $2); }
 	| CALL sword			{ $$ = mk(nCall, $2); }
 	| COUNT sword			{ $$ = mk(nCall, prefix("%count", treecons(mk(nVar, $2), NULL))); }
 	| FLAT sword			{ $$ = flatten(mk(nVar, $2), " "); }
 	| PRIM WORD			{ $$ = mk(nPrim, $2); }
 	| '`' sword			{ $$ = backquote(mk(nVar, mk(nWord, "ifs")), $2); }
 	| BACKBACK word	sword		{ $$ = backquote($2, $3); }
+
+arith   : arith '+' arith		{ $$ = mk(nPlus, $1, $3); }
+	| arith '-' arith		{ $$ = mk(nMinus, $1, $3); }
+	| arith '*' arith		{ $$ = mk(nMult, $1, $3); }
+	| arith '/' arith		{ $$ = mk(nDivide, $1, $3); }
+	| '(' arith ')'			{ $$ = $2; }
+	| ARITH_VAR			{ $$ = mk(nVar, mk(nWord, $1)); }
+	| INT				{ $$ = mk(nInt, $1); }
+	| FLOAT				{ $$ = mk(nFloat, $1); }
 
 param	: WORD				{ $$ = mk(nWord, $1); }
 	| QWORD				{ $$ = mk(nQword, $1); }

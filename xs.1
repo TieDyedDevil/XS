@@ -837,6 +837,31 @@ For example, the result of the extraction operation
 .PP
 is the list
 .Cr "(foo c bar h)" .
+.SS "Arithmetic Substitution"
+A single list element can be formed from an infix arithmetical expression like so:
+.Ds
+.Ci "\:( " " expression " )
+The expression can use any of the 
+.De
+.Cr "+", 
+.Cr "-", 
+.Cr "*" 
+and 
+.Cr "/" 
+operators, and use variable substitution of the form
+.Cr "$var" .
+Parentheses can be used in normal infix fashion for order of evaluation.
+Numbers can be entered in floating-point or integer, but are always decimal.
+Calculation rules are similar to C - any operation involving floats
+produces a float, any operation with integers produces an integer;
+this includes division, so 
+.Ds
+    .Cr "echo :(1 / 2)"
+    .Cr "echo :(1.0 / 2)"
+.De
+produce 0 and 0.5 (with trailing zeros) respectively.
+Integers will wrap around at the same point as the native platform's int,
+and floats at the same point as the native platform's double.
 .SS "Command Substitution"
 A list may be formed from the output of a command by using backquote
 substitution:
@@ -2861,6 +2886,23 @@ Don't trap
 or
 .Cr SIGTERM .
 This is used for debugging.
+.SH MISC NOTES
+.PP
+As with any other shell scripting language,
+process forking takes up the majority of time:
+.Ds
+.Cr "x := 0; while {!~ $x 4000} { x := :(x + 1) }
+.De
+is several magnitudes faster than:
+.Ds
+.Cr "x := 0; while {test $x -ne 4000} { x := :(x + 1) }
+.De
+Even though xs's arithmetic code is rather slow, in this
+case the cost of fork+exec far outweighs it.
+.PP
+Elaborate tricks involving stringifying closures and unstringying them
+later will probably not work. In general, trying to manipulate the scope
+of variables through similar techniques will probably not do what one expects.
 .SH FILES
 .Cr $home/.xsrc ,
 .Cr /dev/null
@@ -2878,7 +2920,7 @@ contain either the character control-a or the sequence control-b
 followed by control-a or control-b.
 .PP
 .Cr \-x
-is not nearly as useful as it should be.
+is not nearly as useful as it should be. 
 .PP
 Too many creatures have fept in.
 .PP

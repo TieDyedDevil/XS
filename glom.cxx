@@ -1,6 +1,14 @@
 /* glom.c -- walk parse tree to produce list ($Revision: 1.1.1.1 $) */
 
 #include "es.hxx"
+#include <sstream>
+#include <functional>
+#include <boost/lexical_cast.hpp>
+using std::binary_function;
+using boost::lexical_cast;
+
+
+static List *calculate(Tree *, Binding *);
 
 /* concat -- cartesion cross product concatenation */
 static List *concat(List* list1,List* list2) {
@@ -184,6 +192,10 @@ static List *glom1(Tree* tree, Binding* binding) {
 				list = subscript(list, sub);
 			}
 			break;
+		case nArith:
+			list = calculate(tree->u[0].p, binding);
+			tree = NULL;
+			break;
 		case nCall:
 			list = listcopy(walk(tree->u[0].p, binding, 0));
 			tree = NULL;
@@ -284,3 +296,80 @@ extern List* glom(Tree* tree, Binding* binding, bool globit) {
 		return glob(list, quote);
 	} else return glom1(tree, binding);
 }
+
+/* Arithmetic code 
+ * Currently horifically inefficient on account of constantly 
+   converting to-and-from string representation.
+ */
+
+static List *tolist(int x) {
+	return mklist(mkstr(str("%d", x)), NULL);
+}
+static List *tolist(double x) {
+	std::stringstream s;
+	s.setf(std::ios_base::showpoint);
+	s << x;
+	return mklist(mkstr(gcdup(s.str().c_str())), NULL);
+}
+static bool isint(List *x) {
+	return strchr(getstr(x->term), '.') == NULL;
+}
+
+
+static int toint(List *x) {
+	try {
+		return lexical_cast<int>(getstr(x->term));
+	} catch (boost::bad_lexical_cast) {
+		fail("glom:arith:toint", "Could not handle integer input ( maybe too large? )");
+	}
+}
+static double todouble(List *x) {
+	return lexical_cast<double>(getstr(x->term));
+}
+
+#define OP(f, x, y) op(f<int>(), f<double>(), x, y)
+
+template <typename ftint, typename ftdouble>
+static List *op(ftint intf, 
+		ftdouble doublef, 
+		List *x, List *y) {
+	return isint(x) && isint(y)
+		? tolist(intf(toint(x), toint(y)))
+		: tolist(doublef(todouble(x), todouble(y)));
+}
+
+/* calculate -- Take an arithmetic tree, produce result */
+static List *calculate(Tree *expr, Binding *binding) {
+	switch (expr->kind) {
+	case nInt:
+		return tolist(lexical_cast<int>(expr->u[0].s));
+	case nFloat:
+		return tolist(lexical_cast<double>(expr->u[0].s));
+	case nVar: {
+		List *var = glom1(expr->u[0].p, binding);
+		List *value = varlookup(getstr(var->term), binding);
+		if (value == NULL) return tolist(0);
+		/* FIXME: Add some validity checks, not everything is a number */
+		return value;
+	}
+#define EXPR1 calculate(expr->u[0].p, binding)
+#define EXPR2 calculate(expr->u[1].p, binding)
+	case nPlus:
+		return OP(std::plus, EXPR1, EXPR2);
+	case nMinus:
+		return OP(std::minus, EXPR1, EXPR2);
+	case nMult:
+		return OP(std::multiplies, EXPR1, EXPR2);
+	case nDivide:
+		List *a = EXPR1, *b = EXPR2;
+#undef EXPR1
+#undef EXPR2
+		// Integer division by 0 causes issues
+		if (isint(b) and toint(b) == 0)
+			return tolist(std::numeric_limits<double>::infinity());
+		List *l = OP(std::divides, a, b);
+		
+	}
+}
+
+
