@@ -525,7 +525,7 @@ extern void inityy(void) {
 #endif
 	yylex_fun = yylex_normal;
 	w = NW;
-	if (bufsize > BUFMAX) {		/* return memory to the system if the buffer got too large */
+	if (bufsize > BUFMAX) {	// return memory to the system if the buffer got too large
 		efree(buf);
 		buf = NULL;
 	}

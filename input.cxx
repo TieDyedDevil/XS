@@ -190,8 +190,14 @@ static int ungetfill(Input *in) {
 
 /* unget -- push back one character */
 extern void unget(Input *in, int c) {
-	--yylloc.last_column;
-	if (yylloc.first_column > yylloc.last_column) yylloc.first_column = yylloc.last_column;
+	if (yylloc.last_column == 0) {
+	    --yylloc.last_line;
+	    if (yylloc.first_line > yylloc.last_line) yylloc.first_line = yylloc.last_line;
+	} else {
+	    --yylloc.last_column;
+	    if (yylloc.first_column > yylloc.last_column) 
+		    yylloc.first_column = yylloc.last_column;
+	}
 
 	if (in->ungot > 0) {
 		assert(in->ungot < MAXUNGET);

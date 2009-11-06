@@ -255,8 +255,7 @@ extern void hidevariables(void) {
 static void importvar(const char* name, const char* value) {
 	char sep[2] = { ENV_SEPARATOR, '\0' };
 
-	List* defn;
-	defn = fsplit(sep, mklist(mkstr(value + 1), NULL), false);
+	List* defn = fsplit(sep, mklist(mkstr(value + 1), NULL), false);
 
 	if (strchr(value, ENV_ESCAPE) != NULL) {
 		List* list = defn;
@@ -313,6 +312,7 @@ extern void initenv(char **envp, bool isprotected) {
 		string name_raw = envstr.substr(0,eq_index);
 		string eq = envstr.substr(eq_index);
 		char *name = str(ENV_DECODE, name_raw.c_str());
+
 		if (!isprotected
 		    || (!hasprefix(name, "fn-") && !hasprefix(name, "set-")))
 			importvar(name, eq.c_str());
