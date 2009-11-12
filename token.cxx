@@ -407,7 +407,7 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 	case ':':
 		InsertFreeCaret();
 		c = GETC();
-		w = NW;
+		w = KW;
 		if (c == '=') {
 			return ASSIGN;
 		} else if (c == '(') {
