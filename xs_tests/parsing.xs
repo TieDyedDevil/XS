@@ -35,3 +35,8 @@ run 'EOF in comment' {
 	$XS -c '# eof in comment'
 }
 conds { expect-success }
+
+run 'Colon handled properly' {
+	echo a:b
+}
+conds { match 'a:b' }
