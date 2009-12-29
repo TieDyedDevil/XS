@@ -9,7 +9,7 @@ using std::map;
 #include <gc/gc.h>
 #include <gc/gc_cpp.h>
 #include <gc/gc_allocator.h>
-#else
+#else /* DEBUGGING ONLY! */
 #define UseGC (void*) new int[1000] 
 #define GC_init()
 #define GC_MALLOC malloc
