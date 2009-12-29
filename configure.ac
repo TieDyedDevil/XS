@@ -136,7 +136,7 @@ choke me
 es_cv_assign_va_list=yes, es_cv_assign_va_list=no))
 if test "$es_cv_assign_va_list" = no
 then
-	AC_DEFINE(NO_VA_LIST_ASSIGN,,No support for assignment of va_lists)
+	AC_DEFINE(NO_VA_LIST_ASSIGN,1,No support for assignment of va_lists)
 fi
 
 dnl check for a u_quad_t or something like that
