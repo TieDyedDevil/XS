@@ -40,3 +40,23 @@ run 'Colon handled properly' {
 	echo a:b
 }
 conds { match 'a:b' }
+
+run 'Equals in middle of word is literal' {
+	echo a=b
+}
+conds { match 'a=b' }
+
+run 'Equals at end of word is literal' {
+	echo c= d
+}
+conds { match 'c= d' }
+
+run 'Equals at beginning of word is literal' {
+	echo e =f
+}
+conds { match 'e =f' }
+
+run 'Free-standing equals incorectly placed fails' {
+	$XS -c 'echo g = h'
+}
+conds expect-failure
