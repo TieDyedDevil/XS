@@ -10,12 +10,12 @@ fn usage {
 	throw error xsdebug 'usage: xsdebug [-x] program arg ...'
 }
 
-trapall := false
+trapall = false
 
 while {~ $1 -*} {
 	if {~ $1 -x} {
-		trapall := true
-		* := $*(2 ...)
+		trapall = true
+		* = $*(2 ...)
 	} {
 		usage
 	}
@@ -24,11 +24,11 @@ if {~ $#* 0} {
 	usage
 }
 
-_program := $1
+_program = $1
 if {!~ $_program /* ./* ../*} {
-	_program := <={ access -n $_program -1e -xf $path }
+	_program = <={ access -n $_program -1e -xf $path }
 }
-* := $*(2 ...)
+* = $*(2 ...)
 
 exec {<>[3] /dev/tty}
 
@@ -40,8 +40,8 @@ fn _get {
 	$&seq {echo >[1=3] -n $*} {return `{line <[0=3]}}
 }
 
-_prompt := '(xsdebug) '
-usage :=
+_prompt = '(xsdebug) '
+usage =
 
 
 #
@@ -53,27 +53,27 @@ usage :=
 #TODO: since while is no longer a primitive, we need to make a replacement function
 # to restore functionality
 
-_debug-!		:= eval
-_debug-continue	:= $&seq {_stepping := false} {throw break}
-_debug-step	:= $&seq {_stepping := true} {throw break}
-_debug-quit	:= { exit 0 }
-_debug-echo	:= eval echo
-_debug-retry	:= throw retry
-_debug-return	:= throw return
-_debug-throw	:= throw break throw
+_debug-!		= eval
+_debug-continue	= $&seq {_stepping = false} {throw break}
+_debug-step	= $&seq {_stepping = true} {throw break}
+_debug-quit	= { exit 0 }
+_debug-echo	= eval echo
+_debug-retry	= throw retry
+_debug-return	= throw return
+_debug-throw	= throw break throw
 
-_debug-trace	:= { |functions|
-	for (func := $functions) {
-		let (old := $(fn-$func)) {
+_debug-trace	= { |functions|
+	for (func = $functions) {
+		let (old = $(fn-$func)) {
 			$&if {!~ $#(_untraced-$func) 0} {
 				_print $func: already traced
 			} {~ $#old 0} {
 				_print $func: undefined
 			} {
 				$&seq {
-					_untraced-$func := $old
+					_untraced-$func = $old
 				} {
-					noexport := $noexport _untraced-$func
+					noexport = $noexport _untraced-$func
 				} {
 					fn $func args {  
 						$&seq {
@@ -82,7 +82,7 @@ _debug-trace	:= { |functions|
 							catch { |e|
 								_print $func raised exception: $e
 							} {
-								let (result := <={$old $args}) {
+								let (result = <={$old $args}) {
 									$&seq {
 										_print $func '->' $result
 									} {
@@ -98,36 +98,36 @@ _debug-trace	:= { |functions|
 	}
 }
 
-_debug-untrace	:= { |functions|
-	for (func := $functions) {
-		let (old := $(_untraced-$func)) {
+_debug-untrace	= { |functions|
+	for (func = $functions) {
+		let (old = $(_untraced-$func)) {
 			$&if {~ $#old 0} {
 				_print $func: not traced
 			} {
-				fn-$func := $old
+				fn-$func = $old
 			}
 		}
 	}
 }
 
-_debug-break	:= { |functions|
-	for (func := $functions) {
-		let (old := $(fn-$func)) {
+_debug-break	= { |functions|
+	for (func = $functions) {
+		let (old = $(fn-$func)) {
 			$&if {!~ $#(_unbroken-$func) 0} {
 				_print $func: already broken
 			} {~ $#old 0} {
 				_print $func: undefined
 			} {
 				$&seq {
-					_unbroken-$func := $old
+					_unbroken-$func = $old
 				} {
-					noexport := $noexport _unbroken-$func
+					noexport = $noexport _unbroken-$func
 				} {
 					fn $func args {  
 						$&seq {
 							_print break in $func $args
 						} {
-							local (* := $args)
+							local (* = $args)
 								_debug break
 						} {
 							catch { |e|
@@ -137,7 +137,7 @@ _debug-break	:= { |functions|
 									_debug break
 								}
 							} {
-								let (result := <={$old $args}) {
+								let (result = <={$old $args}) {
 									$&seq {
 										_print $func '->' $result
 									} {
@@ -155,25 +155,25 @@ _debug-break	:= { |functions|
 	}
 }
 
-_debug-unbreak	:= { |functions|
-	for (func := $functions) {
-		let (old := $(_unbroken-$func)) {
+_debug-unbreak	= { |functions|
+	for (func = $functions) {
+		let (old = $(_unbroken-$func)) {
 			$&if {~ $#old 0} {
 				_print $func: not broken
 			} {
-				fn-$func := $old
+				fn-$func = $old
 			}
 		}
 	}
 }
 
-_debug-watch	:= { |vars|
-	for (var := $vars) {
-		set-$var := { ||
+_debug-watch	= { |vars|
+	for (var = $vars) {
+		set-$var = { ||
 			$&seq {
-				_print old $var ':=' $$var
+				_print old $var '=' $$var
 			} {
-				_print new $var ':=' $*
+				_print new $var '=' $*
 			} {
 				return $*
 			}
@@ -181,21 +181,21 @@ _debug-watch	:= { |vars|
 	}
 }
 
-_debug-unwatch	:= { |vars|
-	for (var := $vars) {
-		set-$var :=
+_debug-unwatch	= { |vars|
+	for (var = $vars) {
+		set-$var =
 	}
 }
 
-_debug-trap	:= { |vars|
-	for (var := $vars) {
-		set-$var := { ||
+_debug-trap	= { |vars|
+	for (var = $vars) {
+		set-$var = { ||
 			$&seq {
-				_print old $var ':=' $$var
+				_print old $var '=' $$var
 			} {
-				_print new $var ':=' $*
+				_print new $var '=' $*
 			} {
-				local (old := $$var; new := $*)
+				local (old = $$var; new = $*)
 					_debug break
 			} {
 				return $*
@@ -204,13 +204,13 @@ _debug-trap	:= { |vars|
 	}
 }
 
-_debug-untrap	:= { |vars|
-	for (var := $vars) {
-		set-$var :=
+_debug-untrap	= { |vars|
+	for (var = $vars) {
+		set-$var =
 	}
 }
 
-_debug-help	:= { ||
+_debug-help	= { ||
 	cat << 'END-OF-HELP'
 command		description (abbreviations)
 
@@ -234,25 +234,25 @@ an empty command is equivalent to step
 END-OF-HELP
 }
 
-_debug-b	:= $_debug-break
-_debug-c	:= $_debug-continue
-_debug-cont	:= $_debug-continue
-_debug-p	:= $_debug-echo
-_debug-print	:= $_debug-echo
-_debug-q	:= $_debug-quit
-_debug-r	:= $_debug-continue
-_debug-run	:= $_debug-continue
-_debug-s	:= $_debug-step
-_debug-?	:= $_debug-help
+_debug-b	= $_debug-break
+_debug-c	= $_debug-continue
+_debug-cont	= $_debug-continue
+_debug-p	= $_debug-echo
+_debug-print	= $_debug-echo
+_debug-q	= $_debug-quit
+_debug-r	= $_debug-continue
+_debug-run	= $_debug-continue
+_debug-s	= $_debug-step
+_debug-?	= $_debug-help
 
 
-let (commands :=) {
-	for (i := <=$&vars) {
+let (commands =) {
+	for (i = <=$&vars) {
 		if {~ $i _debug-*} {
-			commands := $commands $i
+			commands = $commands $i
 		}
 	}
-	noexport := $noexport $commands
+	noexport = $noexport $commands
 }
 
 
@@ -260,18 +260,18 @@ let (commands :=) {
 # the main debugger loop
 #
 
-fn-_debug := { ||
+fn-_debug = { ||
 	$&if {~ $1 break || $_stepping} {
 		<= {
 			while {
-				let (cmd := <={_get $_prompt}) {
+				let (cmd = <={_get $_prompt}) {
 					$&seq {
 						while {~ $cmd(1) $_prompt} {
-							cmd := $cmd(2 ...)
+							cmd = $cmd(2 ...)
 						}
 					} {
 						$&if {~ $#cmd 0} {
-							cmd := step
+							cmd = step
 						}
 					} {
 						$&if {~ $#(_debug-$cmd(1)) 0} {
@@ -290,9 +290,9 @@ fn-_debug := { ||
 # the (debugging) interactive loop
 #
 
-history :=
+history =
 fn %interactive-loop dispatch {
-	let (result := <= true) {
+	let (result = <= true) {
 		catch { |e type msg|
 			$&if {~ $e eof} {
 				$&seq {
@@ -313,12 +313,12 @@ fn %interactive-loop dispatch {
 			}
 		} {
 			forever {
-				let (cmd := ) {
+				let (cmd = ) {
 					$&seq {
 						_print parsing input from $_program:
 					} {
 						while {~ $#cmd 0} {
-							cmd := <={%parse}
+							cmd = <={%parse}
 						}
 					} {
 						_debug
@@ -330,7 +330,7 @@ fn %interactive-loop dispatch {
 								_debug
 							}
 						} {
-							result := <={$dispatch $cmd}
+							result = <={$dispatch $cmd}
 						}
 					}
 				}
@@ -339,21 +339,21 @@ fn %interactive-loop dispatch {
 	}
 }
 
-noexport := (
+noexport = (
 	$noexport
 	fn-^(_print _get _debug)
 	_prompt _program _stepping
 	%interactive-loop
 )
-_stepping := true
+_stepping = true
 
-if ($trapall) {
-	fn-%seq := { ||
-		for (i := $*) {
+if $trapall {
+	fn-%seq = { ||
+		for (i = $*) {
 			$&seq {_print %seq $i} {_debug} $i
 		}
 	}
-	noexport := $noexport %seq if while
+	noexport = $noexport %seq if while
 }
 
 . -i -v $_program $*

@@ -1,25 +1,25 @@
 #!./xs
-VERBOSE := false
-FORK := true
-if $VERBOSE { DOTARGS := -v }
+VERBOSE = false
+FORK = true
+if $VERBOSE { DOTARGS = -v }
 
-let (TMPOUT := /dev/shm/xs.$pid.testout) {
+let (TMPOUT = /dev/shm/xs.$pid.testout) {
     # Ends up without newlines
     fn output {
         cat $TMPOUT
     }
     fn run name code {
-	let (dir := /dev/shm/xs.$pid) {
+	let (dir = /dev/shm/xs.$pid) {
 		rm -fr $dir
 		mkdir $dir
 		cd $dir
 	}
-        TESTNAME := $name
+        TESTNAME = $name
 	log2 Running $name...
 	if $FORK {
-        	RETURNVALUE := <={fork {$code >$TMPOUT >[2=1]}}
+        	RETURNVALUE = <={fork {$code >$TMPOUT >[2=1]}}
 	} else {
-		RETURNVALUE := <={$code > $TMPOUT >[2=1]}
+		RETURNVALUE = <={$code > $TMPOUT >[2=1]}
 	}
 	log2 Done running $name....
 	log2 $TESTNAME produced output\:
@@ -29,15 +29,15 @@ let (TMPOUT := /dev/shm/xs.$pid.testout) {
     }
 }
 
-let (passes := 0
-     fails  := 0)
+let (passes = 0
+     fails  = 0)
 {
     fn pass { 
-	passes := `{expr 1 + $passes}
+	passes = `{expr 1 + $passes}
         log 'Passed: ' $TESTNAME
     }
     fn fail { 
-	fails := `{expr 1 + $fails} 
+	fails = `{expr 1 + $fails} 
 	log 'Failed: ' $TESTNAME
     }
     fn results {
@@ -70,8 +70,8 @@ fn match_re result {
     log2 Match_re....
     eval '~ `` '''' output *'^$^result^'*'
 }
-let (dir := `pwd
-     logfile := `pwd^/xs.log) 
+let (dir = `pwd
+     logfile = `pwd^/xs.log) 
 {
     echo $dir
     fn log msg {
@@ -84,7 +84,7 @@ let (dir := `pwd
     rm -f $logfile
     for file : $dir/xs_tests/*.xs {
 	log2 Running $file
-	local (FILE := $file; XS := $dir/xs) . $DOTARGS $FILE
+	local (FILE = $file; XS = $dir/xs) . $DOTARGS $FILE
     }
     cd $dir
 }

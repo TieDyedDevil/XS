@@ -4,10 +4,10 @@
 # this trip doesn't tour much of the code at all.  es needs a real
 # set of regression tests, soon.
 
-#es:=$0
-es:=./xs
+#es = $0
+es = ./xs
 echo tripping $es
-tmp:=/tmp/trip.$pid
+tmp = /tmp/trip.$pid
 rm -f $tmp
 
 fn fail {
@@ -76,12 +76,12 @@ errorcheck 'tokenizer error'	{$es -c 'echo ''hi'} 'eof in quoted string'
 
 umask 0
 > $tmp
-x := `{ls -l $tmp}
+x  =  `{ls -l $tmp}
 if {!~ $x(1) *-rw-rw-rw-*} { fail umask 0 'produced incorrect result:' $x(1) }
 rm -f $tmp
 umask 027
 > $tmp
-y:=`{ls -l $tmp}
+y = `{ls -l $tmp}
 if {!~ $y(1) *-rw-r-----*} { fail umask 027 'produced incorrect file:' $y(1) }
 rm -f $tmp
 if {!~ `umask 027 0027} { fail umask 'reported bad value:' `umask }
@@ -98,13 +98,13 @@ if {!~ `umask 027 0027} {
 # redirections
 #
 
-fn bytes { for i : $* { let(x := `{wc -c $i}) echo $x(1) } }
+fn bytes { for i : $* { let(x  =  `{wc -c $i}) echo $x(1) } }
 echo foo > foo > bar
 if {!~ `{bytes foo} 0} { fail double redirection created non-empty empty file }
 if {!~ `{bytes bar} 4} { fail 'double redirection created wrong sized file:' `{bytes bar} }
 rm -f foo bar
 echo -n >1 >[2]2 >[1=2] foo
-x := `` '' {cat 1}
+x  =  `` '' {cat 1}
 if {!~ $#x 0} { fail 'dup created non-empty empty file:' `` '' {cat 1} }
 if {!~ `` '' {cat 2} foo} { fail 'dup put wrong contents in file :' `` '' {cat 2} }
 rm -f 1 2
@@ -122,11 +122,11 @@ errorcheck 'redirection error' {cat>()} 'null'
 # Relies on old error mesages
 #check catch/retry \
 #	`` '' {
-#		let (x := a b c d e f g)
+#		let (x  =  a b c d e f g)
 #			catch @ e {
 #				echo caught $e
 #				if {!~ $#x 0} {
-#					x := $x(2 ...)
+#					x  =  $x(2 ...)
 #					throw retry
 #				}
 #				echo never succeeded
@@ -159,11 +159,11 @@ errorcheck 'redirection error' {cat>()} 'null'
 # heredocs and herestrings
 #
 
-bigfile:=/tmp/big.$pid
+bigfile = /tmp/big.$pid
 od $es | sed 5000q > $bigfile
-abc:=(this is a)
-x:=()
-result:='this is a heredoc
+abc = (this is a)
+x = ()
+result = 'this is a heredoc
 this is an heredoc
 '
 if {!~ `` '' {<<[5] EOF cat <[0=5]} $result} {fail unquoted heredoc}

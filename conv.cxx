@@ -38,7 +38,7 @@ static void binding(Format *f, const char *keyword, Tree *tree) {
 		Tree *binding = np->u[0].p;
 		assert(binding != NULL);
 		assert(binding->kind == nAssign);
-		fmtprint(f, "%s%#T:=%T", sep, binding->u[0].p, binding->u[1].p);
+		fmtprint(f, "%s%#T = %T", sep, binding->u[0].p, binding->u[1].p);
 		sep = ";";
 	}
 	fmtprint(f, ")");
@@ -106,7 +106,7 @@ top:
 		return false;
 
 	case nAssign:
-		fmtprint(f, "%#T:=", n->u[0].p);
+		fmtprint(f, "%#T = ", n->u[0].p);
 		tailcall(n->u[1].p, false);
 
 	case nConcat:
@@ -218,8 +218,8 @@ static void enclose(Format *f, Binding *binding, const char *sep) {
 		enclose(f, next, ";");
 		if (!closure_bindings.count(binding))
 			closure_bindings[binding] = (static_cast<uint64_t>(time(NULL)) << 32) | rand();
-		fmtprint(f, "__id__:=%0lx;", closure_bindings[binding]);
-		fmtprint(f, "%S:=%#L%s", binding->name, binding->defn, " ", sep);
+		fmtprint(f, "__id__ = %0lx;", closure_bindings[binding]);
+		fmtprint(f, "%S = %#L%s", binding->name, binding->defn, " ", sep);
 	}
 }
 

@@ -20,13 +20,13 @@ typedef struct yyltype
 %locations
 
 /* 
- * Conflicts:
+ * Conflicts (why GLR is needed, can't be solved with single-lookahead): 
  * 1: In for-binding, ^: could mean the variable has a colon in it or that colon is part of for-statement
  * 2: In for-binding, { could be part of for-binding or of word list (work-around by sharing rule?)
  * 3: In non-for-binding, newline before paren can be confused with newline in binding list
  */
 %glr-parser
-%expect 3
+/*%expect 7*/
 
 %token	WORD QWORD
 %token	LOCAL LET FOR CLOSURE FN

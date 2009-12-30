@@ -3,10 +3,10 @@
 # x is shared (you'll get %closure if you print
 # this)
 run 'Simple until test' {
-	let (x := a) {
+	let (x = a) {
 		until { ~ $x b } {
 			{ ~ $x b } && exit 1
-			x := b
+			x = b
 		}
 		echo good
 	}

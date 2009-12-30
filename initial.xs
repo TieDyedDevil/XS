@@ -43,7 +43,7 @@
 #	an appropriately named fn- variable exists.  If it does, then the
 #	value of that variable is substituted for the function name and
 #	evaluation starts over again.  Thus, for example, the assignment
-#		fn-echo := $&echo
+#		fn-echo = $&echo
 #	means that the command
 #		echo foo bar
 #	is internally translated to
@@ -63,21 +63,21 @@
 #	These builtin functions are straightforward calls to primitives.
 #	See the manual page for details on what they do.
 
-fn-.		:= $&dot
-fn-access	:= $&access
-fn-break	:= $&break
-fn-catch	:= $&catch
-fn-echo		:= $&echo
-fn-exec		:= $&exec
-fn-forever	:= $&forever
-fn-fork		:= $&fork
-fn-newpgrp	:= $&newpgrp
-fn-result	:= $&result
-fn-throw	:= $&throw
-fn-umask	:= $&umask
-fn-wait		:= $&wait
+fn-.		= $&dot
+fn-access	= $&access
+fn-break	= $&break
+fn-catch	= $&catch
+fn-echo		= $&echo
+fn-exec		= $&exec
+fn-forever	= $&forever
+fn-fork		= $&fork
+fn-newpgrp	= $&newpgrp
+fn-result	= $&result
+fn-throw	= $&throw
+fn-umask	= $&umask
+fn-wait		= $&wait
 
-fn-%read	:= $&read
+fn-%read	= $&read
 
 #	eval runs its arguments by turning them into a code fragment
 #	(in string form) and running that fragment.
@@ -88,8 +88,8 @@ fn eval { '{' ^ $^* ^ '}' }
 #	but, as many pointed out, they don't need to be.  These
 #	values are not very clear, but unix demands them.
 
-fn-true		:= result 0
-fn-false	:= result 1
+fn-true		= result 0
+fn-false	= result 1
 
 #	These functions just generate exceptions for control-flow
 #	constructions.  The for command and the while builtin both
@@ -97,11 +97,11 @@ fn-false	:= result 1
 #	The interpreter main() routine (and nothing else)
 #	catches the exit exception.
 
-fn-break	:= throw break
-fn-exit		:= throw exit
+fn-break	= throw break
+fn-exit		= throw exit
 
 
-fn-if := { |condition action else actions|
+fn-if = { |condition action else actions|
         ($&if {$condition}   {$action}
               {~ $else else} {$actions}
               {!~ $else ()} {
@@ -115,15 +115,15 @@ fn-if := { |condition action else actions|
 #	sure that the return value is correct.
 
 
-fn-unwind-protect := { |body cleanup|
+fn-unwind-protect = { |body cleanup|
 	if {!~ $#cleanup 1} {
 		throw error unwind-protect 'unwind-protect body cleanup'
 	}
 	let (exception) {
 		let (result) {
-			result := <={
+			result = <={
 				catch { |e|
-					exception := caught $e
+					exception = caught $e
 				} {
 					$body
 				}
@@ -142,19 +142,19 @@ fn-unwind-protect := { |body cleanup|
 #	the builtins.  Otherwise, we'll just not have a limit command
 #	and get time from /bin or wherever.
 
-if {~ <=$&primitives limit} {fn-limit := $&limit}
-if {~ <=$&primitives time}  {fn-time  := $&time}
+if {~ <=$&primitives limit} {fn-limit = $&limit}
+if {~ <=$&primitives time}  {fn-time  = $&time}
 
 #	These builtins are mainly useful for internal functions, but
 #	they're there to be called if you want to use them.
 
-fn-%apids	:= $&apids
-fn-%fsplit      := $&fsplit
-fn-%newfd	:= $&newfd
-fn-%run         := $&run
-fn-%split       := $&split
-fn-%var		:= $&var
-fn-%whatis	:= $&whatis
+fn-%apids	= $&apids
+fn-%fsplit      = $&fsplit
+fn-%newfd	= $&newfd
+fn-%run         = $&run
+fn-%split       = $&split
+fn-%var		= $&var
+fn-%whatis	= $&whatis
 
 #	These builtins are only around as a matter of convenience, so
 #	users don't have to type the infamous <= (nee <>) operator.
@@ -170,10 +170,10 @@ fn whatis {
 					throw $e $from $message
 				}
 				echo >[1=2] $message
-				result := $result 1
+				result = $result 1
 			} {
 				echo <={%whatis $i}
-				result := $result 0
+				result = $result 0
 			}
 		}
 		result $result
@@ -184,29 +184,29 @@ fn whatis {
 #	While uses to indicate that, while it is a lambda, it
 #	does not catch the return exception.  It does, however, catch break.
 
-fn-while := { |cond body|
+fn-while = { |cond body|
 	catch { |e value|
 		if {!~ $e break} {
 			throw $e $value
 		}
 		result $value
 	} {
-		let (result := <=true)
+		let (result = <=true)
 			forever {
 				if {!$cond} {
 					throw break $result
 				} else {
-					result := <=$body
+					result = <=$body
 				}
 			}
 	}
 }
 
-fn-until := { |cond body|
+fn-until = { |cond body|
 	while { ! $cond } $body
 }
 
-fn-switch := { |value args|
+fn-switch = { |value args|
 	if {~ $args ()} {
 		throw error switch 'usage: switch value [case1 action1] [case2 action2]...default'
 	}
@@ -230,8 +230,8 @@ fn-switch := { |value args|
 # Create's new method named aliasname which
 # calls program with defaultargs first and then
 # other args. Whatis prevents infinite recursion.
-fn-alias := { |aliasname program defaultargs|
-    let (prog := `{whatis $program})
+fn-alias = { |aliasname program defaultargs|
+    let (prog = `{whatis $program})
 	fn $aliasname { $prog $defaultargs $* }
 }
 
@@ -240,15 +240,15 @@ fn-alias := { |aliasname program defaultargs|
 # it becomes multiple elements in the new list
 # Returns value as list (since last operation is assign, no return needed)
 
-fn-map := { |fn-f list|
+fn-map = { |fn-f list|
 	let (result)
 		for item : $list {
-			result := $result <={f $item}
+			result = $result <={f $item}
 		}
 }
 
 # Like map, but uses output (without splitting) of f
-fn-omap := { |fn-f list|
+fn-omap = { |fn-f list|
 	map { |x| result `` '' { f $x } } $list
 }
 
@@ -296,32 +296,32 @@ fn cd dir {
 fn vars {
 	# choose default options
 	if {~ $* -a} {
-		* := -v -f -s -e -p -i
+		* = -v -f -s -e -p -i
 	} else {
-		if {!~ $* -[vfs]} { * := $* -v }
-		if {!~ $* -[epi]} { * := $* -e }
+		if {!~ $* -[vfs]} { * = $* -v }
+		if {!~ $* -[epi]} { * = $* -e }
 	}
 
-	let (   vars	:= false
-		fns	:= false
-		sets	:= false
-		export	:= false
-		priv	:= false
-		intern	:= false
+	let (   vars	= false
+		fns	= false
+		sets	= false
+		export	= false
+		priv	= false
+		intern	= false
 	) {
 		for i : $* {( 
 			switch $i 
-				-v		{vars	:= true}
-				-f		{fns	:= true}
-				-s		{sets	:= true}
-				-e		{export	:= true}
-				-p		{priv	:= true}
-				-i		{intern := true}
+				-v		{vars	= true}
+				-f		{fns	= true}
+				-s		{sets	= true}
+				-e		{export	= true}
+				-p		{priv	= true}
+				-i		{intern = true}
 				{throw error vars 'vars: illegal option:' $i '-- usage: vars -[vfsepia]'}
 		)}
 
 		let (dovar) {
-			dovar := { |var|
+			dovar = { |var|
 				# print functions and/or settor vars
 				if {
 				    if ({~ $var fn-*} $fns 
@@ -368,16 +368,16 @@ fn vars {
 #		`{cmd args}            <={%backquote <={%flatten '' $ifs} {cmd args}}
 #		``ifs {cmd args}       <={%backquote <={%flatten '' ifs} {cmd args}}
 
-fn-%count	:= $&count
-fn-%flatten	:= $&flatten
+fn-%count	= $&count
+fn-%flatten	= $&flatten
 
 #	Note that $&backquote returns the status of the child process
 #	as the first value of its result list.  The default %backquote
 #	puts that value in $bqstatus.
 
 fn %backquote {
-	let ((status output) := <={ $&backquote $* }) {
-		bqstatus := $status
+	let ((status output) = <={ $&backquote $* }) {
+		bqstatus = $status
 		result $output
 	}
 }
@@ -398,14 +398,14 @@ fn %backquote {
 #	-- but that can be fixed and it's still better to write more of
 #	the shell in es itself.
 
-fn-%seq		:= $&seq
+fn-%seq		= $&seq
 
-fn-%not := { |cmd|
+fn-%not = { |cmd|
 	$&if $cmd false true
 }
 
-fn-%and := { |first rest|
-	let (result := <={$first}) {
+fn-%and = { |first rest|
+	let (result = <={$first}) {
 		if {~ $#rest 0} {
 			result $result
 		} else if {result $result} {
@@ -416,11 +416,11 @@ fn-%and := { |first rest|
 	}
 }
 
-fn-%or := { |first rest|
+fn-%or = { |first rest|
 	if {~ $#first 0} {
 		false
 	} else {
-		let (result := <={$first}) {
+		let (result = <={$first}) {
 			if {~ $#rest 0} {
 				result $result
 			} else if {!result $result} {
@@ -439,11 +439,11 @@ fn-%or := { |first rest|
 #		cmd &			%background {cmd}
 
 fn %background cmd {
-	let (pid := <={$&background $cmd}) {
+	let (pid = <={$&background $cmd}) {
 		if {%is-interactive} {
 			echo >[1=2] $pid
 		}
-		apid := $pid
+		apid = $pid
 	}
 }
 
@@ -466,13 +466,13 @@ fn %background cmd {
 #	The %one function is used to make sure that exactly one file is
 #	used as the argument of a redirection.
 
-fn-%openfile	:= $&openfile
-fn-%open	:= %openfile r		# < file
-fn-%create	:= %openfile w		# > file
-fn-%append	:= %openfile a		# >> file
-fn-%open-write	:= %openfile r+		# <> file
-fn-%open-create	:= %openfile w+		# >< file
-fn-%open-append	:= %openfile a+		# >>< file, <>> file
+fn-%openfile	= $&openfile
+fn-%open	= %openfile r		# < file
+fn-%create	= %openfile w		# > file
+fn-%append	= %openfile a		# >> file
+fn-%open-write	= %openfile r+		# <> file
+fn-%open-create	= %openfile w+		# >< file
+fn-%open-append	= %openfile a+		# >>< file, <>> file
 
 fn %one {
 	if {!~ $#* 1} {
@@ -493,7 +493,7 @@ fn %one {
 #		cmd << tag input tag	%here 0 input {cmd}
 #		cmd <<< string		%here 0 string {cmd}
 
-fn-%here	:= $&here
+fn-%here	= $&here
 
 #	These operations are like redirections, except they don't include
 #	explicitly named files.  They do not reduce to the %openfile hook.
@@ -503,9 +503,9 @@ fn-%here	:= $&here
 #		cmd1|cmd2		%pipe {cmd1} 1 0 {cmd2}
 #		cmd1|[m=n] cmd2	%pipe {cmd1} m n {cmd2}
 
-fn-%close	:= $&close
-fn-%dup		:= $&dup
-fn-%pipe	:= $&pipe
+fn-%close	= $&close
+fn-%dup		= $&dup
+fn-%pipe	= $&pipe
 
 #	Input/Output substitution (i.e., the >{} and <{} forms) provide an
 #	interesting case.  If es is compiled for use with /dev/fd, these
@@ -548,10 +548,10 @@ fn-%pipe	:= $&pipe
 #		cmd >{output}		%writeto var {output} {cmd $var}
 
 if {~ <=$&primitives readfrom} {
-	fn-%readfrom := $&readfrom
+	fn-%readfrom = $&readfrom
 } else {
 	fn %readfrom var input cmd {
-		local ($var := /tmp/es.$var.$pid) {
+		local ($var = /tmp/es.$var.$pid) {
 			unwind-protect {
 				$input > $$var
 				# text of $cmd is   command file
@@ -564,10 +564,10 @@ if {~ <=$&primitives readfrom} {
 }
 
 if {~ <=$&primitives writeto} {
-	fn-%writeto := $&writeto
+	fn-%writeto = $&writeto
 } else {
 	fn %writeto var output cmd {
-		local ($var := /tmp/es.$var.$pid) {
+		local ($var = /tmp/es.$var.$pid) {
 			unwind-protect {
 				> $$var
 				$cmd
@@ -585,7 +585,7 @@ if {~ <=$&primitives writeto} {
 #	recommend using files in /tmp rather than named pipes.
 
 #fn %readfrom var cmd body {
-#	local ($var := /tmp/es.$var.$pid) {
+#	local ($var = /tmp/es.$var.$pid) {
 #		unwind-protect {
 #			/etc/mknod $$var p
 #			$&background {$cmd > $$var; exit}
@@ -597,7 +597,7 @@ if {~ <=$&primitives writeto} {
 #}
 
 #fn %writeto var cmd body {
-#	local ($var := /tmp/es.$var.$pid) {
+#	local ($var = /tmp/es.$var.$pid) {
 #		unwind-protect {
 #			/etc/mknod $$var p
 #			$&background {$cmd < $$var; exit}
@@ -610,23 +610,23 @@ if {~ <=$&primitives writeto} {
 
 # Directory push, pretty similar to other pushds (perhaps simpler though)
 # Relies on pwd
-let (dlist := .) {
+let (dlist = .) {
 	fn pushd dir {
-		~ $dir () && dir := `/bin/pwd
+		~ $dir () && dir = `/bin/pwd
 		!~ $#dir 1 && (throw error pushd 
 				Wrong number of arguments '('$#dir, should be 0 or 1')'
 				\n'Usage: pushd [directory]')
 
 		# If the directory is not absolute, we need to make it so
-		~ $dir [~/]* && dir := `/bin/pwd^/^$dir
+		~ $dir [~/]* && dir = `/bin/pwd^/^$dir
 
-		dlist := $dir $dlist
+		dlist = $dir $dlist
 		echo $dlist
 	}
 	fn popd {
 		let (dir) {
-			(dir dlist) := $dlist
-			~ $dlist () && dlist := .
+			(dir dlist) = $dlist
+			~ $dlist () && dlist = .
 			cd $dir
 			echo $dlist
 		}
@@ -645,7 +645,7 @@ let (dlist := .) {
 #	to %home without arguments;  ~user and ~user/path generate calls
 #	to %home with one argument, the user name.
 
-fn-%home	:= $&home
+fn-%home	= $&home
 
 #	Path searching used to be a primitive, but the access function
 #	means that it can be written easier in es.  It is not called for
@@ -657,7 +657,7 @@ fn %pathsearch name { access -n $name -1e -xf $path }
 #	A default version is provided (under conditional compilation) for
 #	systems that don't do #! interpretation themselves.
 
-if {~ <=$&primitives execfailure} {fn-%exec-failure := $&execfailure}
+if {~ <=$&primitives execfailure} {fn-%exec-failure = $&execfailure}
 
 
 #
@@ -706,12 +706,12 @@ if {~ <=$&primitives execfailure} {fn-%exec-failure := $&execfailure}
 #	The parsed code is executed only if it is non-empty, because otherwise
 #	result gets set to zero when it should not be.
 
-fn-%parse	:= $&parse
-fn-%batch-loop	:= $&batchloop
-fn-%is-interactive := $&isinteractive
+fn-%parse	= $&parse
+fn-%batch-loop	= $&batchloop
+fn-%is-interactive = $&isinteractive
 
 fn %interactive-loop {
-	let (result := <=true) {
+	let (result = <=true) {
 		catch { |e type msg|
                 	(switch $e  
 				eof {return $result} 
@@ -729,9 +729,9 @@ fn %interactive-loop {
 				$&if {!~ $#fn-%prompt 0} {
 					%prompt
 				}
-				let (code := <={%parse $prompt}) {
+				let (code = <={%parse $prompt}) {
 					$&if {!~ $#code 0} {
-						result := <={$fn-%dispatch $code}
+						result = <={$fn-%dispatch $code}
 					}
 				}
 			}
@@ -747,7 +747,7 @@ fn %eval-noprint				# <default>
 fn %eval-print		{ echo $* >[1=2]; $* }	# -x
 fn %noeval-noprint	{ }			# -n
 fn %noeval-print	{ echo $* >[1=2] }	# -n -x
-fn-%exit-on-false := $&exitonfalse		# -e
+fn-%exit-on-false = $&exitonfalse		# -e
 
 
 #
@@ -773,27 +773,27 @@ fn-%exit-on-false := $&exitonfalse		# -e
 #	because otherwise there would be an infinite recursion.  So too for
 #	all the other shadowing variables.
 
-set-home := { |x| local (set-HOME) HOME := $x; result $x }
-set-HOME := { |x| local (set-home) home := $x; result $x }
+set-home = { |x| local (set-HOME) HOME = $x; result $x }
+set-HOME = { |x| local (set-home) home = $x; result $x }
 
-set-path := { |x| local (set-PATH) PATH := <={%flatten ':' $x}; result $x }
-set-PATH := { |x| local (set-path) path := <={%fsplit  ':' $x}; result $x }
+set-path = { |x| local (set-PATH) PATH = <={%flatten ':' $x}; result $x }
+set-PATH = { |x| local (set-path) path = <={%fsplit  ':' $x}; result $x }
 
 #	These settor functions call primitives to set data structures used
 #	inside of es.
 
-set-history		:= $&sethistory
-set-signals		:= $&setsignals
-set-noexport		:= $&setnoexport
-set-max-eval-depth	:= $&setmaxevaldepth
+set-history		= $&sethistory
+set-signals		= $&setsignals
+set-noexport		= $&setnoexport
+set-max-eval-depth	= $&setmaxevaldepth
 
 #	If the primitive $&resetterminal is defined (meaning that readline
 #	or editline is being used), setting the variables $TERM or $TERMCAP
 #	should notify the line editor library.
 
 if {~ <=$&primitives resetterminal} {
-	set-TERM	:= { |x| $&resetterminal; result $x }
-	set-TERMCAP	:= { |x| $&resetterminal; result $x } }
+	set-TERM	= { |x| $&resetterminal; result $x }
+	set-TERMCAP	= { |x| $&resetterminal; result $x } }
 
 #
 # Variables
@@ -803,10 +803,10 @@ if {~ <=$&primitives resetterminal} {
 #	can run without problems even if the environment is not set up
 #	correctly.
 
-home		:= /
-ifs		:= ' ' \t \n
-prompt		:= '; ' ''
-max-eval-depth	:= 640
+home		= /
+ifs		= ' ' \t \n
+prompt		= '; ' ''
+max-eval-depth	= 640
 
 #	noexport lists the variables that are not exported.  It is not
 #	exported, because none of the variables that it refers to are
@@ -819,7 +819,7 @@ max-eval-depth	:= 640
 #	is does.  fn-%dispatch is really only important to the current
 #	interpreter loop.
 
-noexport := noexport pid signals apid bqstatus fn-%dispatch path home
+noexport = noexport pid signals apid bqstatus fn-%dispatch path home
 
 
 #

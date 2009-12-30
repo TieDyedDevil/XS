@@ -1,6 +1,6 @@
 run 'Pushd absolute' {
-	orig := `pwd
-	dir := _m29x8.
+	orig = `pwd
+	dir = _m29x8.
 	mkdir $dir
 	pushd $orig/$dir
 	popd
@@ -10,7 +10,7 @@ run 'Pushd absolute' {
 conds expect-success
 
 run 'Pushd relative' {
-	orig := `pwd
+	orig = `pwd
 	mkdir t
 	pushd t
 	popd
@@ -20,7 +20,7 @@ run 'Pushd relative' {
 conds expect-success
 
 run 'Pushd (no args)' {
-	orig := `pwd
+	orig = `pwd
 	mkdir t
 	pushd t
 	pushd

@@ -403,7 +403,7 @@ produces the output
 .SS "Variables"
 A list may be assigned to a variable, using the notation:
 .Ds
-.Ic var " := " list
+.Ic var " = " list
 .De
 .PP
 Any sequence of non-special characters, except a sequence including
@@ -421,8 +421,8 @@ Any variable which has not been assigned a value returns the empty list
 when referenced.
 In addition, multiple references are allowed:
 .Ds
-.Cr "a := foo"
-.Cr "b := a"
+.Cr "a = foo"
+.Cr "b = a"
 .Cr "echo $$b"
 .De
 .PP
@@ -434,7 +434,7 @@ prints
 A variable's definition may also be removed by
 assigning the empty list to a variable:
 .Ds
-.Ic var :=
+.Ic var =
 .De
 .PP
 Multiple variables may be assigned with a single assignment statment.
@@ -447,25 +447,25 @@ variable is bound to all the remaining list values.
 .PP
 For example,
 .Ds
-.Cr "(a b) := 1 2 3"
+.Cr "(a b) = 1 2 3"
 .De
 .PP
 has the same effect as
 .Ds
-.Cr "a := 1"
-.Cr "b := 2 3"
+.Cr "a = 1"
+.Cr "b = 2 3"
 .Ds
 .PP
 and
 .Ds
-.Cr "(a b c) := 1 2"
+.Cr "(a b c) = 1 2"
 .De
 .PP
 is the same as
 .Ds
-.Cr "a := 1"
-.Cr "b := 2"
-.Cr "c :="
+.Cr "a = 1"
+.Cr "b = 2"
+.Cr "c ="
 .Ds
 .PP
 Note that when assigning values to more than one variable,
@@ -500,9 +500,9 @@ such as concatenation, should be enclosed in parentheses:
 .PP
 Thus:
 .Ds
-.Cr "Good\-Morning := Bonjour"
-.Cr "Guten := Good"
-.Cr "Morgen := Morning"
+.Cr "Good\-Morning = Bonjour"
+.Cr "Guten = Good"
+.Cr "Morgen = Morning"
 .Cr "echo $($Guten^\-^$Morgen)"
 .De
 .PP
@@ -544,7 +544,7 @@ The list of subscripts need
 not be in order or even unique.
 Thus, if
 .Ds
-.Cr "a := one two three"
+.Cr "a = one two three"
 .De
 .PP
 then
@@ -583,7 +583,7 @@ is used as a default value; if
 is omitted, the length of the list is used.
 Thus
 .Ds
-.Cr "* := $*(2 ...)"
+.Cr "* = $*(2 ...)"
 .De
 .PP
 removes the first element of
@@ -625,7 +625,7 @@ For example, the following are all equivalent:
 .Ds
 .Cr "cc \-O \-g \-c malloc.c alloca.c"
 .Cr "cc \-^(O g c) (malloc alloca)^.c"
-.Cr "opts:=O g c; files:=malloc alloca; cc \-$opts $files.c"
+.Cr "opts=O g c; files=malloc alloca; cc \-$opts $files.c"
 .De
 .PP
 .I Xs
@@ -677,7 +677,7 @@ will only perform pattern matching if a metacharacter occurs unquoted and
 literally in the input.
 Thus,
 .Ds
-.Cr "foo := '*'"
+.Cr "foo = '*'"
 .Cr "echo $foo"
 .De
 .PP
@@ -1144,7 +1144,7 @@ Thus the following all produce the same output:
 .Cr "{ echo hello, world }"
 .Cr "{ echo hello, world } foo bar"
 .Cr "xs -c { echo hello, world }"
-.Cr "x := { echo hello, world }; $x"
+.Cr "x = { echo hello, world }; $x"
 .Cr "echo { echo hello, world } | xs"
 .Cr "echo { echo hello, world } > foo; xs < foo"
 .De
@@ -1257,7 +1257,7 @@ the value of the variable is substituted for the first word.
 The above syntax for creating functions is equivalent to the
 variable assignment
 .Ds
-.Ci fn\- name " := { | " parameters " | \fIcommands\fP }"
+.Ci fn\- name " = { | " parameters " | \fIcommands\fP }"
 .De
 .PP
 Functions may be deleted with the syntax
@@ -1267,7 +1267,7 @@ Functions may be deleted with the syntax
 .PP
 which is equivalent to the assignment
 .Ds
-.Ci fn\- name :=
+.Ci fn\- name =
 .De
 .PP
 If, as the most common case, a function variable is bound to a lambda,
@@ -1284,12 +1284,12 @@ Variable assignments may be made local to a set of commands with the
 .Cr local
 construct:
 .Ds
-.Cr "local (\fIvar\fP := \fIvalue\fP; \fIvar\fP := \fIvalue ...\fP) \fIcommand\fP"
+.Cr "local (\fIvar\fP = \fIvalue\fP; \fIvar\fP = \fIvalue ...\fP) \fIcommand\fP"
 .De
 .PP
 The command may be a program fragment, so for example:
 .Ds
-.Cr "local (path := /bin /usr/bin; ifs := ) {"
+.Cr "local (path = /bin /usr/bin; ifs = ) {"
 .Cr "     " ...
 .Cr "}"
 .De
@@ -1313,10 +1313,10 @@ A lexically scoped variable is introduced with a
 .Cr let
 statement:
 .Ds
-.Cr "let (\fIvar\fP := \fIvalue\fP; \fIvar\fP := \fIvalue ...\fP) \fIcommand\fP"
+.Cr "let (\fIvar\fP = \fIvalue\fP; \fIvar\fP = \fIvalue ...\fP) \fIcommand\fP"
 .De
 .PP
-(Also, the ":= value" can be left out with same effect as "var :=")
+(Also, the "= value" can be left out with same effect as "var =")
 .PP
 All references to any of the variables defined in a
 .Cr let
@@ -1340,13 +1340,13 @@ is
 .IR xs 's
 default prompt.)
 .Ds
-.Cr "; x := foo"
-.Cr "; let (x := bar) {"
+.Cr "; x = foo"
+.Cr "; let (x = bar) {"
 .Cr "     echo $x"
 .Cr "     fn lexical { echo $x }"
 .Cr "}"
 .Cr "bar"
-.Cr "; local (x := baz) {"
+.Cr "; local (x = baz) {"
 .Cr "     echo $x"
 .Cr "     fn dynamic { echo $x }"
 .Cr "}"
@@ -1412,9 +1412,9 @@ and
 .Cr HOME
 synchronized.
 .Ds
-.Cr "set-HOME := { ||"
-.Cr "    local (set-home := )"
-.Cr "        home := $*"
+.Cr "set-HOME = { ||"
+.Cr "    local (set-home = )"
+.Cr "        home = $*"
 .Cr "    result $*"
 .Cr "}"
 .De
@@ -1677,7 +1677,7 @@ For example, to run some commands and make sure some cleanup routine
 is called even if the user interrupts or disconnects during the script,
 one can use the form:
 .Ds
-.Cr "local (signals := $signals sighup sigint) {"
+.Cr "local (signals = $signals sighup sigint) {"
 .Cr "     catch { |e|"
 .Cr "          cleanup"
 .Cr "          throw $e"
@@ -1767,7 +1767,7 @@ rather than executing them.
 \fIcmd1\fP ; \fIcmd2\fP	%seq {\fIcmd1\fP} {\fIcmd2\fP}
 \fIcmd1\fP && \fIcmd2\fP	%and {\fIcmd1\fP} {\fIcmd2\fP}
 \fIcmd1\fP || \fIcmd2\fP	%or {\fIcmd1\fP} {\fIcmd2\fP}
-fn \fIname\fP \fIargs\fP { \fIcmd\fP }	fn-^\fIname\fP := { |\fIargs\fP| \fIcmd\fP}
+fn \fIname\fP \fIargs\fP { \fIcmd\fP }	fn-^\fIname\fP = { |\fIargs\fP| \fIcmd\fP}
 .ft R
 .De
 .SS "Input/Output Commands"
@@ -2891,11 +2891,11 @@ This is used for debugging.
 As with any other shell scripting language,
 process forking takes up the majority of time:
 .Ds
-.Cr "x := 0; while {!~ $x 4000} { x := :(x + 1) }
+.Cr "x = 0; while {!~ $x 4000} { x = :(x + 1) }
 .De
 is several magnitudes faster than:
 .Ds
-.Cr "x := 0; while {test $x -ne 4000} { x := :(x + 1) }
+.Cr "x = 0; while {test $x -ne 4000} { x = :(x + 1) }
 .De
 Even though xs's arithmetic code is rather slow, in this
 case the cost of fork+exec far outweighs it.

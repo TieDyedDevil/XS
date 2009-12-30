@@ -262,7 +262,10 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 	
 	if (c == EOF)
 		return ENDFILE;
-	if (!meta[c]) {	/* it's a word or keyword. */
+	if (!meta[c] && c != '=') {	/* it's a word or keyword. */
+		// Special handling for = because it is a pseudo-nonword
+		// It only has special meaning when it stands alone, 
+		// not as part of another word
 		InsertFreeCaret();
 		w = RW;
 		size_t i = 0;
@@ -408,15 +411,33 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 		InsertFreeCaret();
 		c = GETC();
 		w = KW;
-		if (c == '=') {
-			return ASSIGN;
-		} else if (c == '(') {
+		if (c == '(') {
 			yylex_fun = yylex_arithmetic;
 			return ARITH_BEGIN;
 		} else {
 			UNGETC(c);
 			return ':'; 
 		}
+	case '=':
+		c = GETC(); 
+		/* = is allowed as part of a word to mean literal char,
+		     so make sure next character isn't word-forming
+		 */
+		if (nw[c]) {
+			w = NW;
+			UNGETC(c);
+			return ASSIGN;
+		} else {
+			/* Fortunately, there is no need to insert a free
+			   caret, if it is part of a word it was already read
+			   (see the hack at top of yylex_normal)
+		         */
+			UNGETC(c);
+			w = RW;
+			yylval.str = "=";
+			return WORD;	
+		}
+
 	case '(':
 		if (w == RW)	/* not keywords, so let & friends work */
 			c = SUB;
