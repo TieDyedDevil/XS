@@ -128,9 +128,11 @@ fn	: FN word params '{' body '}'	{ $$ = fnassign($2, mklambda($3, $5)); }
 
 first	: comword			{ $$ = $1; }
 	| first '^' sword		{ $$ = mk(nConcat, $1, $3); }
+	| ':'				{ $$ = mk(nWord, ":"); }
 
 sword	: comword			{ $$ = $1; }
 	| keyword			{ $$ = mk(nWord, $1); }
+	| ':'				{ $$ = mk(nWord, ":"); }
 
 word	: sword				{ $$ = $1; }
 	| word '^' sword		{ $$ = mk(nConcat, $1, $3); }
@@ -190,5 +192,4 @@ keyword	: '!'		{ $$ = "!"; }
 	| FOR		{ $$ = "for"; }
 	| FN		{ $$ = "fn"; }
 	| CLOSURE	{ $$ = "%closure"; }
-	| ':'		{ $$ = ":"; }
 
