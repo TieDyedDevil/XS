@@ -247,23 +247,15 @@ extern int printfmt(Format *format, const char *fmt) {
 
 extern int fmtprint (Format * format,  const char * fmt, ...) {
 	int n = -format->flushed;
-#if NO_VA_LIST_ASSIGN
 	va_list saveargs;
-
-	memcpy(saveargs, format->args, sizeof(va_list));
-#else
-	va_list saveargs = format->args;
-#endif
+	va_copy(saveargs, format->args);
 
 
 	va_start(format->args, fmt);
 	n += printfmt(format, fmt);
 	va_end(format->args);
-#if NO_VA_LIST_ASSIGN
-	memcpy(format->args, saveargs, sizeof(va_list));
-#else
-	format->args = saveargs;
-#endif
+
+	va_copy(format->args, saveargs);
 
 	return n + format->flushed;
 }

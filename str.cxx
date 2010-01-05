@@ -30,11 +30,7 @@ private:
 extern char *strv(const char *fmt, va_list args) {
 	Str_format format;
 
-#if NO_VA_LIST_ASSIGN
-	memcpy(format.args, args, sizeof(va_list));
-#else
-	format.args	= args;
-#endif
+	va_copy(format.args, args);
 	format.flushed	= 0;
 
 	printfmt(&format, fmt);

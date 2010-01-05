@@ -123,22 +123,6 @@ fi
 AC_FUNC_WAIT3
 AC_CHECK_FUNCS(strerror strtol lstat setrlimit sigrelse sighold sigaction sysconf setsid)
 
-dnl Check to see if you can assign to a va_list
-AC_CACHE_CHECK(whether assignment to va_list ok?, es_cv_assign_va_list,
-AC_TRY_COMPILE(
-[#ifndef HAVE_STDARG_H
-choke me
-#else
-#include <stdarg.h>
-#endif],
-
-[va_list first, second; first = second; return 0;],
-es_cv_assign_va_list=yes, es_cv_assign_va_list=no))
-if test "$es_cv_assign_va_list" = no
-then
-	AC_DEFINE(NO_VA_LIST_ASSIGN,1,No support for assignment of va_lists)
-fi
-
 dnl check for a u_quad_t or something like that
 AC_CACHE_CHECK(for rlimit type ..., es_cv_rlimit_t,
 AC_CMDSTDOUT_CPP(es_cv_rlimit_t, 
