@@ -401,11 +401,15 @@ produces the output
 .Cr "a\-1 a\-2 b\-1 b\-2 c\-1 c\-2"
 .De
 .SS "Variables"
-A list may be assigned to a variable, using the notation:
+A list may be assigned to a variable, using the notation 
 .Ds
 .Ic var " = " list
 .De
 .PP
+Unfortunately, whitespace is required 
+around the assignment operator, this allows
+it to be treated as a normal string character normally.
+This is true also for assignment in let-forms and the like.
 Any sequence of non-special characters, except a sequence including
 only digits, may be used as a variable name.
 .I Xs
