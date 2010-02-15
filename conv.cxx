@@ -30,7 +30,7 @@ static int treecount(Tree *tree) {
 }
 
 /* binding -- print a binding statement */
-static void binding(Format *f, const char *keyword, Tree *tree) {
+static void binding(Format *f, const char *keyword, Tree *tree, const char *assigner="=") {
 	fmtprint(f, "%s(", keyword);
 	const char *sep = "";
 	for (Tree *np = tree->u[0].p; np != NULL; np = np->u[1].p) {
@@ -38,7 +38,7 @@ static void binding(Format *f, const char *keyword, Tree *tree) {
 		Tree *binding = np->u[0].p;
 		assert(binding != NULL);
 		assert(binding->kind == nAssign);
-		fmtprint(f, "%s%#T = %T", sep, binding->u[0].p, binding->u[1].p);
+		fmtprint(f, "%s%#T %s %T", sep, binding->u[0].p, assigner, binding->u[1].p);
 		sep = ";";
 	}
 	fmtprint(f, ")");
@@ -139,7 +139,8 @@ top:
 		tailcall(n->u[1].p, false);
 
 	case nFor:
-		binding(f, "for", n);
+		/* Same internal structure as binding, different syntax slightly hacked around */
+		binding(f, "for", n, ":");
 		tailcall(n->u[1].p, false);
 
 	case nClosure:
