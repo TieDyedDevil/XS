@@ -446,7 +446,7 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 	case '^':
 	case ')':
 	case '{': 
-		begin_block = true;
+		if (c == '{') begin_block = true;
 	case '}':
 		w = NW;
 		return c;
