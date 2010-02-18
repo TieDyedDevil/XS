@@ -1,4 +1,4 @@
-# initial.es -- set up initial interpreter state ($Revision: 1.1.1.1 $)
+# initial.xs -- set up initial interpreter state ($Revision: 1.1.1.1 $)
 
 
 #
@@ -55,8 +55,6 @@
 #	variables.  The only purpose of this file is to provide initial
 #	values.
 
-
-#
 # Builtin functions
 #
 
@@ -79,10 +77,13 @@ fn-wait		= $&wait
 
 fn-%read	= $&read
 
+
+
+
 #	eval runs its arguments by turning them into a code fragment
 #	(in string form) and running that fragment.
 
-fn eval { '{' ^ $^* ^ '}' }
+fn-eval = { |body| '{' ^ $^body ^ '}' }
 
 #	Through version 0.84 of es, true and false were primitives,
 #	but, as many pointed out, they don't need to be.  These
@@ -90,6 +91,8 @@ fn eval { '{' ^ $^* ^ '}' }
 
 fn-true		= result 0
 fn-false	= result 1
+
+
 
 #	These functions just generate exceptions for control-flow
 #	constructions.  The for command and the while builtin both
@@ -160,11 +163,11 @@ fn-%whatis	= $&whatis
 #	users don't have to type the infamous <= (nee <>) operator.
 #	Whatis also protects the used from exceptions raised by %whatis.
 
-fn var		{ for i : $* { echo <={%var $i} } }
+fn-var	=	{ |args| for i : $args { echo <={%var $i} } }
 
-fn whatis {
+fn-whatis = { |args|
 	let (result) {
-		for i : $* {
+		for i : $args {
 			catch { |e from message|
 				if {!~ $e error} {
 					throw $e $from $message
@@ -232,7 +235,7 @@ fn-switch = { |value args|
 # other args. Whatis prevents infinite recursion.
 fn-alias = { |aliasname program defaultargs|
     let (prog = `{whatis $program})
-	fn $aliasname { $prog $defaultargs $* }
+	fn $aliasname { || $prog $defaultargs $* }
 }
 
 # Like map from functional programming, alt. to loop structures
@@ -257,7 +260,7 @@ fn-omap = { |fn-f list|
 #	error messages than the raw $&cd.  (It also used to search $cdpath,
 #	but that's been moved out of the shell.)
 
-fn cd dir {
+fn-cd = { |dir|
 	if {~ $#dir 1} {
 		$&cd $dir
 	} else if {~ $#dir 0} {
@@ -293,7 +296,7 @@ fn cd dir {
 #	When an internal variable is modified, it becomes exportable,
 #	unless it is on the noexport list.
 
-fn vars {
+fn-vars = { ||
 	# choose default options
 	if {~ $* -a} {
 		* = -v -f -s -e -p -i
@@ -375,7 +378,7 @@ fn-%flatten	= $&flatten
 #	as the first value of its result list.  The default %backquote
 #	puts that value in $bqstatus.
 
-fn %backquote {
+fn-%backquote = { ||
 	let ((status output) = <={ $&backquote $* }) {
 		bqstatus = $status
 		result $output
@@ -432,13 +435,25 @@ fn-%or = { |first rest|
 	}
 }
 
+#       A very simple fn using lambdas
+#       Used to be slightly different built-in to grammar
+fn-fn = { |name body rest|
+	if {!~ $rest ()} {
+		throw error fn 'fn: trailing arguments: ' $rest
+	} 
+	if {~ $name ()} {
+		throw error fn 'fn: missing arguments: correct form: fn name { |args| body }'
+	}
+	fn-$name = $body
+}
+
 #	Background commands could use the $&background primitive directly,
 #	but some of the user-friendly semantics ($apid, printing of the
 #	child process id) were easier to write in es.
 #
 #		cmd &			%background {cmd}
 
-fn %background cmd {
+fn %background { |cmd|
 	let (pid = <={$&background $cmd}) {
 		if {%is-interactive} {
 			echo >[1=2] $pid
@@ -474,7 +489,7 @@ fn-%open-write	= %openfile r+		# <> file
 fn-%open-create	= %openfile w+		# >< file
 fn-%open-append	= %openfile a+		# >>< file, <>> file
 
-fn %one {
+fn %one { ||
 	if {!~ $#* 1} {
 		throw error %one <={
 			if {~ $#* 0} {
@@ -566,7 +581,7 @@ if {~ <=$&primitives readfrom} {
 if {~ <=$&primitives writeto} {
 	fn-%writeto = $&writeto
 } else {
-	fn %writeto var output cmd {
+	fn %writeto { |var output cmd|
 		local ($var = /tmp/es.$var.$pid) {
 			unwind-protect {
 				> $$var
@@ -611,7 +626,7 @@ if {~ <=$&primitives writeto} {
 # Directory push, pretty similar to other pushds (perhaps simpler though)
 # Relies on pwd
 let (dlist = .) {
-	fn pushd dir {
+	fn pushd { |dir|
 		~ $dir () && dir = `/bin/pwd
 		!~ $#dir 1 && (throw error pushd 
 				Wrong number of arguments '('$#dir, should be 0 or 1')'
@@ -651,7 +666,7 @@ fn-%home	= $&home
 #	means that it can be written easier in es.  It is not called for
 #	absolute path names or for functions.
 
-fn %pathsearch name { access -n $name -1e -xf $path }
+fn %pathsearch { |name| access -n $name -1e -xf $path }
 
 #	The exec-failure hook is called in the child if an exec() fails.
 #	A default version is provided (under conditional compilation) for
@@ -744,9 +759,9 @@ fn %interactive-loop {
 #	to a command just causes the command to be executed.)
 
 fn %eval-noprint				# <default>
-fn %eval-print		{ echo $* >[1=2]; $* }	# -x
+fn %eval-print		{ || echo $* >[1=2]; $* }	# -x
 fn %noeval-noprint	{ }			# -n
-fn %noeval-print	{ echo $* >[1=2] }	# -n -x
+fn %noeval-print	{ || echo $* >[1=2] }	# -n -x
 fn-%exit-on-false = $&exitonfalse		# -e
 
 

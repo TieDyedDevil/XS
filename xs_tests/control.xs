@@ -14,8 +14,8 @@ run 'Simple until test' {
 conds expect-success { match good }
 
 run 'Lexical return' {
-    fn a ars { $ars }
-    fn b { a {return}; exit 1 }
+    fn a { |ars| $ars }
+    fn b { || a {return}; exit 1 }
     b
     exit 0
 }

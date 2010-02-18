@@ -8,7 +8,7 @@ let (TMPOUT = /dev/shm/xs.$pid.testout) {
     fn output {
         cat $TMPOUT
     }
-    fn run name code {
+    fn run { |name code|
 	let (dir = /dev/shm/xs.$pid) {
 		rm -fr $dir
 		mkdir $dir
@@ -47,26 +47,27 @@ let (passes = 0
 	exit $fails
     }
 }
-fn conds requirements {
+fn conds { |requirements|
     for req : $requirements {
-    	if {! eval $req} { 
+    	if {! eval $req} {
+            log $req failed
     	    fail
     	    return
     	}
     }
     pass
 }
-fn expect-success {
+fn expect-success { ||
     return $RETURNVALUE
 }
 fn expect-failure {
     ! expect-success
 }
-fn match result {
+fn match { |result|
     log2 Matching...
     ~ `` '' output *^$^result^*
 }
-fn match_re result {
+fn match_re { |result|
     log2 Match_re....
     eval '~ `` '''' output *'^$^result^'*'
 }
@@ -74,10 +75,10 @@ let (dir = `pwd
      logfile = `pwd^/xs.log) 
 {
     echo $dir
-    fn log msg {
+    fn log { |msg|
         echo $msg | tee -a $logfile
     }
-    fn log2 msg {
+    fn log2 { |msg|
 	if $VERBOSE { log $msg } else {echo $msg >> $logfile}
     }
 

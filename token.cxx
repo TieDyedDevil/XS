@@ -243,7 +243,6 @@ static int yylex_normal() {
 	static bool param_block = false;
 	int c;
 
-
 	/* rc variable-names may contain only alnum, '*' and '_', so use dnw if we are scanning one. */
 	const char *meta = (dollar ? dnw : nw);
 	dollar = false;
@@ -280,7 +279,6 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 			if (k == '~')
 				return k;
 		} else if (*buf == 'f') {
-			if (streq(buf + 1, "n"))	return FN;
 			if (streq(buf + 1, "or"))	return FOR;
 		} else if (*buf == 'l') {
 			if (streq(buf + 1, "ocal"))	return LOCAL;
