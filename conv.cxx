@@ -437,7 +437,7 @@ static bool Bconv(Format *f) {
 	DOUBLE_CASE(nConcat, "(concat %B %B)", p);
 	DOUBLE_CASE(nClosure, "(%%closure %B %B)", p);
 	DOUBLE_CASE(nFor, "(for %B $B)", p);
-	DOUBLE_CASE(nLambda, "(lambda %B $B)", p);
+	DOUBLE_CASE(nLambda, "(lambda %B %B)", p);
 	DOUBLE_CASE(nLet, "(let %B %B)", p);
 	DOUBLE_CASE(nLocal, "(local %B %B)", p);
 	DOUBLE_CASE(nMatch, "(match %B %B)", p);
