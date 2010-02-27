@@ -139,14 +139,14 @@ top:
 		tailcall(n->u[1].p, false);
 
 	case nFor:
-		/* Same internal structure as binding, different syntax slightly hacked around */
+		/* Same internal structure as binding, different 
+                   syntax slightly hacked around */
 		binding(f, "for", n, ":");
 		tailcall(n->u[1].p, false);
 
 	case nClosure:
 		binding(f, "%closure", n);
 		tailcall(n->u[1].p, false);
-
 
 	case nCall: {
 		Tree *t = n->u[0].p;
