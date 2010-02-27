@@ -41,7 +41,8 @@ extern List *forkexec(const char *file, const List *list, bool inchild) {
 	return mklist(mkterm(mkstatus(status), NULL), NULL);
 }
 
-/* Sets each value to each values, with proper semantics for things like (a b) := 1 2 3 */
+/* Sets each value to each values, with proper semantics for things like 
+   (a b) = 1 2 3 */
 static void assign_helper(List*& value, List*& values, void *vars) {
 	if (!values) value = NULL;
 	else if (vars == NULL || values->next == NULL) {
