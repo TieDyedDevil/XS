@@ -220,6 +220,7 @@ static void mkenv0(Dict::value_type pair) {
 
 extern Vector* mkenv(void) {
 	if (isdirty || rebound) {
+		env.clear();
 		std::for_each(vars.begin(), vars.end(), mkenv0);
 		
 		isdirty = false;

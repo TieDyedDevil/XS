@@ -63,11 +63,15 @@ fn expect-success { ||
 fn expect-failure {
     ! expect-success
 }
+fn match-abs { |result|
+    log2 Absolute matching...
+    ~ `` '' output $^result
+}
 fn match { |result|
     log2 Matching...
     ~ `` '' output *^$^result^*
 }
-fn match_re { |result|
+fn match-re { |result|
     log2 Match_re....
     eval '~ `` '''' output *'^$^result^'*'
 }
