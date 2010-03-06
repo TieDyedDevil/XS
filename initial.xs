@@ -235,7 +235,7 @@ fn-switch = { |value args|
 # other args. Whatis prevents infinite recursion.
 fn-alias = { |aliasname program defaultargs|
     let (prog = `{whatis $program})
-	fn $aliasname { || $prog $defaultargs $* }
+	fn $aliasname { |*| $prog $defaultargs $* }
 }
 
 # Like map from functional programming, alt. to loop structures
@@ -296,7 +296,7 @@ fn-cd = { |dir|
 #	When an internal variable is modified, it becomes exportable,
 #	unless it is on the noexport list.
 
-fn-vars = { ||
+fn-vars = { |*|
 	# choose default options
 	if {~ $* -a} {
 		* = -v -f -s -e -p -i
@@ -378,7 +378,7 @@ fn-%flatten	= $&flatten
 #	as the first value of its result list.  The default %backquote
 #	puts that value in $bqstatus.
 
-fn-%backquote = { ||
+fn-%backquote = { |*|
 	let ((status output) = <={ $&backquote $* }) {
 		bqstatus = $status
 		result $output
@@ -489,7 +489,7 @@ fn-%open-write	= %openfile r+		# <> file
 fn-%open-create	= %openfile w+		# >< file
 fn-%open-append	= %openfile a+		# >>< file, <>> file
 
-fn %one { ||
+fn %one { |*|
 	if {!~ $#* 1} {
 		throw error %one <={
 			if {~ $#* 0} {
@@ -759,9 +759,9 @@ fn %interactive-loop {
 #	to a command just causes the command to be executed.)
 
 fn %eval-noprint				# <default>
-fn %eval-print		{ || echo $* >[1=2]; $* }	# -x
+fn %eval-print		{ |*| echo $* >[1=2]; $* }	# -x
 fn %noeval-noprint	{ }			# -n
-fn %noeval-print	{ || echo $* >[1=2] }	# -n -x
+fn %noeval-print	{ |*| echo $* >[1=2] }	# -n -x
 fn-%exit-on-false = $&exitonfalse		# -e
 
 

@@ -1191,25 +1191,11 @@ If there are more arguments than parameters,
 the last named variable is assigned all the remaining arguments;
 if there are fewer, the parameters for which there are no arguments
 are bound to the empty list.
-If no parameters are listed, the variable named
-.Cr *
-is assigned all the arguments of the lambda.
-.PP
-As a small example,
-.Ds
-.Cr "{ || echo $* } hi"
-.De
-.PP
-is a complicated way of producing the output
-.Cr hi .
-The first word is a function which echoes its
-arguments, and the second word is the argument to the function, the word
-.Cr hi .
 .PP
 Lambdas, like other program fragments, can appear anywhere in a list.
 A more complicated example in the same spirit:
 .Ds
-.Cr "{ |cmd arg| $cmd $arg } { || echo $* } hi"
+.Cr "{ |cmd arg| $cmd $arg } { |*| echo $* } hi"
 .De
 .PP
 This command executes a lambda which runs its first argument, named
@@ -1411,7 +1397,7 @@ and
 .Cr HOME
 synchronized.
 .Ds
-.Cr "set-HOME = { ||"
+.Cr "set-HOME = { |*|"
 .Cr "    local (set-home = )"
 .Cr "        home = $*"
 .Cr "    result $*"

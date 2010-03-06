@@ -252,8 +252,6 @@ top:
 
 /* bindargs -- bind an argument list to the parameters of a lambda */
 extern Binding *bindargs(Tree* params, List* args, Binding* binding) {
-	if (!params) return mkbinding("*", args, binding);
-
 	List* value;
 	Tree* param;
 	for (; params; params = params->u[1].p) {
