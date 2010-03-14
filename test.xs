@@ -48,7 +48,7 @@ let (passes = 0
     }
 }
 fn conds { |requirements|
-    for req : $requirements {
+    for req $requirements {
     	if {! eval $req} {
             log $req failed
     	    fail
@@ -87,7 +87,7 @@ let (dir = `pwd
     }
 
     rm -f $logfile
-    for file : $dir/xs_tests/*.xs {
+    for file $dir/xs_tests/*.xs {
 	log2 Running $file
 	local (FILE = $file; XS = $dir/xs) . $DOTARGS $FILE
     }

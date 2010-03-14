@@ -1349,7 +1349,7 @@ Function (lambda) parameters are lexically bound to their values.
 .SS "For loops"
 The command
 .Ds
-.Cr "for \fIvar\fP : \fIlist\fP { \fIcommand\fP }
+.Cr "for \fIvar\fP \fIlist\fP { \fIcommand\fP }
 .De
 .PP
 Runs the
@@ -1358,6 +1358,8 @@ once for each element of the
 .IR list ,
 with the named variable bound lexically to each
 element of the list, in order.
+Note that if list consists of more than a single term,
+for example (a b c) it must be parenthesized.
 .PP
 If multiple bindings are given in the
 .Cr for
@@ -1368,7 +1370,7 @@ the corresponding variable is bound to the empty list
 for the remaining iterations.
 Thus the loop
 .Ds
-.Cr "for i : a b c; j : x y { echo $#i $i $#j $j" }
+.Cr "for i (a b c); j (x y) { echo $#i $i $#j $j" }
 .De
 .PP
 produces the output

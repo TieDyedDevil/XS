@@ -60,3 +60,10 @@ run 'Free-standing equals incorectly placed fails' {
 	$XS -c 'echo g = h'
 }
 conds expect-failure
+
+run 'For across infix list' {
+	for x (1 2 3) {
+		echo -n $x
+	}
+}
+conds {match 123}

@@ -33,7 +33,7 @@ extern const char nw[] = {
 	1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0,		/*   0 -  15 */
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,		/*  16 -  32 */
 	1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0,		/* ' ' - '/' */
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0,		/* '0' - '?' */
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0,		/* '0' - '?' */
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,		/* '@' - 'O' */
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0,		/* 'P' - '_' */
 	1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,		/* '`' - 'o' */
@@ -303,6 +303,10 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 		c = GETC();
 		if (c == '`')
 			return BACKBACK;
+		else if (c == '(') {
+			yylex_fun = yylex_arithmetic;
+			return ARITH_BEGIN;
+		}
 		UNGETC(c);
 		return '`';
 	case '$':
@@ -405,17 +409,6 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 		newline = true;
 		w = NW;
 		return NL;
-	case ':':
-		InsertFreeCaret();
-		c = GETC();
-		w = KW;
-		if (c == '(') {
-			yylex_fun = yylex_arithmetic;
-			return ARITH_BEGIN;
-		} else {
-			UNGETC(c);
-			return ':'; 
-		}
 	case '=':
 		c = GETC(); 
 		/* = is allowed as part of a word to mean literal char,

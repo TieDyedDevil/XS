@@ -2,6 +2,7 @@
 
 #include "es.hxx"
 #include "print.hxx"
+#include "syntax.hxx"
 #include <map> 
 #include <time.h>
 #include <stdint.h>
@@ -30,18 +31,19 @@ static int treecount(Tree *tree) {
 }
 
 /* binding -- print a binding statement */
-static void binding(Format *f, const char *keyword, Tree *tree, const char *assigner="=") {
-	fmtprint(f, "%s(", keyword);
+static void binding(Format *f, const char *keyword, Tree *tree, const char *assigner="=", bool surround_paren=true) {
+	fmtprint(f, "%s", keyword);
+	if (surround_paren) fmtprint(f, "(");
 	const char *sep = "";
 	for (Tree *np = tree->u[0].p; np != NULL; np = np->u[1].p) {
 		assert(np->kind == nList);
 		Tree *binding = np->u[0].p;
 		assert(binding != NULL);
 		assert(binding->kind == nAssign);
-		fmtprint(f, "%s%#T %s %T", sep, binding->u[0].p, assigner, binding->u[1].p);
+		fmtprint(f, "%s%#T %s (%T)", sep, binding->u[0].p, assigner, binding->u[1].p);
 		sep = ";";
 	}
-	fmtprint(f, ")");
+	if (surround_paren) fmtprint(f, ")");
 }
 
 static std::string arith_dump(Tree *expr) {
@@ -141,8 +143,9 @@ top:
 	case nFor:
 		/* Same internal structure as binding, different 
                    syntax slightly hacked around */
-		binding(f, "for", n, ":");
-		tailcall(n->u[1].p, false);
+		binding(f, "for", n, "", false);
+		/* Braces are mandatory, so thunkify required */
+		tailcall(thunkify(n->u[1].p), false);
 
 	case nClosure:
 		binding(f, "%closure", n);

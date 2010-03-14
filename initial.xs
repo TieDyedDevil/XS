@@ -163,11 +163,11 @@ fn-%whatis	= $&whatis
 #	users don't have to type the infamous <= (nee <>) operator.
 #	Whatis also protects the used from exceptions raised by %whatis.
 
-fn-var	=	{ |args| for i : $args { echo <={%var $i} } }
+fn-var	=	{ |args| for i $args { echo <={%var $i} } }
 
 fn-whatis = { |args|
 	let (result) {
-		for i : $args {
+		for i $args {
 			catch { |e from message|
 				if {!~ $e error} {
 					throw $e $from $message
@@ -219,7 +219,7 @@ fn-switch = { |value args|
 		}
 		result $value
 	} {
-		for (cond action) : $args {
+		for (cond action) $args {
 			if {~ $action ()} { 
 				# Code for default action
 				break <={$cond}
@@ -245,7 +245,7 @@ fn-alias = { |aliasname program defaultargs|
 
 fn-map = { |fn-f list|
 	let (result)
-		for item : $list {
+		for item $list {
 			result = $result <={f $item}
 		}
 }
@@ -310,9 +310,9 @@ fn-vars = { |*|
 		sets	= false
 		export	= false
 		priv	= false
-		intern	= false
-	) {
-		for i : $* {( 
+		intern	= false )
+	{
+		for i $* {( 
 			switch $i 
 				-v		{vars	= true}
 				-f		{fns	= true}
@@ -333,7 +333,7 @@ fn-vars = { |*|
 				} { echo <={%var $var} }
 			}
 			if {$export || $priv} {
-				for var : <= $&vars {
+				for var (<= $&vars) {
 					# if not exported but in priv
 					if {if {~ $var $noexport} $priv else $export} {
 						$dovar $var
@@ -341,7 +341,7 @@ fn-vars = { |*|
 				}
 			}
 			if {$intern} {
-				for var : <= $&internals {
+				for var (<= $&internals) {
 					$dovar $var
 				}
 			}
