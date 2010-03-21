@@ -63,7 +63,6 @@
 
 fn-.		= $&dot
 fn-access	= $&access
-fn-break	= $&break
 fn-catch	= $&catch
 fn-echo		= $&echo
 fn-exec		= $&exec
@@ -95,12 +94,10 @@ fn-false	= result 1
 
 
 #	These functions just generate exceptions for control-flow
-#	constructions.  The for command and the while builtin both
-#	catch the break exception.
+#	constructions. 
 #	The interpreter main() routine (and nothing else)
 #	catches the exit exception.
 
-fn-break	= throw break
 fn-exit		= throw exit
 
 
@@ -110,6 +107,20 @@ fn-if = { |condition action else actions|
               {!~ $else ()} {
                 throw error if 'if: expected else, got: '^$else^' '$^actions
               })
+}
+
+let (nextid = 0) {
+	fn-escape = { |body|
+		nextid = `($nextid + 1)
+		let (id = _escape$nextid) {
+			catch { |e val| 
+				(if {!~ $e $id} { throw $e }
+				 else           { result $val })
+			} {
+				$body { |val| throw $id $val }
+			}
+		}
+	}
 }
 
 #	unwind-protect is a simple wrapper around catch that is used
@@ -185,49 +196,36 @@ fn-whatis = { |args|
 
 #	The while function is implemented with the forever looping primitive.
 #	While uses to indicate that, while it is a lambda, it
-#	does not catch the return exception.  It does, however, catch break.
+#	does not catch the return exception.
 
-fn-while = { |cond body|
-	catch { |e value|
-		if {!~ $e break} {
-			throw $e $value
-		}
-		result $value
-	} {
-		let (result = <=true)
-			forever {
-				if {!$cond} {
-					throw break $result
-				} else {
-					result = <=$body
-				}
+fn-while = { |cond body| escape { |fn-return|
+	let (result = <=true)
+		forever {
+			if {!$cond} {
+				return $result
+			} else {
+				result = <=$body
 			}
-	}
-}
+		}
+}}
 
 fn-until = { |cond body|
 	while { ! $cond } $body
 }
 
-fn-switch = { |value args|
+fn-switch = { |value args| escape { |fn-return|
 	if {~ $args ()} {
 		throw error switch 'usage: switch value [case1 action1] [case2 action2]...default'
 	}
-	catch { |e value|
-		if {!~ $e break} {
-			throw $e $value
-		}
-		result $value
-	} {
-		for (cond action) $args {
-			if {~ $action ()} { 
-				# Code for default action
-				break <={$cond}
-			}
-			~ $value $cond && break <={$action}
+	for (cond action) $args {
+		if {~ $action ()} { 
+			# Code for default action
+			result <={$cond}
+		} else {
+			~ $value $cond && return <={$action}
 		}
 	}
-}
+}}
 
 # Somewhat like bash's alias, but simpler
 # Create's new method named aliasname which
@@ -714,10 +712,6 @@ if {~ <=$&primitives execfailure} {fn-%exec-failure = $&execfailure}
 #	Other than eof, %interactive-loop does not exit on exceptions,
 #	where %batch-loop does.
 #
-#	The looping construct forever is used rather than while, because
-#	while catches the break exception, which would make it difficult
-#	to print ``break outside of loop'' errors.
-#
 #	The parsed code is executed only if it is non-empty, because otherwise
 #	result gets set to zero when it should not be.
 
@@ -725,7 +719,7 @@ fn-%parse	= $&parse
 fn-%batch-loop	= $&batchloop
 fn-%is-interactive = $&isinteractive
 
-fn %interactive-loop {
+fn %interactive-loop { escape |fn-return| {
 	let (result = <=true) {
 		catch { |e type msg|
                 	(switch $e  
@@ -752,7 +746,7 @@ fn %interactive-loop {
 			}
 		}
 	}
-}
+}}
 
 #	These functions are potentially passed to a REPL as the %dispatch
 #	function.  (For %eval-noprint, note that an empty list prepended

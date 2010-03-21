@@ -360,14 +360,14 @@ Since lists can span multiple lines without explicit line
 continuations, they are ideal for long commands. For example:
 .Ds
 .Cr "switch $x \e"
-.Cr "   error   { return 1 } \e"
+.Cr "   error   { result 1 } \e"
 .Cr "   warning { break } \e"
 .Cr "   good    { echo no problem  }"
 .De
 .PP is the same as
 .Ds
 .Cr "switch $x ("
-.Cr "   error   { break }" 
+.Cr "   error   { result 1 }" 
 .Cr "   warning { break }"
 .Cr "   good    { echo no problem  }"
 .Cr ")"
@@ -1444,9 +1444,7 @@ Exceptions in
 are used for many forms of non-structured control flow,
 notably error reporting, signals, and flow of control
 constructs such as
-.Cr break
-and
-.Cr return .
+.Cr escape .
 .PP
 Exceptions are passed up the call chain to catching routines.
 A catcher may decide to intercept an exception,
@@ -1458,10 +1456,6 @@ Exceptions are represented by lists.
 The first word of an exception is, by convention, the type of exception
 being raised.
 The following exceptions are known:
-.TP
-.Cr "break \fIvalue\fP"
-Exit from a loop or a switch.
-The return value of the loop/switch is the argument to the exception.
 .TP
 .Cr eof
 Raised by
@@ -1484,14 +1478,6 @@ When raised from a signal catcher,
 causes the body of the
 .Cr catch
 clause to be run again.
-.TP
-.Cr "return \fIvalue\fP"
-Causes the lexically-matching function to exit, with
-.I value
-as the return value (exit status). This function is somewhat special
-in that it exists only in the scope of it's matching function.
-Also, while it is implemented with exceptions, return is lexically-scoped
-as far as the user is concerned.
 .TP
 .Cr "signal \fIsigname\fP"
 Raised when the shell itself receives a signal,
@@ -1926,6 +1912,22 @@ then all other arguments are echoed literally;
 this is used for echoing a literal
 .Cr "\-n" .
 .TP
+.Cr "escape \fIlambda\fP"
+Run lambda with one argument, an escape block
+which when evaulated will return to the point after this escape.
+This is more formally refered to as an escape continuation.
+In fact, it's behaviour is a simple subset of exceptions, and is implemented
+fairly simply using catch.
+Escape is useful to replace return/break like constructs; for example
+.Ds
+.Cr "fn f { escape |fn-return| {
+.Cr "    ...; return 0;"
+.Cr "    ..."
+.Cr "}"
+.De
+.TP
+will exit the function with result 0 when it reached the return. 
+.TP
 .Cr "eval \fIlist\fP"
 Concatenates the elements of
 .I list
@@ -2123,11 +2125,6 @@ Returns its arguments.
 This is
 .IR xs 's
 identity function.
-.TP
-.Cr "return \fIvalue\fP"
-Causes the current function to exit,
-returning the named
-.IR value .
 .TP
 .Cr "switch \fIvalue\fP \fI\fR[\fPcase1 action1\fR]\fP\fP...\fI\fR[\fPdefault-action\fR]\fP\fP"
 Go through the list of cases, 

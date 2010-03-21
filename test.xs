@@ -47,7 +47,7 @@ let (passes = 0
 	exit $fails
     }
 }
-fn conds { |requirements|
+fn conds { |requirements| escape { |fn-return|
     for req $requirements {
     	if {! eval $req} {
             log $req failed
@@ -56,9 +56,10 @@ fn conds { |requirements|
     	}
     }
     pass
-}
+}}
+
 fn expect-success { ||
-    return $RETURNVALUE
+    result $RETURNVALUE
 }
 fn expect-failure {
     ! expect-success
