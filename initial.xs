@@ -232,8 +232,8 @@ fn-switch = { |value args| escape { |fn-return|
 # calls program with defaultargs first and then
 # other args. Whatis prevents infinite recursion.
 fn-alias = { |aliasname program defaultargs|
-    let (prog = `{whatis $program})
-	fn $aliasname { |*| $prog $defaultargs $* }
+    let (prog = `{which $program})
+	fn $aliasname { |args| $prog $defaultargs $args }
 }
 
 # Like map from functional programming, alt. to loop structures
