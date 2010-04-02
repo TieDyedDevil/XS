@@ -174,13 +174,10 @@ static List* glob0(List* list, StrList* quote) {
 		if (
 			quote->str == QUOTED
 			|| !haswild((str = getstr(list->term)), quote->str)
+                        || (expand1 = glob1(str, quote->str)) == NULL // No matches
 		) {
 			*prevp = list;
 			prevp = &list->next;
-		} else if ((expand1 = glob1(str, quote->str)) == NULL) {
-			list->term->str = ""; 
-			*prevp = list;
-			prevp = &list->next;			
 		} else {
 			assert (expand1);
 			assert (length(expand1) >= 1);
