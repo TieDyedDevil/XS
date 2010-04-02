@@ -719,7 +719,7 @@ fn-%parse	= $&parse
 fn-%batch-loop	= $&batchloop
 fn-%is-interactive = $&isinteractive
 
-fn %interactive-loop { escape |fn-return| {
+fn %interactive-loop { escape { |fn-return|
 	let (result = <=true) {
 		catch { |e type msg|
                 	(switch $e  
