@@ -1,7 +1,7 @@
 /* main.c -- initialization for es ($Revision: 1.3 $) */
 
 #include "es.hxx"
-#include "scheme.h"
+#include <libguile.h>
 
 extern int optind;
 extern char *optarg;
@@ -83,7 +83,7 @@ static void usage(void) {
 
 
 /* run (fake main) -- initialize, parse command arguments, and start running */
-int run(Scheme_Env *e, int argc, char **argv) {
+static void run(void *e, int argc, char **argv) {
 	GC_init();
 	int c;
 	volatile int ac;
@@ -173,32 +173,33 @@ getopt_done:
 			char *file = av[optind++];
 			if ((fd = eopen(file, oOpen)) == -1) {
 				eprint("%s: %s\n", file, esstrerror(errno));
-				return 1;
+				exit(1);
 			}
 			vardef("*", NULL, listify(ac - optind, av + optind));
 			vardef("0", NULL, mklist(mkstr(file), NULL));
-			return exitstatus(runfd(fd, file, runflags));
+			exit(exitstatus(runfd(fd, file, runflags)));
 		}
 
 		vardef("*", NULL, listify(ac - optind, av + optind));
 		vardef("0", NULL, mklist(mkstr(av[0]), NULL));
 		if (cmd != NULL)
-			return exitstatus(runstring(cmd, NULL, runflags));
-		return exitstatus(runfd(0, "stdin", runflags));
+			exit(exitstatus(runstring(cmd, NULL, runflags)));
+		exit(exitstatus(runfd(0, "stdin", runflags)));
 
 	} catch (List *e) {
 		if (termeq(e->term, "exit"))
-			return exitstatus(e->next);
+			exit(exitstatus(e->next));
 		else if (termeq(e->term, "error"))
 			eprint("%L\n",
 			       e->next == NULL ? NULL : e->next->next,
 			       " ");
 		else if (!issilentsignal(e))
 			eprint("uncaught exception: %L\n", e, " ");
-		return 1;
+		exit(1);
 	}
 }
 
 int main(int argc, char **argv) {
-	return scheme_main_setup(1, run, argc, argv);
+	scm_boot_guile(argc, argv, run, 0);
+	return 0;
 }

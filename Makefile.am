@@ -1,6 +1,7 @@
 # Makefile for xs
 
 AM_YFLAGS = -d
+AM_CXXFLAGS = $(GUILE_CFLAGS)
 #AUTOMAKE_OPTIONS = dejagnu
 RUNTESTDEFAULTFLAGS = --tool xs XS=`pwd`/xs --srcdir $$srcdir/testsuite --debug
 
@@ -24,10 +25,12 @@ GEN	= parse.h parse.cxx parse.output sigmsgs.cxx initial.cxx
 
 BUILT_SOURCES = parse.h
 xs_SOURCES = $(COMMON_FILES) initial.cxx main.cxx
+xs_LDADD = $(GUILE_LIBS)
 #ctest_SOURCES = tests/test_print.cxx tests/test_util.cxx tests/all_tests.cxx $(COMMON_FILES)
 #ctest_LDADD = -lcgreen -lm
 
 xsdump_SOURCES = $(COMMON_FILES) dump.cxx main.cxx
+xsdump_LDADD = $(xs_LDADD)
 
 
 MANIFEST:

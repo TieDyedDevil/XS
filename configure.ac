@@ -39,6 +39,8 @@ if test "$debug_build" = yes; then
 fi
 
 
+dnl Guile
+PKG_CHECK_MODULES([GUILE], [guile-2.0])
 
 dnl Old solaris compatibility stuff
 
