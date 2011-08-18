@@ -367,8 +367,7 @@ static List *calculate(Tree *expr, Binding *binding) {
 		// Integer division by 0 causes issues
 		if (isint(b) and toint(b) == 0)
 			return tolist(std::numeric_limits<double>::infinity());
-		List *l = OP(std::divides, a, b);
-		
+		return OP(std::divides, a, b);
 	}
 }
 
