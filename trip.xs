@@ -98,7 +98,7 @@ if {!~ `umask 027 0027} {
 # redirections
 #
 
-fn bytes { |*| for i $* { let(x  =  `{wc -c $i}) echo $x(1) } }
+fn bytes { |*| each $* { |i| let(x  =  `{wc -c $i}) echo $x(1) } }
 echo foo > foo > bar
 if {!~ `{bytes foo} 0} { fail double redirection created non-empty empty file }
 if {!~ `{bytes bar} 4} { fail 'double redirection created wrong sized file:' `{bytes bar} }

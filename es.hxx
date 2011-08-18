@@ -48,7 +48,7 @@ struct Closure {
  */
 
 enum NodeKind {
-	nAssign, nCall, nClosure, nConcat, nFor, nLambda, nLet, nList, nLocal,
+	nAssign, nCall, nClosure, nConcat, nLambda, nLet, nList, nLocal,
 	nMatch, nExtract, nPrim, nQword, nThunk, nVar, nVarsub, nWord,
 	nArith, nPlus, nMinus, nMult, nDivide, nInt, nFloat,
 	nRedir, nPipe		/* only appear during construction */

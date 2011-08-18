@@ -140,13 +140,6 @@ top:
 		binding(f, "let", n);
 		tailcall(n->u[1].p, false);
 
-	case nFor:
-		/* Same internal structure as binding, different 
-                   syntax slightly hacked around */
-		binding(f, "for", n, "", false);
-		/* Braces are mandatory, so thunkify required */
-		tailcall(thunkify(n->u[1].p), false);
-
 	case nClosure:
 		binding(f, "%closure", n);
 		tailcall(n->u[1].p, false);
@@ -439,7 +432,6 @@ static bool Bconv(Format *f) {
 	DOUBLE_CASE(nAssign, "(assign %B %B)", p);
 	DOUBLE_CASE(nConcat, "(concat %B %B)", p);
 	DOUBLE_CASE(nClosure, "(%%closure %B %B)", p);
-	DOUBLE_CASE(nFor, "(for %B $B)", p);
 	DOUBLE_CASE(nLambda, "(lambda %B %B)", p);
 	DOUBLE_CASE(nLet, "(let %B %B)", p);
 	DOUBLE_CASE(nLocal, "(local %B %B)", p);

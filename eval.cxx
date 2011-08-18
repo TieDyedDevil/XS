@@ -124,69 +124,6 @@ const static List *local(Tree *defn, Tree* body,
 	return localbind(dynamic, bindings, body, evalflags);
 }
 
-/* forloop -- evaluate a for loop */
-const static List *forloop(Tree* defn, Tree* body,
-			 Binding* outer, int evalflags) {
-	static List MULTIPLE = { NULL, NULL };
-
-	Binding* looping = NULL;
-	for (; defn != NULL; defn = defn->u[1].p) {
-		assert(defn->kind == nList);
-		if (defn->u[0].p == NULL)
-			continue;
-		Tree* assign = defn->u[0].p;
-		assert(assign->kind == nAssign);
-		List* vars = glom(assign->u[0].p, outer, false);
-		List* list = glom(assign->u[1].p, outer, true);
-		if (vars == NULL)
-			fail("es:for", "null variable name");
-		for (; vars != NULL; vars = vars->next) {
-			const char* var = getstr(vars->term);
-			looping = mkbinding(var, list, looping);
-			list = &MULTIPLE;
-		}
-		SIGCHK();
-	}
-	looping = reversebindings(looping);
-
-	bool allnull;
-	Binding *bp, *lp, *sequence; 
-	List* value;
-	const List* result = ltrue;
-
-	try {
-		for (;;) {
-			allnull = true;
-			bp = outer;
-			lp = looping;
-			sequence = NULL;
-			for (; lp != NULL; lp = lp->next) {
-				value = NULL;
-				if (lp->defn != &MULTIPLE)
-					sequence = lp;
-				assert(sequence != NULL);
-				if (sequence->defn != NULL) {
-					value = mklist(sequence->defn->term,
-							   NULL);
-					sequence->defn = sequence->defn->next;
-					allnull = false;
-				}
-				bp = mkbinding(lp->name, value, bp);
-			}
-			if (allnull) {
-				break;
-			}
-			result = walk(body, bp, evalflags & eval_exitonfalse);
-			SIGCHK();
-		}
-	} catch (List *e) {
-		if (!termeq(e->term, "break"))
-			throw e;
-		return e->next;
-	}
-	return result;
-}
-
 /* matchpattern -- does the text match a pattern? */
 static const List *matchpattern(Tree* subjectform, Tree* patternform,
 			  Binding* binding) {
@@ -232,9 +169,6 @@ top:
 
 		case nLocal:
 		return local(tree->u[0].p, tree->u[1].p, binding, flags);
-
-		case nFor:
-		return forloop(tree->u[0].p, tree->u[1].p, binding, flags);
 
 		case nMatch:
 		return matchpattern(tree->u[0].p, tree->u[1].p, binding);

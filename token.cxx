@@ -278,8 +278,6 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 			int k = *buf;
 			if (k == '~')
 				return k;
-		} else if (*buf == 'f') {
-			if (streq(buf + 1, "or"))	return FOR;
 		} else if (*buf == 'l') {
 			if (streq(buf + 1, "ocal"))	return LOCAL;
 			if (streq(buf + 1, "et"))	return LET;

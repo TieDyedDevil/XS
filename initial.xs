@@ -174,11 +174,11 @@ fn-%whatis	= $&whatis
 #	users don't have to type the infamous <= (nee <>) operator.
 #	Whatis also protects the used from exceptions raised by %whatis.
 
-fn-var	=	{ |args| for i $args { echo <={%var $i} } }
+fn-var	=	{ |args| each $args { |i| echo <={%var $i} } }
 
 fn-whatis = { |args|
 	let (result) {
-		for i $args {
+		each $args { |i|
 			catch { |e from message|
 				if {!~ $e error} {
 					throw $e $from $message
@@ -195,8 +195,6 @@ fn-whatis = { |args|
 }
 
 #	The while function is implemented with the forever looping primitive.
-#	While uses to indicate that, while it is a lambda, it
-#	does not catch the return exception.
 
 fn-while = { |cond body| escape { |fn-return|
 	let (result = <=true)
@@ -213,11 +211,12 @@ fn-until = { |cond body|
 	while { ! $cond } $body
 }
 
-fn-switch = { |value args| escape { |fn-return|
+fn-switch = { |value args| let (cond; action) escape { |fn-return|
 	if {~ $args ()} {
 		throw error switch 'usage: switch value [case1 action1] [case2 action2]...default'
 	}
-	for (cond action) $args {
+	until {~ $args ()} {
+		(cond action args) = $args
 		if {~ $action ()} { 
 			# Code for default action
 			result <={$cond}
@@ -227,6 +226,31 @@ fn-switch = { |value args| escape { |fn-return|
 	}
 }}
 
+
+# Like map from functional programming, alt. to loop structures
+# Different in that if f returns a list,
+# it becomes multiple elements in the new list
+
+fn-map = { |fn-f list|
+	let (result; item) escape { |fn-return|
+		until {~ $list ()}  {
+			(item list) = $list
+			result = $result <={f $item}
+		}
+	}
+}
+
+# We dropped the for construct from the language, instead there is each
+fn-each = { |args| 
+	if {~ $#args 0 || ~ $#args 1} {
+		throw error each 'not enough arguments to each'
+	}
+	let (fn-f = $args($#args)
+	     nargs = $#args) # ugliness of arithmetic may be killed by embedding scheme later?
+		map $fn-f $args(... `($nargs - 1))
+}
+
+## EXPERIMENTAL
 # Somewhat like bash's alias, but simpler
 # Create's new method named aliasname which
 # calls program with defaultargs first and then
@@ -236,17 +260,6 @@ fn-alias = { |aliasname program defaultargs|
 	fn $aliasname { |args| $prog $defaultargs $args }
 }
 
-# Like map from functional programming, alt. to loop structures
-# Different in that if f returns a list,
-# it becomes multiple elements in the new list
-# Returns value as list (since last operation is assign, no return needed)
-
-fn-map = { |fn-f list|
-	let (result)
-		for item $list {
-			result = $result <={f $item}
-		}
-}
 
 # Like map, but uses output (without splitting) of f
 fn-omap = { |fn-f list|
@@ -310,7 +323,7 @@ fn-vars = { |*|
 		priv	= false
 		intern	= false )
 	{
-		for i $* {( 
+		each $* {|i| ( 
 			switch $i 
 				-v		{vars	= true}
 				-f		{fns	= true}
@@ -331,7 +344,7 @@ fn-vars = { |*|
 				} { echo <={%var $var} }
 			}
 			if {$export || $priv} {
-				for var (<= $&vars) {
+				each (<= $&vars) { |var|
 					# if not exported but in priv
 					if {if {~ $var $noexport} $priv else $export} {
 						$dovar $var
@@ -339,7 +352,7 @@ fn-vars = { |*|
 				}
 			}
 			if {$intern} {
-				for var (<= $&internals) {
+				each (<= $&internals) { |var|
 					$dovar $var
 				}
 			}
@@ -720,7 +733,7 @@ fn-%batch-loop	= $&batchloop
 fn-%is-interactive = $&isinteractive
 
 fn %interactive-loop { escape { |fn-return|
-	let (result = <=true) {
+	let (result = <=true) forever {
 		catch { |e type msg|
                 	(switch $e  
 				eof {return $result} 
@@ -732,16 +745,13 @@ fn %interactive-loop { escape { |fn-return|
 				         }
                                 }
 				{ echo >[1=2] 'uncaught exception:' $e $type $msg })
-			throw retry # restart forever loop
 		} {
-			forever {
-				$&if {!~ $#fn-%prompt 0} {
-					%prompt
-				}
-				let (code = <={%parse $prompt}) {
-					$&if {!~ $#code 0} {
-						result = <={$fn-%dispatch $code}
-					}
+			$&if {!~ $#fn-%prompt 0} {
+				%prompt
+			}
+			let (code = <={%parse $prompt}) {
+				$&if {!~ $#code 0} {
+					result = <={$fn-%dispatch $code}
 				}
 			}
 		}

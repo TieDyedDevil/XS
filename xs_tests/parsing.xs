@@ -61,8 +61,8 @@ run 'Free-standing equals incorectly placed fails' {
 }
 conds expect-failure
 
-run 'For across infix list' {
-	for x (1 2 3) {
+run 'Each across infix list' {
+	each (1 2 3) { |x|
 		echo -n $x
 	}
 }

@@ -25,7 +25,7 @@ extern Tree *mk (NodeKind  t, ...) {
 		n = newtree<1>();
 		n->u[0].p = va_arg(ap, Tree *);
 		break;
-	    case nAssign:  case nConcat: case nClosure: case nFor:
+	    case nAssign:  case nConcat: case nClosure:
 	    case nLambda: case nLet: case nList:  case nLocal:
 	    case nVarsub: case nMatch: case nExtract:
 	    case nRedir: case nMinus: case nPlus:
