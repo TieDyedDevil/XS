@@ -276,9 +276,8 @@ class Dict : public Dict_map,
 {
 public:
     Var*& operator[](std::string index) {
-        int icount = count(index);
         Var*& res = Dict_map::operator[](index);
-        assert (res != NULL || icount == 0);
+        assert (res != NULL || count(index) == 0);
         return res;
     }
 };
