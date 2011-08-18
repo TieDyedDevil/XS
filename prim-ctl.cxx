@@ -63,7 +63,6 @@ PRIM(catch) {
 					 evalflags);
 				unblocksignals();
 			} catch (List *fromcatcher) {
-
 				if (termeq(fromcatcher->term, "retry")) {
 					retry = true;
 					unblocksignals();

@@ -1346,39 +1346,6 @@ default prompt.)
 Lexically bound variables are not exported into the environment,
 and never cause the invocation of settor functions.
 Function (lambda) parameters are lexically bound to their values.
-.SS "For loops"
-The command
-.Ds
-.Cr "for \fIvar\fP \fIlist\fP { \fIcommand\fP }
-.De
-.PP
-Runs the
-.I command
-once for each element of the
-.IR list ,
-with the named variable bound lexically to each
-element of the list, in order.
-Note that if list consists of more than a single term,
-for example (a b c) it must be parenthesized.
-.PP
-If multiple bindings are given in the
-.Cr for
-statement, the looping occurs in parallel and
-stops when all lists are exhausted.
-When one list is finished before the others,
-the corresponding variable is bound to the empty list
-for the remaining iterations.
-Thus the loop
-.Ds
-.Cr "for i (a b c); j (x y) { echo $#i $i $#j $j" }
-.De
-.PP
-produces the output
-.Ds
-.Cr "1 a 1 x"
-.Cr "1 b 1 y"
-.Cr "1 c 0"
-.De
 .SS "Settor Functions"
 A settor function is a variable of the form
 .Ci set- var\fR,
@@ -1437,7 +1404,7 @@ the primitive
 .PP
 For details on specific primitives, see the section entitled
 .B PRIMITIVES
-below.
+below.  
 .SS Exceptions
 Exceptions in
 .I xs
@@ -1899,6 +1866,9 @@ With no argument,
 .Cr cd
 changes the current directory to
 .Cr "$home" .
+.TP
+.Cr "each list action"
+Reversed map
 .TP
 .Cr "echo \fR[\fP-n\fR]\fP \fR[\fP--\fR]\fP \fIargs ...\fP"
 Prints its arguments to standard output, terminated by a newline.
@@ -2909,7 +2879,7 @@ is not nearly as useful as it should be.
 Too many creatures have fept in.
 .PP
 Please send bug reports to
-.Cr "fkfire@gmail.com" .
+.Cr "f.koehler427@gmail.com" .
 .SH "SEE ALSO"
 .IR history (1),
 .IR es (1),
