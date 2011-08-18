@@ -1,6 +1,7 @@
 /* main.c -- initialization for es ($Revision: 1.3 $) */
 
 #include "es.hxx"
+#include "scheme.h"
 
 extern int optind;
 extern char *optarg;
@@ -81,8 +82,8 @@ static void usage(void) {
 }
 
 
-/* main -- initialize, parse command arguments, and start running */
-int main(int argc, char **argv) {
+/* run (fake main) -- initialize, parse command arguments, and start running */
+int run(Scheme_Env *e, int argc, char **argv) {
 	GC_init();
 	int c;
 	volatile int ac;
@@ -196,4 +197,8 @@ getopt_done:
 			eprint("uncaught exception: %L\n", e, " ");
 		return 1;
 	}
+}
+
+int main(int argc, char **argv) {
+	return scheme_main_setup(1, run, argc, argv);
 }
