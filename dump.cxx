@@ -262,6 +262,7 @@ static void printheader(const List *title) {
 extern void runinitial(void) {
 	const List *title = runfd(0, "initial.xs", 0);
 
+	GC_disable();
 	printheader(title);
 	foreach (Dict::value_type var, vars) dumpvar(var.first.c_str(), var.second);
 
@@ -279,6 +280,7 @@ extern void runinitial(void) {
 	print("\tfor (i = 0; defs[i].name != NULL; i++)\n");
 	print("\t\tvardef(defs[i].name, NULL, defs[i].value);\n");
 	print("}\n");
+	GC_enable();
 
 	exit(0);
 }
