@@ -136,6 +136,50 @@ static List *subscript(List* list, List* subs) {
 	return result;
 }
 
+
+char *scm_written(SCM s) {
+	SCM out = scm_open_output_string();
+	scm_write(s, out);
+	SCM guile_string = scm_get_output_string(out);
+
+	// This copying seems silly but there is no obvoius way to get a GC string from guile in this case?
+	char *x = scm_to_locale_string(guile_string);
+	char *y = gcdup(x);
+	free(x);
+	return y;
+}
+
+static Binding *currentbinding;
+
+SCM list_to_scm(List *l) {
+	List *n = reverse(l);
+	SCM s = SCM_EOL;
+	iterate (n) {
+		s = scm_cons(scm_from_locale_string(getstr(l->term)), s);
+	}
+	return s;
+}
+
+static SCM lookup(const char *name) {
+	List *l = varlookup(name, currentbinding);
+	return list_to_scm(l);
+}
+
+static List *runSCM(SCM s, Binding *binding) {
+
+	static bool defd = false;
+	if (!defd) {
+		scm_c_define_gsubr("xs-lookup", 1, 0, 0, (scm_t_subr) lookup);
+		defd = true;
+	}
+
+	// FIXME: list splicing?
+	Binding *x = currentbinding;
+	currentbinding = binding;
+	SCM res = scm_eval(s, scm_interaction_environment());
+	currentbinding = x;
+	return mklist(mkterm(scm_written(res), NULL), NULL);
+}
 /* glom1 -- glom when we don't need to produce a quote list */
 static List *glom1(Tree* tree, Binding* binding) {
 	List* result = NULL;
@@ -192,8 +236,8 @@ static List *glom1(Tree* tree, Binding* binding) {
 				list = subscript(list, sub);
 			}
 			break;
-		case nArith:
-			list = calculate(tree->u[0].p, binding);
+		case nSCM:
+			list = runSCM(tree->u[0].scm, binding);
 			tree = NULL;
 			break;
 		case nCall:
@@ -295,80 +339,6 @@ extern List* glom(Tree* tree, Binding* binding, bool globit) {
 		List* list = glom2(tree, binding, &quote);
 		return glob(list, quote);
 	} else return glom1(tree, binding);
-}
-
-/* Arithmetic code 
- * Currently horifically inefficient on account of constantly 
-   converting to-and-from string representation.
- */
-
-static List *tolist(int x) {
-	return mklist(mkstr(str("%d", x)), NULL);
-}
-static List *tolist(double x) {
-	std::stringstream s;
-	s.setf(std::ios_base::showpoint);
-	s << x;
-	return mklist(mkstr(gcdup(s.str().c_str())), NULL);
-}
-static bool isint(List *x) {
-	return strchr(getstr(x->term), '.') == NULL;
-}
-
-
-static int toint(List *x) {
-	try {
-		return lexical_cast<int>(getstr(x->term));
-	} catch (boost::bad_lexical_cast) {
-		fail("glom:arith:toint", "Could not handle integer input ( maybe too large? )");
-	}
-}
-static double todouble(List *x) {
-	return lexical_cast<double>(getstr(x->term));
-}
-
-#define OP(f, x, y) op(f<int>(), f<double>(), x, y)
-
-template <typename ftint, typename ftdouble>
-static List *op(ftint intf, 
-		ftdouble doublef, 
-		List *x, List *y) {
-	return isint(x) && isint(y)
-		? tolist(intf(toint(x), toint(y)))
-		: tolist(doublef(todouble(x), todouble(y)));
-}
-
-/* calculate -- Take an arithmetic tree, produce result */
-static List *calculate(Tree *expr, Binding *binding) {
-	switch (expr->kind) {
-	case nInt:
-		return tolist(lexical_cast<int>(expr->u[0].s));
-	case nFloat:
-		return tolist(lexical_cast<double>(expr->u[0].s));
-	case nVar: {
-		List *var = glom1(expr->u[0].p, binding);
-		List *value = varlookup(getstr(var->term), binding);
-		if (value == NULL) return tolist(0);
-		/* FIXME: Add some validity checks, not everything is a number */
-		return value;
-	}
-#define EXPR1 calculate(expr->u[0].p, binding)
-#define EXPR2 calculate(expr->u[1].p, binding)
-	case nPlus:
-		return OP(std::plus, EXPR1, EXPR2);
-	case nMinus:
-		return OP(std::minus, EXPR1, EXPR2);
-	case nMult:
-		return OP(std::multiplies, EXPR1, EXPR2);
-	case nDivide:
-		List *a = EXPR1, *b = EXPR2;
-#undef EXPR1
-#undef EXPR2
-		// Integer division by 0 causes issues
-		if (isint(b) and toint(b) == 0)
-			return tolist(std::numeric_limits<double>::infinity());
-		return OP(std::divides, a, b);
-	}
 }
 
 

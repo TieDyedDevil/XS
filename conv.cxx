@@ -46,36 +46,6 @@ static void binding(Format *f, const char *keyword, Tree *tree, const char *assi
 	if (surround_paren) fmtprint(f, ")");
 }
 
-static std::string arith_dump(Tree *expr) {
-	std::string sep;
-    	switch (expr->kind) {
-	    	case nFloat:
-	    	case nInt: 
-		    	return expr->u[0].s;
-		case nVar:
-			// FIXME: Should look similar to nVar code in Tconv
-			return str("$%s", expr->u[0].p->u[0].s);
-		case nPlus:
-			sep = "+";
-			break;
-		case nMinus:
-			sep = "-";
-			break;
-		case nMult:
-			sep = "*";
-			break;
-		case nDivide:
-			sep = "/";
-			break;	
-		default:
-			panic("unknown node kind in arithmetic expression: %d",
-				expr->kind);
-    	}
-	// FIXME: this could probably easily be made more efficient
-	return "(" + arith_dump(expr->u[0].p) +
-		sep + 
-		arith_dump(expr->u[1].p) + ")";
-}
 
 /* %T -- print a tree */
 static bool Tconv(Format *f) {
@@ -153,9 +123,10 @@ top:
 		return false;
 	}
 
-	case nArith: {
-		Tree *t = n->u[0].p;
-		fmtprint(f, ":(%s)", arith_dump(t).c_str());
+	case nSCM: { 
+		// this is only correct (and only needs to be for now) for scheme code, not general SCM
+		SCM s = n->u[0].scm;
+		fmtprint(f, "`%s", scm_written(s));
 		return false;
 	}
 

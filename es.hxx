@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <functional>
 #include <string>
+#include <libguile.h>
 
 #define iterate(list) for (; list != NULL; list = list->next)
 
@@ -50,7 +51,7 @@ struct Closure {
 enum NodeKind {
 	nAssign, nCall, nClosure, nConcat, nLambda, nLet, nList, nLocal,
 	nMatch, nExtract, nPrim, nQword, nThunk, nVar, nVarsub, nWord,
-	nArith, nPlus, nMinus, nMult, nDivide, nInt, nFloat,
+	nSCM,
 	nRedir, nPipe		/* only appear during construction */
 };
 
@@ -59,6 +60,7 @@ struct Tree {
 	union {
 		Tree *p;
 		const char *s;
+		SCM scm;
 		int i;
 	} u[2];
 };
@@ -411,4 +413,9 @@ inline void print_exception(List *e) {
 	eprint("%L\n", e, " ");
 }
 
+
+
+
+
+extern char* scm_written(SCM s);
 #endif

@@ -4,7 +4,7 @@
 #include "input.hxx"
 #include "syntax.hxx"
 #include "parse.h"
-
+#include <stack>
 
 static inline bool isodigit(char c) {
 	return '0' <= c && c < '8';
@@ -23,6 +23,12 @@ static char *buf = NULL;
 
 #define	InsertFreeCaret()	STMT(if (w != NW) { w = NW; UNGETC(c); return '^'; })
 
+static inline void bufput(int pos, char val) {
+	while (pos >= bufsize)
+		buf = reinterpret_cast<char*>(
+			erealloc(buf, bufsize *= 2));
+	buf[pos] = val;
+}
 
 /*
  *	Special characters (i.e., "non-word") in es:
@@ -68,25 +74,59 @@ const char dnw[] = {
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/* 240 - 255 */
 };
 
-/* Non-words for aithmetic variables */
-const char adnw[] = {
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/*   0 -  15 */
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/*  16 -  32 */
-	1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/* ' ' - '/' */
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,		/* '0' - '?' */
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,		/* '@' - 'O' */
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0,		/* 'P' - '_' */
-	1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,		/* '`' - 'o' */
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1,		/* 'p' - DEL */
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/* 128 - 143 */
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/* 144 - 159 */
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/* 160 - 175 */
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/* 176 - 191 */
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/* 192 - 207 */
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/* 208 - 223 */
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/* 224 - 239 */
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,		/* 240 - 255 */
-};
+#if 0
+int fill_input(SCM port) {
+/*
+	scm_t_port *pt = SCM_PTAB_ENTRY (port);
+	pt->read_pos = (const unsigned char*) buf;
+	pt->read_end = (unsigned char*) buf + 1;
+*/
+	scm_t_port *pt = SCM_PTAB_ENTRY (port);
+	pt->read_pos = (unsigned char*) pt->read_buf;
+	bufput(0,GETC());
+	return buf[0];
+}
+SCM read_lisp_expression() {
+	// see ports.c, ports.h in guile
+	static SCM port = NULL;
+	if (port == NULL) {
+		scm_t_bits s = scm_make_port_type("xsinput", fill_input, NULL);
+		port = scm_new_port_table_entry(s);
+		
+		SCM_SET_CELL_WORD_0 (port, SCM_CELL_WORD_0(port) | SCM_OPN | SCM_RDNG); // no better api for this?
+		scm_t_port *pt = SCM_PTAB_ENTRY (port);
+		scm_port_non_buffer (pt);
+	}
+	return scm_read(port);
+}
+#endif
+
+
+// As manual states, scm_read discards whitespace before next token
+// So, we hack around this by restoring the whitespace
+static std::stack<char> last_ws;
+static SCM get_character() {
+	char x = GETC();
+	if (isspace(x)) last_ws.push(x);
+	else while (!last_ws.empty()) last_ws.pop();
+	return SCM_MAKE_CHAR(x);
+}
+
+
+SCM read_lisp_expression() {
+	UNGETC('(');
+	SCM s_get_character = scm_c_make_gsubr("get_character", 0, 0, 0, (scm_t_subr) get_character);
+	SCM v = scm_vector(scm_list_5(SCM_BOOL_F, SCM_BOOL_F, SCM_BOOL_F, s_get_character, SCM_BOOL_F));
+	SCM port = scm_make_soft_port(v, scm_from_latin1_string("r"));
+	SCM res = scm_read(port);
+
+	// white space hack
+	while (!last_ws.empty()) {
+		UNGETC(last_ws.top());
+		last_ws.pop();
+	}
+	eprint(scm_written(res));
+}
 	
 
 
@@ -168,14 +208,7 @@ static bool getfds(int fd[2], int c, int default0, int default1) {
 	return true;
 }
 
-static inline void bufput(int pos, char val) {
-	while (pos >= bufsize)
-		buf = reinterpret_cast<char*>(
-			erealloc(buf, bufsize *= 2));
-	buf[pos] = val;
-}
 
-static int yylex_arithmetic();
 static int yylex_normal();
 int (*yylex_fun)() = yylex_normal;
 int yylex() {
@@ -184,57 +217,6 @@ int yylex() {
 		return NL;
 	}
 	return yylex_fun();
-}
-
-static int yylex_arithmetic() {
-	static int paren_count = 1;
-	int c;
-	while (c = GETC(), c == ' ' || c == '\t' || c == '\n');
-
-	if (isdigit(c) || c == '.') {
-		bool floating = false;
-		size_t i = 0;
-		do {
-		    	if (c == '.') floating = true;  // TODO: Does this work with other localities?
-		    	bufput(i++, c);
-		} while (c = GETC(), isdigit(c) || c =='.');
-		UNGETC(c);
-		bufput(i, '\0');
-
-		yylval.str = gcdup(buf);
-		return floating ? FLOAT : INT;
-	}
-	switch (c) {
-	case '(': 
-		++paren_count; 
-		// FALLTHROUGH
-	case '+': case '-': case '/': case '*': 
-		return c;
-	case ')': 
-		--paren_count;
-		if (paren_count == 0) {
-			paren_count = 1;
-			yylex_fun = yylex_normal;
-		}
-		return c;
-	case '$': {
-		size_t i = 0;
-		while (c = GETC(), c != EOF && !adnw[c])
-			bufput(i++, c);
-		UNGETC(c);
-		if (i == 0) {
-			scanerror("Variable with no name inside arithmetic expression");
-			return ERROR;
-		}
-
-		bufput(i, '\0');
-		yylval.str = gcdup(buf);
-		return ARITH_VAR;
-	}
-	default: 
-		scanerror("Invalid token in arithmetic expression");
-		return ERROR;
-	}
 }
 
 static int yylex_normal() {
@@ -246,7 +228,7 @@ static int yylex_normal() {
 	/* rc variable-names may contain only alnum, '*' and '_', so use dnw if we are scanning one. */
 	const char *meta = (dollar ? dnw : nw);
 	dollar = false;
-	if (newline) {
+	if (newline)  {
 		newline = false;
 		/* \n sets yylloc.last_line, but not first_line
 		 * in case the newline is syntactically invalid
@@ -302,8 +284,8 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 		if (c == '`')
 			return BACKBACK;
 		else if (c == '(') {
-			yylex_fun = yylex_arithmetic;
-			return ARITH_BEGIN;
+			yylval.scm = read_lisp_expression();
+			return LISP;
 		}
 		UNGETC(c);
 		return '`';

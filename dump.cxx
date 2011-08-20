@@ -23,7 +23,7 @@ using std::string;
  * things can be here.)
  *
  * since these things are read-only they cannot point to structures
- * that need to be garbage collected.  (think of this like a very
+ * that need to be garbage collected (still true???).  (think of this like a very
  * old generation in a generational collector.)
  *
  * to simplify matters, all values are stored in C variables with
@@ -102,17 +102,11 @@ static const char *nodename(NodeKind k) {
 	case nExtract:	return "Extract";
 	case nPrim:	return "Prim";
 	case nQword:	return "Qword";
+	case nSCM:	return "SCM";
 	case nThunk:	return "Thunk";
 	case nVar:	return "Var";
 	case nVarsub:	return "Varsub";
      	case nWord:	return "Word";
-	case nArith: 	return "Arith";
-	case nPlus:	return "Plus";
-	case nMinus:	return "Minus";
-	case nMult:	return "Mult";
-	case nDivide:	return "Divide";
-	case nInt:	return "Int";
-	case nFloat:	return "Flat";
 	default:	panic("nodename: bad node kind %d", k);
 	}
 }
@@ -126,15 +120,18 @@ static const char *dumptree(Tree *tree) {
 		    default:
 			panic("dumptree: bad node kind %d", tree->kind);
 		    case nWord: case nQword: case nPrim:
-		    case nInt: case nFloat:
 			print("static Tree_s %s = { n%s, { { %s } } };\n",
 			      name + 1, nodename(tree->kind), dumpstring(tree->u[0].s));
 			break;
-		    case nCall: case nThunk: case nVar: case nArith:
+		    case nSCM:
+			print("static Tree_s %s = { n%s, { { %s } } };\n",
+			      name + 1, nodename(tree->kind), dumpstring(scm_written(tree->u[0].scm))); //anti-duplication measures?
+			break;
+
+		    case nCall: case nThunk: case nVar:
 			print("static Tree_p %s = { n%s, { { (Tree *) %s } } };\n",
 			      name + 1, nodename(tree->kind), dumptree(tree->u[0].p));
 			break;
-		    case nPlus: case nMinus: case nMult: case nDivide:
 		    case nAssign:  case nConcat: case nClosure: 
 		    case nLambda: case nLet: case nList:  case nLocal:
 		    case nVarsub: case nMatch: case nExtract:
