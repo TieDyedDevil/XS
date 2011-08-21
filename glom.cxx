@@ -166,7 +166,6 @@ static SCM lookup(const char *name) {
 }
 
 static List *runSCM(SCM s, Binding *binding) {
-
 	static bool defd = false;
 	if (!defd) {
 		scm_c_define_gsubr("xs-lookup", 1, 0, 0, (scm_t_subr) lookup);
