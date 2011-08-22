@@ -83,8 +83,9 @@ static void usage(void) {
 
 
 /* run (fake main) -- initialize, parse command arguments, and start running */
-static void run(void *e, int argc, char **argv) {
-	GC_init();
+static void run(void *unused, int argc, char **argv) {
+	//GC_init();
+	GC_disable();
 	int c;
 	volatile int ac;
 	char **volatile av;
@@ -92,10 +93,14 @@ static void run(void *e, int argc, char **argv) {
 	volatile int runflags = 0;		/* -[einvxL] */
 	volatile bool isprotected = false;	/* -p */
 	volatile bool allowquit = false;	/* -d */
-	volatile bool cmd_stdin = false;		/* -s */
+	volatile bool cmd_stdin = false;	/* -s */
 	volatile bool loginshell = false;	/* -l or $0[0] == '-' */
 	bool keepclosed = false;		/* -o */
 	const char *volatile cmd = NULL;	/* -c */
+	for (char **envp = environ; *envp != NULL; ++envp)
+		fprintf(stderr, "%x\n", *envp);
+	//char **y = environ;
+	//fprintf(stderr, "%x\n", *y);
 
 	initconv();
 
@@ -157,13 +162,14 @@ getopt_done:
 		initinput();
 		initprims();
 
+		//GC_collect();
+		initenv(environ, isprotected);
 		runinitial();
 
 		initpath();
 		initpid();
 		initsignals(runflags & run_interactive, allowquit);
 		hidevariables();
-		initenv(environ, isprotected);
 
 		if (loginshell)
 			runxsrc();
@@ -200,6 +206,11 @@ getopt_done:
 }
 
 int main(int argc, char **argv) {
+	// https://subversion.cs.uu.nl/repos/project.UHC.pub/tags/1.0.0/README.valgrind
+	// for making boehm and valgrind play together
+	GC_init();
+	GC_init();
+	GC_disable();
 	scm_boot_guile(argc, argv, run, 0);
 	return 0;
 }

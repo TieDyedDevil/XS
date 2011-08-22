@@ -8,8 +8,6 @@ using std::binary_function;
 using boost::lexical_cast;
 
 
-static List *calculate(Tree *, Binding *);
-
 /* concat -- cartesion cross product concatenation */
 static List *concat(List* list1,List* list2) {
 	List* result = NULL;
@@ -136,7 +134,6 @@ static List *subscript(List* list, List* subs) {
 	return result;
 }
 
-
 char *scm_written(SCM s) {
 	SCM out = scm_open_output_string();
 	scm_write(s, out);
@@ -149,26 +146,25 @@ char *scm_written(SCM s) {
 	return y;
 }
 
-static Binding *currentbinding;
+static Binding *currentbinding = NULL;
 
-SCM list_to_scm(List *l) {
-	List *n = reverse(l);
+SCM list_to_scm(const List *l) {
 	SCM s = SCM_EOL;
-	iterate (n) {
+	iterate (l) {
 		s = scm_cons(scm_from_locale_string(getstr(l->term)), s);
 	}
-	return s;
+	return scm_reverse(s);
 }
 
-static SCM lookup(const char *name) {
-	List *l = varlookup(name, currentbinding);
+static SCM lookup(SCM name) {
+	List *l = varlookup(scm_to_locale_string(name), currentbinding);
 	return list_to_scm(l);
 }
 
 static List *runSCM(SCM s, Binding *binding) {
 	static bool defd = false;
 	if (!defd) {
-		scm_c_define_gsubr("xs-lookup", 1, 0, 0, (scm_t_subr) lookup);
+		scm_c_define_gsubr("xs-var", 1, 0, 0, (scm_t_subr) lookup);
 		defd = true;
 	}
 
@@ -235,6 +231,10 @@ static List *glom1(Tree* tree, Binding* binding) {
 				list = subscript(list, sub);
 			}
 			break;
+		case nSCM_unread:
+			tree->kind = nSCM;
+			tree->u[0].scm = scm_c_read_string(tree->u[0].s);
+			// FALLTHROUGH
 		case nSCM:
 			list = runSCM(tree->u[0].scm, binding);
 			tree = NULL;

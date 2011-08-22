@@ -125,7 +125,6 @@ SCM read_lisp_expression() {
 		UNGETC(last_ws.top());
 		last_ws.pop();
 	}
-	eprint(scm_written(res));
 	return res;
 }
 	

@@ -102,7 +102,7 @@ static const char *nodename(NodeKind k) {
 	case nExtract:	return "Extract";
 	case nPrim:	return "Prim";
 	case nQword:	return "Qword";
-	case nSCM:	return "SCM";
+	case nSCM:	return "SCM_unread";
 	case nThunk:	return "Thunk";
 	case nVar:	return "Var";
 	case nVarsub:	return "Varsub";
@@ -123,6 +123,8 @@ static const char *dumptree(Tree *tree) {
 			print("static Tree_s %s = { n%s, { { %s } } };\n",
 			      name + 1, nodename(tree->kind), dumpstring(tree->u[0].s));
 			break;
+
+			// we can't just dump the SCM, hence the different node type
 		    case nSCM:
 			print("static Tree_s %s = { n%s, { { %s } } };\n",
 			      name + 1, nodename(tree->kind), dumpstring(scm_written(tree->u[0].scm))); //anti-duplication measures?
@@ -258,7 +260,6 @@ static void printheader(const List *title) {
 extern void runinitial(void) {
 	const List *title = runfd(0, "initial.xs", 0);
 
-	GC_disable();
 	printheader(title);
 	foreach (Dict::value_type var, vars) dumpvar(var.first.c_str(), var.second);
 
@@ -276,7 +277,6 @@ extern void runinitial(void) {
 	print("\tfor (i = 0; defs[i].name != NULL; i++)\n");
 	print("\t\tvardef(defs[i].name, NULL, defs[i].value);\n");
 	print("}\n");
-	GC_enable();
 
 	exit(0);
 }

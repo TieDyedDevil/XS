@@ -18,6 +18,7 @@ extern Tree *mk (NodeKind  t, ...) {
 		panic("mk: bad node kind %d", t);
 	    case nWord: case nQword: case nPrim:
 	    case nCall: case nThunk: case nVar:
+	    case nSCM_unread:
 		n = newtree<1>();
 		n->u[0].p = va_arg(ap, Tree *);
 		break;

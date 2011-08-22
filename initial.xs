@@ -111,7 +111,7 @@ fn-if = { |condition action else actions|
 
 let (nextid = 0) {
 	fn-escape = { |body|
-		nextid = `(+ (xs-var "nextid") 1)
+		nextid = `(+ (string->number (car (xs-var "nextid"))) 1)
 		let (id = _escape$nextid) {
 			catch { |e val| 
 				(if {!~ $e $id} { throw $e }
@@ -247,7 +247,7 @@ fn-each = { |args|
 	}
 	let (fn-f = $args($#args)
 	     nargs = $#args) # ugliness of arithmetic may be killed by embedding scheme later?
-		map $fn-f $args(... `(- (xs-var "nargs") 1))
+		map $fn-f $args(... `(- (string->number (car (xs-var "nargs"))) 1))
 }
 
 ## EXPERIMENTAL

@@ -304,6 +304,7 @@ static void importvar(const char* name, const char* value) {
 /* initenv -- load variables from the environment */
 extern void initenv(char **envp, bool isprotected) {
 	for (std::string envstr; *envp != NULL ; envp++) {
+		fprintf(stderr, "%x\n", *envp);
 		envstr = *envp;
 		size_t eq_index = envstr.find('=');
 		if (eq_index == -1) {

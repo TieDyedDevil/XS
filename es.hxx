@@ -51,7 +51,7 @@ struct Closure {
 enum NodeKind {
 	nAssign, nCall, nClosure, nConcat, nLambda, nLet, nList, nLocal,
 	nMatch, nExtract, nPrim, nQword, nThunk, nVar, nVarsub, nWord,
-	nSCM,
+	nSCM, nSCM_unread,
 	nRedir, nPipe		/* only appear during construction */
 };
 
@@ -81,10 +81,10 @@ struct StrList {
 class Vector : public std::vector< char*, gc_allocator<char*> >, 
 	       public gc_cleanup 
 {
-public: void sort() {
-        extern int qstrcmp(const char *, const char *);
-        std::sort(begin(), end(), qstrcmp);
-    }
+	public: void sort() {
+        	extern int qstrcmp(const char *, const char *);
+        	std::sort(begin(), end(), qstrcmp);
+    	}
 };
 
 
@@ -146,7 +146,7 @@ extern bool isclosure(Term *term);
 /* list.c */
 
 extern List *mklist(Term* term, List* next);
-extern List *reverse(List *list);
+extern List *reverse(List *list); // DESTRUCTIVE!
 extern List *append(const List* head, List* tail);
 extern List *listcopy(const List *list);
 extern int length(List* list);
