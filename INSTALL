@@ -1,7 +1,9 @@
 Building from Git
 -----------------
 
-See the below, but call autoreconf first!
+See the below, but call 
+   % autoreconf -i
+first.
 
 Basic Installation
 ------------------
