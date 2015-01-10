@@ -3,7 +3,7 @@
 #include "es.hxx"
 #include "input.hxx"
 #include "syntax.hxx"
-#include "parse.h"
+#include "parse.hxx"
 
 Tree errornode;
 Tree *parsetree;

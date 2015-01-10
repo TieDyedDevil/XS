@@ -4,7 +4,7 @@
 #include "es.hxx"
 #include "term.hxx"
 #include "input.hxx"
-#include "parse.h"
+#include "parse.hxx"
 
 
 /*

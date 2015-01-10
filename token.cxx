@@ -3,7 +3,7 @@
 #include "es.hxx"
 #include "input.hxx"
 #include "syntax.hxx"
-#include "parse.h"
+#include "parse.hxx"
 
 
 static inline bool isodigit(char c) {

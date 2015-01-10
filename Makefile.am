@@ -20,9 +20,9 @@ COMMON_FILES	= access.cxx closure.cxx conv.cxx eval.cxx fd.cxx glob.cxx \
 	  sigmsgs.cxx signal.cxx split.cxx syntax.cxx status.cxx str.cxx term.cxx \
 	  token.cxx tree.cxx util.cxx var.cxx version.cxx parse.yxx
 OTHER	= Makefile parse.yxx mksignal
-GEN	= parse.h parse.cxx parse.output sigmsgs.cxx initial.cxx
+GEN	= parse.hxx parse.cxx parse.output sigmsgs.cxx initial.cxx
 
-BUILT_SOURCES = parse.h
+BUILT_SOURCES = parse.hxx
 xs_SOURCES = $(COMMON_FILES) initial.cxx main.cxx
 #ctest_SOURCES = tests/test_print.cxx tests/test_util.cxx tests/all_tests.cxx $(COMMON_FILES)
 #ctest_LDADD = -lcgreen -lm
