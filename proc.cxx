@@ -66,9 +66,9 @@ static int dowait(int *statusp) {
 		slow = true;
 		n = interrupted ? -2 :
 #if HAVE_WAIT3
-			wait3((void *) statusp, 0, &wait_rusage);
+			wait3((int *) statusp, 0, &wait_rusage);
 #else
-			wait((void *) statusp);
+			wait((int *) statusp);
 #endif
 	} else
 		n = -2;
