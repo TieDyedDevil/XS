@@ -52,12 +52,13 @@ static bool allprintable(const char *s) {
 }
 
 static const char *dumpstring(const char *string) {
+	static int counter = 0;
 	if (string == NULL)
 		return "NULL";
 	if (strings.count(string) == 0) {
 		const char *name = str("S_%F", string);
 		if (strlen(name) > MAXVARNAME)
-			name = str("X_%ulx", (long long) string);
+			name = str("X_%ulx", (long long) counter++);
 		print("static const char %s[] = ", name);
 		if (allprintable(string))
 			print("\"%s\";\n", string);
