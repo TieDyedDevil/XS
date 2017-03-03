@@ -5,9 +5,8 @@ Some c++ features are used in the code-base now,
 so it is no longer valid C (and obviously needs
 a c++ compiler)
 
-The assignment operator is now := instead of =. Using
-= was inconvenient because many commands use = to 
-specify "long" arguments (--foo=blah).
+The assignment operator must be delimited by whitespace in order to
+distinguish this usage from "long" arguments (--foo=blah).
 
 Closures in child shells should operate the same as they did
 in their parents - if f and g share x, changing x in f changes
