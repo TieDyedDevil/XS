@@ -5,6 +5,27 @@ See the below, but call
    % autoreconf -i
 first.
 
+Prerequisites
+-------------
+
+   The following libraries are required:
+
+   boost
+   gc
+
+   Also, the following libraries are recommended:
+
+   ncurses
+   readline
+
+   On Fedora, for example, these prerequisites are satisfied by
+installing the following packages:
+
+   boost-devel
+   gc-devel
+   ncurses-devel
+   readline-devel
+
 Basic Installation
 ------------------
 
