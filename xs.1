@@ -844,7 +844,7 @@ is the list
 .SS "Arithmetic Substitution"
 A single list element can be formed from an infix arithmetical expression like so:
 .Ds
-.Ci "\:( " " expression " )
+.Ci "\`( " " expression " )
 The expression can use any of the 
 .De
 .Cr "+", 
@@ -860,8 +860,8 @@ Calculation rules are similar to C - any operation involving floats
 produces a float, any operation with integers produces an integer;
 this includes division, so 
 .Ds
-    .Cr "echo :(1 / 2)"
-    .Cr "echo :(1.0 / 2)"
+.Cr "echo `(1 / 2)"
+.Cr "echo `(1.0 / 2)"
 .De
 produce 0 and 0.5 (with trailing zeros) respectively.
 Integers will wrap around at the same point as the native platform's int,
@@ -1223,7 +1223,7 @@ A function in
 .I xs
 is introduced with the syntax
 .Ds
-.Ci fn " name parameters " { " commands " } "
+.Ci fn " name" " { | " parameters " | \fIcommands\fP }"
 .De
 .PP
 If the function name appears as the first word of a command,
