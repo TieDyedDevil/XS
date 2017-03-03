@@ -212,7 +212,7 @@ static char *expandhome(char* string, StrList* quote) {
 
 	if (list != NULL) {
 		if (list->next != NULL)
-			fail("es:expandhome", "%%home returned more than one value");
+			fail("xs:expandhome", "%%home returned more than one value");
 		char* home = gcdup(getstr(list->term));
 		if (c == '\0') {
 			string = home;

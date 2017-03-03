@@ -102,7 +102,7 @@ static List *subscript(List* list, List* subs) {
 	while (subs != NULL) {
 		lo = atoi(getstr(subs->term));
 		if (lo < 1) {
-			fail("es:subscript", "bad subscript: %s", getstr(subs->term));
+			fail("xs:subscript", "bad subscript: %s", getstr(subs->term));
 		}
 		subs = subs->next;
 		if (subs != NULL && streq(getstr(subs->term), "...")) {
@@ -113,7 +113,7 @@ static List *subscript(List* list, List* subs) {
 			else {
 				hi = atoi(getstr(subs->term));
 				if (hi < 1) {
-					fail("es:subscript", "bad subscript: %s", getstr(subs->term));
+					fail("xs:subscript", "bad subscript: %s", getstr(subs->term));
 				}
 				if (hi > len)
 					hi = len;
@@ -181,8 +181,8 @@ static List *glom1(Tree* tree, Binding* binding) {
 		}
 		case nVarsub:
 			list = glom1(tree->u[0].p, binding);
-			if (list == NULL) fail("es:glom", "null variable name in subscript");
-			if (list->next != NULL) fail("es:glom", "multi-word variable name in subscript");
+			if (list == NULL) fail("xs:glom", "null variable name in subscript");
+			if (list->next != NULL) fail("xs:glom", "multi-word variable name in subscript");
 
 			{
 				const char* name = getstr(list->term);
@@ -212,7 +212,7 @@ static List *glom1(Tree* tree, Binding* binding) {
 			break;
 	        }
 		default:
-			fail("es:glom", "glom1: bad node kind %d", tree->kind);
+			fail("xs:glom", "glom1: bad node kind %d", tree->kind);
 		}
 
 		if (list != NULL) {

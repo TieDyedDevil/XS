@@ -131,7 +131,7 @@ int main(int argc, char **argv) {
 
 getopt_done:
 	if (cmd_stdin && cmd != NULL) {
-		eprint("es: -s and -c are incompatible\n");
+		eprint("xs: -s and -c are incompatible\n");
 		exit(1);
 	}
 

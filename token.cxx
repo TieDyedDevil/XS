@@ -25,7 +25,7 @@ static char *buf = NULL;
 
 
 /*
- *	Special characters (i.e., "non-word") in es:
+ *	Special characters (i.e., "non-word") in xs:
  *		\t \n # : ; & | ^ $ ` ' ! { } ( ) < > \ 
  */
 

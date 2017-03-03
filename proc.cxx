@@ -46,7 +46,7 @@ extern int efork(bool parent, bool background) {
 			hasforked = true;
 			break;
 		case -1:
-			fail("es:efork", "fork: %s", esstrerror(errno));
+			fail("xs:efork", "fork: %s", esstrerror(errno));
 		}
 	}
 	closefds();
@@ -106,7 +106,7 @@ top:
 					if (deadpid != -1)
 						reap(deadpid, proc->status);
 					else if (errno != EINTR)
-						fail("es:ewait", "wait: %s", esstrerror(errno));
+						fail("xs:ewait", "wait: %s", esstrerror(errno));
 					else if (interruptible)
 						SIGCHK();
 				proc->alive = false;
@@ -130,14 +130,14 @@ top:
 		int status;
 		while ((pid = dowait(&status)) == -1) {
 			if (errno != EINTR)
-				fail("es:ewait", "wait: %s", esstrerror(errno));
+				fail("xs:ewait", "wait: %s", esstrerror(errno));
 			if (interruptible)
 				SIGCHK();
 		}
 		reap(pid, status);
 		goto top;
 	}
-	fail("es:ewait", "wait: %d is not a child of this shell", pid);
+	fail("xs:ewait", "wait: %d is not a child of this shell", pid);
 	NOTREACHED;
 }
 

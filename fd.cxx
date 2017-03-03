@@ -9,7 +9,7 @@ extern void mvfd(int old, int newFd) {
 	if (old != newFd) {
 		int fd = dup2(old, newFd);
 		if (fd == -1)
-			fail("es:mvfd", "dup2: %s", esstrerror(errno));
+			fail("xs:mvfd", "dup2: %s", esstrerror(errno));
 		assert(fd == newFd);
 		close(old);
 	}
@@ -179,7 +179,7 @@ extern void releasefd(int n) {
 			*fdp = dup(fd);
 			if (*fdp == -1) {
 				assert(errno != EBADF);
-				fail("es:releasefd", "%s", esstrerror(errno));
+				fail("xs:releasefd", "%s", esstrerror(errno));
 			}
 			close(fd);
 		}

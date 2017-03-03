@@ -59,7 +59,7 @@ static List *assign(Tree* varform, Tree* valueform, Binding* binding) {
 	List* vars = glom(varform, binding, false);
 
 	if (vars == NULL)
-		fail("es:assign", "null variable name");
+		fail("xs:assign", "null variable name");
 
 	List* values = glom(valueform, binding, true);
 	List* result = values;
@@ -93,7 +93,7 @@ static Binding *letbindings(Tree* defn, Binding* binding,
 		values = glom(assign->u[1].p, context, true);
 
 		if (vars == NULL)
-			fail("es:let", "null variable name");
+			fail("xs:let", "null variable name");
 
 		for (; vars != NULL; vars = vars->next) {
 			name = getstr(vars->term);
@@ -139,7 +139,7 @@ const static List *forloop(Tree* defn, Tree* body,
 		List* vars = glom(assign->u[0].p, outer, false);
 		List* list = glom(assign->u[1].p, outer, true);
 		if (vars == NULL)
-			fail("es:for", "null variable name");
+			fail("xs:for", "null variable name");
 		for (; vars != NULL; vars = vars->next) {
 			const char* var = getstr(vars->term);
 			looping = mkbinding(var, list, looping);
@@ -270,7 +270,7 @@ extern const List *pathsearch(Term *term) {
 	List *search, *list;
 	search = varlookup("fn-%pathsearch", NULL);
 	if (search == NULL)
-		fail("es:pathsearch", "%E: fn %%pathsearch undefined", term);
+		fail("xs:pathsearch", "%E: fn %%pathsearch undefined", term);
 	list = mklist(term, NULL);
 	return eval(append(search, list), NULL, 0);
 }
@@ -279,7 +279,7 @@ class Depth_tracker {
 	public:
 		Depth_tracker() {
 			if (++evaldepth >= maxevaldepth)
-				fail("es:eval", "max-eval-depth exceeded");
+				fail("xs:eval", "max-eval-depth exceeded");
 		}
 		~Depth_tracker() {
 			--evaldepth;

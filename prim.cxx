@@ -10,7 +10,7 @@ extern const List*
     prim(const char *s, List* list, Binding* binding, int evalflags) {
 	Prim p = prims[s];
 	if (p) return (*prims[s])(list, binding, evalflags);
-	else fail("es:prim", "unknown primitive: %s", s);
+	else fail("xs:prim", "unknown primitive: %s", s);
 }
 
 PRIM(primitives) {
