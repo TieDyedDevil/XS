@@ -1,9 +1,9 @@
-Xs is a cleanly-designed shell with functional programming. It is based off the source-code for 
-the es project, which was in the public domain. The changes in xs can also be 
-considered to be in the public domain.
+Xs is a cleanly-designed shell with functional programming. It is
+based on the source-code for the es project, which was in the public
+domain. The changes in xs can also be considered to be in the public
+domain.
 
-Xs is not source-level compatible with es. See the manpage (xs.1) for more details about it.
+Xs is not source-level compatible with es. See xs(1) for more details.
 
-Most of the xs source code remains the same as es. The primary authors of that shell can be 
-found in that source code, currently located at: ftp://ftp.sys.utoronto.ca/pub/es/. Modifications 
-since es-0.9-beta1 are all parts of xs and have been written by Frederic Koehler.
+The es shell source code is currently located at:
+ftp://ftp.sys.utoronto.ca/pub/es/ .
