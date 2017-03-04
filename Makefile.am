@@ -31,7 +31,7 @@ xsdump_SOURCES = $(COMMON_FILES) dump.cxx main.cxx
 
 
 MANIFEST:
-	find . -type f | sed s/..// > MANIFEST
+	find . -type f | sed s/..// | sed /^\\./d | sed /^autom4te.cache/d | sort > MANIFEST
 
 ctags	:
 	etags --declarations /usr/include/stdlib.h /usr/include/stdio.h /usr/include/unistd.h /usr/include/signal.h  /usr/include/errno.h /usr/include/dirent.h /usr/include/sys/wait.h /usr/include/sys/stat.h *.cxx *.hxx
