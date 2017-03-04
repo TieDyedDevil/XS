@@ -1,4 +1,5 @@
 - Why do we see garbage in `vars` listing?
+  - And what's with the ^A's?
 - Confirm list of special characters.
 - Add relational operators.
 - Document basic readline history.
