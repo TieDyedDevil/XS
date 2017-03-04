@@ -1,7 +1,7 @@
 # Makefile for xs
 
 AM_YFLAGS = -d
-#AUTOMAKE_OPTIONS = dejagnu
+AUTOMAKE_OPTIONS = foreign
 RUNTESTDEFAULTFLAGS = --tool xs XS=`pwd`/xs --srcdir $$srcdir/testsuite --debug
 
 dist_man_MANS = xs.1
