@@ -1,3 +1,6 @@
+- Why do we see garbage in `vars` listing?
+- Confirm list of special characters.
+- Add relational operators.
 - Document basic readline history.
 - Add Unicode escapes?
 - Add examples.
