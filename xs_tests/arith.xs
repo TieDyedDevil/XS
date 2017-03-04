@@ -13,6 +13,11 @@ run 'Simple division' {
 }
 conds { match '2' }
 
+run 'Simple modulus' {
+    echo `(5 % 3)
+}
+conds { match '2' }
+
 run 'Simple subtraction' {
     echo `(2 - 1)
 }
