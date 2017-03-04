@@ -3,7 +3,7 @@
 #define	REQUIRE_STAT	1
 #define	REQUIRE_DIRENT	1
 
-#include "es.hxx"
+#include "xs.hxx"
 #include "term.hxx"
 
 const char *QUOTED = "QUOTED", *UNQUOTED = "r";

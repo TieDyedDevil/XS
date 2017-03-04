@@ -1,7 +1,7 @@
 
 /* input.c -- read input from files or strings ($Revision: 1.2 $) */
 
-#include "es.hxx"
+#include "xs.hxx"
 #include "term.hxx"
 #include "input.hxx"
 #include "parse.hxx"
@@ -382,7 +382,7 @@ static int fdfill(Input *in) {
 		in->fd = EOF_FD;
 		in->runflags &= ~run_interactive;
 		if (nread == -1)
-			fail("$&parse", "%s: %s", in->name == NULL ? "es" : in->name, esstrerror(errno));
+			fail("$&parse", "%s: %s", in->name == NULL ? "xs" : in->name, esstrerror(errno));
 		return EOF;
 	}
 

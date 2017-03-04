@@ -3,7 +3,7 @@
 #define	REQUIRE_STAT	1
 #include <sys/param.h>
 
-#include "es.hxx"
+#include "xs.hxx"
 #include "prim.hxx"
 #include <string>
 

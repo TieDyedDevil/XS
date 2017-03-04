@@ -1,5 +1,5 @@
 #! ./xs -p
-# esdebug: a debugger for es scripts ($Revision: 1.1.1.1 $)
+# xsdebug: a debugger for xs scripts ($Revision: 1.1.1.1 $)
 
 # TODO
 #	catch signals (at least sigint) better
@@ -216,7 +216,7 @@ command		description (abbreviations)
 
 break f		set a breakpoint on entry to and exit from function f (b)
 continue	continue execution (c, cont, r, run)
-echo expr ...	echo the es expression (print, p)
+echo expr ...	echo the xs expression (print, p)
 quit		exit esdebug (q)
 throw e ...	throw exception e
 trace f		trace calls to function f
@@ -228,7 +228,7 @@ untrace f	cancel tracing of f
 untrap v	cancel trap of v
 unwatch v	cancel watch of v
 watch v		trace assignments to variable v
-! cmd		run es command cmd
+! cmd		run xs command cmd
 
 an empty command is equivalent to step
 END-OF-HELP

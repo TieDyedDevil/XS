@@ -1,6 +1,6 @@
 /* prim.c -- primitives and primitive dispatching ($Revision: 1.1.1.1 $) */
 
-#include "es.hxx"
+#include "xs.hxx"
 #include "prim.hxx"
 
 static Prim_dict prims;

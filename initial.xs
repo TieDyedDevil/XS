@@ -5,41 +5,36 @@
 # Introduction
 #
 
-#	Initial.es contains a series of definitions used to set up the
-#	initial state of the es virtual machine.  In early versions of es
-#	(those before version 0.8), initial.es was turned into a string
-#	which was evaluated when the program started.  This unfortunately
-#	took a lot of time on startup and, worse, created a lot of garbage
-#	collectible memory which persisted for the life of the shell,
-#	causing a lot of extra scanning.
+#	Initial.xs contains a series of definitions used to set up the
+#	initial state of the xs virtual machine.
 #
-#	Since version 0.8, building es is a two-stage process.  First a
-#	version of the shell called esdump is built.  Esdump reads and
+#	Building xs is a two-stage process.  First a
+#	version of the shell called xsdump is built.  Xsdump reads and
 #	executes commands from standard input, similar to a normal interpreter,
 #	but when it is finished, it prints on standard ouput C code for
 #	recreating the current state of interpreter memory.  (The code for
-#	producing the C code is in dump.c.)  Esdump starts up with no
-#	variables defined.  This file (initial.es) is run through esdump
+#	producing the C code is in dump.c.)  Xsdump starts up with no
+#	variables defined.  This file (initial.xs) is run through xsdump
 #	to produce a C file, initial.c, which is linked with the rest of
-#	the interpreter, replacing dump.c, to produce the actual es
+#	the interpreter, replacing dump.c, to produce the actual xs
 #	interpreter.
 #
-#	Because the shell's memory state is empty when initial.es is run,
+#	Because the shell's memory state is empty when initial.xs is run,
 #	you must be very careful in what instructions you put in this file.
 #	For example, until the definition of fn-%pathsearch, you cannot
 #	run external programs other than those named by absolute path names.
-#	An error encountered while running esdump is fatal.
+#	An error encountered while running xsdump is fatal.
 #
-#	The bulk of initial.es consists of assignments of primitives to
-#	functions.  A primitive in es is an executable object that jumps
+#	The bulk of initial.xs consists of assignments of primitives to
+#	functions.  A primitive in xs is an executable object that jumps
 #	directly into some C code compiled into the interpreter.  Primitives
 #	are referred to with the syntactic construct $&name;  by convention,
 #	the C function implementing the primitive is prim_name.  The list
 #	of primitives is available as the return value (exit status) of
 #	the primitive $&primitives.  Primitives may not be reassigned.
 #
-#	Functions in es are simply variables named fn-name.  When es
-#	evaluates a command, if the first word is a string, es checks if
+#	Functions in xs are simply variables named fn-name.  When xs
+#	evaluates a command, if the first word is a string, xs checks if
 #	an appropriately named fn- variable exists.  If it does, then the
 #	value of that variable is substituted for the function name and
 #	evaluation starts over again.  Thus, for example, the assignment
@@ -50,7 +45,7 @@
 #		$&echo foo bar
 #	This mechanism is used pervasively.
 #
-#	Note that definitions provided in initial.es can be overriden (aka,
+#	Note that definitions provided in initial.xs can be overriden (aka,
 #	spoofed) without changing this file at all, just by redefining the
 #	variables.  The only purpose of this file is to provide initial
 #	values.
@@ -279,7 +274,7 @@ fn-cd = { |dir|
 
 #	The vars function is provided for cultural compatibility with
 #	rc's whatis when used without arguments.  The option parsing
-#	is very primitive;  perhaps es should provide a getopt-like
+#	is very primitive;  perhaps xs should provide a getopt-like
 #	builtin.
 #
 #	The options to vars can be partitioned into two categories:
@@ -288,7 +283,7 @@ fn-cd = { |dir|
 #	and their type (-f for functions, -s for settor functions,
 #	and -v for all others).
 #
-#	Internal variables are those defined in initial.es (along
+#	Internal variables are those defined in initial.xs (along
 #	with pid and path), and behave like unexported variables,
 #	except that they are known to have an initial value.
 #	When an internal variable is modified, it becomes exportable,
@@ -352,7 +347,7 @@ fn-vars = { |*|
 # Syntactic sugar
 #
 
-#	Much of the flexibility in es comes from its use of syntactic rewriting.
+#	Much of the flexibility in xs comes from its use of syntactic rewriting.
 #	Traditional shell syntax is rewritten as it is parsed into calls
 #	to ``hook'' functions.  Hook functions are special only in that
 #	they are the result of the rewriting that goes on.  By convention,
@@ -395,9 +390,9 @@ fn-%backquote = { |*|
 #	braces.  The logical operators are implemented in terms of if.
 #
 #	%and and %or are recursive, which is slightly inefficient given
-#	the current implementation of es -- it is not properly tail recursive
+#	the current implementation of xs -- it is not properly tail recursive
 #	-- but that can be fixed and it's still better to write more of
-#	the shell in es itself.
+#	the shell in xs itself.
 
 fn-%seq		= $&seq
 
@@ -447,7 +442,7 @@ fn-fn = { |name body rest|
 
 #	Background commands could use the $&background primitive directly,
 #	but some of the user-friendly semantics ($apid, printing of the
-#	child process id) were easier to write in es.
+#	child process id) were easier to write in xs.
 #
 #		cmd &			%background {cmd}
 
@@ -521,11 +516,11 @@ fn-%dup		= $&dup
 fn-%pipe	= $&pipe
 
 #	Input/Output substitution (i.e., the >{} and <{} forms) provide an
-#	interesting case.  If es is compiled for use with /dev/fd, these
+#	interesting case.  If xs is compiled for use with /dev/fd, these
 #	functions will be built in.  Otherwise, versions of the hooks are
 #	provided here which use files in /tmp.
 #
-#	The /tmp versions of the functions are straightforward es code,
+#	The /tmp versions of the functions are straightforward xs code,
 #	and should be easy to follow if you understand the rewriting that
 #	goes on.  First, an example.  The pipe
 #		ls|wc
@@ -564,7 +559,7 @@ if {~ <=$&primitives readfrom} {
 	fn-%readfrom = $&readfrom
 } else {
 	fn %readfrom var input cmd {
-		local ($var = /tmp/es.$var.$pid) {
+		local ($var = /tmp/xs.$var.$pid) {
 			unwind-protect {
 				$input > $$var
 				# text of $cmd is   command file
@@ -580,7 +575,7 @@ if {~ <=$&primitives writeto} {
 	fn-%writeto = $&writeto
 } else {
 	fn %writeto { |var output cmd|
-		local ($var = /tmp/es.$var.$pid) {
+		local ($var = /tmp/xs.$var.$pid) {
 			unwind-protect {
 				> $$var
 				$cmd
@@ -598,7 +593,7 @@ if {~ <=$&primitives writeto} {
 #	recommend using files in /tmp rather than named pipes.
 
 #fn %readfrom var cmd body {
-#	local ($var = /tmp/es.$var.$pid) {
+#	local ($var = /tmp/xs.$var.$pid) {
 #		unwind-protect {
 #			/etc/mknod $$var p
 #			$&background {$cmd > $$var; exit}
@@ -610,7 +605,7 @@ if {~ <=$&primitives writeto} {
 #}
 
 #fn %writeto var cmd body {
-#	local ($var = /tmp/es.$var.$pid) {
+#	local ($var = /tmp/xs.$var.$pid) {
 #		unwind-protect {
 #			/etc/mknod $$var p
 #			$&background {$cmd < $$var; exit}
@@ -661,7 +656,7 @@ let (dlist = .) {
 fn-%home	= $&home
 
 #	Path searching used to be a primitive, but the access function
-#	means that it can be written easier in es.  It is not called for
+#	means that it can be written easier in xs.  It is not called for
 #	absolute path names or for functions.
 
 fn %pathsearch { |name| access -n $name -1e -xf $path }
@@ -677,8 +672,8 @@ if {~ <=$&primitives execfailure} {fn-%exec-failure = $&execfailure}
 # Read-eval-print loops
 #
 
-#	In es, the main read-eval-print loop (REPL) can lie outside the
-#	shell itself.  Es can be run in one of two modes, interactive or
+#	In xs, the main read-eval-print loop (REPL) can lie outside the
+#	shell itself.  Xs can be run in one of two modes, interactive or
 #	batch, and there is a hook function for each form.  It is the
 #	responsibility of the REPL to call the parser for reading commands,
 #	hand those commands to an appropriate dispatch function, and handle
@@ -692,9 +687,9 @@ if {~ <=$&primitives execfailure} {fn-%exec-failure = $&execfailure}
 #	%batch-loop is used.
 #
 #	The function %parse can be used to call the parser, which returns
-#	an es command.  %parse takes two arguments, which are used as the
+#	an xs command.  %parse takes two arguments, which are used as the
 #	main and secondary prompts, respectively.  %parse typically returns
-#	one line of input, but es allows commands (notably those with braces
+#	one line of input, but xs allows commands (notably those with braces
 #	or backslash continuations) to continue across multiple lines; in
 #	that case, the complete command and not just one physical line is
 #	returned.
@@ -772,9 +767,9 @@ fn-%exit-on-false = $&exitonfalse		# -e
 #	value.)
 
 #	These functions are used to alias the standard unix environment
-#	variables HOME and PATH with their es equivalents, home and path.
+#	variables HOME and PATH with their xs equivalents, home and path.
 #	With path aliasing, colon separated strings are split into lists
-#	for their es form (using the %fsplit builtin) and are flattened
+#	for their xs form (using the %fsplit builtin) and are flattened
 #	with colon separators when going to the standard unix form.
 #
 #	These functions are pretty idiomatic.  set-home disables the set-HOME
@@ -789,7 +784,7 @@ set-path = { |x| local (set-PATH) PATH = <={%flatten ':' $x}; result $x }
 set-PATH = { |x| local (set-path) path = <={%fsplit  ':' $x}; result $x }
 
 #	These settor functions call primitives to set data structures used
-#	inside of es.
+#	inside of xs.
 
 set-history		= $&sethistory
 set-signals		= $&setsignals
@@ -839,4 +834,4 @@ noexport = noexport pid signals apid bqstatus fn-%dispatch path home
 #	is printed in the header comment in initial.c;  nobody really
 #	wants to look at initial.c anyway.
 
-result es initial state built in `/bin/pwd on `/bin/date for <=$&version
+result xs initial state built in `/bin/pwd on `/bin/date for <=$&version

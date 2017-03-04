@@ -1,6 +1,6 @@
 /* conv.c -- convert between internal and external forms ($Revision: 1.1.1.1 $) */
 
-#include "es.hxx"
+#include "xs.hxx"
 #include "print.hxx"
 #include "syntax.hxx"
 #include <map> 

@@ -1,6 +1,6 @@
 /* status.c -- status manipulations ($Revision: 1.1.1.1 $) */
 
-#include "es.hxx"
+#include "xs.hxx"
 #include "term.hxx"
 
 static const Term

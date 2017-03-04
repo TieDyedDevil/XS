@@ -1,6 +1,6 @@
 /* util.c -- the kitchen sink ($Revision: 1.2 $) */
 
-#include "es.hxx"
+#include "xs.hxx"
 #include <stdlib.h>
 #include <fcntl.h>
 #include "print.hxx"

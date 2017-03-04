@@ -1,7 +1,7 @@
-/* parse.y -- grammar for es ($Revision: 1.2 $) */
+/* parse.y -- grammar for xs ($Revision: 1.2 $) */
 
 %{
-#include "es.hxx"
+#include "xs.hxx"
 #include "input.hxx"
 #include "syntax.hxx"
 
@@ -50,11 +50,11 @@ typedef struct yyltype
 		arith
 %type <kind>	binder
 
-%start es
+%start xs
 
 %%
 
-es	: line end		{ parsetree = $1; YYACCEPT; }
+xs	: line end		{ parsetree = $1; YYACCEPT; }
 	| error end		{ yyerrok; parsetree = NULL; YYABORT; }
 
 end	: NL			{ if (!readheredocs(false)) YYABORT; }

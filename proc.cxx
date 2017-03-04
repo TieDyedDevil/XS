@@ -1,6 +1,6 @@
 /* proc.c -- process control system calls ($Revision: 1.2 $) */
 
-#include "es.hxx"
+#include "xs.hxx"
 #include <list>
 using std::list;
 

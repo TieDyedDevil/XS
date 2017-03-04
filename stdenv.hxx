@@ -1,6 +1,6 @@
 /* stdenv.hxx -- set up an environment we can use ($Revision: 1.3 $) */
 
-#include "esconfig.hxx"
+#include "xsconfig.hxx"
 #include <vector>
 #include <map>
 using std::map;
@@ -31,7 +31,7 @@ class gc_cleanup {};
  */
 
 /*
- * protect the rest of es source from the dance of the includes
+ * protect the rest of xs source from the dance of the includes
  */
 
 #if HAVE_UNISTD_H
@@ -133,7 +133,7 @@ typedef struct direct Dirent;
 #define STRING(s) _STRING(s)
 
 /*
- * types we use throughout es
+ * types we use throughout xs
  */
 
 #if USE_SIG_ATOMIC_T

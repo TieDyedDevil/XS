@@ -1,6 +1,6 @@
 /* heredoc.c -- in-line files (here documents) ($Revision: 1.1.1.1 $) */
 
-#include "es.hxx"
+#include "xs.hxx"
 #include "input.hxx"
 #include "syntax.hxx"
 #include <sstream>

@@ -1,6 +1,6 @@
 /* eval.c -- evaluation of lists and trees ($Revision: 1.2 $) */
 
-#include "es.hxx"
+#include "xs.hxx"
 #include <string>
 #include <term.hxx>
 unsigned long evaldepth = 0, maxevaldepth = MAXmaxevaldepth;

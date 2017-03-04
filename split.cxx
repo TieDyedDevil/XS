@@ -1,6 +1,6 @@
 /* split.c -- split strings based on separators ($Revision: 1.1.1.1 $) */
 
-#include "es.hxx"
+#include "xs.hxx"
 #include <sstream>
 using std::stringstream;
 

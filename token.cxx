@@ -1,6 +1,6 @@
-/* token.c -- lexical analyzer for es ($Revision: 1.1.1.1 $) */
+/* token.c -- lexical analyzer for xs ($Revision: 1.1.1.1 $) */
 
-#include "es.hxx"
+#include "xs.hxx"
 #include "input.hxx"
 #include "syntax.hxx"
 #include "parse.hxx"

@@ -1,4 +1,3 @@
-- Change remaining es references to xs.
 - Note requirement for C++ compiler.
 - Add more math operators.
 - Automate version string generation.

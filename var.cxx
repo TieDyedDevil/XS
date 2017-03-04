@@ -1,6 +1,6 @@
-/* var.c -- es variables ($Revision: 1.1.1.1 $) */
+/* var.c -- xs variables ($Revision: 1.1.1.1 $) */
 
-#include "es.hxx"
+#include "xs.hxx"
 #include "var.hxx"
 #include "term.hxx"
 #include <vector>

@@ -1,6 +1,6 @@
 /* tree.c -- functions for manipulating parse-trees. (create, copy, scan) ($Revision: 1.1.1.1 $) */
 
-#include "es.hxx"
+#include "xs.hxx"
 
 template <int size>
 static Tree* newtree() {

@@ -1,12 +1,12 @@
-# trip.es -- take a tour of es
-# Invoke as "path-to-new-es < trip.es"
+# trip.xs -- take a tour of xs
+# Invoke as "path-to-new-xs < trip.xs"
 
-# this trip doesn't tour much of the code at all.  es needs a real
+# this trip doesn't tour much of the code at all.  xs needs a real
 # set of regression tests, soon.
 
-#es = $0
-es = ./xs
-echo tripping $es
+#xs = $0
+xs = ./xs
+echo tripping $xs
 tmp = /tmp/trip.$pid
 rm -f $tmp
 
@@ -40,13 +40,13 @@ fn expect { |*|
 
 # lexical tests
 
-errorcheck 'tokenizer error'	{$es -c 'echo hi |[2'} 'expected ''='' or '']'' after digit'
-errorcheck 'tokenizer error'	{$es -c 'echo hi |[92=]'} 'expected digit after ''='''
-errorcheck 'tokenizer error'	{$es -c 'echo hi |[a]'} 'expected digit after ''['''
-errorcheck 'tokenizer error'	{$es -c 'echo hi |[2-'} 'expected ''='' or '']'' after digit'
-errorcheck 'tokenizer error'	{$es -c 'echo hi |[2=99a]'} 'expected '']'' after digit'
-errorcheck 'tokenizer error'	{$es -c 'echo hi |[2=a99]'} 'expected digit or '']'' after ''='''
-errorcheck 'tokenizer error'	{$es -c 'echo ''hi'} 'eof in quoted string'
+errorcheck 'tokenizer error'	{$xs -c 'echo hi |[2'} 'expected ''='' or '']'' after digit'
+errorcheck 'tokenizer error'	{$xs -c 'echo hi |[92=]'} 'expected digit after ''='''
+errorcheck 'tokenizer error'	{$xs -c 'echo hi |[a]'} 'expected digit after ''['''
+errorcheck 'tokenizer error'	{$xs -c 'echo hi |[2-'} 'expected ''='' or '']'' after digit'
+errorcheck 'tokenizer error'	{$xs -c 'echo hi |[2=99a]'} 'expected '']'' after digit'
+errorcheck 'tokenizer error'	{$xs -c 'echo hi |[2=a99]'} 'expected digit or '']'' after ''='''
+errorcheck 'tokenizer error'	{$xs -c 'echo ''hi'} 'eof in quoted string'
 
 
 #
@@ -160,7 +160,7 @@ errorcheck 'redirection error' {cat>()} 'null'
 #
 
 bigfile = /tmp/big.$pid
-od $es | sed 5000q > $bigfile
+od $xs | sed 5000q > $bigfile
 abc = (this is a)
 x = ()
 result = 'this is a heredoc
@@ -189,8 +189,8 @@ eof
 	fail quoting '$' in heredoc
 }
 
-errorcheck 'incomplete heredoc'	{$es -c 'cat<<eof'} 'pending' 
-errorcheck 'incomplete heredoc'	{$es -c 'cat<<eof'\n} 'incomplete'
+errorcheck 'incomplete heredoc'	{$xs -c 'cat<<eof'} 'pending' 
+errorcheck 'incomplete heredoc'	{$xs -c 'cat<<eof'\n} 'incomplete'
 
-errorcheck 'bad heredoc marker'	{$es -c 'cat<<(eof eof)'} 'not a single literal word'
-errorcheck 'bad heredoc marker'	{$es -c 'cat<<'''\n''''\n} 'contains a newline'
+errorcheck 'bad heredoc marker'	{$xs -c 'cat<<(eof eof)'} 'not a single literal word'
+errorcheck 'bad heredoc marker'	{$xs -c 'cat<<'''\n''''\n} 'contains a newline'

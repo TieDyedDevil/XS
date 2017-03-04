@@ -3,7 +3,7 @@
 #define	REQUIRE_IOCTL	1
 
 #include <time.h>
-#include "es.hxx"
+#include "xs.hxx"
 #include "prim.hxx"
 
 #ifdef HAVE_SETRLIMIT

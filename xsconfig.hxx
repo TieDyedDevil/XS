@@ -1,4 +1,4 @@
-/* config.h -- es(1) configuration parameters ($Revision: 1.1.1.1 $) */
+/* config.h -- xs(1) configuration parameters ($Revision: 1.1.1.1 $) */
 
 /*
  * Compile time options
@@ -77,12 +77,12 @@
  *
  *	KERNEL_POUNDBANG
  *		this value should be true when the builtin version of execve(2)
- *		understands #! headers.  if false, es provides a builtin for
+ *		understands #! headers.  if false, xs provides a builtin for
  *		running #! files.  the default is true; are there any real
  *		systems still out there that don't support it?
  *
  *	JOB_PROTECT
- *		set this to true if you want es to perform
+ *		set this to true if you want xs to perform
  *		backgrounding as if it were a job controlling shell;
  *		that is, if you want background jobs to be put in new
  *		process groups.  this flag is ignored if the system
@@ -97,12 +97,12 @@
  *		characters appear in them.
  *
  *	READLINE
- *		true if es is being linked with editline or gnu readline.
+ *		true if xs is being linked with editline or gnu readline.
  *
  *	REF_ASSERTIONS
  *		if this is on, assertions about the use of the Ref() macro
  *		will be checked at run-time.  this is only useful if you're
- *		modifying es source, and makes the binary much larger.
+ *		modifying xs source, and makes the binary much larger.
  *
  *	SHOW_DOT_FILES
  *		if this option is off (the default), wildcard patterns do not
@@ -145,7 +145,7 @@
  *
  *	USE_STDARG
  *		define this if you have an ansi compiler and the <stdarg.h>
- *		header file.  if not, es will try to use <varargs.h>, but
+ *		header file.  if not, xs will try to use <varargs.h>, but
  *		you may need to hack a bit to get that working.
  *
  *	USE_UNISTD
@@ -159,7 +159,7 @@
  *
  *	VOID_SIGNALS
  *		define this as true if signal handlers are declared with void
- *		return type; otherwise es uses int for signal returns. */
+ *		return type; otherwise xs uses int for signal returns. */
 
 
 /*

@@ -1,6 +1,6 @@
 /* syntax.c -- abstract syntax tree re-writing rules ($Revision: 1.1.1.1 $) */
 
-#include "es.hxx"
+#include "xs.hxx"
 #include "input.hxx"
 #include "syntax.hxx"
 #include "parse.hxx"

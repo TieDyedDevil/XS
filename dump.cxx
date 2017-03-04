@@ -1,6 +1,6 @@
-/* dump.c -- dump es's internal state as a c program ($Revision: 1.1.1.1 $) */
+/* dump.c -- dump xs's internal state as a c program ($Revision: 1.1.1.1 $) */
 
-#include "es.hxx"
+#include "xs.hxx"
 #include "var.hxx"
 #include "term.hxx"
 #include "print.hxx"
@@ -16,9 +16,9 @@ using std::string;
 
 /*
  * the $&dumpstate prints the appropriate C data structures for
- * representing the parts of es's memory that can be stored in
+ * representing the parts of xs's memory that can be stored in
  * the text (read-only) segment of the program.  (some liberties
- * are taken with regard to what the initial.es routines can do
+ * are taken with regard to what the initial.xs routines can do
  * regarding changing lexically bound values in order that more
  * things can be here.)
  *
@@ -255,7 +255,7 @@ static void printheader(const List *title) {
 	)
 		panic("dumpstate: Tree union sizes do not match struct sizes");
 
-	print("/* %L */\n\n#include \"es.hxx\"\n#include \"term.hxx\"\n\n", title, " ");
+	print("/* %L */\n\n#include \"xs.hxx\"\n#include \"term.hxx\"\n\n", title, " ");
 	print("%s\n\n", PPSTRING(TreeTypes));
 }
 

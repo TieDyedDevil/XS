@@ -1,6 +1,6 @@
-/* es.hxx -- definitions for higher order shell ($Revision: 1.2 $) */
-#ifndef ES_HXX
-#define ES_HXX
+/* xs.hxx -- definitions for higher order shell ($Revision: 1.2 $) */
+#ifndef XS_HXX
+#define XS_HXX
 
 #include "config.h"
 #include "stdenv.hxx"
@@ -19,7 +19,7 @@
 
 
 /*
- * the fundamental es data structures.
+ * the fundamental xs data structures.
  */
 
 struct Term;
@@ -108,7 +108,7 @@ extern char *gcndup(const char* s, size_t n);	/* util.c: copy a counted string i
 inline char *gcdup(const char *s) {
 	return gcndup(s, strlen(s));
 }
-/* initial.c (for es) or dump.c (for esdump) */
+/* initial.c (for xs) or dump.c (for xsdump) */
 
 extern void runinitial(void);
 

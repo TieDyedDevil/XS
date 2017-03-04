@@ -1,6 +1,6 @@
-/* str.c -- es string operations ($Revision: 1.1.1.1 $) */
+/* str.c -- xs string operations ($Revision: 1.1.1.1 $) */
 
-#include "es.hxx"
+#include "xs.hxx"
 #include "print.hxx"
 #include <sstream>
 #include <limits>

@@ -1,6 +1,6 @@
 /* match.c -- pattern matching routines ($Revision: 1.1.1.1 $) */
 
-#include "es.hxx"
+#include "xs.hxx"
 
 enum { RANGE_FAIL = -1, RANGE_ERROR = -2 };
 

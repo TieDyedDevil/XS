@@ -1,6 +1,6 @@
 /* closure.c -- operations on bindings, closures, lambdas, and thunks ($Revision: 1.1.1.1 $) */
 
-#include "es.hxx"
+#include "xs.hxx"
 #include <stdint.h>
 #include <map>
 

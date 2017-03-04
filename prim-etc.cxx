@@ -2,7 +2,7 @@
 
 #include <pwd.h>
 
-#include "es.hxx"
+#include "xs.hxx"
 #include "prim.hxx"
 
 PRIM(result) {

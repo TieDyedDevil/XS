@@ -1,6 +1,6 @@
 /* glom.c -- walk parse tree to produce list ($Revision: 1.1.1.1 $) */
 
-#include "es.hxx"
+#include "xs.hxx"
 #include <sstream>
 #include <functional>
 #include <boost/lexical_cast.hpp>

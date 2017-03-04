@@ -1,6 +1,6 @@
 /* fd.c -- file descriptor manipulations ($Revision: 1.2 $) */
 
-#include "es.hxx"
+#include "xs.hxx"
 #include <vector>
 using std::vector;
 
@@ -124,7 +124,7 @@ typedef struct {
 static Reserve *reserved = NULL;
 static int rescount = 0, resmax = 0;
 
-/* registerfd -- reserve a file descriptor for es */
+/* registerfd -- reserve a file descriptor for xs */
 extern void registerfd(int *fdp, bool closeonfork) {
 #if ASSERTIONS
 	int i;
@@ -168,7 +168,7 @@ extern void closefds(void) {
 	}
 }
 
-/* releasefd -- release a specific file descriptor from its es uses */
+/* releasefd -- release a specific file descriptor from its xs uses */
 extern void releasefd(int n) {
 	int i;
 	assert(n >= 0);

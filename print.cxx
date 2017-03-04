@@ -1,6 +1,6 @@
 /* print.c -- formatted printing routines ($Revision: 1.1.1.1 $) */
 
-#include "es.hxx"
+#include "xs.hxx"
 #include "print.hxx"
 
 /* Should be the > than he the largest numerical value of any normal english character used for fmttab */
@@ -339,7 +339,7 @@ extern void panic (const char * fmt, ...) {
 	FD_format format;
 	
 	va_start(format.args, fmt);
-	eprint("es panic: ");
+	eprint("xs panic: ");
 	fdprint(&format, 2, fmt);
 	va_end(format.args);
 	eprint("\n");

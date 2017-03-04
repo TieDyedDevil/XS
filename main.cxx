@@ -1,6 +1,6 @@
-/* main.c -- initialization for es ($Revision: 1.3 $) */
+/* main.c -- initialization for xs ($Revision: 1.3 $) */
 
-#include "es.hxx"
+#include "xs.hxx"
 
 extern int optind;
 extern char *optarg;

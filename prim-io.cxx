@@ -1,6 +1,6 @@
 /* prim-io.c -- input/output and redirection primitives ($Revision: 1.2 $) */
 
-#include "es.hxx"
+#include "xs.hxx"
 #include "prim.hxx"
 #include <stdio.h>
 #include <sstream>

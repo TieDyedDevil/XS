@@ -17,8 +17,6 @@ conv.cxx
 COPYING
 depcomp
 dump.cxx
-esconfig.hxx
-es.hxx
 eval.cxx
 fd.cxx
 glob.cxx
@@ -72,7 +70,9 @@ var.cxx
 var.hxx
 version.cxx
 xs.1
+xsconfig.hxx
 xsdebug
+xs.hxx
 xs.log
 xs_tests/alias.xs
 xs_tests/arith.xs

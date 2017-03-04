@@ -12,7 +12,7 @@ noinst_PROGRAMS = xsdump
 #TESTS = ctest 
 
 VPATH = $(srcdir) 
-HFILES	= config.hxx es.hxx gc.hxx input.hxx prim.hxx print.hxx sigmsgs.hxx \
+HFILES	= config.hxx xs.hxx gc.hxx input.hxx prim.hxx print.hxx sigmsgs.hxx \
 	  stdenv.hxx syntax.hxx term.hxx var.hxx
 COMMON_FILES	= access.cxx closure.cxx conv.cxx eval.cxx fd.cxx glob.cxx \
 	  glom.cxx input.cxx heredoc.cxx list.cxx match.cxx opt.cxx \
@@ -52,5 +52,5 @@ src	:
 initial.cxx : xsdump $(srcdir)/initial.xs
 	./xsdump < $(srcdir)/initial.xs > initial.cxx || (rm initial.cxx; false)
 
-sigmsgs.cxx : mksignal $(SIGFILES) es.hxx 
+sigmsgs.cxx : mksignal $(SIGFILES) xs.hxx 
 	sh $(srcdir)/mksignal $(SIGFILES) > sigmsgs.cxx

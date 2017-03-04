@@ -1,4 +1,4 @@
-/* prim.hxx -- definitions for es primitives ($Revision: 1.1.1.1 $) */
+/* prim.hxx -- definitions for xs primitives ($Revision: 1.1.1.1 $) */
 #include <string>
 
 #define	PRIM(name)	static const List* CONCAT(prim_,name)( \
