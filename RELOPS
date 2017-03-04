@@ -1,0 +1,57 @@
+Ideas for relops
+
+<=, < and > are already defined.
+
+Lexemes
+  :lt :eq :gt :le :ge :ne
+
+We can't use ~ subject pattern for string matching.
+There's no way to specify that a pattern must match
+the entire subject.
+
+Can we overload relops to do both numeric and string
+comparison? Use locale collating order.
+
+Relops should have lower precedence than arithops if
+used within `(). Evaluating relops only in an arith
+context would allow use of conventional tokens
+(<, >, ==, <=, >=, !=). However, then we introduce
+type punning, e.g. `(($a < $b) + $c). Let's not...
+
+Alternatively, relops could be be prefix ops. This
+would allow for multiple subjects and targets,
+similar to pattern matching. The combination rules
+might be a bit different in that it doesn't make
+sense to return a single value e.g. for
+
+  :lt subj targ2 targ2 ...
+
+OTOH, we could do something like this:
+
+  relop (subj1 .. subjN) (targ1 .. targN)
+
+returns a list
+
+  sub1 rel targ1 .. subj1 rel targN .. subjN rel targ1 .. subjN rel targN
+
+The abstract syntax would be:
+
+  relop subj-list targ-list
+
+Should we define relops in terms of primitives?
+
+  :lt = &#lt
+  :eq = $&eq
+  :gt = $&gt
+  :le = $&le
+  :ge = $&ge
+  :ne = $&ne
+
+Or define primitives as taking strictly two arguments
+and then use initial.xs to define the standard operators
+(:foo) with the cross-product behavior. We'd need one
+HOF to do the cross-product, taking a relop as an argument.
+Something like:
+
+  :lt = %relop-cross $&lt
+
