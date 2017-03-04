@@ -2875,11 +2875,11 @@ Display version and exit.
 As with any other shell scripting language,
 process forking takes up the majority of time:
 .Ds
-.Cr "x = 0; while {!~ $x 4000} { x = :(x + 1) }
+.Cr "x = 0; while {!~ $x 4000} { x = `(x + 1) }
 .De
 is several magnitudes faster than:
 .Ds
-.Cr "x = 0; while {test $x -ne 4000} { x = :(x + 1) }
+.Cr "x = 0; while {test $x -ne 4000} { x = `(x + 1) }
 .De
 Even though xs's arithmetic code is rather slow, in this
 case the cost of fork+exec far outweighs it.
