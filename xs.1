@@ -845,25 +845,28 @@ is the list
 A single list element can be formed from an infix arithmetical expression like so:
 .Ds
 .Ci "\`( " " expression " )
-The expression can use any of the 
 .De
+The expression can use any of the 
 .Cr "+", 
 .Cr "-", 
-.Cr "*" 
+.Cr "*", 
+.Cr "/", 
 and 
-.Cr "/" 
+.Cr "%" 
 operators, and use variable substitution of the form
 .Cr "$var" .
 Parentheses can be used in normal infix fashion for order of evaluation.
 Numbers can be entered in floating-point or integer, but are always decimal.
 Calculation rules are similar to C - any operation involving floats
 produces a float, any operation with integers produces an integer;
-this includes division, so 
+this includes division and modulus, so 
 .Ds
 .Cr "echo `(1 / 2)"
 .Cr "echo `(1.0 / 2)"
+.Cr "echo `(5 % 3)"
+.Cr "echo `(5.0 / 3)"
 .De
-produce 0 and 0.5 (with trailing zeros) respectively.
+produce 0, 0.5 (with trailing zeros), 2 and 2.0 (with trailing zeros) respectively.
 Integers will wrap around at the same point as the native platform's int,
 and floats at the same point as the native platform's double.
 .SS "Command Substitution"

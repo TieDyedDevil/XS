@@ -34,7 +34,7 @@ typedef struct yyltype
 %left	SUB
 
 %left '+' '-'
-%left '*' '/'
+%left '*' '/' '%'
 
 %union {
 	Tree *tree;
@@ -139,6 +139,7 @@ arith   : arith '+' arith		{ $$ = mk(nPlus, $1, $3); }
 	| arith '-' arith		{ $$ = mk(nMinus, $1, $3); }
 	| arith '*' arith		{ $$ = mk(nMult, $1, $3); }
 	| arith '/' arith		{ $$ = mk(nDivide, $1, $3); }
+	| arith '%' arith		{ $$ = mk(nModulus, $1, $3); }
 	| '(' arith ')'			{ $$ = $2; }
 	| ARITH_VAR			{ $$ = mk(nVar, mk(nWord, $1)); }
 	| INT				{ $$ = mk(nInt, $1); }

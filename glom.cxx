@@ -364,13 +364,24 @@ static List *calculate(Tree *expr, Binding *binding) {
 	case nDivide:
 		{
 		List *a = EXPR1, *b = EXPR2;
-#undef EXPR1
-#undef EXPR2
 		// Integer division by 0 causes issues
 		if (isint(b) and toint(b) == 0)
 			return tolist(std::numeric_limits<double>::infinity());
 		return OP(std::divides, a, b);
 		}
+	case nModulus:
+		{
+		List *a = EXPR1, *b = EXPR2;
+		if (isint(b) and toint(b) == 0)
+			return tolist(std::numeric_limits<double>::infinity());
+		if (not isint(b) and todouble(b) == 0.0)
+			return tolist(std::numeric_limits<double>::infinity());
+		double r = std::fmod(todouble(a), todouble(b));
+		if (isint(a) and isint(b)) return tolist(static_cast<int>(r));
+		else return tolist(r);
+		}
+#undef EXPR1
+#undef EXPR2
 	default:
 		fail("xs:calculate", "bad expr kind %d", expr->kind);
 	}

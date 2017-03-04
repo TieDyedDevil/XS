@@ -113,6 +113,7 @@ static const char *nodename(NodeKind k) {
 	case nMinus:	return "Minus";
 	case nMult:	return "Mult";
 	case nDivide:	return "Divide";
+	case nModulus:	return "Modulus";
 	case nInt:	return "Int";
 	case nFloat:	return "Flat";
 	default:	panic("nodename: bad node kind %d", k);
@@ -136,7 +137,7 @@ static const char *dumptree(Tree *tree) {
 			print("static Tree_p %s = { n%s, { { (Tree *) %s } } };\n",
 			      name + 1, nodename(tree->kind), dumptree(tree->u[0].p));
 			break;
-		    case nPlus: case nMinus: case nMult: case nDivide:
+		    case nPlus: case nMinus: case nMult: case nDivide: case nModulus:
 		    case nAssign:  case nConcat: case nClosure: case nFor:
 		    case nLambda: case nLet: case nList:  case nLocal:
 		    case nVarsub: case nMatch: case nExtract:
