@@ -76,10 +76,17 @@ static void usage(void) {
 #if LISPTREES
 		"	-L	print parser results in LISP format\n"
 #endif
+		"	-V	show version and exit\n"
 	);
 	exit(1);
 }
 
+/* vers -- print version and exit */
+static void vers(void) NORETURN;
+static void vers(void) {
+	eprint(version);
+	exit(0);
+}
 
 /* main -- initialize, parse command arguments, and start running */
 int main(int argc, char **argv) {
@@ -107,7 +114,7 @@ int main(int argc, char **argv) {
 	if (argv[0][0] == '-')
 		loginshell = true;
 
-	while ((c = getopt(argc, argv, "eilxvnpodsc:?GIL")) != EOF)
+	while ((c = getopt(argc, argv, "eilxvnpodsc:?GILV")) != EOF)
 		switch (c) {
 #define FLAG(x, action) case x: action; break; 
 		FLAG('c', cmd = optarg);
@@ -125,6 +132,7 @@ int main(int argc, char **argv) {
 		FLAG('d', allowquit = true);
 		FLAG('s', cmd_stdin = true; goto getopt_done);
 		FLAG('G', GC_disable());
+		FLAG('V', vers());
 		default:
 			usage();
 		}

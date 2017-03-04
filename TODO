@@ -1,6 +1,4 @@
 - Eliminate SVN ($Revision: ... $) tags.
 - Note requirement for C++ compiler.
-- Automate version string generation.
-- Add -V option to report version.
 - Add examples.
 - Add tests.
