@@ -19,6 +19,9 @@ with the latest version of autoconf. There are a few new --enable options.
 
 Some simple new functions have been added - map, omap, until, switch.
 
+The modulus operator (%) may be used in math expressions. This is
+implemented by std::fmod.
+
 Readline now has tab-complete for functions & binaries in path.
 
 The init-file is now .xsrc (since es and xs are not compatible).
