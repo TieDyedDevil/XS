@@ -1,4 +1,3 @@
-- Eliminate SVN ($Revision: ... $) tags.
 - Add Unicode escapes?
 - Note requirement for C++ compiler.
 - Add examples.

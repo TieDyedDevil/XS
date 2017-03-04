@@ -1,4 +1,4 @@
-/* config.h -- xs(1) configuration parameters ($Revision: 1.1.1.1 $) */
+/* config.h -- xs(1) configuration parameters */
 
 /*
  * Compile time options

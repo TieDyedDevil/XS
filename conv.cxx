@@ -1,4 +1,4 @@
-/* conv.c -- convert between internal and external forms ($Revision: 1.1.1.1 $) */
+/* conv.c -- convert between internal and external forms */
 
 #include "xs.hxx"
 #include "print.hxx"

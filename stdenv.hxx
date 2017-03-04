@@ -1,4 +1,4 @@
-/* stdenv.hxx -- set up an environment we can use ($Revision: 1.3 $) */
+/* stdenv.hxx -- set up an environment we can use */
 
 #include "xsconfig.hxx"
 #include <vector>

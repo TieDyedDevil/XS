@@ -1,4 +1,4 @@
-/* xs.hxx -- definitions for higher order shell ($Revision: 1.2 $) */
+/* xs.hxx -- definitions for higher order shell */
 #ifndef XS_HXX
 #define XS_HXX
 

@@ -1,4 +1,4 @@
-/* opt.c -- option parsing ($Revision: 1.1.1.1 $) */
+/* opt.c -- option parsing */
 
 #include "xs.hxx"
 

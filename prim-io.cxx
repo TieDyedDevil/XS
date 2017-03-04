@@ -1,4 +1,4 @@
-/* prim-io.c -- input/output and redirection primitives ($Revision: 1.2 $) */
+/* prim-io.c -- input/output and redirection primitives */
 
 #include "xs.hxx"
 #include "prim.hxx"

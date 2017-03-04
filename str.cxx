@@ -1,4 +1,4 @@
-/* str.c -- xs string operations ($Revision: 1.1.1.1 $) */
+/* str.c -- xs string operations */
 
 #include "xs.hxx"
 #include "print.hxx"

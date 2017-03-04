@@ -1,4 +1,4 @@
-/* fd.c -- file descriptor manipulations ($Revision: 1.2 $) */
+/* fd.c -- file descriptor manipulations */
 
 #include "xs.hxx"
 #include <vector>

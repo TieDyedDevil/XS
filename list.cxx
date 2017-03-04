@@ -1,4 +1,4 @@
-/* list.c -- operations on lists ($Revision: 1.1.1.1 $) */
+/* list.c -- operations on lists */
 
 #include "xs.hxx"
 #include <algorithm>

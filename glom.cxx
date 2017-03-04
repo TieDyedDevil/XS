@@ -1,4 +1,4 @@
-/* glom.c -- walk parse tree to produce list ($Revision: 1.1.1.1 $) */
+/* glom.c -- walk parse tree to produce list */
 
 #include "xs.hxx"
 #include <sstream>

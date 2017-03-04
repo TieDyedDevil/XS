@@ -1,4 +1,4 @@
-/* match.c -- pattern matching routines ($Revision: 1.1.1.1 $) */
+/* match.c -- pattern matching routines */
 
 #include "xs.hxx"
 

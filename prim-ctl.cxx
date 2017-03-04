@@ -1,4 +1,4 @@
-/* prim-ctl.c -- control flow primitives ($Revision: 1.1.1.1 $) */
+/* prim-ctl.c -- control flow primitives */
 
 #include "xs.hxx"
 #include "prim.hxx"

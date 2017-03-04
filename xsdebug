@@ -1,5 +1,5 @@
 #! ./xs -p
-# xsdebug: a debugger for xs scripts ($Revision: 1.1.1.1 $)
+# xsdebug: a debugger for xs scripts
 
 # TODO
 #	catch signals (at least sigint) better

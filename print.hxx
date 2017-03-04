@@ -1,4 +1,4 @@
-/* print.hxx -- interface to formatted printing routines ($Revision: 1.1.1.1 $) */
+/* print.hxx -- interface to formatted printing routines */
 
 struct Format {
 public:

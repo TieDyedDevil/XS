@@ -1,4 +1,4 @@
-/* sigmsgs.h -- interface to signal name and message date ($Revision: 1.1.1.1 $) */
+/* sigmsgs.h -- interface to signal name and message date */
 
 typedef struct {
 	int sig;

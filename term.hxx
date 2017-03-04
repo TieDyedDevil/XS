@@ -1,4 +1,4 @@
-/* term.h -- definition of term structure ($Revision: 1.1.1.1 $) */
+/* term.h -- definition of term structure */
 
 struct Term {
 	const char *str;

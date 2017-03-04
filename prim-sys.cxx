@@ -1,4 +1,4 @@
-/* prim-sys.c -- system call primitives ($Revision: 1.2 $) */
+/* prim-sys.c -- system call primitives */
 
 #define	REQUIRE_IOCTL	1
 

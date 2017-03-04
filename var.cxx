@@ -1,4 +1,4 @@
-/* var.c -- xs variables ($Revision: 1.1.1.1 $) */
+/* var.c -- xs variables */
 
 #include "xs.hxx"
 #include "var.hxx"

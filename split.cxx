@@ -1,4 +1,4 @@
-/* split.c -- split strings based on separators ($Revision: 1.1.1.1 $) */
+/* split.c -- split strings based on separators */
 
 #include "xs.hxx"
 #include <sstream>

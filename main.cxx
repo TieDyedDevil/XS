@@ -1,4 +1,4 @@
-/* main.c -- initialization for xs ($Revision: 1.3 $) */
+/* main.c -- initialization for xs */
 
 #include "xs.hxx"
 

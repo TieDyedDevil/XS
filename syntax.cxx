@@ -1,4 +1,4 @@
-/* syntax.c -- abstract syntax tree re-writing rules ($Revision: 1.1.1.1 $) */
+/* syntax.c -- abstract syntax tree re-writing rules */
 
 #include "xs.hxx"
 #include "input.hxx"

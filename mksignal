@@ -1,5 +1,5 @@
 #! /bin/sh
-# mksignal -- generate xs's internal signal table from signal.h ($Revision: 1.1.1.1 $)
+# mksignal -- generate xs's internal signal table from signal.h
 
 echo '#include "xs.hxx"'
 echo '#include "sigmsgs.hxx"'

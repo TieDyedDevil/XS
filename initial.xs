@@ -1,4 +1,4 @@
-# initial.xs -- set up initial interpreter state ($Revision: 1.1.1.1 $)
+# initial.xs -- set up initial interpreter state
 
 
 #

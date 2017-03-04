@@ -1,4 +1,4 @@
-/* util.c -- the kitchen sink ($Revision: 1.2 $) */
+/* util.c -- the kitchen sink */
 
 #include "xs.hxx"
 #include <stdlib.h>

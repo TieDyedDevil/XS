@@ -1,4 +1,4 @@
-/* closure.c -- operations on bindings, closures, lambdas, and thunks ($Revision: 1.1.1.1 $) */
+/* closure.c -- operations on bindings, closures, lambdas, and thunks */
 
 #include "xs.hxx"
 #include <stdint.h>

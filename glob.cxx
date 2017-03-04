@@ -1,4 +1,4 @@
-/* glob.c -- wildcard matching ($Revision: 1.1.1.1 $) */
+/* glob.c -- wildcard matching */
 
 #define	REQUIRE_STAT	1
 #define	REQUIRE_DIRENT	1
