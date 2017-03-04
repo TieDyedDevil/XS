@@ -360,15 +360,17 @@ static List *calculate(Tree *expr, Binding *binding) {
 		return OP(std::minus, EXPR1, EXPR2);
 	case nMult:
 		return OP(std::multiplies, EXPR1, EXPR2);
-	case nDivide:
+	case nDivide: {
 		List *a = EXPR1, *b = EXPR2;
 #undef EXPR1
 #undef EXPR2
 		// Integer division by 0 causes issues
 		if (isint(b) and toint(b) == 0)
 			return tolist(std::numeric_limits<double>::infinity());
-		List *l = OP(std::divides, a, b);
-		
+		return OP(std::divides, a, b);
+	}
+	default:
+		fail("xs:calculate", "bad expr kind %d", expr->kind);
 	}
 }
 
