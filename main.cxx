@@ -84,7 +84,7 @@ static void usage(void) {
 /* vers -- print version and exit */
 static void vers(void) NORETURN;
 static void vers(void) {
-	eprint(version);
+	eprint("%s\n", version);
 	exit(0);
 }
 
