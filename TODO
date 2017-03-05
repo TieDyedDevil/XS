@@ -2,6 +2,5 @@
 - Confirm list of special characters.
 - Why do we see garbage in `vars` listing?
   - And what's with the ^A's?
-- Document basic readline history.
 - Add examples.
 - Add tests.
