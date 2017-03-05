@@ -19,6 +19,7 @@ extern void initprims_controlflow(Prim_dict& primdict);	/* prim-ctl.c */
 extern void initprims_io(Prim_dict& primdict);		/* prim-io.c */
 extern void initprims_etc(Prim_dict& primdict);		/* prim-etc.c */
 extern void initprims_sys(Prim_dict& primdict);		/* prim-sys.c */
+extern void initprims_rel(Prim_dict& primdict);		/* prim-rel.c */
 extern void initprims_proc(Prim_dict& primdict);	/* proc.c */
 extern void initprims_access(Prim_dict& primdict);	/* access.c */
 

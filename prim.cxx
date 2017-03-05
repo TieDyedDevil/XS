@@ -28,6 +28,7 @@ extern void initprims(void) {
 	initprims_controlflow(prims);
 	initprims_io(prims);
 	initprims_etc(prims);
+	initprims_rel(prims);
 	initprims_sys(prims);
 	initprims_proc(prims);
 	initprims_access(prims);

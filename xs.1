@@ -2567,6 +2567,26 @@ with the variable
 locally bound
 to the name of a file which is used as the input for the command
 .IR output .
+.TP
+.Cr "%cmp \fIa b\fP"
+Compares its arguments and returns -1, 0 or 1 if
+.I a
+is respectively less than, equal to or greater than
+.IR b .
+This is a lexicographic comparison honoring the locale's
+collation order.
+.SS "Relational Functions"
+The relational functions are built upon
+.IR "%cmp" ,
+and return a boolean result.
+.Ds
+.Cr "%lt \fIa b\fP"
+.Cr "%eq \fIa b\fP"
+.Cr "%gt \fIa b\fP"
+.Cr "%le \fIa b\fP"
+.Cr "%ge \fIa b\fP"
+.Cr "%ne \fIa b\fP"
+.De
 .SS "Utility Functions"
 These functions are useful for people customizing the shell,
 may be used by other builtin commands,

@@ -22,6 +22,8 @@ Some simple new functions have been added - map, omap, until, switch.
 The modulus operator (%) may be used in math expressions. This is
 implemented by std::fmod.
 
+Low-level comparison and relational functions have been added.
+
 Readline now has tab-complete for functions & binaries in path.
 
 The init-file is now .xsrc (since es and xs are not compatible).
