@@ -2113,18 +2113,19 @@ Like
 .TP
 .Cr "popd"
 .I cd
-into the directory that was last pushed by
-.I pushd
-, popping the directory off of an internal stack.
+into the directory on top of the directory stack and pop the stack.
 If the stack is empty (for example, if
 .I pushd
 has not been called), then stay in the current directory.
-Also displays the remaining stack, starting from the top.
+Also displays the remaining stack.
 .TP
 .Cr "pushd \fR[\fP\fIdir\fP\fR]\fP"
-Add directory's absolute path onto 
-.IR popd 's 
-stack. Also displays the new stack.
+Add directory's absolute path onto the directory stack,
+.I cd
+into the directory and display the new stack. If
+.I dir
+is not provided, use
+.IR pwd .
 .TP 
 .Cr "result \fIvalue ...\fP"
 Returns its arguments.
