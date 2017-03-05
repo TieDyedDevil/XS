@@ -5,10 +5,6 @@ Ideas for relops
 Lexemes
   :lt :eq :gt :le :ge :ne
 
-We can't use ~ subject pattern for string matching.
-There's no way to specify that a pattern must match
-the entire subject.
-
 Can we overload relops to do both numeric and string
 comparison? Use locale collating order.
 
