@@ -24,6 +24,9 @@ implemented by std::fmod.
 
 Low-level comparison and relational functions have been added.
 
+Corrected the behaviors of pushd and popd. Added dirs to display
+directory stack.
+
 Readline now has tab-complete for functions & binaries in path.
 
 The init-file is now .xsrc (since es and xs are not compatible).

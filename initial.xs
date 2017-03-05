@@ -632,6 +632,7 @@ if {~ <=$&primitives writeto} {
 # Relies on pwd
 let (dlist = .) {
 	fn pushd { |dir|
+		~ $dlist . && dlist = `/bin/pwd
 		~ $dir () && dir = `/bin/pwd
 		!~ $#dir 1 && (throw error pushd 
 				Wrong number of arguments '('$#dir, should be 0 or 1')'
@@ -640,16 +641,26 @@ let (dlist = .) {
 		# If the directory is not absolute, we need to make it so
 		~ $dir [~/]* && dir = `/bin/pwd^/^$dir
 
-		dlist = $dir $dlist
+		# Paths on the stack must not have trailing /
+		{~ $dir */} && dir = <={~~ $dir */}
+
+		{~ $dir $dlist(1)} || {
+			dlist = $dir $dlist
+			cd $dir
+		}
 		echo $dlist
 	}
 	fn popd {
-		let (dir) {
+		{!~ $dlist .} && let (pop; dir) {
+			(pop dlist) = $dlist
 			(dir dlist) = $dlist
-			~ $dlist () && dlist = .
+			echo $dir $dlist
 			cd $dir
-			echo $dlist
+			~ $dlist () && dlist = .
 		}
+	}
+	fn dirs {
+		{~ $dlist .} || echo $dlist
 	}
 }
 

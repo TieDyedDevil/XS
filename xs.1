@@ -1903,6 +1903,10 @@ With no argument,
 changes the current directory to
 .Cr "$home" .
 .TP
+.Cr "dirs"
+Displays the directory stack. (See
+.IR pushd " and " popd ".)"
+.TP
 .Cr "echo \fR[\fP-n\fR]\fP \fR[\fP--\fR]\fP \fIargs ...\fP"
 Prints its arguments to standard output, terminated by a newline.
 Arguments are separated by spaces.
@@ -2112,16 +2116,15 @@ Like
 into the directory that was last pushed by
 .I pushd
 , popping the directory off of an internal stack.
-If it's internal stack is empty (for example,
-if
+If the stack is empty (for example, if
 .I pushd
-has not been called), then stays in the current directory.
-Also prints out the stack, starting from the top.
+has not been called), then stay in the current directory.
+Also displays the remaining stack, starting from the top.
 .TP
 .Cr "pushd \fR[\fP\fIdir\fP\fR]\fP"
 Add directory's absolute path onto 
-.I popd 's 
-stack. Also outputs the stack.
+.IR popd 's 
+stack. Also displays the new stack.
 .TP 
 .Cr "result \fIvalue ...\fP"
 Returns its arguments.
