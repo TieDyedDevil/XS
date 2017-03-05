@@ -10,7 +10,8 @@ PRIM(cmp) {
 	const char *a = getstr(list->term);
 	const char *b = getstr(list->next->term);
 	int r = strcoll(a, b);
-	list = mklist(mkstr(str("%d", r)), NULL);
+
+	list = mklist(mkstr(str("%d", r > 0 ? 1 : r < 0 ? -1 : 0)), NULL);
 	return list;
 }
 
