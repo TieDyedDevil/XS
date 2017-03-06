@@ -3,6 +3,7 @@
 - Add relop tests.
 - Install AUTHORS, CHANGES, README and TODO.
 - Confirm list of special characters.
+- Add job control (SIGTSTP, fg, bg).
 - Why do we see garbage in `vars` listing?
   - And what's with the ^A's?
 - Add examples.
