@@ -78,3 +78,16 @@ parse.y.  It is not clear to me why this is the case.  FSF's bison works
 fine.  This has not been `fixed' because it is not clear what is
 `broken'.  This may also be other dependencies that I do not
 understand.
+
+
+
+Setting xs as your default shell
+--------------------------------
+
+  Add the xs binary's path to /etc/shells, then change your shell using
+usermod or chsh.
+
+  If you built xs with readline, consult readline(1) for options to set
+in your ~/.inputrc file.  Also, enable persistent history by assigning
+a file path to the history variable in your ~/.xsrc file.
+
