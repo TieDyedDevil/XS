@@ -467,6 +467,17 @@ fn %background { |cmd|
 	}
 }
 
+#	We need a jobs command. This is better than nothing.
+
+fn jobs {
+	let (pids = <=$&apids) {
+		if {!~ $#pids 0} {
+			pids = `{echo $pids|tr ' ' ,}
+			ps -fj -p $pids
+		}
+	}
+}
+
 #	These redirections are rewritten:
 #
 #		cmd < file		%open 0 file {cmd}
