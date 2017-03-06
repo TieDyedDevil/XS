@@ -1,3 +1,4 @@
+- Implement a jobs command.
 - Add infix relops tokens and parser.
 - Confirm list of special characters.
 - Why do we see garbage in `vars` listing?
