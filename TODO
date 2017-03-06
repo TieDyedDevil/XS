@@ -1,6 +1,7 @@
 - Update pushd tests.
-- Add relop tests.
 - Add infix relops tokens and parser.
+- Add relop tests.
+- Install AUTHORS, CHANGES, README and TODO.
 - Confirm list of special characters.
 - Why do we see garbage in `vars` listing?
   - And what's with the ^A's?
