@@ -1,4 +1,5 @@
-- Implement a jobs command.
+- Update pushd tests.
+- Add relop tests.
 - Add infix relops tokens and parser.
 - Confirm list of special characters.
 - Why do we see garbage in `vars` listing?
