@@ -29,6 +29,8 @@ directory stack.
 
 Added a rudimentary jobs command.
 
+Added a history command.
+
 Readline now has tab-complete for functions & binaries in path.
 
 The init-file is now .xsrc (since es and xs are not compatible).

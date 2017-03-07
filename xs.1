@@ -1535,12 +1535,14 @@ The process ID of the last process started in the background.
 The name of a file to which commands are appended as
 .I xs
 reads them.
-This facilitates the use of a stand-alone history program
+The 
+.I history
+builtin uses this file, if defined. To use an external program
 (such as
-.IR history (1))
-which parses the contents of the history file and presents them to
-.I xs
-for reinterpretation.
+.IR history (1)),
+delete or redefine the 
+.I xs history
+function.
 If
 .Cr history
 is not set (the default), then
@@ -2001,6 +2003,21 @@ runs
 in the parent directory
 .Rc ( .. ),
 but leaves the shell in the current directory.
+.TP
+.Cr "history \fR[\fI#\fR | -c | -d \fI#\fR]\fP"
+Display or modify the history list. (See the
+.I history
+variable in
+.BI "SPECIAL VARIABLES" ".)"
+With no options, the entire history list is displayed. A numeric option
+limits the display to the specified number of most recent entries.
+The
+.I -c
+option clears the history list, while
+.I -d #
+deletes the
+.IR # 'th
+history item.
 .TP
 .Cr "if \fR[\fP\fItest then-action\fR]\fP \fR[else \fPelse-action\fR]\fP"
 Evaluates the command
