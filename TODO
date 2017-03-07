@@ -1,4 +1,3 @@
-- Update pushd tests.
 - Add infix relops tokens and parser.
 - Add relop tests.
 - Install AUTHORS, CHANGES, README and TODO.

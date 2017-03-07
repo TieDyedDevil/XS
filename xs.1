@@ -2127,8 +2127,8 @@ Add directory's absolute path onto the directory stack,
 .I cd
 into the directory and display the new stack. If
 .I dir
-is not provided, use
-.IR pwd .
+is not provided and the stack is at least two deep, then alternate
+between the top two directories.
 .TP 
 .Cr "result \fIvalue ...\fP"
 Returns its arguments.

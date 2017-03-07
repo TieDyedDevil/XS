@@ -21,8 +21,14 @@ conds expect-success
 
 run 'Pushd (no args)' {
 	orig = `pwd
+	pushd
+	~ $orig `pwd
 	mkdir t
 	cd t
+	pushd
+	~ $orig/t `pwd
+	pushd
+	~ $orig `pwd
 	pushd
 	~ $orig/t `pwd
 	popd
