@@ -7,3 +7,4 @@ they're either documented as intentional or fixed.
   - should QUIT cause xs to exit?
 - readline completion doesn't see xs function names.
 - there are crashes.
+	let (a) {echo $a(2)}
