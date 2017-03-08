@@ -1,8 +1,9 @@
-This file is a place to collect observations about `xs` behavior until
+This file is a place to collect observations about xs behavior until
 they're either documented as intentional or fixed.
 
 - subscripts don't work in here documents.
-- signal handling seems a bit unfinished
+- signal handling seems a bit unfinished:
   - INT doesn't always work; not sure why
   - should QUIT cause xs to exit?
-- there are crashes
+- readline completion doesn't see xs function names.
+- there are crashes.
