@@ -1,0 +1,28 @@
+Since you're coming to xs from another shell, there are some things that
+you'll need to know.
+
+  * ~/.xsrc is the only initialization file, executed only when xs starts
+    as a login shell.
+  * Apostrophe (') is the only paired quoting character.
+  * There are *no* escapes or substitutions of any kind inside '...'.
+  * To include a ' inside of '...', double the interior ', e.g. 'Frank''s'.
+  * Quote (") has no meaning for quoting. It is accepted as a word constituent.
+  * Substitution inside of a word is done via concatenation, using caret (^),
+    e.g. 'foo is '^$foo .
+  * All values are lists. Variable expansion preserves whitespace.
+  * To change IFS, use the double-backote (``) operator, e.g.
+    xy = `` x `{echo 37x42}
+    assigns the two-item list 37 42 to the variable xy.
+  * The assignment operator (=) must always be surrounded by spaces.
+    These are valid words: a=foo grack= =flink =ergh=
+  * $#foo returns the number of list items, not the number of characters
+    in the expansion of $foo .
+  * Use $^foo to flatten $foo into a one-item list with a blank between
+    each pair of original list items.
+  * The concatenation operator generates the cross-product of lists, e.g
+    ls foo.^[ch]
+    and
+    ls bar.^(cxx hxx) .
+  * Redirection and piping of stdin/stdout is as you'd expect; everything
+    else has an xs-specfic syntax.
+  * 
