@@ -10,7 +10,7 @@ you'll need to know.
   * Substitution inside of a word is done via concatenation, using caret (^),
     e.g. 'foo is '^$foo .
   * All values are lists. Variable expansion preserves whitespace.
-  * To change IFS, use the double-backote (``) operator, e.g.
+  * To change IFS, use the double-backquote (``) operator, e.g.
     xy = `` x `{echo 37x42}
     assigns the two-item list 37 42 to the variable xy.
   * The assignment operator (=) must always be surrounded by spaces.
@@ -25,4 +25,10 @@ you'll need to know.
     ls bar.^(cxx hxx) .
   * Redirection and piping of stdin/stdout is as you'd expect; everything
     else has an xs-specfic syntax.
-  * 
+  * The readline library (assuming xs is built with readline, which is the
+    default) doesn't know about xs word constituent characters when
+    completing filenames. You'll get the best results using apostrophe (')
+    to begin words that will contain xs-specific word-terminating characters.
+  * Xs does not interoperate transparently with programs that stuff values
+    into the environment. For example, this doesn't do what you'd expect:
+    echo this is a test|{/usr/bin/read l}; echo $l .
