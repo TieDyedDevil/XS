@@ -1,7 +1,6 @@
 - What is vars supposed to do?
 - Add infix relops tokens and parser.
 - Add relop tests.
-- Install AUTHORS, CHANGES, README and TODO.
 - Add job control (SIGTSTP, fg, bg).
 - Add examples.
 - Add tests.
