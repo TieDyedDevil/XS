@@ -368,7 +368,7 @@ PRIM(time) {
 }
 #endif	/* BUILTIN_TIME */
 
-#ifndef KERNEL_POUNDBANG
+#if !KERNEL_POUNDBANG
 PRIM(execfailure) {
 	int fd, len, argc;
 	char header[1024], *args[10], *s, *end, *file;
@@ -446,7 +446,7 @@ extern void initprims_sys(Prim_dict& primdict) {
 #if BUILTIN_TIME
 	X(time);
 #endif
-#ifndef KERNEL_POUNDBANG
+#if !KERNEL_POUNDBANG
 	X(execfailure);
 #endif /* !KERNEL_POUNDBANG */
 }

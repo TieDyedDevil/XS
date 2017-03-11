@@ -257,7 +257,7 @@ PRIM(pipe) {
 	return result;
 }
 
-#ifdef HAVE_DEV_FD
+#if HAVE_DEV_FD
 PRIM(readfrom) {
 	int pid, p[2], status;
 	caller = "$&readfrom";
@@ -438,7 +438,7 @@ extern void initprims_io(Prim_dict& primdict) {
 	X(backquote);
 	X(newfd);
 	X(here);
-#ifdef HAVE_DEV_FD
+#if HAVE_DEV_FD
 	X(readfrom);
 	X(writeto);
 #endif
