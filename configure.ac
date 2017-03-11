@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(xs, 1.1)
+AC_INIT(xs,1.1,,,[https://github.com/TieDyedDevil/XS])
 AC_CONFIG_HEADER(config.h)
 AM_INIT_AUTOMAKE([-Wall])
 
