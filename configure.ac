@@ -67,13 +67,13 @@ dnl ----------------------------
 AC_CACHE_CHECK(for /dev/fd filesystem, es_cv_sys_dev_fd,
 [test -d /dev/fd && es_cv_sys_dev_fd=yes || es_cv_sys_dev_fd=no])
 if test $es_cv_sys_dev_fd = yes; then
-  AC_DEFINE(HAVE_DEV_FD,,/dev/fd support for >{} <{})
+  AC_DEFINE(HAVE_DEV_FD,1,/dev/fd support for >{} <{})
 fi
 
 AC_SYS_INTERPRETER
 if test $ac_cv_sys_interpreter = yes
 then
-	AC_DEFINE(KERNEL_POUNDBANG,,execve has shebang support)
+	AC_DEFINE(KERNEL_POUNDBANG,1,execve has shebang support)
 fi
 
 
