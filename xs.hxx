@@ -327,6 +327,7 @@ extern bool continued_input;
 extern Tree *parse(const char *esprompt1, const char *esprompt2);
 extern Tree *parsestring(const char *str);
 extern void sethistory(const char *file);
+extern void inithistory(void);
 extern bool isinteractive(void);
 extern void initinput(void);
 extern void resetparser(void);

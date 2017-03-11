@@ -142,6 +142,14 @@ writeit:
 	++hist_from;
 #endif
 }
+
+/* inithistory -- read the history file at startup */
+extern void inithistory(void) {
+#if READLINE
+	loghistory("", 0);
+#endif
+}
+
 /* sethistory -- change the file for the history log */
 extern void sethistory(const char *file) {
 	if (historyfd != -1) {

@@ -175,6 +175,9 @@ getopt_done:
 		if (loginshell)
 			runxsrc();
 
+		if (runflags & run_interactive)
+			inithistory();
+
 		if (cmd == NULL && !cmd_stdin && optind < ac) {
 			int fd;
 			char *file = av[optind++];
