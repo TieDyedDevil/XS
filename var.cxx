@@ -237,11 +237,11 @@ extern List *listvars(bool internal) {
 	if (internal) {
 		foreach (Dict::value_type x, vars)
 			if (x.second->flags & var_isinternal)
-				varlist = mklist(mkstr(x.first.c_str()), varlist);
+				varlist = mklist(mkstr(gcdup(x.first.c_str())), varlist);
 	} else { // external only
 		foreach (Dict::value_type x, vars)
 			if ((x.second->flags & var_isinternal) == 0 && !specialvar(x.first))
-				varlist = mklist(mkstr(x.first.c_str()), varlist);
+				varlist = mklist(mkstr(gcdup(x.first.c_str())), varlist);
 	}
 	
 	return (varlist = sortlist(varlist));

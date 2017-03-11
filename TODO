@@ -1,4 +1,3 @@
-- What is vars supposed to do?
 - Add infix relops tokens and parser.
 - Add relop tests.
 - Add job control (SIGTSTP, fg, bg).
