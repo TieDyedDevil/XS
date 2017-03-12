@@ -81,19 +81,12 @@ dnl Checks for libraries.
 
 AC_CHECK_LIB(sun, getpwuid)
 
-if test "$use_readline" = yes || test "$use_editline" = yes
+if test "$use_readline" = yes
 then
-    dnl Are these really wanted/can they even work?
-	dnl AC_CHECK_LIB(terminfo, main)
-	dnl AC_CHECK_LIB(termcap, main)
-    AC_CHECK_LIB(ncurses, initscr)
-    if test "$use_readline" = yes
-    then
-    	AC_CHECK_LIB(readline, readline)
-    elif test "$use_editline" = yes
-    then
-    	AC_CHECK_LIB(edit, readline)
-    fi
+	AC_CHECK_LIB(readline, readline)
+elif test "$use_editline" = yes
+then
+	AC_CHECK_LIB(edit, readline)
 fi
 
 
