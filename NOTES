@@ -1,6 +1,7 @@
 This file is a place to collect observations about xs behavior until
 they're either documented as intentional or fixed.
 
+- variable-name checking may be incorrect (token.cxx).
 - subscripts don't work in here documents.
 - can't throw from default branch of switch.
 - signal handling seems a bit unfinished:
