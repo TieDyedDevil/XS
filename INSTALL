@@ -1,91 +1,39 @@
-Building from Git
------------------
-
-See the below, but call 
-   % autoreconf -i
-first.
-
 Prerequisites
 -------------
 
-   The following libraries are required:
+Xs requires the boost and gc (Boehm) libraries. The readline or editline
+library is strongly recommended.
 
-   boost
-   gc
-
-   Also, the following libraries are recommended:
-
-   readline
-
-   On Fedora, for example, these prerequisites are satisfied by
-installing the following packages:
-
-   boost-devel
-   gc-devel
-   readline-devel
+You'll need a C++ compiler, the GNU Autotools and YACC or Bison, plus
+the developer packages of the libraries noted above, in order to build xs.
 
 Basic Installation
 ------------------
 
-   Xs now uses the GNU configure system for configuration.  This
-means that on nearly all platforms, it should just build and work
-fine.  To do this, just type:
+Xs uses the GNU configure system for configuration.  This means that on
+nearly all platforms, it should just build and work fine. To do this,
+just type:
 
+   % autoreconf -i
    % ./configure
    % make
-
-   Xs needs an ANSI compiler (or at least a compiler that respects
-protoypes and provides large portions of the ANSI library).
-Otherwise it should build with the basic tools available on most UNIX
-platforms.
-
-   Xs obeys the GNU configure convention of allowing you to build in
-a directory different from the source directory.  To do this, just
-execute configure with a path to the source.  For example:
-
-   % /path/to/configure
-
-   Also obeying the GNU configure convention, configure will take
-arguments specifying a variety of directories.  Currently the only
-relevant ones are the prefix directory (/usr/local by default); bindir,
-the directory in which `xs' will reside ($prefix/bin by default); and
-mandir, the directory that will contain the manpage ($prefix/man by
-default).  These are given to configure by:
-
-   % ./configure --prefix=directory
-   % ./configure --bindir=directory --mandir=directory
-
-   Similarly, setting the `CC', `CFLAGS', and `LDFLAGS' environmental
-variables will cause those to be used in the Makefile.
-
-Xs Options
-----------
-
-  Xs can be built to link to two command line editting libraries:
-GNU readline and editline.  For information about obtaining these, see
-the README file.  These may used by providing, respectively, the
---with-readline or --with-editline respectively.  
-
-
 
 Problems with building
 ----------------------
 
-  The HP-UX yacc program seems to dislike the use of LOCAL in
-parse.y.  It is not clear to me why this is the case.  FSF's bison works
-fine.  This has not been `fixed' because it is not clear what is
-`broken'.  This may also be other dependencies that I do not
-understand.
+  (Is this still true?)
 
-
+The HP-UX yacc program seems to dislike the use of LOCAL in parse.yxx.
+It is not clear to me why this is the case.  FSF's bison works fine.
+This has not been `fixed' because it is not clear what is `broken'.
+This may also be other dependencies that I do not understand.
 
 Setting xs as your default shell
 --------------------------------
 
-  Add the xs binary's path to /etc/shells, then change your shell using
+Add the xs binary's path to /etc/shells, then change your shell using
 usermod or chsh.
 
-  If you built xs with readline, consult readline(1) for options to set
+If you built xs with readline, consult readline(1) for options to set
 in your ~/.inputrc file.  Also, enable persistent history by assigning
 a file path to the history variable in your ~/.xsrc file.
-
