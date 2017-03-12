@@ -90,7 +90,7 @@ static List *qconcat(List* list1, List* list2,
 /* subscript -- variable subscripting */
 static List *subscript(List* list, List* subs) {
 	int lo, hi, len = length(list), counter = 1;
-	List *result, *current = list;
+	List *result = NULL, *current = list;
 	List **prevp = &result;
 
 	if (subs != NULL && streq(getstr(subs->term), "...")) {
