@@ -165,7 +165,7 @@ top:
 
 	case nArith: {
 		Tree *t = n->u[0].p;
-		fmtprint(f, ":(%s)", arith_dump(t).c_str());
+		fmtprint(f, "`(%s)", arith_dump(t).c_str());
 		return false;
 	}
 
