@@ -8,5 +8,3 @@ they're either documented as intentional or fixed.
   - INT doesn't always work; not sure why
   - should QUIT cause xs to exit?
 - readline completion doesn't see xs function or variable names.
-- there are crashes.
-- wow, this is huge (3.1 MB); boost's fault?
