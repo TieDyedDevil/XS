@@ -1943,10 +1943,10 @@ In fact, it's behaviour is a simple subset of exceptions, and is implemented
 fairly simply using catch.
 Escape is useful to replace return/break like constructs; for example
 .Ds
-.Cr "fn f { escape |fn-return| {
+.Cr "fn f { escape { |fn-return| {
 .Cr "    ...; return 0;"
 .Cr "    ..."
-.Cr "}"
+.Cr "}}"
 .De
 .TP
 will exit the function with result 0 when it reached the return. 
