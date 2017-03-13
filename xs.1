@@ -1916,9 +1916,12 @@ With no argument,
 changes the current directory to
 .Cr "$home" .
 .TP
-.Cr "dirs"
+.Cr "dirs \fR[\fP-c\fR]\fP"
 Displays the directory stack. (See
 .IR pushd " and " popd ".)"
+With the
+.Cr "\-c"
+option, clear the directory stack.
 .TP
 .Cr "echo \fR[\fP-n\fR]\fP \fR[\fP--\fR]\fP \fIargs ...\fP"
 Prints its arguments to standard output, terminated by a newline.

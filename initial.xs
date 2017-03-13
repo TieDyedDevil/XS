@@ -666,7 +666,8 @@ let (dlist = .) {
 			~ $dlist () && dlist = .
 		}
 	}
-	fn dirs {
+	fn dirs {|*|
+		~ $* -c && dlist = .
 		~ $dlist . || echo $dlist
 	}
 }
