@@ -1,3 +1,4 @@
+- Start as interactive shell on pty.
 - Add infix relops tokens and parser.
 - Add relop tests.
 - Add job control (SIGTSTP, fg, bg).
