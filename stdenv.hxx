@@ -16,6 +16,7 @@ using std::map;
 #define gc_allocator std::allocator
 #define traceable_allocator std::allocator
 #define GC_gcollect()
+#define GC_disable()
 class gc_cleanup {};
 #endif
 
