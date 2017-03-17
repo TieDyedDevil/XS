@@ -146,7 +146,7 @@ top:
 	case nFor:
 		/* Same internal structure as binding, different 
                    syntax slightly hacked around */
-		binding(f, "for", n, "", false);
+		binding(f, "for ", n, "", false);
 		/* Braces are mandatory, so thunkify required */
 		tailcall(thunkify(n->u[1].p), false);
 
