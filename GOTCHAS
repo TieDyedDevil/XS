@@ -29,6 +29,7 @@ you'll need to know.
     default) doesn't know about xs word constituent characters when
     completing filenames. You'll get the best results using apostrophe (')
     to begin words that will contain xs-specific word-terminating characters.
-  * Xs does not interoperate transparently with programs that stuff values
-    into the environment. For example, this doesn't do what you'd expect:
-    echo this is a test|{/usr/bin/read l}; echo $l .
+  * There's no builtin `read` as in a POSIX-like shell. This is to avoid
+    confusion with the %read function, which has a different semantics. In
+    general, if you want to use a POSIX-like command that returns values by
+    modifying the environment, it won't function in xs.
