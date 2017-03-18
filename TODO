@@ -1,3 +1,4 @@
+- Make a platform-neutral fix for the sigsetjmp() issue (see stdenv.hxx).
 - Start as interactive shell on pty.
 - Add infix relops tokens and parser.
 - Add relop tests.

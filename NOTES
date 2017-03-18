@@ -4,9 +4,5 @@ they're either documented as intentional or fixed.
 - variable-name checking may be incorrect (token.cxx).
 - subscripts don't work in here documents.
 - can't throw from default branch of switch.
-- signal handling seems a bit unfinished:
-  - INT doesn't always work; not sure why
-    - After first ^C, xs blocks SIGINT
-      ; cat /proc/<pid-of-xs>/status | grep Sig*
-  - should QUIT cause xs to exit?
+- should QUIT cause xs to exit?
 - readline completion doesn't see xs function or variable names.

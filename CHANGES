@@ -31,6 +31,11 @@ Added a rudimentary jobs command.
 
 Added a history command.
 
+On platforms that provide a sigsetjmp() library call, the first
+SIGINT caused all subsequent SIGINTs to be blocked. This broke the
+ability to cancel an unfinished command line using ^C. Worse, all
+forked programs inherited the SIGINT block. This is now fixed.
+
 Readline now has tab-complete for functions & binaries in path.
 
 The init-file is now .xsrc (since es and xs are not compatible).
