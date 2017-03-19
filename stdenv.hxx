@@ -103,10 +103,12 @@ typedef struct direct Dirent;
 #define	EOF	(-1)
 #endif
 
-/* FIX: Set HAVE_SIGSETJMP in autoconfig. */
-#define HAVE_SIGSETJMP 1
+/*
+ * xs_setjmp/longjmp/jmp_buf ensure proper signal handling when we throw
+ * out of a handler
+ */
 
-#if HAVE_SIGSETJMP
+#if HAVE_DECL_SIGSETJMP
 # define xs_setjmp(buf) sigsetjmp(buf,1)
 # define xs_longjmp     siglongjmp
 # define xs_jmp_buf     sigjmp_buf

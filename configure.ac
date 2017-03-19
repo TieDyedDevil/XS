@@ -76,6 +76,9 @@ then
 	AC_DEFINE(KERNEL_POUNDBANG,1,execve has shebang support)
 fi
 
+dnl sigsetjmp
+AC_CHECK_DECLS([sigsetjmp],[],[],[[#include <setjmp.h>]])
+
 
 dnl Checks for libraries.
 
