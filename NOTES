@@ -1,8 +1,8 @@
 This file is a place to collect observations about xs behavior until
 they're either documented as intentional or fixed.
 
+- readline completion doesn't see xs function or variable names.
 - variable-name checking may be incorrect (token.cxx).
 - subscripts don't work in here documents.
-- can't throw from default branch of switch.
-- switch doesn't seem to work correctly with lexical variables...?
-- readline completion doesn't see xs function or variable names.
+- can't throw from a switch.
+  - check implementation of throw and escape.
