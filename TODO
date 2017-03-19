@@ -1,5 +1,3 @@
-- SIGQUIT causes callreadline() to behave as-if it received EOF
-  and cause xs to exit. This is incorrect.
 - Start as interactive shell on pty.
 - Add infix relops tokens and parser.
 - Add relop tests.
