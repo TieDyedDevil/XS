@@ -93,7 +93,7 @@ extern void ewrite(int fd, const char *buf, size_t n) {
 	const char *volatile bufp = buf;
 	for (i = 0, remain = n; remain > 0; bufp += i, remain -= i) {
 		interrupted = false;
-		if (!setjmp(slowlabel)) {
+		if (!xs_setjmp(slowlabel)) {
 			slow = true;
 			if (interrupted)
 				break;
@@ -115,7 +115,7 @@ extern int qstrcmp(const char *s1, const char *s2) {
 extern long eread(int fd, char *buf, size_t n) {
 	long r;
 	interrupted = false;
-	if (!setjmp(slowlabel)) {
+	if (!xs_setjmp(slowlabel)) {
 		slow = true;
 		if (!interrupted)
 			r = read(fd, buf, n);

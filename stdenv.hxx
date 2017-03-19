@@ -103,43 +103,17 @@ typedef struct direct Dirent;
 #define	EOF	(-1)
 #endif
 
-/* FIX: Define to test whether this fixes SIGINT being permanently
-   blocked with first occurrence on platforms (e.g. Linux) that do
-   have sigsetjmp() and siglongjmp(). [NOTE: It does.]
-
-   The problem arises because GNU libc's setjmp() and longjmp()
-   don't restore signal context (per SysV behavior), unlike the
-   POSIX sig... variations.
-
-   Clearly, we need both an autoconf test and a portable way of
-   defining the proper macros even when the platform headers aren't
-   to our liking. */
+/* FIX: Set HAVE_SIGSETJMP in autoconfig. */
 #define HAVE_SIGSETJMP 1
 
 #if HAVE_SIGSETJMP
-/* FIX: Test this. See above. */
-# ifdef sigsetjmp
-/* FOR NOW, let's lean on the current GNU libc headers.
-   This is not OK in the long run.
-
-   I wonder: Is the __... prefix a well-known convention to name the
-   underlying function of a macro with the same name? */
-#  ifdef setjmp
-#   undef setjmp
-#  endif
-#  define setjmp(buf) __sigsetjmp(buf,1)
-#  define longjmp     siglongjmp
-#  define jmp_buf     sigjmp_buf
-# endif
-
-/* Some versions of linux are helpful by providing sigsetjmp as a macro
- *    rather than as a function.  *arg* */
-# ifndef sigsetjmp
-
-#  define setjmp(buf) sigsetjmp(buf,1)
-#  define longjmp     siglongjmp
-#  define jmp_buf     sigjmp_buf
-# endif
+# define xs_setjmp(buf) sigsetjmp(buf,1)
+# define xs_longjmp     siglongjmp
+# define xs_jmp_buf     sigjmp_buf
+#else
+# define xs_setjmp(buf) setjmp(buf)
+# define xs_longjmp     longjmp
+# define xs_jmp_buf     jmp_buf
 #endif
 
 /*

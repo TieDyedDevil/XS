@@ -245,7 +245,7 @@ int Input::get() {
 static char *callreadline() {
 	char *r;
 	interrupted = false;
-	if (!setjmp(slowlabel)) {
+	if (!xs_setjmp(slowlabel)) {
 		slow = true;
 		update_hist();
 		r = interrupted ? NULL : readline(continued_input ? prompt2 : prompt);

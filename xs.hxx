@@ -387,7 +387,7 @@ extern void getsigeffects(Sigeffect effects[]);
 extern List *mksiglist(void);
 extern void initsignals(bool interactive, bool allowdumps);
 extern Atomic slow, interrupted;
-extern jmp_buf slowlabel;
+extern xs_jmp_buf slowlabel;
 extern bool sigint_newline;
 extern void sigchk(void);
 extern bool issilentsignal(List *e);

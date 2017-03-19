@@ -7,7 +7,7 @@ typedef Sigresult (*Sighandler)(int);
 
 bool sigint_newline = true;
 
-jmp_buf slowlabel;
+xs_jmp_buf slowlabel;
 Atomic slow = false;
 Atomic interrupted = false;
 static Atomic sigcount;
@@ -80,7 +80,7 @@ static void catcher(int sig) {
 	}
 	interrupted = true;
 	if (slow)
-		longjmp(slowlabel, 1);
+		xs_longjmp(slowlabel, 1);
 }
 
 
