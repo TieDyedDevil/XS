@@ -4,5 +4,6 @@ they're either documented as intentional or fixed.
 - variable-name checking may be incorrect (token.cxx).
 - subscripts don't work in here documents.
 - can't throw from default branch of switch.
+- switch doesn't seem to work correctly with lexical variables...?
 - should QUIT cause xs to exit?
 - readline completion doesn't see xs function or variable names.
