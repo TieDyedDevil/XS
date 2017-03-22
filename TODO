@@ -5,3 +5,4 @@
 - Add job control (SIGTSTP, fg, bg).
 - Add examples.
 - Add tests.
+- Get xsdebug working.
