@@ -621,7 +621,7 @@ void terminal_size() {
 	struct winsize ws;
 	if (ioctl(0, TIOCGWINSZ, &ws) == 0) {
 #if READLINE
-		rl_set_screen_size(ws.ws_row, ws.ws_col);
+		rl_set_screen_size(0, ws.ws_col);
 #endif
 	}
 }
