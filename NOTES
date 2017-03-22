@@ -1,7 +1,6 @@
 This file is a place to collect observations about xs behavior until
 they're either documented as intentional or fixed.
 
-- can we do a better job of handling WINCH signals?
 - readline completion doesn't see xs function or variable names.
 - variable-name checking may be incorrect (token.cxx).
 - subscripts don't work in here documents.
