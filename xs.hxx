@@ -335,6 +335,8 @@ extern void resetparser(void);
 extern const List *runfd(int fd, const char *name, int flags);
 extern const List *runstring(const char *str, const char *name, int flags);
 
+extern void terminal_size();
+
 /* eval_* flags are also understood as runflags */
 #define	run_interactive		 4	/* -i or $0[0] = '-' */
 #define	run_noexec		 8	/* -n */

@@ -1,8 +1,7 @@
-- xs needs its own SIGWINCH handler. Readline won't do the job a/o 6.3.
-  See https://bugs.python.org/issue23735 for background.
 - Add infix relops tokens and parser.
 - Add relop tests.
 - Add job control (SIGTSTP, fg, bg).
 - Add examples.
 - Add tests.
 - Get xsdebug working.
+- Should probably use autconf macro AC_HEADER_TIOCGWINSZ.

@@ -119,7 +119,7 @@ extern Sigeffect esignal(int sig, Sigeffect effect) {
 			}
 			break;
 		case sig_special:
-			if (sig != SIGINT) {
+			if (sig != SIGINT && sig != SIGWINCH) {
 				eprint("$&setsignals: special handler not defined for %s\n", signame(sig));
 				return old;
 			}
@@ -195,6 +195,8 @@ extern void initsignals(bool interactive, bool allowdumps) {
 
 	if (interactive || sigeffect[SIGINT] == sig_default)
 		esignal(SIGINT, sig_special);
+	if (interactive)
+		esignal(SIGWINCH, sig_special);
 	if (!allowdumps) {
 		if (interactive)
 			esignal(SIGTERM, sig_noop);
@@ -300,15 +302,22 @@ extern void sigchk(void) {
 		throw e;
 		NOTREACHED;
 	case sig_special:
-		assert(sig == SIGINT);
-		/* this is the newline you see when you hit ^C while typing a command */
-		if (sigint_newline)
-			eprint("\n");
-		sigint_newline = true;
-			
-		throw e;
-		NOTREACHED;
-		break;
+		switch (sig) {
+		case SIGINT:
+			/* this is the newline you see when you hit ^C while typing a command */
+			if (sigint_newline)
+				eprint("\n");
+			sigint_newline = true;
+			throw e;
+			NOTREACHED;
+			break;
+		case SIGWINCH:
+			terminal_size();
+			break;
+		default:
+			assert(0);
+			break;
+		}
 	case sig_noop:
 		break;
 	default:

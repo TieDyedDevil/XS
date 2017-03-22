@@ -42,6 +42,10 @@ This is now fixed.
 
 Readline now has tab-complete for functions & binaries in path.
 
+xs now has its own SIGWINCH handler since readline, as of version
+6.3, no longer handles the signal. For background, please read:
+https://bugs.python.org/issue23735 
+
 The init-file is now .xsrc (since es and xs are not compatible).
 
 [implementation] The Ref() macros have been replaced with the Ref RAII-style class, which is much cleaner

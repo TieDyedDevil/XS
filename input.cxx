@@ -609,6 +609,22 @@ extern bool isinteractive(void) {
 	return input == NULL ? false : ((input->runflags & run_interactive) != 0);
 }
 
+/*
+ * Terminal size
+ */
+
+#include <termios.h>
+#include <sys/ioctl.h>
+
+/* terminal_size -- update terminal size */
+void terminal_size() {
+	struct winsize ws;
+	if (ioctl(0, TIOCGWINSZ, &ws) == 0) {
+#if READLINE
+		rl_set_screen_size(ws.ws_row, ws.ws_col);
+#endif
+	}
+}
 
 /*
  * initialization
@@ -622,6 +638,9 @@ extern void initinput(void) {
 
 	/* mark the historyfd as a file descriptor to hold back from forked children */
 	registerfd(&historyfd, true);
+
+	/* initialize our view of the terminal size */
+	terminal_size();
 
 #if READLINE
 	rl_meta_chars = 0;
