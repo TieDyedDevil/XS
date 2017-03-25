@@ -40,7 +40,8 @@ When built with readline, xs would exit on SIGQUIT (^\) because the
 signal caused xs to behave as-if readline() had received an EOF.
 This is now fixed.
 
-Readline now has tab-complete for functions & binaries in path.
+Readline now has tab-complete for functions, variables, binaries in path
+and (when written with a ./ prefix) files in the working directory.
 
 xs now has its own SIGWINCH handler since readline, as of version
 6.3, no longer handles the signal. For background, please read:

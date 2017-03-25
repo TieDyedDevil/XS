@@ -278,16 +278,6 @@ static inline const char * simple_basename(const char *str) {
 #include "var.hxx"
 /* TODO Variable completion on $ */
 static char ** command_completion(const char *text, int start, int end) {
-	{
-		int i = 0;
-		while (isspace(text[i])) ++i;
-		if (start > i) {
-			//if (text[start] == '$') puts("$ completion concept");
-			/* Only for first word on line */
-			return NULL;
-		}
-		else text += i;
-	}
 	char **results = NULL;
 
 	/* Leave room for \0, and special first element */
@@ -332,13 +322,26 @@ static char ** command_completion(const char *text, int start, int end) {
 
 	/* Match (some) variables - can't easily match lexical/local because that would require partially
 	 * parsing/evaluating the input (which would contain a let/local somewhere in it) */
+	int matchvar = *text == '$';
 	for (; lvars; lvars = lvars->next) {
 		const char* str = getstr(lvars->term);
-		if (strncmp("fn-", str, 3) != 0
-		   || strncmp(text, str + 3, end - start) != 0) continue;
+		char* amatch;
+		if (matchvar) {
+			char var[512];
+			if (strncmp("fn-", str, 3) == 0
+			   || strncmp(text + 1, str, (end - start) - 1) != 0) continue;
+			*var = '$';
+			strncpy(var+1, str, sizeof(var)-1);
+			if (var[sizeof(var)-1] != '\0') continue;
+			amatch = strdup(var);
+		} else {
+			if (strncmp("fn-", str, 3) != 0
+			   || strncmp(text, str + 3, end - start) != 0) continue;
+			amatch = strdup(str + 3);
+		}
 		++results_size;
 		results = reinterpret_cast<char**>(erealloc(results, results_size * sizeof(char*)));
-		results[result_p++] = strdup(str + 3);
+		results[result_p++] = amatch;
 	}
 
 	assert (result_p == results_size - 1);
