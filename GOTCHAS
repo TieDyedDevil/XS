@@ -25,11 +25,9 @@ you'll need to know.
     ls bar.^(cxx hxx) .
   * Redirection and piping of stdin/stdout is as you'd expect; everything
     else has an xs-specfic syntax.
-  * The readline library (assuming xs is built with readline, which is the
-    default) doesn't know about xs word constituent characters when
-    completing filenames. You'll get the best results using apostrophe (')
-    to begin words that will contain xs-specific word-terminating characters.
   * There's no builtin `read` as in a POSIX-like shell. This is to avoid
     confusion with the %read function, which has a different semantics. In
     general, if you want to use a POSIX-like command that returns values by
-    modifying the environment, it won't function in xs.
+    modifying the environment, it won't function in xs. (The /usr/bin/read
+    file on systems that have bash is just a stub; maybe it's there so
+    completers can list it despite it being a shell builtin.)
