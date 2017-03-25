@@ -3,7 +3,6 @@ they're either documented as intentional or fixed.
 
 - does switch handle optional otherwise clause consistently?
   - in particular: presence vs. absence
-- readline completion doesn't see xs function or variable names.
 - variable-name checking may be incorrect (token.cxx).
 - subscripts don't work in here documents.
 - can't throw from a switch.

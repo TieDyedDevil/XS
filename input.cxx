@@ -328,7 +328,7 @@ static char ** command_completion(const char *text, int start, int end) {
 
 	List* lvars = NULL;
 	foreach (Dict::value_type x, vars)
-		lvars = mklist(mkstr(x.first.c_str()), lvars);
+		lvars = mklist(mkstr(gcdup(x.first.c_str())), lvars);
 
 	/* Match (some) variables - can't easily match lexical/local because that would require partially
 	 * parsing/evaluating the input (which would contain a let/local somewhere in it) */
