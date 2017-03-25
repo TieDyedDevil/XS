@@ -276,8 +276,7 @@ static inline const char * simple_basename(const char *str) {
 }
 
 #include "var.hxx"
-/* TODO Variable completion on $ */
-static char ** command_completion(const char *text, int start, int end) {
+static char ** get_completions(const char *text, int start, int end) {
 	char **results = NULL;
 
 	/* Leave room for \0, and special first element */
@@ -342,6 +341,21 @@ static char ** command_completion(const char *text, int start, int end) {
 		++results_size;
 		results = reinterpret_cast<char**>(erealloc(results, results_size * sizeof(char*)));
 		results[result_p++] = amatch;
+	}
+
+	if (results) {
+		/* Because we found completions, readline's filename completion
+		 * won't run; we have to call it. */
+		int state = 0;
+		char* fn;
+		do {
+			fn = rl_filename_completion_function(text, state++);
+			if (fn != NULL) {
+				++results_size;
+				results = reinterpret_cast<char**>(erealloc(results, results_size * sizeof(char*)));
+				results[result_p++] = strdup(fn);
+			}
+		} while (fn != NULL);
 	}
 
 	assert (result_p == results_size - 1);
@@ -649,7 +663,7 @@ extern void initinput(void) {
 	rl_filename_quote_characters = " \t\n\\'`=$><;|&{()}";
 	default_quote_function = rl_filename_quoting_function;
 	rl_filename_quoting_function = quote_func;
-	rl_attempted_completion_function = command_completion;
+	rl_attempted_completion_function = get_completions;
 	rl_change_environment = 0;
 	rl_prefer_env_winsize = 0;
 #endif
