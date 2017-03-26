@@ -1,4 +1,4 @@
-/* print.c -- formatted printing routines */
+/* print.cxx -- formatted printing routines */
 
 #include "xs.hxx"
 #include "print.hxx"

@@ -1,4 +1,4 @@
-/* fd.c -- file descriptor manipulations */
+/* fd.cxx -- file descriptor manipulations */
 
 #include "xs.hxx"
 #include <vector>

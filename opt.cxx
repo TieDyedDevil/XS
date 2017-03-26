@@ -1,4 +1,4 @@
-/* opt.c -- option parsing */
+/* opt.cxx -- option parsing */
 
 #include "xs.hxx"
 

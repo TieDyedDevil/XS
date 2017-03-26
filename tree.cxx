@@ -1,4 +1,4 @@
-/* tree.c -- functions for manipulating parse-trees. (create, copy, scan) */
+/* tree.cxx -- functions for manipulating parse-trees. (create, copy, scan) */
 
 #include "xs.hxx"
 

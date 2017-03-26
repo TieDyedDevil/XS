@@ -1,4 +1,4 @@
-/* var.c -- xs variables */
+/* var.cxx -- xs variables */
 
 #include "xs.hxx"
 #include "var.hxx"

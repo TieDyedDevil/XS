@@ -1,4 +1,4 @@
-/* dump.c -- dump xs's internal state as a c program */
+/* dump.cxx -- dump xs's internal state as a c program */
 
 #include "xs.hxx"
 #include "var.hxx"

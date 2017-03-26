@@ -1,4 +1,4 @@
-/* signal.c -- signal handling */
+/* signal.cxx -- signal handling */
 
 #include "xs.hxx"
 #include "sigmsgs.hxx"

@@ -1,4 +1,4 @@
-/* main.c -- initialization for xs */
+/* main.cxx -- initialization for xs */
 
 #include "xs.hxx"
 

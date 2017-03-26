@@ -1,4 +1,4 @@
-/* term.c -- operations on terms */
+/* term.cxx -- operations on terms */
 
 #include "xs.hxx"
 #include "term.hxx"

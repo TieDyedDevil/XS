@@ -1,4 +1,4 @@
-/* prim-etc.c -- miscellaneous primitives */
+/* prim-etc.cxx -- miscellaneous primitives */
 
 #include <pwd.h>
 

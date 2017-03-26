@@ -1,4 +1,4 @@
-/* access.c -- access testing and path searching */
+/* access.cxx -- access testing and path searching */
 
 #define	REQUIRE_STAT	1
 #include <sys/param.h>

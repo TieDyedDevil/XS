@@ -1,4 +1,4 @@
-/* proc.c -- process control system calls */
+/* proc.cxx -- process control system calls */
 
 #include "xs.hxx"
 #include <list>

@@ -1,4 +1,4 @@
-/* str.c -- xs string operations */
+/* str.cxx -- xs string operations */
 
 #include "xs.hxx"
 #include "print.hxx"

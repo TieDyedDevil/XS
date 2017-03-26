@@ -1,4 +1,4 @@
-/* status.c -- status manipulations */
+/* status.cxx -- status manipulations */
 
 #include "xs.hxx"
 #include "term.hxx"

@@ -1,4 +1,4 @@
-/* eval.c -- evaluation of lists and trees */
+/* eval.cxx -- evaluation of lists and trees */
 
 #include "xs.hxx"
 #include <string>

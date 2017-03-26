@@ -1,4 +1,4 @@
-/* input.c -- read input from files or strings */
+/* input.cxx -- read input from files or strings */
 
 #include "xs.hxx"
 #include "term.hxx"

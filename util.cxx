@@ -1,4 +1,4 @@
-/* util.c -- the kitchen sink */
+/* util.cxx -- the kitchen sink */
 
 #include "xs.hxx"
 #include <stdlib.h>

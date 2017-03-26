@@ -1,4 +1,4 @@
-/* match.c -- pattern matching routines */
+/* match.cxx -- pattern matching routines */
 
 #include "xs.hxx"
 

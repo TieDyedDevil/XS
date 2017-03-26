@@ -1,4 +1,4 @@
-/* prim-rel.c -- relational primitives */
+/* prim-rel.cxx -- relational primitives */
 
 #include "xs.hxx"
 #include "prim.hxx"

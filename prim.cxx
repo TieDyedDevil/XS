@@ -1,4 +1,4 @@
-/* prim.c -- primitives and primitive dispatching */
+/* prim.cxx -- primitives and primitive dispatching */
 
 #include "xs.hxx"
 #include "prim.hxx"

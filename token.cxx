@@ -1,4 +1,4 @@
-/* token.c -- lexical analyzer for xs */
+/* token.cxx -- lexical analyzer for xs */
 
 #include "xs.hxx"
 #include "input.hxx"

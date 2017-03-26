@@ -1,4 +1,4 @@
-/* heredoc.c -- in-line files (here documents) */
+/* heredoc.cxx -- in-line files (here documents) */
 
 #include "xs.hxx"
 #include "input.hxx"
