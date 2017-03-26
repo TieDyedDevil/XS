@@ -4,4 +4,3 @@
 - Add examples.
 - Add tests.
 - Get xsdebug working.
-- Should probably use autconf macro AC_HEADER_TIOCGWINSZ.

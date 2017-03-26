@@ -631,7 +631,9 @@ extern bool isinteractive(void) {
  */
 
 #include <termios.h>
+#if GWINSZ_IN_SYS_IOCTL
 #include <sys/ioctl.h>
+#endif
 
 /* terminal_size -- update terminal size */
 void terminal_size(void) {
