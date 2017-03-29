@@ -7,10 +7,16 @@ you'll need to know.
   * There are *no* escapes or substitutions of any kind inside '...'.
   * To include a ' inside of '...', double the interior ', e.g. 'Frank''s'.
   * Quote (") has no meaning for quoting. It is accepted as a word constituent.
-  * Substitution inside of a word is done via concatenation, using caret (^),
-    e.g. 'foo is '^$foo .
+  * Substitution inside of a word is done using caret (^) for concatenation,
+    e.g.:
+    'foo is '^$foo
+    and
+    'My File.'^*
+    xs will also insert a caret when it can do so unambiguously (see Free
+    Carets in xs(1)). Thus the above may be written without carets.
   * All values are lists. Variable expansion preserves whitespace.
-  * To change IFS, use the double-backquote (``) operator, e.g.
+  * To change IFS for one command, use the double-backquote (``) operator,
+    e.g.:
     xy = `` x `{echo 37x42}
     assigns the two-item list 37 42 to the variable xy.
   * The assignment operator (=) must always be surrounded by spaces.
@@ -19,12 +25,13 @@ you'll need to know.
     in the expansion of $foo .
   * Use $^foo to flatten $foo into a one-item list with a blank between
     each pair of original list items.
-  * The concatenation operator generates the cross-product of lists, e.g
+  * The concatenation operator generates the cross-product of lists, e.g.:
     ls foo.^[ch]
     and
     ls bar.^(cxx hxx) .
-  * Redirection and piping of stdin/stdout is as you'd expect; everything
-    else has an xs-specfic syntax.
+  * Redirection and piping of stdin/stdout is as you'd expect; there's an
+    xs-specfic syntax for all other redirection operations (redirect stderr,
+    duplicate a descriptor, close a descriptor).
   * There's no builtin `read` as in a POSIX-like shell. This is to avoid
     confusion with the %read function, which has a different semantics. In
     general, if you want to use a POSIX-like command that returns values by
