@@ -1,6 +1,7 @@
 This file is a place to collect observations about xs behavior until
 they're either documented as intentional or fixed.
 
+- no way to return a lambda from a function?
 - restore editline support, or remove editline from xs(1)?
 - tab completion should consider context.
 - filename completion (via readline) needs improvement.
