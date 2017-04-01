@@ -38,3 +38,5 @@ you'll need to know.
     modifying the environment, it won't function in xs. (The /usr/bin/read
     file on systems that have bash is just a stub; maybe it's there so
     completers can list it despite it being a shell builtin.)
+  * Command status is not stored in $?. Instead, the <= operator returns
+    the exit code for the command to which it is applied.
