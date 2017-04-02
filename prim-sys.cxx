@@ -65,7 +65,7 @@ PRIM(fork) {
 	status = ewaitfor(pid);
 	SIGCHK();
 	printstatus(0, status);
-	return mklist(mkstr(mkstatus(status)), mklist(mkstr(str("%d", pid)), NULL));
+	return mklist(mkstr(mkstatus(status)), NULL);
 }
 
 PRIM(run) {
