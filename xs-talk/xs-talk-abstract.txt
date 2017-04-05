@@ -1,0 +1,4 @@
+Xs is the eXtensible Shell descended from Plan9's rc, featuring a
+programming language having Lisp-like semantics and a conventional
+syntax. I'll describe xs, show some examples and mention the work
+I've done to make xs usable.

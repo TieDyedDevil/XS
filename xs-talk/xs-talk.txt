@@ -1,0 +1,82 @@
+The eXtensible Shell (xs)
+
+rc (Plan9) => es => xs
+
+Both ancestors are still present, but
+not actively maintained:
+
+@web http://tobold.org/article/rc
+
+@web https://wryun.github.io/es-shell/
+
+Xs development inactive since 2015.
+Still packaged in Fedora (F20).
+
+@dnf -C info xs|less
+
+Released version (xs 1.0) has serious
+flaws in implementation and man page.
+
+Language has Lisp-ish semantics with
+infix syntax.
+
+Example: This presentation is run by:
+
+@less plz
+
+Lists, function parameters, closures,
+exceptions, lexical bindings, lambdas
+
+However: no way to return a closure or
+lambda from a function. :\
+
+But you can still instantiate functions
+(including closed-over functions) from
+a function:
+
+@less obj-example.xs
+
+You can also do something akin to Lisp
+macros:
+
+@less -f <{xs -v macro-example.xs >[2=1]}
+
+Above the interpreter and platform
+API, much of xs is written in xs.
+
+@less ../initial.xs
+
+Two-stage compile-/link-time bootstrap.
+
+@touch ../dump.cxx ../initial.xs
+@make -C ..
+
+Many primitives can be replaced by
+user-defined functions written in xs.
+
+REPL is written in xs and can be
+replaced by user.
+
+@less +/Read-eval-print\ loops ../initial.xs
+
+Command-line editing and history is
+provided by GNU readline.
+
+Deficits:
+  - no job control (^Z, fg, bg, disown)
+  - no relops (lexer, parser)
+  - debugger bit-rot
+  - weak/incomplete tests
+  - size (3+ MB?!) [blame Boost?]
+  - poor error detection/reporting
+  - ...
+
+Repo:
+  https://github.com/TieDyedDevil/XS
+
+My .xsrc:
+  https://github.com/TieDyedDevil/Fi3/\
+blob/master/files/_xsrc
+
+Requirements: C++, Autotools, yacc,
+libgc, libreadline, libboost*
