@@ -5,6 +5,7 @@ they're either documented as intentional or fixed.
 - restore editline support, or remove editline from xs(1)?
 - tab completion should consider context.
 - filename completion (via readline) needs improvement.
+- readline is unaware of %prompt; this affects ^U behavior.
 - does switch handle optional otherwise clause consistently?
   - in particular: presence vs. absence
 - variable-name checking may be incorrect (token.cxx).
