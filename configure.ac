@@ -23,6 +23,11 @@ AC_ARG_WITH(readline,  AS_HELP_STRING(--without-readline, use GNU Readline),
 AC_ARG_WITH(editline, AS_HELP_STRING(--with-editline, use the Editline library),
 	use_editline=yes)
 
+if test "$use_editline" = yes
+then
+	use_readline=no
+fi
+
 AC_ARG_ENABLE(debug, AS_HELP_STRING(--enable-debug, debug mode for xs developers), debug_build=yes) 
 AC_ARG_ENABLE(static, AS_HELP_STRING(--enable-static, build statically), LDFLAGS=-static) 
 
