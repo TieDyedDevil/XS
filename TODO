@@ -1,6 +1,7 @@
 - Add &printf primitive and printf builtin.
   - Need a function that consumes arguments from list
     based upon format spec. Varargs won't fly.
+    - Use libffi w/ strtod() and strtol().
 - Add relop tests.
 - Add job control (SIGTSTP, fg, bg, disown).
 - Add examples.
