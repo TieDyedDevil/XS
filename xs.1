@@ -1797,6 +1797,17 @@ $^\fIvar\fP	<={%flatten ' ' $\fIvar\fP}
 \`\`\fIifs\fP {\fIcmd args\fP}	<={%backquote <={%flatten '' \fIifs\fP} {\fIcmd args\fP}}
 .ft R
 .De
+.SS "Relational operators"
+.Ds
+.ft \*(Cf
+\fIa\fP :lt \fIb\fP	{~ {%cmp \fIa\fP \fIb\fP} -1}
+\fIa\fP :le \fIb\fP	{~ {%cmp \fIa\fP \fIb\fP} -1 0}
+\fIa\fP :gt \fIb\fP	{~ {%cmp \fIa\fP \fIb\fP} 1}
+\fIa\fP :ge \fIb\fP	{~ {%cmp \fIa\fP \fIb\fP} 1 0}
+\fIa\fP :eq \fIb\fP	{~ {%cmp \fIa\fP \fIb\fP} 0}
+\fIa\fP :ne \fIb\fP	{~ {%cmp \fIa\fP \fIb\fP} -1 1}
+.ft R
+.De
 .SH BUILTINS
 Builtin commands are shell functions that exist at shell startup time.
 Most builtins are indistinguishable from external commands,
