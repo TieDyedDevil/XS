@@ -13,10 +13,10 @@
 #	executes commands from standard input, similar to a normal interpreter,
 #	but when it is finished, it prints on standard ouput C code for
 #	recreating the current state of interpreter memory.  (The code for
-#	producing the C code is in dump.c.)  Xsdump starts up with no
+#	producing the C code is in dump.cxx.)  Xsdump starts up with no
 #	variables defined.  This file (initial.xs) is run through xsdump
-#	to produce a C file, initial.c, which is linked with the rest of
-#	the interpreter, replacing dump.c, to produce the actual xs
+#	to produce a C file, initial.cxx, which is linked with the rest of
+#	the interpreter, replacing dump.cxx, to produce the actual xs
 #	interpreter.
 #
 #	Because the shell's memory state is empty when initial.xs is run,
@@ -877,7 +877,7 @@ noexport = noexport pid signals apid bqstatus fn-%dispatch path home
 #
 
 #	This is silly and useless, but whatever value is returned here
-#	is printed in the header comment in initial.c;  nobody really
-#	wants to look at initial.c anyway.
+#	is printed in the header comment in initial.cxx;  nobody really
+#	wants to look at initial.cxx anyway.
 
 result xs initial state built in `/bin/pwd on `/bin/date for <=$&version

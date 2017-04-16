@@ -1,11 +1,11 @@
-/* syntax.h -- abstract syntax tree interface */
+/* syntax.hxx -- abstract syntax tree interface */
 
 #define	CAR	u[0].p
 #define	CDR	u[1].p
 
 typedef enum {Less, LessEqual, Greater, GreaterEqual, Equal, NotEqual} Relation;
 
-/* syntax.c */
+/* syntax.cxx */
 
 extern Tree errornode;
 
@@ -33,7 +33,7 @@ extern Tree *redirappend(Tree *t, Tree *r);
 
 extern Tree *relop(Tree *left, Tree *right, Relation rel);
 
-/* heredoc.c */
+/* heredoc.cxx */
 
 extern bool readheredocs(bool endfile);
 extern bool queueheredoc(Tree *t);

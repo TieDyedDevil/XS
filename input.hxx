@@ -1,4 +1,4 @@
-/* input.h -- definitions for xs lexical analyzer */
+/* input.hxx -- definitions for xs lexical analyzer */
 #ifndef INPUT_HXX
 #define INPUT_HXX
 
@@ -34,14 +34,14 @@ int GETC();
 #define	UNGETC(c)	unget(input, c)
 
 
-/* input.c */
+/* input.cxx */
 
 extern void unget(Input *in, int c);
 extern bool disablehistory;
 extern void yyerror(const char *s);
 
 
-/* token.c */
+/* token.cxx */
 
 extern const char dnw[];
 extern int yylex(void);
@@ -56,7 +56,7 @@ extern Tree *parsetree;
 extern int yyparse(void);
 
 
-/* heredoc.c */
+/* heredoc.cxx */
 
 extern void emptyherequeue(void);
 #endif

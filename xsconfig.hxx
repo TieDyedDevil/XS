@@ -1,4 +1,4 @@
-/* config.h -- xs(1) configuration parameters */
+/* config.hxx -- xs(1) configuration parameters */
 
 /*
  * Compile time options
@@ -215,7 +215,7 @@
 /* OSF/1 on HP snakes -- from John Robert LoVerso <loverso@osf.org> */
 
 #ifdef __hp_osf
-#define __NO_FP_VARARGS		/* avoid bug compiling print.c */
+#define __NO_FP_VARARGS		/* avoid bug compiling print.cxx */
 #endif
 
 

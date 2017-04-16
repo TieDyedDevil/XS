@@ -90,7 +90,7 @@ public: void sort() {
  * our programming environment
  */
 
-/* print.c -- see print.hxx for more */
+/* print.cxx -- see print.hxx for more */
 
 extern int print(const char *fmt, ...);
 extern int eprint(const char *fmt, ...);
@@ -102,18 +102,18 @@ extern void panic(const char *fmt, ...) NORETURN;
 #define	gcnew(type)	new (UseGC) type
 #define galloc	GC_MALLOC
 
-extern char *gcndup(const char* s, size_t n);	/* util.c: copy a counted string into gc space */
+extern char *gcndup(const char* s, size_t n);	/* util.cxx: copy a counted string into gc space */
 
 /* copy a 0-terminated string into gc space */
 inline char *gcdup(const char *s) {
 	return gcndup(s, strlen(s));
 }
-/* initial.c (for xs) or dump.c (for xsdump) */
+/* initial.cxx (for xs) or dump.cxx (for xsdump) */
 
 extern void runinitial(void);
 
 
-/* fd.c */
+/* fd.cxx */
 
 extern void mvfd(int oldfd, int newfd);
 extern int newfd(void);
@@ -130,7 +130,7 @@ extern int defer_close(bool parent, int fd);
 extern void undefer(int ticket);
 
 
-/* term.c */
+/* term.cxx */
 
 extern Term* mkterm(const char* str, Closure* closure);
 extern Term* mkstr(const char* str);
@@ -141,7 +141,7 @@ extern bool termeq(Term *term, const char *s);
 extern bool isclosure(Term *term);
 
 
-/* list.c */
+/* list.cxx */
 
 extern List *mklist(Term* term, List* next);
 extern List *reverse(List *list);
@@ -153,12 +153,12 @@ extern Term *nth(List *list, int n);
 extern List* sortlist(List* list);
 
 
-/* tree.c */
+/* tree.cxx */
 
 extern Tree *mk(NodeKind , ...);
 
 
-/* closure.c */
+/* closure.cxx */
 
 extern Closure *mkclosure(Tree* tree, Binding* binding);
 extern Closure *extractbindings(Tree *tree);
@@ -166,7 +166,7 @@ extern Binding *mkbinding(const char* name, List* defn, Binding* next);
 extern Binding *reversebindings(Binding *binding);
 
 
-/* eval.c */
+/* eval.cxx */
 
 extern Binding *bindargs(Tree* params, List* args, Binding* binding);
 extern List *forkexec(const char *file, const List *list, bool inchild);
@@ -189,13 +189,13 @@ extern unsigned long evaldepth, maxevaldepth;
 #define	eval_flags		(eval_inchild|eval_exitonfalse)
 
 
-/* glom.c */
+/* glom.cxx */
 
 extern List* glom(Tree* tree, Binding* binding, bool globit);
 extern List *glom2(Tree* tree, Binding* binding, StrList **quotep);
 
 
-/* glob.c */
+/* glob.cxx */
 
 extern const char *QUOTED, *UNQUOTED;
 #define IS_RAW(q) *q == 'r'
@@ -209,13 +209,13 @@ extern List* dirmatch(const char* prefix,
 		      const char* quote);
 
 
-/* match.c */
+/* match.cxx */
 extern bool match(const char *subject, const char *pattern, const char *quote);
 extern bool listmatch(List* subject, List* pattern, StrList* quote);
 extern List *extractmatches(List *subjects, List *patterns, StrList *quotes);
 
 
-/* var.c */
+/* var.cxx */
 
 extern void initenv(char **envp, bool isprotected);
 extern void hidevariables(void);
@@ -241,7 +241,7 @@ private:
 	int flags;
 };
 
-/* status.c */
+/* status.cxx */
 
 extern const List *ltrue, *lfalse;
 extern bool istrue(const List *status);
@@ -250,12 +250,12 @@ extern char *mkstatus(int status);
 extern void printstatus(int pid, int status);
 
 
-/* access.c */
+/* access.cxx */
 
 extern const char *checkexecutable(const char *file);
 
 
-/* proc.c */
+/* proc.cxx */
 
 extern bool hasforked;
 extern int efork(bool parent, bool background);
@@ -263,7 +263,7 @@ extern int ewait(int pid, bool interruptible, void *rusage);
 #define	ewaitfor(pid)	ewait(pid, false, NULL)
 
 
-/* dict.c */
+/* dict.cxx */
 
 struct Var;
 typedef map<
@@ -284,23 +284,23 @@ public:
 };
 
 extern void dictforall(Dict* dict, void (*proc)(void *, const char *, void *), void* arg);
-/* conv.c */
+/* conv.cxx */
 
 extern void initconv(void);
 
 
 
-/* str.c */
+/* str.cxx */
 
 extern char *str(const char *fmt, ...);	/* create a gc space string by printing */
 extern StrList* mkstrlist(const char* str, StrList* next);
 
 
-/* vec.c */
+/* vec.cxx */
 
 extern Vector* vectorize(const List* list);
 
-/* util.c */
+/* util.cxx */
 
 extern const char *esstrerror(int err);
 extern void uerror(const char *msg);
@@ -318,7 +318,7 @@ inline void efree(void *p) {
 }
 
 
-/* input.c */
+/* input.cxx */
 
 extern const char *prompt, *prompt2;
 #if READLINE
@@ -349,7 +349,7 @@ extern bool resetterminal;
 #endif
 
 
-/* opt.c */
+/* opt.cxx */
 
 extern void esoptbegin(List *list, const char *caller, const char *usage);
 extern int esopt(const char *options);
@@ -357,7 +357,7 @@ extern Term *esoptarg(void);
 extern List *esoptend(void);
 
 
-/* prim.c */
+/* prim.cxx */
 
 extern const List* 
 prim(const char *s, List* list, Binding* binding, int evalflags);
@@ -365,7 +365,7 @@ prim(const char *s, List* list, Binding* binding, int evalflags);
 extern void initprims(void);
 
 
-/* split.c */
+/* split.cxx */
 
 extern void startsplit(const char *sep, bool coalesce);
 extern void splitstring(const char *in, size_t len, bool endword);
@@ -373,7 +373,7 @@ extern List* endsplit(void);
 extern List* fsplit(const char *sep, List* list, bool coalesce);
 
 
-/* signal.c */
+/* signal.cxx */
 
 extern int signumber(const char *name);
 extern char *signame(int sig);
@@ -398,13 +398,13 @@ extern void blocksignals(void);
 extern void unblocksignals(void);
 
 
-/* open.c */
+/* open.cxx */
 
 enum OpenKind { oOpen, oCreate, oAppend, oReadWrite, oReadCreate, oReadAppend };
 extern int eopen(const char *name, OpenKind k);
 
 
-/* version.c */
+/* version.cxx */
 
 extern const char * const version;
 

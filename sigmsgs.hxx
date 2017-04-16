@@ -1,4 +1,4 @@
-/* sigmsgs.h -- interface to signal name and message date */
+/* sigmsgs.hxx -- interface to signal name and message date */
 
 typedef struct {
 	int sig;

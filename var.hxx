@@ -1,4 +1,4 @@
-/* var.h -- xs variables */
+/* var.hxx -- xs variables */
 
 typedef struct Var Var;
 struct Var {
