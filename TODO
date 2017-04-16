@@ -1,3 +1,4 @@
+- Factor numeric conversions out of glom.cxx and use in &cmp.
 - Add relop tests.
 - Add job control (SIGTSTP, fg, bg, disown).
 - Add examples.
