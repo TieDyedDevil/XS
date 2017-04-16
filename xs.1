@@ -2630,8 +2630,8 @@ Compares its arguments and returns -1, 0 or 1 if
 .I a
 is respectively less than, equal to or greater than
 .IR b .
-This is a lexicographic comparison honoring the locale's
-collation order.
+If either argument is non-numeric, then the arguments are compared
+lexicographically, honoring the locale's collation order.
 .SS "Utility Functions"
 These functions are useful for people customizing the shell,
 may be used by other builtin commands,
