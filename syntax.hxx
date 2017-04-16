@@ -3,6 +3,7 @@
 #define	CAR	u[0].p
 #define	CDR	u[1].p
 
+typedef enum {Less, LessEqual, Greater, GreaterEqual, Equal, NotEqual} Relation;
 
 /* syntax.c */
 
@@ -30,6 +31,7 @@ extern Tree *mkredir(Tree *cmd, Tree *file);
 extern Tree *mkredircmd(const char *cmd, int fd);
 extern Tree *redirappend(Tree *t, Tree *r);
 
+extern Tree *relop(Tree *left, Tree *right, Relation rel);
 
 /* heredoc.c */
 

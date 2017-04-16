@@ -226,3 +226,24 @@ extern Tree *redirappend(Tree *tree, Tree *r) {
 	*tp = mk(nRedir, r, t);
 	return tree;
 }
+
+/* relop -- build the prefix form of an infix relop */
+extern Tree *relop(Tree *left, Tree *right, Relation rel) {
+	Tree *match;
+	switch (rel) {
+	case Less: match = mk(nWord, "-1"); break;
+	case LessEqual:
+		match = treecons(mk(nWord, "-1"), treecons(mk(nWord, "0"), NULL));
+		break;
+	case Greater: match = mk(nWord, "1"); break;
+	case GreaterEqual:
+		match = treecons(mk(nWord, "1"), treecons(mk(nWord, "0"), NULL));
+		break;
+	case Equal: match = mk(nWord, "0"); break;
+	case NotEqual:
+		match = treecons(mk(nWord, "-1"), treecons(mk(nWord, "1"), NULL));
+		break;
+	}
+	return mk(nMatch, mk(nCall, treecons(mk(nWord, "%cmp"),
+		treecons(left, treecons(right, NULL)))), match);
+}

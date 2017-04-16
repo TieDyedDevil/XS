@@ -348,13 +348,6 @@ fn-vars = { |*|
 
 fn-%cmp = $&cmp
 
-fn-%lt = {|a b| ~ <={%cmp $a $b} -1}
-fn-%eq = {|a b| ~ <={%cmp $a $b} 0}
-fn-%gt = {|a b| ~ <={%cmp $a $b} 1}
-fn-%ge = {|a b| {%gt $a $b} || {%eq $a $b}}
-fn-%le = {|a b| {%lt $a $b} || {%eq $a $b}}
-fn-%ne = {|a b| !{%eq $a $b}}
-
 #
 # Syntactic sugar
 #

@@ -287,6 +287,14 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 			return EXTRACT;
 		else if (streq(buf, "%closure"))
 			return CLOSURE;
+		else if (*buf == ':') {
+			if (streq(buf + 1, "lt"))	return LT;
+			if (streq(buf + 1, "le"))	return LE;
+			if (streq(buf + 1, "gt"))	return GT;
+			if (streq(buf + 1, "ge"))	return GE;
+			if (streq(buf + 1, "eq"))	return EQ;
+			if (streq(buf + 1, "ne"))	return NE;
+		}
 		w = RW;
 		yylval.str = gcdup(buf);
 		return WORD;

@@ -25,6 +25,7 @@ typedef struct yyltype
 %token	NL ENDFILE ERROR 
 %token  PARAM_BEGIN PARAM_END
 %token  INT FLOAT ARITH_BEGIN ARITH_VAR
+%token	LT LE GT GE EQ NE
 
 %left	LOCAL LET FOR CLOSURE ')'
 %left	ANDAND OROR NL
@@ -35,6 +36,8 @@ typedef struct yyltype
 
 %left '+' '-'
 %left '*' '/' '%'
+
+%nonassoc	LT LE GT GE EQ NE
 
 %union {
 	Tree *tree;
@@ -85,6 +88,12 @@ cmd	: %prec LET				{ $$ = NULL; }
 	| '!' caret cmd				{ $$ = prefix("%not", mk(nList, thunkify($3), NULL)); }
 	| '~' word words			{ $$ = mk(nMatch, $2, $3); }
 	| EXTRACT word words			{ $$ = mk(nExtract, $2, $3); }
+	| first LT word		{ $$ = relop($1, $3, Less); }
+	| first LE word		{ $$ = relop($1, $3, LessEqual); }
+	| first GT word		{ $$ = relop($1, $3, Greater); }
+	| first GE word		{ $$ = relop($1, $3, GreaterEqual); }
+	| first EQ word		{ $$ = relop($1, $3, Equal); }
+	| first NE word		{ $$ = relop($1, $3, NotEqual); }
 
 simple	: first				{ $$ = treecons2($1, NULL); }
 	| simple  word	{ $$ = treeconsend2($1, $2); }
