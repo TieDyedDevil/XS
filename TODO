@@ -1,3 +1,4 @@
+- Add &printf primitive and printf builtin.
 - Add relop tests.
 - Add job control (SIGTSTP, fg, bg, disown).
 - Add examples.
