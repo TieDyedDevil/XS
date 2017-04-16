@@ -22,7 +22,9 @@ Some simple new functions have been added - map, omap, until, switch.
 The modulus operator (%) may be used in math expressions. This is
 implemented by std::fmod.
 
-Low-level comparison and relational functions have been added.
+Added infix relational operators :lt, :le, :gt, :ge, :eq and :ne.
+These all use the new comparison function %cmp, which in turn uses
+the primitive comparison function &cmp.
 
 Corrected the behaviors of pushd and popd. Added dirs to display
 directory stack.
