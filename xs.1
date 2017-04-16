@@ -994,6 +994,9 @@ inverts the truth value of the exit status of a command.
 has the usual complement of relational operators. To avoid confusion
 with redirection or assignment, the relops are spelled:
 .IR :lt ", " :le ", " :gt ", " :ge ", " :eq " and " :ne .
+The relational operators are built upon
+.I "%cmp"
+and return a boolean value.
 .SS "Input and output"
 .PP
 The standard output of a command may be redirected to a file with
@@ -2618,18 +2621,6 @@ is respectively less than, equal to or greater than
 .IR b .
 This is a lexicographic comparison honoring the locale's
 collation order.
-.SS "Relational Functions"
-The relational functions are built upon
-.IR "%cmp" ,
-and return a boolean result.
-.Ds
-.Cr "%lt \fIa b\fP"
-.Cr "%eq \fIa b\fP"
-.Cr "%gt \fIa b\fP"
-.Cr "%le \fIa b\fP"
-.Cr "%ge \fIa b\fP"
-.Cr "%ne \fIa b\fP"
-.De
 .SS "Utility Functions"
 These functions are useful for people customizing the shell,
 may be used by other builtin commands,
@@ -2749,12 +2740,13 @@ prefixes:
 .ta 1.75i 3.5i
 .Ds
 .ft \*(Cf
-apids	here	read
-close	home	run
-count	newfd	seq
-dup	openfile	split
-flatten	parse	var
-fsplit	pipe	whatis
+apids	here	run
+close	home	seq
+cmp	newfd	split
+count	openfile	var
+dup	parse	whatis
+flatten	pipe
+fsplit	read
 .ft R
 .De
 .PP
