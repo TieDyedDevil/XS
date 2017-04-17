@@ -1,3 +1,4 @@
+- Why does build fail w/o libffi?
 - printf: add %f conversion.
 - Add job control (SIGTSTP, fg, bg, disown).
 - Add tests.
