@@ -5,6 +5,82 @@
 #include "xs.hxx"
 #include "prim.hxx"
 
+#if HAVE_LIBFFI
+#include <ffi.h>
+#include <string.h>
+#include <stdlib.h>
+
+static int isnumber(const char *s) {
+	return strspn(s, "0123456789.") == strlen(s);
+}
+
+static int isfloat(const char *s) {
+	return strchr(s, '.') != NULL;
+}
+
+static char* unescape(char *s) {
+	char *f, *t;
+	for (f = t = s; *f; ++f) {
+		if (*f == '\\') {
+			switch(*++f) {
+			case 'a': *t++ = '\a'; break;
+			case 'b': *t++ = '\b'; break;
+			case 'e': *t++ = '\e'; break;
+			case 'f': *t++ = '\f'; break;
+			case 'n': *t++ = '\n'; break;
+			case 'r': *t++ = '\r'; break;
+			case 't': *t++ = '\t'; break;
+			case 'v': *t++ = '\v'; break;
+			default: *t++ = *f;
+			}
+		} else *t++ = *f;
+	}
+	*t = '\0';
+	return s;
+}
+
+#define PRINTF_MAX_VARARGS 20
+PRIM(printf) {
+	if (list != NULL) {
+		ffi_cif cif;
+		ffi_type *args[PRINTF_MAX_VARARGS];
+		void *values[PRINTF_MAX_VARARGS];
+		long longs[PRINTF_MAX_VARARGS];
+		double doubles[PRINTF_MAX_VARARGS];
+		ffi_arg rc;
+		char *fmt = unescape((char*)getstr(list->term));
+		list = list->next;
+		args[0] = &ffi_type_pointer;
+		values[0] = &fmt;
+		int i = 1;
+		while (list) {
+			const char *arg = getstr(list->term);
+			if (isnumber(arg)) {
+				if (isfloat(arg)) {
+					args[i] = &ffi_type_double;
+					doubles[i] = strtod(arg, NULL);
+					values[i] = &doubles[i];
+				} else {
+					args[i] = &ffi_type_slong;
+					longs[i] = strtol(arg, NULL, 10);
+					values[i] = &longs[i];
+				}
+			} else {
+				args[i] = &ffi_type_pointer;
+				values[i] = gcdup(arg);
+			}
+			list = list->next;
+			++i;
+			if (i == PRINTF_MAX_VARARGS) break;
+		}
+		if (ffi_prep_cif(&cif, FFI_DEFAULT_ABI, i, &ffi_type_sint, args) == FFI_OK) {
+			ffi_call(&cif, FFI_FN(print), &rc, values);
+		}
+	} else eprint("printf: format missing\n");
+	return ltrue;
+}
+#endif
+
 PRIM(result) {
 	return list;
 }
@@ -284,5 +360,8 @@ extern void initprims_etc(Prim_dict& primdict) {
 	X(resetterminal);
 	X(promptignore);
 	X(nopromptignore);
+#endif
+#if HAVE_LIBFFI
+	X(printf);
 #endif
 }

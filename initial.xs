@@ -154,6 +154,10 @@ fn-unwind-protect = { |body cleanup|
 if {~ <=$&primitives limit} {fn-limit = $&limit}
 if {~ <=$&primitives time}  {fn-time  = $&time}
 
+#	Ditto for the printf builtin.
+
+if {~ <=$&primitives printf} {fn-printf = $&printf}
+
 #	These builtins are mainly useful for internal functions, but
 #	they're there to be called if you want to use them.
 
