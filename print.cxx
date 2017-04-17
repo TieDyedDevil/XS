@@ -164,8 +164,12 @@ static bool pctconv(Format *format) {
 }
 
 static bool badconv(Format *format) {
+#if HAVE_LIBFFI
+	fail("printfmt", "bad conversion character: %%%c", format->invoker);
+#else
 	panic("bad conversion character in printfmt: %%%c", format->invoker);
 	NOTREACHED;
+#endif
 }
 
 
