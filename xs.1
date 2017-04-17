@@ -2812,9 +2812,9 @@ writeto	%writeto
 .ft R
 .De
 .PP
-The
+The primitive
 .Cr printf
-primitive interprets the following backslash escapes in its format string:
+interprets the following backslash escapes in its format string:
 .ta 1.75i 3.5i
 .Ds
 .ft \*(Cf
@@ -2822,6 +2822,17 @@ a	n
 b	r
 e	t
 f	v
+.ft R
+.De
+.PP
+and these conversions and flags:
+.ta 1.75i 3.5i
+.Ds
+.ft \*(Cf
+c	#
+d	-
+s	0
+	.
 .ft R
 .De
 .PP
