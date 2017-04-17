@@ -1,5 +1,5 @@
-- Why does build fail w/o libffi?
-- printf: add %f conversion.
+- FIX: Why does build fail w/o libffi?
+- printf: add %e, %f and %g conversions.
 - Add job control (SIGTSTP, fg, bg, disown).
 - Add tests.
   - relops
