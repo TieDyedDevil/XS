@@ -64,6 +64,17 @@ static bool sconv(Format *format) {
 	return false;
 }
 
+/* FINISH - This is a temporary implementation. */
+#include <stdio.h>
+static bool fconv(Format *format) {
+	double f = va_arg(format->args, double);
+	size_t len;
+	char number[999];	
+	len = snprintf(number, 999, "%f", f);
+	format->append(number, len);
+	return false;
+}
+
 char *utoa(unsigned long long u, char *t, unsigned int radix, const char *digit) {
 	if (u >= radix) {
 		t = utoa(u / radix, t, radix, digit);
@@ -189,6 +200,7 @@ static void inittab(void) {
 	fmttab['s'] = sconv;
 	fmttab['c'] = cconv;
 	fmttab['d'] = dconv;
+	fmttab['f'] = fconv;
 	fmttab['o'] = oconv;
 	fmttab['x'] = xconv;
 	fmttab['%'] = pctconv;
