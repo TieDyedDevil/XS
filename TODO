@@ -1,3 +1,4 @@
+- printf: add %f conversion.
 - Document builtin printf.
 - Add job control (SIGTSTP, fg, bg, disown).
 - Add tests.

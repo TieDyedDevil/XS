@@ -2812,9 +2812,22 @@ writeto	%writeto
 .ft R
 .De
 .PP
+The
+.Cr printf
+primitive interprets the following backslash escapes in its format string:
+.ta 1.75i 3.5i
+.Ds
+.ft \*(Cf
+a	n
+b	r
+e	t
+f	v
+.ft R
+.De
+.PP
 The primitive
 .Cr resetterminal
-is if
+is present if
 .I xs
 is compiled with support for the
 .I readline
