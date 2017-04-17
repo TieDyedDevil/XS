@@ -47,6 +47,7 @@ PRIM(printf) {
 		void *values[PRINTF_MAX_VARARGS];
 		long longs[PRINTF_MAX_VARARGS];
 		double doubles[PRINTF_MAX_VARARGS];
+		const char* strings[PRINTF_MAX_VARARGS];
 		ffi_arg rc;
 		char *fmt = unescape((char*)getstr(list->term));
 		list = list->next;
@@ -67,15 +68,15 @@ PRIM(printf) {
 				}
 			} else {
 				args[i] = &ffi_type_pointer;
-				values[i] = gcdup(arg);
+				strings[i] = gcdup(arg);
+				values[i] = &strings[i];
 			}
 			list = list->next;
 			++i;
 			if (i == PRINTF_MAX_VARARGS) break;
 		}
-		if (ffi_prep_cif(&cif, FFI_DEFAULT_ABI, i, &ffi_type_sint, args) == FFI_OK) {
+		if (ffi_prep_cif(&cif, FFI_DEFAULT_ABI, i, &ffi_type_sint, args) == FFI_OK)
 			ffi_call(&cif, FFI_FN(print), &rc, values);
-		}
 	} else eprint("printf: format missing\n");
 	return ltrue;
 }
