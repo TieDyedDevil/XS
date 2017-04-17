@@ -73,7 +73,11 @@ PRIM(printf) {
 			}
 			list = list->next;
 			++i;
-			if (i == PRINTF_MAX_VARARGS) break;
+			if (i == PRINTF_MAX_VARARGS) {
+				eprint("printf: more than %d args; excess ignored\n",
+					PRINTF_MAX_VARARGS);
+				break;
+			}
 		}
 		if (ffi_prep_cif(&cif, FFI_DEFAULT_ABI, i, &ffi_type_sint, args) == FFI_OK)
 			ffi_call(&cif, FFI_FN(print), &rc, values);
