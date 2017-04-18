@@ -64,14 +64,37 @@ static bool sconv(Format *format) {
 	return false;
 }
 
-/* FINISH - This is a temporary implementation. */
-#include <stdio.h>
 static bool fconv(Format *format) {
 	double f = va_arg(format->args, double);
-	size_t len;
-	char number[999];	
-	len = snprintf(number, 999, "%f", f);
-	format->append(number, len);
+	int point, sign;
+	const int repprec = 6;
+	const int defprec = 6;
+	/* ecvt(), though obsolete in POSIX, is exactly what we need. */
+	const char *digits = ecvt(f, repprec, &point, &sign);
+	/* FINISH - do actual formatting; not temporary visualization. */
+	/* We need be concerned with width (format->f1) and precision
+	   (format->f2; default = 6). Don't forget to round when
+	   precision is less than defprec. Overflow width if needed.
+	   Flag `#` means to include a decimal point even for an
+	   integral value.
+	   Flag `-` causes left-justification.
+	   Flag `0` changes padding to zeroes instead of blanks. */
+	size_t len = strlen(digits);
+	format->put(sign ? '-' : '+');
+	format->append(digits, len);
+	format->put(' ');
+#define dpp_buflen 8
+	char dpp[dpp_buflen];
+	char *p = dpp+dpp_buflen-1;
+	int dps = point < 0;
+	if (dps) point = -point;
+	do {
+		*p-- = point % 10 + '0';
+		point = point / 10;
+	} while (point != 0);
+	if (dps) format->put('-');
+	format->append(p+1, (p-dpp)-(dpp_buflen-3));
+#undef dpp_buflen
 	return false;
 }
 
