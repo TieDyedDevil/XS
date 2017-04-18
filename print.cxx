@@ -78,7 +78,18 @@ static bool fconv(Format *format) {
 	   Flag `#` means to include a decimal point even for an
 	   integral value.
 	   Flag `-` causes left-justification.
-	   Flag `0` changes padding to zeroes instead of blanks. */
+	   Flag `0` changes padding to zeroes instead of blanks.
+	   Add leading zero (before `.`) when point = 0.
+	   When point <= -repprec, print 0.0 per width and precision.
+	   Handle number = '000000' as a special case, since ecvt()
+	   allows point to be either 0 or 1. */
+	/*
+	format->flags & FMT_leftside
+	format->flage & FMT_altform
+	format->flags & FMT_zeropad
+	format->f1
+	format->f2
+	*/
 	size_t len = strlen(digits);
 	format->put(sign ? '-' : '+');
 	format->append(digits, len);
