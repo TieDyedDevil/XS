@@ -80,7 +80,13 @@ static bool fconv(Format *format) {
 	   Flag `-` causes left-justification.
 	   Flag `0` changes padding to zeroes instead of blanks.
 	   Add leading zero (before `.`) when point = 0.
-	   When point <= -repprec, print 0.0 per width and precision.
+	   When point <= max(-repprec, -precision), print 0.0 per
+	   width and precision.
+	   Round final digit when precision < repprec.
+	   Total width before padding:
+	     point >= 0: 1 + point + precision
+	     point < 0: -point + 1 + precision
+	   Pad if total width (above) < requested width.
 	   Handle number = '000000' as a special case, since ecvt()
 	   allows point to be either 0 or 1. */
 	/*
