@@ -9,6 +9,7 @@
 #include <ffi.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 static int isnumber(const char *s) {
 	return strspn(s, "0123456789.") == strlen(s);
@@ -19,7 +20,9 @@ static int isfloat(const char *s) {
 }
 
 static char* unescape(char *s) {
-	char *f, *t;
+	char *f, *t, *hf;
+	unsigned cp;
+	int hdc;
 	for (f = t = s; *f; ++f) {
 		if (*f == '\\') {
 			switch(*++f) {
@@ -30,6 +33,21 @@ static char* unescape(char *s) {
 			case 'n': *t++ = '\n'; break;
 			case 'r': *t++ = '\r'; break;
 			case 't': *t++ = '\t'; break;
+#if 0
+			case 'u':
+			case 'U':
+				hf = *f++ == 'u' ? "%4x" : "%8x";
+				/* replace sscanf; advance f */
+				sscanf(f, hf, &cp);
+				if (cp<0x80) *t++=c;
+				else if (cp<0x800) *t++=192+cp/64, *t++=128+cp%64;
+				else if (cp-0xd800<0x800) goto error;
+				else if (cp<0x10000) *t++=224+cp/4096, *t++=128+cp/64%64, *t++=128+cp%64;
+				else if (cp<0x110000) *t++=240+cp/262144, *t++=128+cp/4096%64, *t++=128+cp/64%64, *t++=128+cp%64;
+				else goto error;
+error:
+				break;
+#endif
 			case 'v': *t++ = '\v'; break;
 			default: *t++ = *f;
 			}
@@ -80,7 +98,7 @@ PRIM(printf) {
 			}
 		}
 		if (ffi_prep_cif(&cif, FFI_DEFAULT_ABI, i, &ffi_type_sint, args) == FFI_OK)
-			ffi_call(&cif, FFI_FN(print), &rc, values);
+			ffi_call(&cif, FFI_FN(printf), &rc, values);
 	} else eprint("printf: format missing\n");
 	return ltrue;
 }

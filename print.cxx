@@ -64,57 +64,6 @@ static bool sconv(Format *format) {
 	return false;
 }
 
-static bool fconv(Format *format) {
-	double f = va_arg(format->args, double);
-	int point, sign;
-	const int repprec = 6;
-	const int defprec = 6;
-	/* ecvt(), though obsolete in POSIX, is exactly what we need. */
-	const char *digits = ecvt(f, repprec, &point, &sign);
-	/* FINISH - do actual formatting; not temporary visualization. */
-	/* We need be concerned with width (format->f1) and precision
-	   (format->f2; default = 6). Don't forget to round when
-	   precision is less than defprec. Overflow width if needed.
-	   Flag `#` means to include a decimal point even for an
-	   integral value.
-	   Flag `-` causes left-justification.
-	   Flag `0` changes padding to zeroes instead of blanks.
-	   Add leading zero (before `.`) when point = 0.
-	   When point <= max(-repprec, -precision), print 0.0 per
-	   width and precision.
-	   Round final digit when precision < repprec.
-	   Total width before padding:
-	     point >= 0: 1 + point + precision
-	     point < 0: -point + 1 + precision
-	   Pad if total width (above) < requested width.
-	   Handle number = '000000' as a special case, since ecvt()
-	   allows point to be either 0 or 1. */
-	/*
-	format->flags & FMT_leftside
-	format->flage & FMT_altform
-	format->flags & FMT_zeropad
-	format->f1
-	format->f2
-	*/
-	size_t len = strlen(digits);
-	format->put(sign ? '-' : '+');
-	format->append(digits, len);
-	format->put(' ');
-#define dpp_buflen 8
-	char dpp[dpp_buflen];
-	char *p = dpp+dpp_buflen-1;
-	int dps = point < 0;
-	if (dps) point = -point;
-	do {
-		*p-- = point % 10 + '0';
-		point = point / 10;
-	} while (point != 0);
-	if (dps) format->put('-');
-	format->append(p+1, (p-dpp)-(dpp_buflen-3));
-#undef dpp_buflen
-	return false;
-}
-
 char *utoa(unsigned long long u, char *t, unsigned int radix, const char *digit) {
 	if (u >= radix) {
 		t = utoa(u / radix, t, radix, digit);
@@ -240,7 +189,6 @@ static void inittab(void) {
 	fmttab['s'] = sconv;
 	fmttab['c'] = cconv;
 	fmttab['d'] = dconv;
-	fmttab['f'] = fconv;
 	fmttab['o'] = oconv;
 	fmttab['x'] = xconv;
 	fmttab['%'] = pctconv;
