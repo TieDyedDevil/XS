@@ -304,6 +304,7 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 		if (c == '!')
 			w = KW;
 	}
+	int is_utf8 = 0;
 	switch (c) {
 	case '!':
 		return '!';
@@ -382,6 +383,38 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 			*buf = n;
 			break;
 		}
+		case 'u': case 'U': {
+			unsigned n = 0;
+			int i = 0;
+			int dc = c == 'u' ? 4 : 8;
+			while (dc--) {
+				c = GETC();
+				if (!isxdigit(c))
+					break;
+				n = (n << 4)
+				  | (c - (isdigit(c) ? '0' : ((islower(c) ? 'a' : 'A') - 0xA)));
+			}
+			if (n < 0x80) bufput(i++, n);
+			else if (n < 0x800) {
+				bufput(i++, 192+n/64);
+				bufput(i++, 128+n%64);
+			} else if (n-0xd800 < 0x800) {
+				eprint("here\n"); /* REMOVE */
+				goto badescape;
+			} else if (n < 0x10000) {
+				bufput(i++, 224+n/4096);
+				bufput(i++, 128+n/64%64);
+				bufput(i++, 128+n%64);
+			} else if (n < 0x110000) {
+				bufput(i++, 240+n/262144);
+				bufput(i++, 128+n/4096%64);
+				bufput(i++, 128+n/64%64);
+				bufput(i++, 128+n%64);
+			} else goto badescape;
+			bufput(i, '\0');
+			is_utf8 = 1;
+			break;
+		}
 		case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': {
 			int n = 0;
 			do {
@@ -403,7 +436,7 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 			*buf = c;
 			break;
 		}
-		buf[1] = 0;
+		if (!is_utf8) buf[1] = 0;
 		yylval.str = gcdup(buf);
 		return QWORD;
 	case '#':

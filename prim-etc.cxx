@@ -19,44 +19,6 @@ static int isfloat(const char *s) {
 	return strchr(s, '.') != NULL;
 }
 
-static char* unescape(char *s) {
-	char *f, *t, *hf;
-	unsigned cp;
-	int hdc;
-	for (f = t = s; *f; ++f) {
-		if (*f == '\\') {
-			switch(*++f) {
-			case 'a': *t++ = '\a'; break;
-			case 'b': *t++ = '\b'; break;
-			case 'e': *t++ = '\e'; break;
-			case 'f': *t++ = '\f'; break;
-			case 'n': *t++ = '\n'; break;
-			case 'r': *t++ = '\r'; break;
-			case 't': *t++ = '\t'; break;
-#if 0
-			case 'u':
-			case 'U':
-				hf = *f++ == 'u' ? "%4x" : "%8x";
-				/* replace sscanf; advance f */
-				sscanf(f, hf, &cp);
-				if (cp<0x80) *t++=c;
-				else if (cp<0x800) *t++=192+cp/64, *t++=128+cp%64;
-				else if (cp-0xd800<0x800) goto error;
-				else if (cp<0x10000) *t++=224+cp/4096, *t++=128+cp/64%64, *t++=128+cp%64;
-				else if (cp<0x110000) *t++=240+cp/262144, *t++=128+cp/4096%64, *t++=128+cp/64%64, *t++=128+cp%64;
-				else goto error;
-error:
-				break;
-#endif
-			case 'v': *t++ = '\v'; break;
-			default: *t++ = *f;
-			}
-		} else *t++ = *f;
-	}
-	*t = '\0';
-	return s;
-}
-
 #define PRINTF_MAX_VARARGS 20
 PRIM(printf) {
 	if (list != NULL) {
@@ -67,7 +29,7 @@ PRIM(printf) {
 		double doubles[PRINTF_MAX_VARARGS];
 		const char* strings[PRINTF_MAX_VARARGS];
 		ffi_arg rc;
-		char *fmt = unescape((char*)getstr(list->term));
+		const char *fmt = getstr(list->term);
 		list = list->next;
 		args[0] = &ffi_type_pointer;
 		values[0] = &fmt;

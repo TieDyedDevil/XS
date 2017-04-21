@@ -29,6 +29,8 @@ the primitive comparison function &cmp.
 Added a builtin printf, compiled when libffi is available. This
 is implemented by the primitive &printf.
 
+Added Unicode escapes \uxxxx and \Uxxxxxxxx.
+
 Corrected the behaviors of pushd and popd. Added dirs to display
 directory stack.
 

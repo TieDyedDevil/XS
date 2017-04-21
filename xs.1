@@ -314,6 +314,14 @@ hexadecimal character
 .Ci \e nnn
 octal character
 .IR nnn
+.TP
+.Ci \eu nnnn
+Unicode character
+.IR nnnn
+.TP
+.Ci \eU nnnnnnnn
+Unicode character
+.IR nnnnnnnn
 .IE
 .SS Comments
 The number sign
@@ -2172,6 +2180,9 @@ If the stack is empty (for example, if
 has not been called), then stay in the current directory.
 Also displays the remaining stack.
 .TP
+.Cr "printf \fIformat ...\fP"
+Print formatted text.
+.TP
 .Cr "pushd \fR[\fP\fIdir\fP\fR]\fP"
 Add directory's absolute path onto the directory stack,
 .I cd
@@ -2809,32 +2820,6 @@ printf	printf
 readfrom	%readfrom
 time	time
 writeto	%writeto
-.ft R
-.De
-.PP
-The primitive
-.Cr printf
-interprets the following backslash escapes in its format string:
-.ta 1.75i 3.5i
-.Ds
-.ft \*(Cf
-a	n
-b	r
-e	t
-f	v
-.ft R
-.De
-.PP
-and these conversions and flags:
-.ta 1.75i 3.5i
-.Ds
-.ft \*(Cf
-c	#
-d	-
-f	0
-o	.
-s
-x
 .ft R
 .De
 .PP
