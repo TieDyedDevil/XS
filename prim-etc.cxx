@@ -58,7 +58,7 @@ PRIM(printf) {
 		while (list) {
 			nextconv(&fcp);
 			if (!validconv(*fcp))
-				eprint("printf: invalid format specifier: %c", *fcp);
+				fail("$&printf", "printf: invalid format specifier: %c", *fcp);
 			const char *arg = getstr(list->term);
 			if (!stringconv(*fcp) && isnumber(arg)) {
 				if (floatconv(*fcp) || isfloat(arg)) {
@@ -78,14 +78,14 @@ PRIM(printf) {
 			list = list->next;
 			++i;
 			if (i == PRINTF_MAX_VARARGS) {
-				eprint("printf: more than %d args; excess ignored\n",
+				fail("$&printf", "printf: more than %d args; excess ignored",
 					PRINTF_MAX_VARARGS);
 				break;
 			}
 		}
 		if (ffi_prep_cif(&cif, FFI_DEFAULT_ABI, i, &ffi_type_sint, args) == FFI_OK)
 			ffi_call(&cif, FFI_FN(printf), &rc, values);
-	} else eprint("printf: format missing\n");
+	} else fail("$&printf", "printf: format missing");
 	return ltrue;
 }
 #endif
