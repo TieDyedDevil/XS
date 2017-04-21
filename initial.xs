@@ -768,7 +768,7 @@ fn %interactive-loop { escape { |fn-return|
 	let (result = <=true) {
 		catch { |e type msg|
                 	(switch $e  
-				eof {return $result} 
+				eof {echo exit; return $result}
 				exit {throw $e $type $msg} 
 				error { echo >[1=2] $msg
 					$fn-%dispatch false } 
