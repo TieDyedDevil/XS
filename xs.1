@@ -2181,7 +2181,11 @@ has not been called), then stay in the current directory.
 Also displays the remaining stack.
 .TP
 .Cr "printf \fIformat ...\fP"
-Print formatted text.
+Print formatted text. Valid conversions are those of
+.IR printf (3),
+as appropriate to use in an intepreted environment with
+limited data types. Length modifiers and pointer arguments
+are not supported.
 .TP
 .Cr "pushd \fR[\fP\fIdir\fP\fR]\fP"
 Add directory's absolute path onto the directory stack,
@@ -3002,6 +3006,7 @@ Please send bug reports to
 .IR getrlimit (2),
 .IR fopen (3),
 .IR getpwent (3)
+.IR printf (3)
 .PP
 Paul Haahr and Byron Rakitzis,
 .I "Es \(em A shell with higher-order functions,"

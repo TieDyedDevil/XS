@@ -22,13 +22,13 @@ static int isfloat(const char *s) {
 static void nextconv(char **s) {
 	char *pct = strchr(*s, '%');
 	if (pct) {
-		const int fw = strspn(++pct, "-+ #.0123456789");
+		const int fw = strspn(++pct, "'-+ #.0123456789");
 		*s = pct + fw;
 	}
 }
 
 static int validconv(char c) {
-	return strchr("csdefgx", c) != NULL;
+	return strchr("%aAcdeEfFgGiosuxX", c) != NULL;
 }
 
 static int stringconv(char c) {
