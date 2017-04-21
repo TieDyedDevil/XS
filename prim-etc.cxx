@@ -19,6 +19,26 @@ static int isfloat(const char *s) {
 	return strchr(s, '.') != NULL;
 }
 
+static void nextconv(char **s) {
+	char *pct = strchr(*s, '%');
+	if (pct) {
+		const int fw = strspn(++pct, "-+ #.0123456789");
+		*s = pct + fw;
+	}
+}
+
+static int validconv(char c) {
+	return strchr("csdefgx", c) != NULL;
+}
+
+static int stringconv(char c) {
+	return strchr("cs", c) != NULL;
+}
+
+static int floatconv(char c) {
+	return strchr("efg", c) != NULL;
+}
+
 #define PRINTF_MAX_VARARGS 20
 PRIM(printf) {
 	if (list != NULL) {
@@ -34,10 +54,14 @@ PRIM(printf) {
 		args[0] = &ffi_type_pointer;
 		values[0] = &fmt;
 		int i = 1;
+		char *fcp = (char*)fmt;
 		while (list) {
+			nextconv(&fcp);
+			if (!validconv(*fcp))
+				eprint("printf: invalid format specifier: %c", *fcp);
 			const char *arg = getstr(list->term);
-			if (isnumber(arg)) {
-				if (isfloat(arg)) {
+			if (!stringconv(*fcp) && isnumber(arg)) {
+				if (floatconv(*fcp) || isfloat(arg)) {
 					args[i] = &ffi_type_double;
 					doubles[i] = strtod(arg, NULL);
 					values[i] = &doubles[i];
