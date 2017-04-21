@@ -310,22 +310,30 @@ tab
 .Ci \ex nn
 hexadecimal character
 .IR nn ,
-for n in {0..9, a..f, A..F}
+for
+.I n
+in {0..9, a..f, A..F}
 .TP
 .Ci \e nnn
 octal character
 .IR nnn ,
-for n in {0..7}
+for
+.I n
+in {0..7}
 .TP
 .Ci \eu nnnn
 Unicode character
 .IR nnnn ,
-for n in {0..9, a..f, A..F}
+for
+.I n
+in {0..9, a..f, A..F}
 .TP
 .Ci \eU nnnnnnnn
 Unicode character
 .IR nnnnnnnn ,
-for n in {0..9, a..f, A..F}
+for
+.I n
+in {0..9, a..f, A..F}
 .IE
 .SS Comments
 The number sign
@@ -858,6 +866,7 @@ A single list element can be formed from an infix arithmetical expression like s
 .Ds
 .Ci "\`( " " expression " )
 .De
+.PP
 The expression can use any of the 
 .Cr "+", 
 .Cr "-", 
@@ -889,6 +898,7 @@ this includes division and modulus, so
 .Cr "echo `(5 % 3)"
 .Cr "echo `(5.0 / 3)"
 .De
+.PP
 produce 0, 0.5 (with trailing zeros), 2 and 2.0 (with trailing zeros) respectively.
 Integers will wrap around at the same point as the native platform's int,
 and floats at the same point as the native platform's double.
@@ -1980,6 +1990,7 @@ Escape is useful to replace return/break like constructs; for example
 .Cr "}}"
 .De
 .TP
+\&
 will exit the function with result 0 when it reached the return. 
 .TP
 .Cr "eval \fIlist\fP"
@@ -2080,11 +2091,15 @@ the number of actions, so one can write code like:
 .Ds
 .Cr "... } else if {~ $a $b} { ... }"
 .De
+.TP
+\&
 Note that:
 .Ds
 .Cr ...}
 .Cr "else if {~ $a $b} { ... }"
 .De
+.TP
+\&
 , with the else on a seperate line, will only
 work if the if-command has parentheses wrapping it's body
 and else-statements.
@@ -2967,10 +2982,12 @@ process forking takes up the majority of time:
 .Ds
 .Cr "x = 0; while {!~ $x 4000} { x = `($x + 1) }
 .De
+.PP
 is several magnitudes faster than:
 .Ds
 .Cr "x = 0; while {test $x -ne 4000} { x = `($x + 1) }
 .De
+.PP
 Even though xs's arithmetic code is rather slow, in this
 case the cost of fork+exec far outweighs it.
 .PP
