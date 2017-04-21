@@ -309,19 +309,23 @@ tab
 .TP
 .Ci \ex nn
 hexadecimal character
-.IR nn
+.IR nn ,
+for n in {0..9, a..f, A..F}
 .TP
 .Ci \e nnn
 octal character
-.IR nnn
+.IR nnn ,
+for n in {0..7}
 .TP
 .Ci \eu nnnn
 Unicode character
-.IR nnnn
+.IR nnnn ,
+for n in {0..9, a..f, A..F}
 .TP
 .Ci \eU nnnnnnnn
 Unicode character
-.IR nnnnnnnn
+.IR nnnnnnnn ,
+for n in {0..9, a..f, A..F}
 .IE
 .SS Comments
 The number sign
@@ -3005,7 +3009,7 @@ Please send bug reports to
 .IR execve (2),
 .IR getrlimit (2),
 .IR fopen (3),
-.IR getpwent (3)
+.IR getpwent (3),
 .IR printf (3)
 .PP
 Paul Haahr and Byron Rakitzis,
