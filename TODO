@@ -1,3 +1,4 @@
+- Fit PRIM(printf) into the same buffering scheme used by print.
 - FIX: Why does build fail w/o libffi?
 - Add job control (SIGTSTP, fg, bg, disown).
 - Add tests.
