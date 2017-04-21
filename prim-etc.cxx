@@ -39,21 +39,29 @@ static int floatconv(char c) {
 	return strchr("efg", c) != NULL;
 }
 
-#define PRINTF_MAX_VARARGS 20
 PRIM(printf) {
 	if (list != NULL) {
+		const int printf_max_varargs = 20;
 		ffi_cif cif;
-		ffi_type *args[PRINTF_MAX_VARARGS];
-		void *values[PRINTF_MAX_VARARGS];
-		long longs[PRINTF_MAX_VARARGS];
-		double doubles[PRINTF_MAX_VARARGS];
-		const char* strings[PRINTF_MAX_VARARGS];
+		ffi_type *args[printf_max_varargs];
+		void *values[printf_max_varargs];
+		long longs[printf_max_varargs];
+		double doubles[printf_max_varargs];
+		const char* strings[printf_max_varargs];
 		ffi_arg rc;
 		const char *fmt = getstr(list->term);
 		list = list->next;
+		char out[1024];
+		char *p_out = out;
+		size_t outsz = sizeof(out);
+		size_t *p_outsz = &outsz;
 		args[0] = &ffi_type_pointer;
-		values[0] = &fmt;
-		int i = 1;
+		values[0] = &p_out;
+		args[1] = &ffi_type_ulong;
+		values[1] = &p_outsz;
+		args[2] = &ffi_type_pointer;
+		values[2] = &fmt;
+		int i = 3;
 		char *fcp = (char*)fmt;
 		while (list) {
 			nextconv(&fcp);
@@ -77,14 +85,16 @@ PRIM(printf) {
 			}
 			list = list->next;
 			++i;
-			if (i == PRINTF_MAX_VARARGS) {
-				fail("$&printf", "printf: more than %d args; excess ignored",
-					PRINTF_MAX_VARARGS);
+			if (i == printf_max_varargs) {
+				fail("$&printf", "printf: too many args");
 				break;
 			}
 		}
-		if (ffi_prep_cif(&cif, FFI_DEFAULT_ABI, i, &ffi_type_sint, args) == FFI_OK)
-			ffi_call(&cif, FFI_FN(printf), &rc, values);
+		if (ffi_prep_cif(&cif, FFI_DEFAULT_ABI, i, &ffi_type_sint, args) == FFI_OK) {
+			ffi_call(&cif, FFI_FN(snprintf), &rc, values);
+			if ((int)rc >= outsz) fail("$&printf", "printf: output too long");
+			print("%s", out);
+		}
 	} else fail("$&printf", "printf: format missing");
 	return ltrue;
 }
