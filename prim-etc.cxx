@@ -11,7 +11,7 @@
 #include <stdio.h>
 
 static int isnumber(const char *s) {
-	return strspn(s, "0123456789.") == strlen(s);
+	return strspn(s, "-0123456789.") == strlen(s);
 }
 
 static int isfloat(const char *s) {
@@ -40,6 +40,10 @@ static int charconv(char c) {
 
 static int floatconv(char c) {
 	return strchr("efg", c) != NULL;
+}
+
+static int integralconv(char c) {
+	return strchr("diox", c) != NULL;
 }
 
 PRIM(printf) {
@@ -74,6 +78,8 @@ PRIM(printf) {
 			const char *arg = getstr(list->term);
 			if (!textconv(*fcp) && isnumber(arg)) {
 				if (floatconv(*fcp) || isfloat(arg)) {
+					if (integralconv(*fcp))
+						fail("$&printf", "printf: integral value required");
 					args[i] = &ffi_type_double;
 					doubles[i] = strtod(arg, NULL);
 					values[i] = &doubles[i];
