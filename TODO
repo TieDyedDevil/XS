@@ -1,6 +1,6 @@
 - Add job control (SIGTSTP, fg, bg, disown).
 - Add tests.
-  - printf
   - Extend existing suites.
+  - Make printf tests platform-independent.
 - Add examples.
 - Get xsdebug working.
