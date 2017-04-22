@@ -1,8 +1,7 @@
 Prerequisites
 -------------
 
-Xs requires the boost and gc (Boehm) libraries. The readline or editline
-library is strongly recommended, as is the ffi library.
+Xs requires the boost, ffi, gc (Boehm) and readline libraries.
 
 You'll need a C++ compiler, the GNU Autotools and YACC or Bison, plus
 the developer packages of the libraries noted above, in order to build xs.

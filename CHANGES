@@ -5,6 +5,8 @@ Some c++ features are used in the code-base now,
 so it is no longer valid C (and obviously needs
 a c++ compiler)
 
+The (optional) editline library is no longer supported.
+
 The assignment operator must be delimited by whitespace in order to
 distinguish this usage from "long" arguments (--foo=blah).
 
@@ -27,7 +29,7 @@ These all use the new comparison function %cmp, which in turn uses
 the primitive comparison function &cmp.
 
 Added a builtin printf, compiled when libffi is available. This
-is implemented by the primitive &printf.
+is implemented by the primitive &printf and requires the ffi library.
 
 Added Unicode escapes \uxxxx and \Uxxxxxxxx.
 

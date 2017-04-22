@@ -36,8 +36,6 @@ static int historyfd = -1;
 #include <readline/readline.h>
 #include <readline/history.h>
 bool continued_input = false;
-int rl_meta_chars;	/* for editline; ignored for gnu readline */
-
 #endif
 
 
@@ -662,7 +660,6 @@ extern void initinput(void) {
 	registerfd(&historyfd, true);
 
 #if READLINE
-	rl_meta_chars = 0;
 	rl_basic_word_break_characters = " \t\n\\'`><=;|&{()}";
 	rl_completer_quote_characters = "'";
 	rl_filename_quote_characters = " \t\n\\'`=$><;|&{()}";

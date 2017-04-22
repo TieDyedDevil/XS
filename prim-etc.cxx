@@ -5,7 +5,6 @@
 #include "xs.hxx"
 #include "prim.hxx"
 
-#if HAVE_LIBFFI
 #include <ffi.h>
 #include <string.h>
 #include <stdlib.h>
@@ -98,7 +97,6 @@ PRIM(printf) {
 	} else fail("$&printf", "printf: format missing");
 	return ltrue;
 }
-#endif
 
 PRIM(result) {
 	return list;

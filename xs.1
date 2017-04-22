@@ -2755,11 +2755,11 @@ builtin functions with the same names:
 .ta 1.75i 3.5i
 .Ds
 .ft \*(Cf
-access	forever	throw
-catch	fork	umask
-echo	if	wait
-exec	newpgrp	
-exit	result	
+access	forever	result
+catch	fork	throw
+echo	if	umask
+exec	newpgrp	wait
+exit	printf	
 .ft R
 .De
 .PP
@@ -2844,7 +2844,6 @@ Those primitives, and the functions to which they are bound, are
 .ft \*(Cf
 execfailure	%exec-failure
 limit	limit
-printf	printf
 readfrom	%readfrom
 time	time
 writeto	%writeto
@@ -2857,9 +2856,7 @@ is present if
 .I xs
 is compiled with support for the
 .I readline
-or
-.I editline
-libraries.
+library.
 It is used in the implementation of settor functions of the
 .Cr TERM
 and

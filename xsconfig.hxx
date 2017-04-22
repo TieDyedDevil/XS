@@ -97,7 +97,7 @@
  *		characters appear in them.
  *
  *	READLINE
- *		true if xs is being linked with editline or gnu readline.
+ *		true if xs is being linked with gnu readline.
  *
  *	REF_ASSERTIONS
  *		if this is on, assertions about the use of the Ref() macro
@@ -173,7 +173,7 @@
 # define SYSV_SIGNALS 1
 #endif
 
-#if HAVE_LIBREADLINE || HAVE_LIBEDITLINE
+#if HAVE_LIBREADLINE
 # define READLINE 1
 #endif
 

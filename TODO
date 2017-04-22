@@ -1,4 +1,3 @@
-- FIX: Why does build fail w/o libffi?
 - Add job control (SIGTSTP, fg, bg, disown).
 - Add tests.
   - relops

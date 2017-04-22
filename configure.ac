@@ -14,19 +14,10 @@ $1=`(eval "$ac_cpp conftest.$ac_ext") 2>&AC_FD_CC | $2`
 rm -f conftest*
 ])
 
-
 use_readline=yes
-use_editline=no
 
 AC_ARG_WITH(readline,  AS_HELP_STRING(--without-readline, use GNU Readline), 
 	use_readline=no)
-AC_ARG_WITH(editline, AS_HELP_STRING(--with-editline, use the Editline library),
-	use_editline=yes)
-
-if test "$use_editline" = yes
-then
-	use_readline=no
-fi
 
 AC_ARG_ENABLE(debug, AS_HELP_STRING(--enable-debug, debug mode for xs developers), debug_build=yes) 
 AC_ARG_ENABLE(static, AS_HELP_STRING(--enable-static, build statically), LDFLAGS=-static) 
@@ -67,7 +58,7 @@ dnl Boehm
 AC_CHECK_LIB(gc, main, , [AC_MSG_ERROR([Boehm GC is not installed])])
 
 dnl FFI
-AC_CHECK_LIB(ffi, ffi_call)
+AC_CHECK_LIB(ffi, ffi_call, , [AC_MSG_ERROR([libffi is not installed])])
 
 dnl ----------------------------
 dnl CHECK FOR /dev/fd FILESYSTEM
@@ -95,9 +86,6 @@ AC_CHECK_LIB(sun, getpwuid)
 if test "$use_readline" = yes
 then
 	AC_CHECK_LIB(readline, readline)
-elif test "$use_editline" = yes
-then
-	AC_CHECK_LIB(edit, readline)
 fi
 
 

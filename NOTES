@@ -2,8 +2,6 @@ This file is a place to collect observations about xs behavior until
 they're either documented as intentional or fixed.
 
 - no way to return a lambda from a function?
-- editline's readline compatibility isn't actually compatible.
-  - links fine, but UI doesn't seem to work as intended.
 - tab completion should consider context.
 - filename completion (via readline) needs improvement.
 - readline is unaware of %prompt; this affects ^U behavior.
