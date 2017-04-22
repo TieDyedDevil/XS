@@ -30,8 +30,12 @@ static int validconv(char c) {
 	return strchr("%aAcdeEfFgGiosuxX", c) != NULL;
 }
 
-static int stringconv(char c) {
+static int textconv(char c) {
 	return strchr("cs", c) != NULL;
+}
+
+static int charconv(char c) {
+	return c == 'c';
 }
 
 static int floatconv(char c) {
@@ -46,6 +50,7 @@ PRIM(printf) {
 		void *values[printf_max_varargs];
 		long longs[printf_max_varargs];
 		double doubles[printf_max_varargs];
+		char chars[printf_max_varargs];
 		const char* strings[printf_max_varargs];
 		ffi_arg rc;
 		const char *fmt = getstr(list->term);
@@ -67,7 +72,7 @@ PRIM(printf) {
 			if (!validconv(*fcp))
 				fail("$&printf", "printf: invalid format specifier: %c", *fcp);
 			const char *arg = getstr(list->term);
-			if (!stringconv(*fcp) && isnumber(arg)) {
+			if (!textconv(*fcp) && isnumber(arg)) {
 				if (floatconv(*fcp) || isfloat(arg)) {
 					args[i] = &ffi_type_double;
 					doubles[i] = strtod(arg, NULL);
@@ -77,6 +82,12 @@ PRIM(printf) {
 					longs[i] = strtol(arg, NULL, 10);
 					values[i] = &longs[i];
 				}
+			} else if (charconv(*fcp)) {
+				if (arg[1] != '\0')
+					fail("$&printf", "printf: %%c arg is not a character");
+				args[i] = &ffi_type_schar;
+				chars[i] = *arg;
+				values[i] = &chars[i];
 			} else {
 				args[i] = &ffi_type_pointer;
 				strings[i] = gcdup(arg);
