@@ -1,6 +1,5 @@
 - Add job control (SIGTSTP, fg, bg, disown).
 - Add tests.
-  - relops
   - printf
   - Extend existing suites.
 - Add examples.
