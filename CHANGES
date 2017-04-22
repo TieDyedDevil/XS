@@ -28,8 +28,10 @@ Added infix relational operators :lt, :le, :gt, :ge, :eq and :ne.
 These all use the new comparison function %cmp, which in turn uses
 the primitive comparison function &cmp.
 
-Added a builtin printf, compiled when libffi is available. This
-is implemented by the primitive &printf and requires the ffi library.
+Added a builtin printf. This is implemented by the primitive &printf
+and requires the ffi library. The underlying implemention is printf(3),
+but the xs wrapper limits access to printf(3p) functionality without
+length modifiers.
 
 Added Unicode escapes \uxxxx and \Uxxxxxxxx.
 
