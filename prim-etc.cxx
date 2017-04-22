@@ -38,8 +38,12 @@ static int charconv(char c) {
 	return c == 'c';
 }
 
+static int stringconv(char c) {
+	return c == 's';
+}
+
 static int floatconv(char c) {
-	return strchr("efg", c) != NULL;
+	return strchr("aAeEfFgG", c) != NULL;
 }
 
 static int integralconv(char c) {
@@ -79,7 +83,7 @@ PRIM(printf) {
 			if (!textconv(*fcp) && isnumber(arg)) {
 				if (floatconv(*fcp) || isfloat(arg)) {
 					if (integralconv(*fcp))
-						fail("$&printf", "printf: integral value required");
+						fail("$&printf", "printf: %%%c: integral value required", *fcp);
 					args[i] = &ffi_type_double;
 					doubles[i] = strtod(arg, NULL);
 					values[i] = &doubles[i];
@@ -90,11 +94,13 @@ PRIM(printf) {
 				}
 			} else if (charconv(*fcp)) {
 				if (arg[1] != '\0')
-					fail("$&printf", "printf: %%c arg is not a character");
+					fail("$&printf", "printf: %%c: character value required");
 				args[i] = &ffi_type_schar;
 				chars[i] = *arg;
 				values[i] = &chars[i];
 			} else {
+				if (!stringconv(*fcp))
+					fail("$&printf", "printf: %%%c: numeric value required", *fcp);
 				args[i] = &ffi_type_pointer;
 				strings[i] = gcdup(arg);
 				values[i] = &strings[i];
