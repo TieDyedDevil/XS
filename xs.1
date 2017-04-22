@@ -885,12 +885,12 @@ or
 .Cr "%" 
 are not allowed within an arithmetic expression.
 .PP
-Parentheses can be used in normal infix fashion for order of evaluation.
-Absent parentheses, evaluation is left-to-right.
+Parentheses can be used in normal infix fashion to alter order of evaluation.
+Absent parentheses, evaluation follows the usual precedence.
 .PP
 Numbers can be entered in floating-point or integer, but are always decimal.
 Calculation rules are similar to C - any operation involving floats
-produces a float, any operation with integers produces an integer;
+produces a float, any operation with only integers produces an integer;
 this includes division and modulus, so 
 .Ds
 .Cr "echo `(1 / 2)"
@@ -902,6 +902,9 @@ this includes division and modulus, so
 produce 0, 0.5 (with trailing zeros), 2 and 2.0 (with trailing zeros) respectively.
 Integers will wrap around at the same point as the native platform's int,
 and floats at the same point as the native platform's double.
+.PP
+.IR xs 's
+floats are stored with limited (typically 6 signicant digits) precision.
 .SS "Command Substitution"
 A list may be formed from the output of a command by using backquote
 substitution:
