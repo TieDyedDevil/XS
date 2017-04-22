@@ -6,7 +6,7 @@
 #include <stdlib.h>
 
 static int isnumber(const char *s) {
-	return strspn(s, "0123456789.") == strlen(s);
+	return strspn(s, "-0123456789.") == strlen(s);
 }
 
 static int isfloat(const char *s) {
