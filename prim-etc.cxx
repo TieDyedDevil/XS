@@ -43,7 +43,7 @@ static int floatconv(char c) {
 }
 
 static int integralconv(char c) {
-	return strchr("diox", c) != NULL;
+	return strchr("diouxX", c) != NULL;
 }
 
 PRIM(printf) {
