@@ -370,16 +370,17 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 		case 't':	*buf = '\t';	break;
 		case 'x': case 'X': {
 			int n = 0;
-			for (;;) {
+			int dc = 2;
+			while (dc) {
 				c = GETC();
 				if (!isxdigit(c))
 					break;
 				n = (n << 4)
 				  | (c - (isdigit(c) ? '0' : ((islower(c) ? 'a' : 'A') - 0xA)));
+				--dc;
 			}
-			if (n == 0)
+			if (dc != 0 || n == 0)
 				goto badescape;
-			UNGETC(c);
 			*buf = n;
 			break;
 		}
@@ -387,13 +388,16 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 			unsigned n = 0;
 			int i = 0;
 			int dc = c == 'u' ? 4 : 8;
-			while (dc--) {
+			while (dc) {
 				c = GETC();
 				if (!isxdigit(c))
 					break;
 				n = (n << 4)
 				  | (c - (isdigit(c) ? '0' : ((islower(c) ? 'a' : 'A') - 0xA)));
+				--dc;
 			}
+			if (dc != 0 || n == 0)
+				goto badescape;
 			if (n < 0x80) bufput(i++, n);
 			else if (n < 0x800) {
 				bufput(i++, 192+n/64);
@@ -415,15 +419,16 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 			is_utf8 = 1;
 			break;
 		}
-		case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': {
-			int n = 0;
-			do {
-				n = (n << 3) | (c - '0');
+		case '0': case '1': case '2': case '3': {
+			int n = c - '0', dc = 2;
+			while (dc) {
 				c = GETC();
-			} while (isodigit(c));
-			if (n == 0)
+				if (!isodigit(c)) break;
+				n = (n << 3) | (c - '0');
+				--dc;
+			};
+			if (dc != 0 || n == 0)
 				goto badescape;
-			UNGETC(c);
 			*buf = n;
 			break;
 		}
