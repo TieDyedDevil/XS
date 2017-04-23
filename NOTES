@@ -1,13 +1,19 @@
 This file is a place to collect observations about xs behavior until
 they're either documented as intentional or fixed.
 
-- no way to return a lambda from a function?
-- tab completion should consider context.
-- filename completion (via readline) needs improvement.
+** readline
 - readline is unaware of %prompt; this affects ^U behavior.
-- does switch handle optional otherwise clause consistently?
-  - in particular: presence vs. absence
+- tab completion should consider context.
+
+** closures
+- upward funargs don't work
+  - lambda can be returned from a function using `result`,
+    but closures don't work when function is applied.
+
+** control
+- `throw retry` can create an uninterruptible loop.
+  - for now, this is documented in xs.1.
+
+** syntax
 - variable-name checking may be incorrect (token.cxx).
 - subscripts don't work in here documents.
-- can't throw from a switch.
-  - check implementation of throw and escape.
