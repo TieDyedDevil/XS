@@ -337,6 +337,13 @@ for
 .I n
 in {0..9, a..f, A..F}
 .IE
+.PP
+The character escapes may be used with
+.Cr eval
+to create characters from codepoints at runtime.
+.Ds
+.Cr "echo `{{|cp| eval echo '\u'$cp} 01dd}"
+.De
 .SS Comments
 The number sign
 .Rc ( # )
