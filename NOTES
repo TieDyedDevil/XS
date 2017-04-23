@@ -9,6 +9,7 @@ they're either documented as intentional or fixed.
 - upward funargs don't work
   - lambda can be returned from a function using `result`,
     but closures don't work when function is applied.
+  - for now, this is documented in xs.1.
 
 ** control
 - `throw retry` can create an uninterruptible loop.

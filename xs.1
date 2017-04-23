@@ -1527,6 +1527,9 @@ When raised from a signal catcher,
 causes the body of the
 .Cr catch
 clause to be run again.
+.B If the cause of the caught signal is not resolved, invoking
+.Cr retry
+.B will create an uninterruptible loop.
 .TP
 .Cr "signal \fIsigname\fP"
 Raised when the shell itself receives a signal,
@@ -2224,6 +2227,14 @@ Returns its arguments.
 This is
 .IR xs 's
 identity function.
+.TP
+\&
+While
+.Cr result
+may be used to return a lambda from a function, a closure associated
+with the function will not work. In other words,
+.I xs
+does not support upward funargs.
 .TP
 .Cr "switch \fIvalue\fP \fI\fR[\fPcase1 action1\fR]\fP\fP...\fI\fR[\fPdefault-action\fR]\fP\fP"
 Go through the list of cases, 
