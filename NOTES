@@ -17,4 +17,3 @@ they're either documented as intentional or fixed.
 
 ** syntax
 - variable-name checking may be incorrect (token.cxx).
-- subscripts don't work in here documents.
