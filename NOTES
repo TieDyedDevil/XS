@@ -2,7 +2,6 @@ This file is a place to collect observations about xs behavior until
 they're either documented as intentional or fixed.
 
 ** readline
-- readline is unaware of %prompt; this affects ^U behavior.
 - tab completion should consider context.
 
 ** closures
