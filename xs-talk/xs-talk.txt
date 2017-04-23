@@ -27,8 +27,8 @@ Example: This presentation is run by:
 Lists, function parameters, closures,
 exceptions, lexical bindings, lambdas
 
-However: no way to return a closure or
-lambda from a function. :\
+However: closure returned from function
+does not work (no upward funargs). :(
 
 But you can still instantiate functions
 (including closed-over functions) from
@@ -62,13 +62,26 @@ replaced by user.
 Command-line editing and history is
 provided by GNU readline.
 
+Improved over v1.0:
+  - added modulus (%) operator
+  - added builtin printf
+  - added Unicode character escapes
+  - corrected pushd/popd behavior
+  - added dirs command
+  - added rudimentary jobs command
+  - added history command
+  - tab completion of function names
+  - tab completion of variable names
+  - added SIGWINCH handler
+  - many man page corrections
+  - many bug fixes
+
 Deficits:
   - no job control (^Z, fg, bg, disown)
-  - no relops (lexer, parser)
   - debugger bit-rot
   - weak/incomplete tests
   - size (3+ MB?!) [blame Boost?]
-  - poor error detection/reporting
+  - inconsistent error detection/reporting
   - ...
 
 Repo:
@@ -80,4 +93,4 @@ My .xsrc:
 blob/master/files/_xsrc
 
 Requirements: C++, Autotools, yacc,
-libgc, libreadline, libboost*
+libgc, libffi, libreadline, libboost*
