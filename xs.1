@@ -1706,10 +1706,10 @@ being necessary.
 .TP
 \&
 Surround any zero-width character sequences (e.g. display attribute
-control) with
-.Cr \e001
+control) with the character returned by
+.Cr $&promptignore
 to the immediate left and
-.Cr \e002
+.Cr $&nopromptignore
 to the immediate right of the zero-width sequence. This allows
 .I readline
 to properly calculate the position of the cursor when editing a line.
@@ -2896,6 +2896,15 @@ and
 .Cr TERMCAP
 variables to notify the line editing packages that the terminal
 configuration has changed.
+.PP
+The primitives
+.Cr promptignore
+and
+.Cr nopromptignore
+are also present with
+.I readline
+support. Use the values returned by these primitives to mark
+the beginning and end of zero-width character sequences in prompts.
 .PP
 Several primitives are not directly associated with other function.
 They are:
