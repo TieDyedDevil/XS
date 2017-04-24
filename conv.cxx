@@ -325,7 +325,7 @@ quoteit:
 			    case '\r':	fmtprint(f, "\\r");	break;
 			    case '\t':	fmtprint(f, "\\t");	break;
 		            case '\33':	fmtprint(f, "\\e");	break;
-			    default:	fmtprint(f, "\\%o", c);	break;
+			    default:	fmtprint(f, "\\%03o", c);	break;
 			}
 			state = Unquoted;
 		} else {
