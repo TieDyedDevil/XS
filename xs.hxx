@@ -12,10 +12,14 @@
 
 /*
  * meta-information for exported environment strings
+ *
+ * Our ancestors used ^A and ^B, but these conflict with
+ * readline's begin/end markers for zero-width character
+ * sequences.
  */
 
-#define ENV_SEPARATOR	'\001'		/* control-A */
-#define	ENV_ESCAPE	'\002'		/* control-B */
+#define ENV_SEPARATOR	'\005'		/* control-E */
+#define ENV_ESCAPE	'\006'		/* control-F */
 
 
 /*
