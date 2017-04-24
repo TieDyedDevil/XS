@@ -1676,6 +1676,8 @@ is printed when input is expected to continue on the next
 line.  (See
 .Cr %parse
 for details.)
+.TP
+\&
 .I xs
 sets
 .Cr $prompt
@@ -1701,6 +1703,16 @@ on the screen,
 and can therefore be grabbed by a mouse and placed
 directly into a file for use as a shell script, without further editing
 being necessary.
+.TP
+\&
+Surround any zero-width character sequences (e.g. display attribute
+control) with
+.Cr \e001
+to the immediate left and
+.Cr \e002
+to the immediate right of the zero-width sequence. This allows
+.I readline
+to properly calculate the position of the cursor when editing a line.
 .TP
 .Cr signals
 Contains a list of the signals which
