@@ -3,16 +3,8 @@ they're either documented as intentional or fixed.
 
 ** readline
 - tab completion should consider context.
-
-** closures
-- upward funargs don't work
-  - lambda can be returned from a function using `result`,
-    but closures don't work when function is applied.
-  - for now, this is documented in xs.1.
-
-** control
-- `throw retry` can create an uninterruptible loop.
-  - for now, this is documented in xs.1.
+- incremental search corrupts display when prompt contains
+  a multibyte UTF-8 character.
 
 ** syntax
 - variable-name checking may be incorrect (token.cxx).
