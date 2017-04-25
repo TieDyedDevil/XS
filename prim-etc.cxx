@@ -357,15 +357,6 @@ PRIM(resetterminal) {
 	rl_reset_terminal(NULL);
 	return ltrue;
 }
-/* Return strings which you can use to delimit invisible characters in rompts */
-PRIM(promptignore) {
-	static const char s[] = { RL_PROMPT_START_IGNORE, '\0' };
-	return mklist(mkstr(s), NULL);
-}
-PRIM(nopromptignore) {
-	static const char s[] = { RL_PROMPT_END_IGNORE, '\0' };
-	return mklist(mkstr(s), NULL);
-}
 #endif
 
 
@@ -398,8 +389,6 @@ extern void initprims_etc(Prim_dict& primdict) {
 	X(setmaxevaldepth);
 #if READLINE
 	X(resetterminal);
-	X(promptignore);
-	X(nopromptignore);
 #endif
 #if HAVE_LIBFFI
 	X(printf);

@@ -1708,16 +1708,6 @@ and can therefore be grabbed by a mouse and placed
 directly into a file for use as a shell script, without further editing
 being necessary.
 .TP
-\&
-Surround any zero-width character sequences (e.g. display attribute
-control) with the character returned by
-.Cr $&promptignore
-to the immediate left and
-.Cr $&nopromptignore
-to the immediate right of the zero-width sequence. This allows
-.I readline
-to properly calculate the position of the cursor when editing a line.
-.TP
 .Cr signals
 Contains a list of the signals which
 .I xs
@@ -2900,15 +2890,6 @@ and
 .Cr TERMCAP
 variables to notify the line editing packages that the terminal
 configuration has changed.
-.PP
-The primitives
-.Cr promptignore
-and
-.Cr nopromptignore
-are also present with
-.I readline
-support. Use the values returned by these primitives to mark
-the beginning and end of zero-width character sequences in prompts.
 .PP
 Several primitives are not directly associated with other function.
 They are:
