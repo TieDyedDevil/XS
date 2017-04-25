@@ -14,8 +14,8 @@
  * meta-information for exported environment strings
  */
 
-#define ENV_SEPARATOR	'\001'		/* control-A */
-#define	ENV_ESCAPE	'\002'		/* control-B */
+#define ENV_SEPARATOR	'\003'		/* control-C */
+#define ENV_ESCAPE	'\005'		/* control-E */
 
 
 /*
