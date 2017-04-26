@@ -261,7 +261,7 @@ const char *mzwcs(const char *prompt) {
 	if (!prompt) return prompt;
 
 	int esc = 0, csi = 0, osc = 0, stt = 0, ste = 0, mark = 0;
-	static char outbuf[1024];
+	char outbuf[1024];
 	char *f = (char*)prompt, *t = (char*)&outbuf[0];
 	while (*f) {
 		if (t >= &outbuf[sizeof(outbuf)-3]) return prompt;
@@ -305,7 +305,7 @@ const char *mzwcs(const char *prompt) {
 		++t; ++f;
 	}
 	*t = '\0';
-	return (const char*)outbuf;
+	return (const char*)gcdup(outbuf);
 }
 #else
 const char *mzwcs(const char *prompt) {return prompt;}
