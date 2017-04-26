@@ -54,12 +54,9 @@ This is now fixed.
 Readline now has tab-complete for functions, variables, binaries in path
 and (when written with a ./ prefix) files in the working directory.
 
-Removed &$promptignore and &$nopromptignore. These codes are the same
-as used by the xs' environment markers, and require exceptional care
-to keep the values out of variables. Given that the %prompt function
-*must* write $prompt in order to keep readline synced to the cursor
-position, the codes can't be used. In practical terms, this means no
-terminal attributes on prompts. Boo hoo...
+Removed &$promptignore and &$nopromptignore. Xs automatically marks
+zero-width character sequences in $prompt in order for readline() to
+keep track of cursor position.
 
 xs now has its own SIGWINCH handler since readline, as of version
 6.3, no longer handles the signal. For background, please read:

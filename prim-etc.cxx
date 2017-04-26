@@ -10,6 +10,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#if READLINE
+#include <readline/readline.h>
+#endif
+
 static int isnumber(const char *s) {
 	return strspn(s, "-0123456789.") == strlen(s);
 }
@@ -251,6 +255,62 @@ PRIM(sethistory) {
 	return list;
 }
 
+#if READLINE
+/* mark zero-width character sequences for readline() */
+const char *mzwcs(const char *prompt) {
+	if (!prompt) return prompt;
+
+	int esc = 0, csi = 0, osc = 0, stt = 0, ste = 0, mark = 0;
+	static char outbuf[1024];
+	char *f = (char*)prompt, *t = (char*)&outbuf[0];
+	while (*f) {
+		if (t >= &outbuf[sizeof(outbuf)-3]) return prompt;
+		if (*f == '\e') {
+			esc = 1;
+			if (!mark) *t++ = RL_PROMPT_START_IGNORE;
+			mark = 1;
+		}
+		if (esc && *f == '[') {esc = 0; csi = 1;}
+		if (esc && *f == ']') {esc = 0; osc = 1; stt = 1;}
+		if (esc && strchr("PX^_", *f)) {esc = 0; stt = 1;}
+		if (esc && isalpha(*f)) {
+			*t++ = *f++;
+			*t++ = RL_PROMPT_END_IGNORE;
+			esc = 0; mark = 0;
+			continue;
+		}
+		if (iscntrl(*f) && !strchr("\a\e\n\r\t", *f)) {
+			if (!mark) *t++ = RL_PROMPT_START_IGNORE; mark = 1;
+		}
+		if (csi && isalpha(*f)) {
+			*t++ = *f++; *t++ = RL_PROMPT_END_IGNORE;
+			csi = 0; mark = 0;
+			continue;
+		}
+		if (mark && !iscntrl(*f)) {
+			*t++ = RL_PROMPT_END_IGNORE; mark = 0;
+		}
+		if (osc && *f == '\a') {
+			*t++ = *f++; *t++ = RL_PROMPT_END_IGNORE;
+			osc = 0; stt = 0;
+			continue;
+		}
+		if (stt && *f == '\e') ste = 1;
+		if (stt && ste && *f == '\\') {
+			*t++ = *f++; *t++ = RL_PROMPT_END_IGNORE;
+			stt = 0; ste = 0;
+			continue;
+		}
+		*t = *f;
+		++t; ++f;
+	}
+	*t = '\0';
+	return (const char*)outbuf;
+}
+#else
+const char *mzwcs(const char *prompt) {return prompt;}
+#endif
+
 PRIM(parse) {
 	List *result;
 	Tree *tree;
@@ -261,7 +321,7 @@ PRIM(parse) {
 		if ((list = list->next) != NULL)
 			prompt2 = getstr(list->term);
 	}
-	tree = parse(prompt1, prompt2);
+	tree = parse(mzwcs(prompt1), mzwcs(prompt2));
 	result = (tree == NULL)
 		   ? NULL
 		   : mklist(mkterm(NULL, mkclosure(mk(nThunk, tree), NULL)),
@@ -352,7 +412,6 @@ PRIM(setmaxevaldepth) {
 }
 
 #if READLINE
-#include <readline/readline.h>
 PRIM(resetterminal) {
 	rl_reset_terminal(NULL);
 	return ltrue;
