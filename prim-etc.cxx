@@ -287,7 +287,7 @@ const char *mzwcs(const char *prompt) {
 			csi = 0; mark = 0;
 			continue;
 		}
-		if (mark && !iscntrl(*f)) {
+		if (mark && !csi && !osc && !stt && !iscntrl(*f)) {
 			*t++ = RL_PROMPT_END_IGNORE; mark = 0;
 		}
 		if (osc && *f == '\a') {
@@ -304,7 +304,13 @@ const char *mzwcs(const char *prompt) {
 		*t = *f;
 		++t; ++f;
 	}
+	if (mark) *t++ = RL_PROMPT_END_IGNORE;
 	*t = '\0';
+#if 0
+	FILE *fp = fopen("prompt.log", "w");
+	fwrite(outbuf, sizeof(char), strlen(outbuf), fp);
+	fclose(fp);
+#endif
 	return (const char*)gcdup(outbuf);
 }
 #else
