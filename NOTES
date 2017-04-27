@@ -3,18 +3,9 @@ they're either documented as intentional or fixed.
 
 ** readline
 - tab completion should consider context.
-- incremental search corrupts display when prompt contains
-  a multibyte UTF-8 character.
 
 ** syntax
 - variable-name checking may be incorrect (token.cxx).
 - free caret doesn't always work after subscript
 	$x(1)`b		OK
 	$a$x(1)`b	not OK
-
-** environment
-- list ending with '' does not have print/read equivalence.
-  - see var.cxx\importvar() and conv.cxx\Wconv().
-	x = 1 2 ''
-	echo $#x $x
-	xs -c 'echo $#x $x'
