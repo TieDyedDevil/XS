@@ -6,9 +6,6 @@ they're either documented as intentional or fixed.
 
 ** syntax
 - variable-name checking may be incorrect (token.cxx).
-- free caret doesn't always work after subscript
-	$x(1)`b		OK
-	$a$x(1)`b	not OK
 
 ** control
 - the default branch of switch swallows exceptions
