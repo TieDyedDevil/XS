@@ -403,8 +403,9 @@ static bool Wconv(Format *f) {
 
 	for (lp = va_arg(f->args, List *); lp != NULL; lp = next) {
 		int c;
-		const char *s;
-		for (s = getstr(lp->term); (c = *s) != '\0'; s++) {
+		const char *s = getstr(lp->term);
+		if (*s == '\0') f->put(ENV_SEPARATOR);
+		else for (; (c = *s) != '\0'; s++) {
 			if (c == ENV_ESCAPE || c == ENV_SEPARATOR)
 				f->put(ENV_ESCAPE);
 			f->put(c);
