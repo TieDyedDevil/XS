@@ -9,3 +9,7 @@ they're either documented as intentional or fixed.
 - free caret doesn't always work after subscript
 	$x(1)`b		OK
 	$a$x(1)`b	not OK
+
+** control
+- the default branch of switch swallows exceptions
+	{|x| switch $x a {echo ok} {throw error test 'not a'}} b
