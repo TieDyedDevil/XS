@@ -276,39 +276,40 @@ const char *mzwcs(const char *prompt) {
 		if (esc && isalpha(*f)) {
 			*t++ = *f++;
 			*t++ = RL_PROMPT_END_IGNORE;
-			esc = 0; mark = 0;
+			esc = 0;
 			continue;
 		}
 		if (iscntrl(*f) && !strchr("\a\e\n\r\t", *f)) {
-			if (!mark) *t++ = RL_PROMPT_START_IGNORE; mark = 1;
+			if (!mark) *t++ = RL_PROMPT_START_IGNORE;
+			mark = 1;
 		}
 		if (csi && isalpha(*f)) {
 			*t++ = *f++; *t++ = RL_PROMPT_END_IGNORE;
 			csi = 0; mark = 0;
 			continue;
 		}
-		if (mark && !csi && !osc && !stt && !iscntrl(*f)) {
-			*t++ = RL_PROMPT_END_IGNORE; mark = 0;
-		}
 		if (osc && *f == '\a') {
 			*t++ = *f++; *t++ = RL_PROMPT_END_IGNORE;
-			osc = 0; stt = 0;
+			osc = 0; stt = 0; mark = 0;
 			continue;
+		}
+		if (ste) {
+			if (*f == '\\') {
+				*t++ = *f++; *t++ = RL_PROMPT_END_IGNORE;
+				stt = 0; mark = 0;
+				continue;
+			}
+			ste = 0;
 		}
 		if (stt && *f == '\e') ste = 1;
-		if (stt && ste && *f == '\\') {
-			*t++ = *f++; *t++ = RL_PROMPT_END_IGNORE;
-			stt = 0; ste = 0;
-			continue;
-		}
-		*t = *f;
-		++t; ++f;
+		*t++ = *f++;
 	}
 	if (mark) *t++ = RL_PROMPT_END_IGNORE;
 	*t = '\0';
 #if 0
-	FILE *fp = fopen("prompt.log", "w");
+	FILE *fp = fopen("prompt.log", "a");
 	fwrite(outbuf, sizeof(char), strlen(outbuf), fp);
+	fwrite("\n", sizeof(char), 1, fp);
 	fclose(fp);
 #endif
 	return (const char*)gcdup(outbuf);
