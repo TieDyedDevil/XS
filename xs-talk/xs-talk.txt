@@ -73,15 +73,17 @@ Improved over v1.0:
   - tab completion of function names
   - tab completion of variable names
   - added SIGWINCH handler
+  - control sequences in $prompt w/o
+    $&promptignore and $&nopromptignore
   - many man page corrections
   - many bug fixes
+  - expanded test suite
 
 Deficits:
   - no job control (^Z, fg, bg, disown)
   - debugger bit-rot
   - weak/incomplete tests
   - size (3+ MB?!) [blame Boost?]
-  - inconsistent error detection/reporting
   - ...
 
 Repo:
