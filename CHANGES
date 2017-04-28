@@ -47,6 +47,8 @@ SIGINT caused all subsequent SIGINTs to be blocked. This broke the
 ability to cancel an unfinished command line using ^C. Worse, all
 forked programs inherited the SIGINT block. This is now fixed.
 
+The `escape` command no longer discards exception arguments.
+
 When built with readline, xs would exit on SIGQUIT (^\) because the
 signal caused xs to behave as-if readline() had received an EOF.
 This is now fixed.

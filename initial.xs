@@ -109,7 +109,7 @@ let (nextid = 0) {
 		nextid = `($nextid + 1)
 		let (id = _escape$nextid) {
 			catch { |e val| 
-				(if {!~ $e $id} { throw $e }
+				(if {!~ $e $id} { throw $e $val }
 				 else           { result $val })
 			} {
 				$body { |val| throw $id $val }

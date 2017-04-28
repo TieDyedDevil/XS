@@ -7,10 +7,6 @@ they're either documented as intentional or fixed.
 ** syntax
 - variable-name checking may be incorrect (token.cxx).
 
-** control
-- the default branch of switch swallows exceptions
-	{|x| switch $x a {echo ok} {throw error test 'not a'}} b
-
 ** systemd locale
 - systemd does not pass locale environment variables when spawning
   a login shell. This can cause readline to improperly redraw the
