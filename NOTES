@@ -7,6 +7,11 @@ they're either documented as intentional or fixed.
 ** syntax
 - variable-name checking may be incorrect (token.cxx).
 
+** processes
+- intermittent `wait: No child processes` upon starting
+  login shell. Seems to happen more often when there
+  are a lot of Chromium tabs open.
+
 ** systemd locale
 - systemd does not pass locale environment variables when spawning
   a login shell. This can cause readline to improperly redraw the

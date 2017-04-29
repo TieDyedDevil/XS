@@ -105,8 +105,10 @@ top:
 				while ((deadpid = dowait(&proc->status)) != pid)
 					if (deadpid != -1)
 						reap(deadpid, proc->status);
-					else if (errno != EINTR)
+					else if (errno != EINTR) {
+						eprint("aha 1\n");
 						fail("xs:ewait", "wait: %s", esstrerror(errno));
+					}
 					else if (interruptible)
 						SIGCHK();
 				proc->alive = false;
@@ -129,8 +131,10 @@ top:
 	if (pid == 0) {
 		int status;
 		while ((pid = dowait(&status)) == -1) {
-			if (errno != EINTR)
+			if (errno != EINTR) {
+				eprint("aha 2\n");
 				fail("xs:ewait", "wait: %s", esstrerror(errno));
+			}
 			if (interruptible)
 				SIGCHK();
 		}
