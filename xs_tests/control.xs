@@ -28,3 +28,10 @@ run 'Escape val' {
     }}
 }
 conds {match 5}
+
+run 'Throw from escape' {
+    escape { |e|
+        throw error foo 'a b c'
+    }
+}
+conds {match a b c}
