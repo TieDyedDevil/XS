@@ -11,6 +11,7 @@ they're either documented as intentional or fixed.
 - intermittent `wait: No child processes` upon starting
   login shell. Seems to happen more often when there
   are a lot of Chromium tabs open.
+  - Don't forget to REMOVE marked debug code.
 
 ** systemd locale
 - systemd does not pass locale environment variables when spawning

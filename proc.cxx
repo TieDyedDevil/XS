@@ -106,7 +106,7 @@ top:
 					if (deadpid != -1)
 						reap(deadpid, proc->status);
 					else if (errno != EINTR) {
-						eprint("aha 1\n");
+						eprint("aha 1\n"); /* REMOVE */
 						fail("xs:ewait", "wait: %s", esstrerror(errno));
 					}
 					else if (interruptible)
@@ -132,7 +132,7 @@ top:
 		int status;
 		while ((pid = dowait(&status)) == -1) {
 			if (errno != EINTR) {
-				eprint("aha 2\n");
+				eprint("aha 2\n"); /* REMOVE */
 				fail("xs:ewait", "wait: %s", esstrerror(errno));
 			}
 			if (interruptible)
