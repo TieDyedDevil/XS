@@ -1,3 +1,5 @@
+- Resolve intermittent wait: No child processes
+  upon starting shell.
 - Add job control (SIGTSTP, fg, bg, disown).
 - Add tests.
   - Extend existing suites.
