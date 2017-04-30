@@ -1,25 +1,10 @@
-Es 0.9beta to xs 1.1
---------------------
-
-Some c++ features are used in the code-base now,
-so it is no longer valid C (and obviously needs
-a c++ compiler)
+xs 1.0 to xs 1.1
+----------------
 
 The (optional) editline library is no longer supported.
 
 The assignment operator must be delimited by whitespace in order to
 distinguish this usage from "long" arguments (--foo=blah).
-
-Closures in child shells should operate the same as they did
-in their parents - if f and g share x, changing x in f changes
-x in g, which previously did not work. The implementation operates
-by adding an __id__ definition before variables in each closure.
-
-The build system has been rather improved - automake is used instead of 
-a manually written Makefile.in, and the autoconf files updated to operate
-with the latest version of autoconf. There are a few new --enable options.
-
-Some simple new functions have been added - map, omap, until, switch.
 
 The modulus operator (%) may be used in math expressions. This is
 implemented by std::fmod.
@@ -65,6 +50,30 @@ Added $&random. This returns a random integer.
 xs now has its own SIGWINCH handler since readline, as of version
 6.3, no longer handles the signal. For background, please read:
 https://bugs.python.org/issue23735 
+
+Es 0.9beta to xs 1.0 (2015)
+---------------------------
+
+Some c++ features are used in the code-base now,
+so it is no longer valid C (and obviously needs
+a c++ compiler)
+
+The assignment operator is now := instead of =. Using
+= was inconvenient because many commands use = to 
+specify "long" arguments (--foo=blah).
+
+Closures in child shells should operate the same as they did
+in their parents - if f and g share x, changing x in f changes
+x in g, which previously did not work. The implementation operates
+by adding an __id__ definition before variables in each closure.
+
+The build system has been rather improved - automake is used instead of 
+a manually written Makefile.in, and the autoconf files updated to operate
+with the latest version of autoconf. There are a few new --enable options.
+
+Some simple new functions have been added - map, omap, until, switch.
+
+Readline now has tab-complete for functions & binaries in path.
 
 The init-file is now .xsrc (since es and xs are not compatible).
 
