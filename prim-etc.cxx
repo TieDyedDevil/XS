@@ -425,6 +425,10 @@ PRIM(resetterminal) {
 }
 #endif
 
+PRIM(random) {
+	return mklist(mkstr(str("%d", random())), NULL);
+}
+
 
 /*
  * initialization
@@ -453,6 +457,7 @@ extern void initprims_etc(Prim_dict& primdict) {
 	X(isinteractive);
 	X(exitonfalse);
 	X(setmaxevaldepth);
+	X(random);
 #if READLINE
 	X(resetterminal);
 #endif
