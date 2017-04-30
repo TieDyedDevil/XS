@@ -22,15 +22,20 @@ COMMON_FILES	= access.cxx closure.cxx conv.cxx eval.cxx fd.cxx glob.cxx \
 	  sigmsgs.cxx signal.cxx split.cxx syntax.cxx status.cxx str.cxx term.cxx \
 	  token.cxx tree.cxx util.cxx var.cxx version.cxx parse.yxx
 OTHER	= Makefile parse.yxx mksignal
-GEN	= parse.hxx parse.cxx parse.output sigmsgs.cxx initial.cxx
+GEN	= parse.hxx parse.cxx parse.output sigmsgs.cxx initial.cxx git_info.hxx
 
-BUILT_SOURCES = parse.hxx
-xs_SOURCES = $(COMMON_FILES) initial.cxx main.cxx
+BUILT_SOURCES = parse.hxx git_info.hxx
+xs_SOURCES = $(COMMON_FILES) initial.cxx main.cxx git_info.hxx
 #ctest_SOURCES = tests/test_print.cxx tests/test_util.cxx tests/all_tests.cxx $(COMMON_FILES)
 #ctest_LDADD = -lcgreen -lm
 
 xsdump_SOURCES = $(COMMON_FILES) dump.cxx main.cxx
 
+GIT_INFO := $(shell ./git_info.sh)
+
+.PHONY: force
+git_info.hxx : force
+	echo '$(GIT_INFO)' | cmp -s - $@ || echo '$(GIT_INFO)' > $@
 
 MANIFEST:
 	find . -type f | sed s/..// | sed /^\\./d | sed /^autom4te.cache/d | sort > MANIFEST

@@ -17,6 +17,7 @@
 /parse.cxx
 /parse.hxx
 /sigmsgs.cxx
+/git_info.hxx
 /xs
 /xsdump
 /xs.log
