@@ -1,6 +1,7 @@
 #!./xs
 VERBOSE = false
 FORK = true
+PLATFORM = `{uname -m}
 if $VERBOSE { DOTARGS = -v }
 
 let (TMPOUT = /dev/shm/xs.$pid.testout) {
@@ -77,7 +78,6 @@ fn match-re { |result|
     eval '~ `` '''' output *'^$^result^'*'
 }
 let (dir = `pwd
-     platform = `{uname -m}
      logfile = `pwd^/xs.log) 
 {
     echo $dir
@@ -89,9 +89,19 @@ let (dir = `pwd
     }
 
     rm -f $logfile
-    for file ($dir/xs_tests/*.xs $dir/xs_tests/platform/$platform/*.xs) {
+    for file ($dir/xs_tests/*.xs) {
 	log2 Running $file
 	local (FILE = $file; XS = $dir/xs) . $DOTARGS $FILE
+    }
+
+    let (platform_tests = `{ls $dir/xs_tests/platform/$PLATFORM/*.xs >[2]/dev/null}) {
+        if {!~ $platform_tests ()} {
+            log '-------  Begin' $PLATFORM 'platform tests'
+            for file ($platform_tests) {
+                log2 Running $file
+                local (FILE = $file; XS = $dir/xs) . $DOTARGS $FILE
+            }
+        } else log '-------  No' $PLATFORM 'platform tests'
     }
     cd $dir
 }
