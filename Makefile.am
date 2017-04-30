@@ -49,7 +49,7 @@ test	: check trip testxs
 trip	: xs $(srcdir)/trip.xs
 	./xs < $(srcdir)/trip.xs
 fuzz	: xs ~/.xsrc
-	zzuf -O copy -s 1:10000 -r 0.001:0.050 -vic -f unset ./xs -p -n ~/.xsrc
+	zzuf -O copy -s 1:10000 -r 0.001:0.050 -vic ./xs -p -n ~/.xsrc
 
 # No point in including all the actual tests as deps
 testxs  : xs $(srcdir)/test.xs
