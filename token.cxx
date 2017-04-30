@@ -403,7 +403,6 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 				bufput(i++, 192+n/64);
 				bufput(i++, 128+n%64);
 			} else if (n-0xd800 < 0x800) {
-				eprint("here\n"); /* REMOVE */
 				goto badescape;
 			} else if (n < 0x10000) {
 				bufput(i++, 224+n/4096);

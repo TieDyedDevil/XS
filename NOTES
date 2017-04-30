@@ -1,32 +1,3 @@
 This file is a place to collect observations about xs behavior until
 they're either documented as intentional or fixed.
 
-** readline
-- tab completion should consider context.
-
-** syntax
-- variable-name checking may be incorrect (token.cxx).
-
-** processes
-- intermittent `wait: No child processes` upon starting
-  login shell. Seems to happen more often when there
-  are a lot of Chromium tabs open.
-  - Don't forget to REMOVE marked debug code.
-
-** systemd locale
-- systemd does not pass locale environment variables when spawning
-  a login shell. This can cause readline to improperly redraw the
-  input upon exiting incremental history search when $prompt
-  contains multibyte UTF-8 characters.
-
-  While it's possible to "fix" this by editing the getty@.service
-  file to comment out the Environment=... line, I think it's safer
-  to include the following code in your ~/.xsrc file.
-	-- begin ~/.xsrc --
-	{~ $LC_ALL ()} && {force_locale = <=true}
-	LC_ALL = en_US.utf8
-	
-	# ... your code goes here ...
-	
-	if {result $force_locale} {exec xs}
-	-- end ~/.xsrc --
