@@ -1,6 +1,9 @@
 xs 1.0 to xs 1.1
 ----------------
 
+Corrected errors and formatting issues in the man page. Added
+some clarifications.
+
 The (optional) editline library is no longer supported.
 
 The assignment operator must be delimited by whitespace in order to
@@ -16,7 +19,7 @@ the primitive comparison function &cmp.
 Added a builtin printf. This is implemented by the primitive &printf
 and requires the ffi library. The underlying implemention is printf(3),
 but the xs wrapper limits access to printf(3p) functionality without
-length modifiers.
+length modifiers. This addition requires the ffi library.
 
 Added Unicode escapes \uxxxx and \Uxxxxxxxx.
 
@@ -50,6 +53,38 @@ Added $&random. This returns a random integer.
 xs now has its own SIGWINCH handler since readline, as of version
 6.3, no longer handles the signal. For background, please read:
 https://bugs.python.org/issue23735 
+
+Added a `fuzz` target to the Makefile.
+
+Control sequences in $prompt are automatically marked to hide
+them from readline's column counter.
+
+Octal and hexadecimal character escapes now require a fixed
+number of digits.
+
+Fixed print/read equivalence for `for` statement.
+
+Fixed print/read equivalence for arithmetic expressions.
+
+Fixed subscript to return a valid empty list when the index
+is out of range.
+
+Read the history file at startup of an interactive shell. This
+makes history available at the initial prompt.
+
+Fixed the `vars` command.
+
+Corrected the version information. The version is now taken
+from configure.ac.
+
+The interactive loop prints `exit` upon EOF.
+
+Changed many messages and comments to reflect that is xs, not es.
+
+Removed obsolete and out-of-date VCS revision tags from source files.
+
+No effort has been made to maintain compatibility with systems other
+than POSIX and Linux. If xs still builds elsewhere, it's just luck...
 
 Es 0.9beta to xs 1.0 (2015)
 ---------------------------
