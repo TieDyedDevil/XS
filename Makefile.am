@@ -6,7 +6,7 @@ RUNTESTDEFAULTFLAGS = --tool xs XS=`pwd`/xs --srcdir $$srcdir/testsuite --debug
 
 dist_man_MANS = xs.1
 
-dist_doc_DATA = README CHANGES INSTALL GOTCHAS NOTES AUTHORS TODO
+dist_doc_DATA = README CHANGES INSTALL GOTCHAS NOTES AUTHORS TODO SYSTEMD_LOCALE
 
 bin_PROGRAMS = xs
 noinst_PROGRAMS = xsdump
