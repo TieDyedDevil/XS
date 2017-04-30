@@ -15,14 +15,17 @@ you'll need to know.
     xs will also insert a caret when it can do so unambiguously (see Free
     Carets in xs(1)). Thus the above may be written without carets.
   * All values are lists. Variable expansion preserves whitespace.
-  * To change IFS for one command, use the double-backquote (``) operator,
+  * Use the backquote (`) operator to run a command and get its output
+    as a list. $ifs determines how to split the command's output text.
+    The status of the command is in $bqstatus.
+  * To change $ifs for one command, use the double-backquote (``) operator,
     e.g.:
     xy = `` x `{echo 37x42}
     assigns the two-item list 37 42 to the variable xy.
+  * Use the <= operator to run a command and get its exit code.
   * The assignment operator (=) must always be surrounded by spaces.
     These are valid words: a=foo grack= =flink =ergh=
-  * $#foo returns the number of list items, not the number of characters
-    in the expansion of $foo .
+  * $#foo returns the number of list items.
   * Use $^foo to flatten $foo into a one-item list with a blank between
     each pair of original list items.
   * The concatenation operator generates the cross-product of lists, e.g.:
@@ -32,11 +35,5 @@ you'll need to know.
   * Redirection and piping of stdin/stdout is as you'd expect; there's an
     xs-specfic syntax for all other redirection operations (redirect stderr,
     duplicate a descriptor, close a descriptor).
-  * There's no builtin `read` as in a POSIX-like shell. This is to avoid
-    confusion with the %read function, which has a different semantics. In
-    general, if you want to use a POSIX-like command that returns values by
-    modifying the environment, it won't function in xs. (The /usr/bin/read
-    file on systems that have bash is just a stub; maybe it's there so
-    completers can list it despite it being a shell builtin.)
-  * Command status is not stored in $?. Instead, the <= operator returns
-    the exit code for the command to which it is applied.
+  * Beware trampolines to builtin commands for other shells, e.g. bash's
+    /usr/bin/read.
