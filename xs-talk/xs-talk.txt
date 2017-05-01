@@ -64,8 +64,10 @@ provided by GNU readline.
 
 Improved over v1.0:
   - added modulus (%) operator
+  - added relational operators
   - added builtin printf
   - added Unicode character escapes
+  - added $&random primitive
   - corrected pushd/popd behavior
   - added dirs command
   - added rudimentary jobs command
