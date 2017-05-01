@@ -1,6 +1,9 @@
 #! ./xs -p
 # xsdebug: a debugger for xs scripts
 
+# IMPORTANT: This doesn't work. It's actually es code.
+# This needs to be modified or rewritten for xs.
+
 # TODO
 #	catch signals (at least sigint) better
 #	clean up the output
