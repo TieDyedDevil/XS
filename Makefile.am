@@ -22,20 +22,23 @@ COMMON_FILES	= access.cxx closure.cxx conv.cxx eval.cxx fd.cxx glob.cxx \
 	  sigmsgs.cxx signal.cxx split.cxx syntax.cxx status.cxx str.cxx term.cxx \
 	  token.cxx tree.cxx util.cxx var.cxx version.cxx parse.yxx
 OTHER	= Makefile parse.yxx mksignal
-GEN	= parse.hxx parse.cxx parse.output sigmsgs.cxx initial.cxx git_info.hxx
+GEN	= parse.hxx parse.cxx parse.output sigmsgs.cxx initial.cxx git_hash.hxx git_url.hxx
 
-BUILT_SOURCES = parse.hxx git_info.hxx
-xs_SOURCES = $(COMMON_FILES) initial.cxx main.cxx git_info.hxx
+BUILT_SOURCES = parse.hxx git_hash.hxx git_url.hxx
+xs_SOURCES = $(COMMON_FILES) initial.cxx main.cxx git_hash.hxx git_url.hxx
 #ctest_SOURCES = tests/test_print.cxx tests/test_util.cxx tests/all_tests.cxx $(COMMON_FILES)
 #ctest_LDADD = -lcgreen -lm
 
 xsdump_SOURCES = $(COMMON_FILES) dump.cxx main.cxx
 
-GIT_INFO := $(shell ./git_info.sh)
+GIT_HASH := $(shell ./git_hash.sh)
+GIT_URL := $(shell ./git_url.sh)
 
 .PHONY: force
-git_info.hxx : force
-	echo '$(GIT_INFO)' | cmp -s - $@ || echo '$(GIT_INFO)' > $@
+git_hash.hxx : force
+	echo '$(GIT_HASH)' | cmp -s - $@ || echo '$(GIT_HASH)' > $@
+git_url.hxx : force
+	echo '$(GIT_URL)' | cmp -s - $@ || echo '$(GIT_URL)' > $@
 
 MANIFEST:
 	find . -type f | sed s/..// | sed /^\\./d | sed /^autom4te.cache/d | sort > MANIFEST
