@@ -79,6 +79,8 @@ from configure.ac.
 
 The interactive loop prints `exit` upon EOF.
 
+Fixed 'stutter' of `xs -v FILE` caused by unget.
+
 Changed many messages and comments to reflect that is xs, not es.
 
 Removed obsolete and out-of-date VCS revision tags from source files.

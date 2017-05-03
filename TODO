@@ -1,4 +1,3 @@
-- Fix 'stutter' of `xs -v FILE` caused by unget.
 - Add job control (SIGTSTP, fg, bg, disown).
 - Add tests.
 - Add examples.

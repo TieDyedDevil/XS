@@ -211,6 +211,7 @@ extern void unget(Input *in, int c) {
 			&& (input->runflags & run_echoinput) == 0)
 		--in->buf;
 	else {
+		in->suppress_echo = true;
 		in->unget_fill = true;
 		assert(in->rbuf == NULL);
 		in->rbuf = in->buf;
@@ -233,7 +234,8 @@ int Input::get() {
 		warn("null character ignored");
 	if ((runflags & run_echoinput) && c != EOF) {
 		char buffer = c;
-		ewrite(2, &buffer, 1);
+		if (!suppress_echo) ewrite(2, &buffer, 1);
+		suppress_echo = false;
 	}
 	return c;
 }

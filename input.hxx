@@ -8,7 +8,7 @@ struct Input {
 	Input() : prev(NULL), name(NULL), buf(NULL), bufend(NULL),
 		  bufbegin(NULL), rbuf(NULL), buflen(0),
 		  ungot(0), lineno(0), fd(-3), runflags(0),
-		  unget_fill(false) 
+		  unget_fill(false), suppress_echo(false)
 	{memzero(unget, sizeof(int) * MAXUNGET);}
 	int get();
 	virtual int fill()=0;
@@ -23,6 +23,7 @@ struct Input {
 	int fd;
 	int runflags;
 	bool unget_fill;
+	bool suppress_echo;
 };
 extern Input *input;
 
