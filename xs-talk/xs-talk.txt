@@ -83,7 +83,7 @@ Improved over v1.0:
 
 Deficits:
   - no job control (^Z, fg, bg, disown)
-  - debugger bit-rot
+  - debugger needs to be rewritten
   - weak/incomplete tests
   - size (3+ MB?!) [blame Boost?]
   - ...
