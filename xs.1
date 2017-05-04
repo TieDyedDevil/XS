@@ -391,14 +391,14 @@ continuations, they are ideal for long commands. For example:
 .Ds
 .Cr "switch $x \e"
 .Cr "   error   { result 1 } \e"
-.Cr "   warning { break } \e"
+.Cr "   warning { echo oops! } \e"
 .Cr "   good    { echo no problem  }"
 .De
 .PP is the same as
 .Ds
 .Cr "switch $x ("
 .Cr "   error   { result 1 }" 
-.Cr "   warning { break }"
+.Cr "   warning { echo oops! }"
 .Cr "   good    { echo no problem  }"
 .Cr ")"
 .De
@@ -1968,11 +1968,6 @@ and make l be ls in long form, with color (due to previous alias):
 .Cr "alias l ls -l"
 .De
 .TP
-.Cr "break \fIvalue\fP"
-Exits the current loop.
-.I Value
-is used as the return value for the loop command.
-.TP
 .Cr "catch \fIcatcher body\fP"
 Runs
 .IR body .
@@ -2070,8 +2065,7 @@ This is equivalent to a
 .Cr "while {true} {\fIcmd\fP}"
 loop except that
 .Cr forever
-does not catch any exceptions, including
-.Cr break .
+does not catch any exceptions.
 .TP
 .Cr "fork \fIcmd\fP"
 Runs a command in a subshell.
@@ -2265,10 +2259,6 @@ testing if they are equal to
 .IR value .
 The matching action of the first
 case which matches is executed.
-The break exception can be used to
-manually exit the switch, but
-is not necessary to signify the
-end of an action (unlike in C).
 .TP
 .Cr "until \fItest body\fP"
 Identical to while, except test is negated
@@ -3036,11 +3026,6 @@ of variables through similar techniques will probably not do what one expects.
 .SH BUGS
 The interpreter should be properly tail recursive;
 that is, tail calls should not consume stack space.
-.PP
-.Cr break
-and
-.Cr return
-should have lexical scope.
 .PP
 Woe betide the environment string set by some other program to
 contain either the character control-a or the sequence control-b
