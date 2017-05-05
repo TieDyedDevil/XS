@@ -17,6 +17,7 @@
 /parse.cxx
 /parse.hxx
 /sigmsgs.cxx
+/git_date.hxx
 /git_hash.hxx
 /git_url.hxx
 /xs

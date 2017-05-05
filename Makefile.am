@@ -24,17 +24,20 @@ COMMON_FILES	= access.cxx closure.cxx conv.cxx eval.cxx fd.cxx glob.cxx \
 OTHER	= Makefile parse.yxx mksignal
 GEN	= parse.hxx parse.cxx parse.output sigmsgs.cxx initial.cxx git_hash.hxx git_url.hxx
 
-BUILT_SOURCES = parse.hxx git_hash.hxx git_url.hxx
-xs_SOURCES = $(COMMON_FILES) initial.cxx main.cxx git_hash.hxx git_url.hxx
+BUILT_SOURCES = parse.hxx git_date.hxx git_hash.hxx git_url.hxx
+xs_SOURCES = $(COMMON_FILES) initial.cxx main.cxx git_date.hxx git_hash.hxx git_url.hxx
 #ctest_SOURCES = tests/test_print.cxx tests/test_util.cxx tests/all_tests.cxx $(COMMON_FILES)
 #ctest_LDADD = -lcgreen -lm
 
 xsdump_SOURCES = $(COMMON_FILES) dump.cxx main.cxx
 
+GIT_DATE := $(shell ./git_date.sh)
 GIT_HASH := $(shell ./git_hash.sh)
 GIT_URL := $(shell ./git_url.sh)
 
 .PHONY: force
+git_date.hxx : force
+	echo '$(GIT_DATE)' | cmp -s - $@ || echo '$(GIT_DATE)' > $@
 git_hash.hxx : force
 	echo '$(GIT_HASH)' | cmp -s - $@ || echo '$(GIT_HASH)' > $@
 git_url.hxx : force
