@@ -8,6 +8,7 @@
 #include <ffi.h>
 #include <string.h>
 #include <stdlib.h>
+#include <time.h>
 #include <stdio.h>
 
 #if READLINE
@@ -425,6 +426,10 @@ PRIM(resetterminal) {
 }
 #endif
 
+static void initrandom() {
+	srandom(time(NULL));
+}
+
 PRIM(random) {
 	return mklist(mkstr(str("%d", random())), NULL);
 }
@@ -457,6 +462,7 @@ extern void initprims_etc(Prim_dict& primdict) {
 	X(isinteractive);
 	X(exitonfalse);
 	X(setmaxevaldepth);
+	initrandom();
 	X(random);
 #if READLINE
 	X(resetterminal);
