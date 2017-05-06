@@ -22,7 +22,7 @@ COMMON_FILES	= access.cxx closure.cxx conv.cxx eval.cxx fd.cxx glob.cxx \
 	  sigmsgs.cxx signal.cxx split.cxx syntax.cxx status.cxx str.cxx term.cxx \
 	  token.cxx tree.cxx util.cxx var.cxx version.cxx parse.yxx
 OTHER	= Makefile parse.yxx mksignal
-GEN	= parse.hxx parse.cxx parse.output sigmsgs.cxx initial.cxx git_hash.hxx git_url.hxx
+GEN	= parse.hxx parse.cxx parse.output sigmsgs.cxx initial.cxx git_date.hxx git_hash.hxx git_url.hxx
 
 BUILT_SOURCES = parse.hxx git_date.hxx git_hash.hxx git_url.hxx
 xs_SOURCES = $(COMMON_FILES) initial.cxx main.cxx git_date.hxx git_hash.hxx git_url.hxx
