@@ -1,3 +1,7 @@
+- Finish removing autotools-isms...
+  - Favor POSIX/Linux.
 - Add job control (SIGTSTP, fg, bg, disown).
 - Add tests.
-- Add examples.
+- Add supporting documentation:
+  - Tutorial
+  - Sample code

@@ -8,7 +8,7 @@ system, Bison and the developer packages of the libraries noted above.
 
 Xs is known to build with these library versions:
    boost        1.60
-   ffi          6.0
+   ffi          6.0.2
    gc           1.0.3
    readline     6.3
 
