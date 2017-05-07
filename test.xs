@@ -91,7 +91,7 @@ let (dir = `pwd
     rm -f $logfile
     for file ($dir/xs_tests/*.xs) {
 	log2 Running $file
-	local (FILE = $file; XS = $dir/xs) . $DOTARGS $FILE
+	local (FILE = $file; XS = $dir/build/xs) . $DOTARGS $FILE
     }
 
     let (platform_tests = `{ls $dir/xs_tests/platform/$PLATFORM/*.xs >[2]/dev/null}) {
@@ -99,7 +99,7 @@ let (dir = `pwd
             log '-------  Begin' $PLATFORM 'platform tests'
             for file ($platform_tests) {
                 log2 Running $file
-                local (FILE = $file; XS = $dir/xs) . $DOTARGS $FILE
+                local (FILE = $file; XS = $dir/build/xs) . $DOTARGS $FILE
             }
         } else log '-------  No' $PLATFORM 'platform tests'
     }
