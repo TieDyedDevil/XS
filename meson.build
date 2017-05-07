@@ -1,4 +1,7 @@
 project('xs', 'cpp')
+quiet_compile_flags = ['-Wno-unused-variable', '-Wno-unused-private-field',
+	'-Wno-varargs', '-Wno-unused-function', '-Wno-non-virtual-dtor',
+	'-Wno-char-subscripts']
 boost_dep = dependency('boost')
 compiler = meson.get_compiler('cpp')
 ffi_lib = compiler.find_library('ffi')
@@ -31,6 +34,7 @@ xsdump = executable('xsdump', ['access.cxx', 'closure.cxx', 'conv.cxx',
 		'signal.cxx', 'split.cxx', 'status.cxx', 'str.cxx',
 		'syntax.cxx', 'term.cxx', 'token.cxx', 'tree.cxx',
 		'util.cxx', 'var.cxx', 'version.cxx',],
+	cpp_args: quiet_compile_flags,
 	dependencies: [boost_dep, readline_lib, gc_lib, ffi_lib])
 initial_cxx = custom_target('initial.cxx',
 	input: 'initial.xs',
@@ -47,6 +51,7 @@ xs = executable('xs', ['access.cxx', 'closure.cxx', 'conv.cxx', 'eval.cxx',
 		'syntax.cxx', 'term.cxx', 'token.cxx', 'tree.cxx',
 		'util.cxx', 'var.cxx', 'version.cxx',],
 	dependencies: [boost_dep, readline_lib, gc_lib, ffi_lib],
+	cpp_args: quiet_compile_flags,
 	install: true)
 install_man('xs.1')
 install_data(['AUTHORS', 'CHANGES', 'COPYING', 'GOTCHAS', 'INSTALL',
