@@ -2,11 +2,11 @@ Xs - The eXtensible Shell
 =========================
 
 Xs is a cleanly-designed shell with functional programming. It is
-based on the source-code for the es project, which was in the public
-domain. The changes in xs can also be considered to be in the public
-domain.
+based on the source code for the es project, which was in the public
+domain and derived from rc, which was also in the public domain. The
+changes in xs can also be considered to be in the public domain.
 
-Xs is not source-level compatible with es. See xs(1) for more details.
+Xs is not source-level compatible with es or rc.
 
 Ancestral Implementations
 -------------------------

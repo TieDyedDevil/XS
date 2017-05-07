@@ -3,17 +3,23 @@ Prerequisites
 
 Xs requires the boost, ffi, gc (Boehm) and readline libraries.
 
-You'll need a C++ compiler, the Meson/Ninja build system and Bison, plus
-the developer packages of the libraries noted above, in order to build xs.
+To build xs you'll need a C++ compiler, the Meson/Ninja build system,
+Bison and the developer packages of the libraries noted above.
 
-Basic Installation
-------------------
+Xs is known to build with these library versions:
+   boost        1.60
+   ffi          6.0
+   gc           1.0.3
+   readline     6.3
+
+Installation
+------------
 
 To build and install xs, do:
 
    $ ./build.sh
    $ ./build.sh check
-   $ ./build.sh install
+   $ sudo ./build.sh install
 
 Setting xs as your default shell
 --------------------------------
@@ -21,6 +27,6 @@ Setting xs as your default shell
 Add the xs binary's path to /etc/shells, then change your shell using
 usermod or chsh.
 
-If you built xs with readline, consult readline(1) for options to set
-in your ~/.inputrc file.  Also, enable persistent history by assigning
-a file path to the history variable in your ~/.xsrc file.
+Consult readline(1) for options to set in your ~/.inputrc file.  Also,
+enable persistent history by assigning a file path to the history variable
+in your ~/.xsrc file.

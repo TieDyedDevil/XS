@@ -42,9 +42,8 @@ forked programs inherited the SIGINT block. This is now fixed.
 
 The `escape` command no longer discards exception arguments.
 
-When built with readline, xs would exit on SIGQUIT (^\) because the
-signal caused xs to behave as-if readline() had received an EOF.
-This is now fixed.
+Xs would exit on SIGQUIT (^\) because the signal caused xs to behave as
+if readline() had received an EOF. This is now fixed.
 
 Readline now has tab-complete for functions, variables, binaries in path
 and (when written with a ./ prefix) files in the working directory.
@@ -53,16 +52,12 @@ Removed &$promptignore and &$nopromptignore. Xs automatically marks
 zero-width character sequences in $prompt in order for readline() to
 keep track of cursor position.
 
-Added $&random. This returns a random integer.
+Added $&random. This returns a random integer. The random sequence is
+seeded from the system clock when xs starts.
 
 xs now has its own SIGWINCH handler since readline, as of version
 6.3, no longer handles the signal. For background, please read:
 https://bugs.python.org/issue23735 
-
-Added a `fuzz` target to the Makefile.
-
-Control sequences in $prompt are automatically marked to hide
-them from readline's column counter.
 
 Octal and hexadecimal character escapes now require a fixed
 number of digits.
@@ -79,8 +74,9 @@ makes history available at the initial prompt.
 
 Fixed the `vars` command.
 
-Corrected the version information. The version is now taken
-from configure.ac.
+$&version now returns the actual version number. Git repo info
+(last commit date, last commit hash and repo URL) is also
+reported.
 
 The interactive loop prints `exit` upon EOF.
 
