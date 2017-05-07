@@ -3,8 +3,8 @@ Prerequisites
 
 Xs requires the boost, ffi, gc (Boehm) and readline libraries.
 
-To build xs you'll need a C++ compiler, the Meson/Ninja build system,
-Bison and the developer packages of the libraries noted above.
+To build xs you'll need the Clang C++ compiler, the Meson/Ninja build
+system, Bison and the developer packages of the libraries noted above.
 
 Xs is known to build with these library versions:
    boost        1.60
