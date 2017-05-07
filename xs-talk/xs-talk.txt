@@ -16,7 +16,7 @@ infix syntax.
 
 Example: This presentation is run by:
 
-@less plz
+@less -e plz
 
 Lists, function parameters, closures,
 exceptions, lexical bindings, lambdas
@@ -28,22 +28,22 @@ But you can still instantiate functions
 (including closed-over functions) from
 a function:
 
-@less obj-example.xs
+@less -e obj-example.xs
 
 You can also do something akin to Lisp
 macros:
 
-@less -f <{xs -v macro-example.xs >[2=1]}
+@less -e -f <{xs -v macro-example.xs >[2=1]}
 
 Above the interpreter and platform
 API, much of xs is written in xs.
 
-@less ../initial.xs
+@less -e ../initial.xs
 
 Two-stage compile-/link-time bootstrap.
 
 @touch ../dump.cxx ../initial.xs
-@cd .. && ./build.sh
+@cd .. && ./build.sh -v | less -e
 
 Many primitives can be replaced by
 user-defined functions written in xs.
