@@ -1,7 +1,3 @@
 This file is a place to collect observations about xs behavior until
 they're either documented as intentional or fixed.
 
-- Issues related to attempted Mac OS X build:
-  - Should ./configure look for libhistory separately from libreadline?
-  - Require libhistory and libreadline 6.3 or later?
-  - ./configure should support choice of specific libraries, e.g. readline.
