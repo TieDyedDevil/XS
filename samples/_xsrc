@@ -1,0 +1,657 @@
+# This code is in two parts. See the bottom of this file.
+# ref: /usr{/local}/share/doc/xs/NOTES
+~ $LC_ALL () && {force_locale = <=true}
+LC_ALL = en_US.utf8
+# end
+
+path = /usr/local/bin /usr/bin /usr/sbin $home/.local/bin $home/bin
+history = $home/.xshistory
+CC = clang
+CXX = clang++
+BROWSER = web-browser
+http_proxy = http://localhost:8118/
+EDITOR = vis
+VISUAL = $EDITOR
+DVTM_EDITOR = $EDITOR
+PARINIT = 'rTbgqR B=.,?_A_a Q=_s>|*-+ d1'
+SHLVL =
+
+access -d ~/.xsrc.d && {for f ~/.xsrc.d/*.xs {. $f}}
+
+tty -s && stty start undef stop undef
+
+let (dc) {dc = `{env TERM=ansi dircolors -c}; eval $dc(2) \= $dc(3)}
+
+if {~ $SSH_TTY ()} {
+	pgrep -xc pulseaudio >/dev/null || {
+		pulseaudio --start
+		pacmd load-module module-switch-on-connect
+		pacmd load-module module-dbus-protocol
+	}
+	pgrep -xc mpd >/dev/null || {
+		rm -f ~/.mpd/mpd.log
+		mpd
+	}
+	~/.monitor/monitor
+}
+
+fn .ab {tput bold}
+fn .ad {tput dim}
+fn .ai {tput sitm}
+fn .af {|n| tput setaf $n}
+fn .an {tput sgr0}
+fn .as {if {~ $TERM linux} .ad else .ai}
+
+fn .d {|*|} # docstring
+fn .a {|*|} # argstring
+
+fn lb {
+	.d 'List local functions and binaries'
+	.ab; echo \* ~/.xsrc; .an
+	cat ~/.xsrc|grep '^fn'|cut -d' ' -f2|grep -v -e '^\.' -e '^%' \
+		|tr \n ' '|par 72j
+	echo
+	.ab; echo \* ~/bin; .an
+	ls ~/bin|tr \n ' '|par 72j
+	echo
+	.ab; echo \* /usr/local/bin; .an
+	ls /usr/local/bin|tr \n ' '|par 72j
+}
+
+fn prompt
+fn sc
+fn sd
+fn se
+
+fn .tattr {|*|
+	let (cs) {
+		switch $* (
+		bold {cs = `.ab}
+		normal {cs = `.an}
+		dim {cs = `.ad}
+		italic {cs = `.ai}
+		red {cs = `{.af 1}}
+		green {cs = `{.af 2}}
+		yellow {cs = `{.af 3}}
+		blue {cs = `{.af 4}}
+		magenta {cs = `{.af 5}}
+		cyan {cs = `{.af 6}}
+		)
+		~ $cs () || printf %s $cs
+	}
+}
+
+if {~ $prompt_parts ()} {_op = \> \| xs} else {_op = $prompt_parts}
+local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
+	fn prompt {|x|
+		.d 'Alter prompt'
+		.a '-o P1 P2 PT'
+		.a 'P1 P2 PT'
+		.a 'P1 P2'
+		.a 'PT'
+		.a '-a bold|normal|dim|italic'
+		.a '-a red|green|yellow|blue|magenta|cyan'
+		if {~ $x(1) -o} {
+			if {~ $#x 4} {_op = $x(2 ...)} \
+			else {throw error prompt 'P1 P2 PT'}
+		}
+		if {~ $x(1) -a} {
+			if {~ $#x 2} {
+				let (svpa = $(_pa@$pid)) {
+					_pa@$pid = `{.tattr $x(2)}
+					~ $#(_pa@$pid) 0 && {_pa@$pid = $svpa}
+				}
+			} else {throw error prompt 'bold|normal|dim|italic' \
+				^'|red|green|yellow|blue|magenta|cyan'}
+		} else if {~ $#x 2 3} {_p1@$pid = $x(1); _p2@$pid = $x(2)}
+		if {~ $#x 3 1} {_pt@$pid = $x($#x)}
+		if {~ $x ()} {
+			_p1@$pid = $_op(1); _p2@$pid = $_op(2)
+			_pt@$pid = $_op(3)
+		}
+		if {~ $(_pt@$pid) () ''} {
+			_pr@$pid = ($(_p1@$pid)^' ' $(_p2@$pid)^' ')
+		} else {
+			_pr@$pid = ($(_pt@$pid)^$(_p1@$pid)^' '
+				  $(_pt@$pid)^$(_p2@$pid)^' ')
+		}
+	}
+	fn %prompt {
+		.an; tput ed
+		~ $(_pr@$pid) () && {
+			_pa@$pid = `.ab; prompt; _n@$pid = 0; _s@$pid = -1
+		}
+		let ((p1 p2) = $(_pr@$pid); sn) {
+			if {~ $(_n@$pid) -1} {
+				prompt = $p1 $p2
+			} else {
+				let (seq = $(_n@$pid)) {
+					_n@$pid = `($seq+1)
+					sn = `` '' {printf %3d $(_n@$pid)}
+				}
+				if {~ $(_pt@$pid) '' ()} {
+					prompt = $sn$p1 $sn$p2
+				} else {
+					prompt = $sn' '$p1 $sn' '$p2
+				}
+			}
+			prompt = ($(_pa@$pid)^$prompt(1)^`.an
+				  $(_pa@$pid)^$prompt(2)^`.an)
+		}
+	}
+	fn sc {.d 'Prompt seqnum continue'; ~ $(_s@$pid) -1 || \
+						_n@$pid = $(_s@$pid)}
+	fn sd {.d 'Prompt seqnum disable'; _s@$pid = $(_n@$pid); _n@$pid = -1}
+	fn se {.d 'Prompt seqnum enable'; _n@$pid = 0; _s@$pid = -1}
+}
+
+pr1 = \u252c \u251c
+#    1┬
+#    1├
+#    2┬
+pr2 = \u253c \u251c
+#    1┼
+#    1├
+#    2┼
+pr3 = \u256a \u251c
+#    1╪
+#    1├
+#    2╪
+pr4 = \u250c \u251c
+#    1┌
+#    1├
+#    2┌
+pr5 = \u2510 \u251c
+#    1┐
+#    1├
+#    2┐
+pr6 = \u00bb \u203a
+#    1»
+#    1›
+#    2»
+pr7 = \u0394 \u00a6
+#    1Δ
+#    1¦
+#    2Δ
+
+fn rp {
+	.d 'Random prompt'
+	let (np = 7; na = 10; att = (normal bold dim italic red green blue
+					magenta yellow cyan); r; i; a) {
+		r = <=$&random
+		i = `($r % $np + 1)
+		prompt $(pr$i) $(_pt@$pid)
+		a = ()
+		while {~ $a ()} {
+			i = `($r / 100 % $na + 1)
+			a = `{.tattr $att($i)}
+			r = <=$&random
+		}
+		prompt -a $att($i)
+	}
+}
+
+fn --
+
+fn .web-query {|site path query|
+	if {~ $#query 0} {
+		web-browser $site
+	} else {
+		let (q) {
+			q = `{echo $^query|sed 's/\+/%2B/g'|tr ' ' +}
+			web-browser $site^$path^$q
+		}
+	}
+}
+fn amazon {|*|
+	.d 'Search Amazon'
+	.a '[QUERY]'
+	.web-query https://amazon.com/ s/\?field-keywords= $*
+}
+fn google {|*|
+	.d 'Search Google'
+	.a '[QUERY]'
+	.web-query https://google.com/ search\?q= $*
+}
+fn scholar {|*|
+	.d 'Search Google Scholar'
+	.a '[QUERY]'
+	.web-query https://scholar.google.com/ scholar\?hl=en\&q= $*
+}
+fn wikipedia {|*|
+	.d 'Search Wikipedia'
+	.a '[QUERY]'
+	.web-query https://en.wikipedia.org/ wiki/Special:Search\?search= $*
+}
+fn youtube {|*|
+	.d 'Search YouTube'
+	.a '[QUERY]'
+	.web-query https://youtube.com/ results\?search_query= $*
+}
+
+fn --
+
+fn .fbset {|*| ~ $TERM linux && fbset -a -g $* $* 32}
+fn vtfhd {
+	.d 'Set framebuffer size 1920x1080 (16:9)'
+	.fbset 1920 1080
+}
+fn vtqfhd {
+	.d 'Set framebuffer size 3840x2160 (16:9)'
+	.fbset 3840 2160
+}
+fn vtqhd {
+	.d 'Set framebuffer size 2560x1440 (16:9)'
+	.fbset 2560 1440
+}
+fn vtuwqhd {
+	.d 'Set framebuffer size 3440x1440 (21:9)'
+	.fbset 3440 1440
+}
+fn vtuw-uxga {
+	.d 'Set framebuffer size 2560x1080 (21:9)'
+	.fbset 2560 1080
+}
+fn vtwxga {
+	.d 'Set framebuffer size 1366x768 (16:9)'
+	.fbset 1366 768
+}
+fn vtfbfit {
+	.d 'Fit framebuffer to largest display'
+	if {~ $TERM linux} {
+		let (best; hv) {
+			best = `{cat /sys/class/drm/*/modes \
+				|grep -Eo '[[:digit:]]+x[[:digit:]]+' \
+				|sort -gr|uniq|head -1}
+			echo Using $best
+			hv = `` x {echo -n $best}
+			.fbset $hv
+		}
+	}
+}
+
+fn --
+
+fn agl {|*|
+	.d 'Search tree for pattern in files'
+	.a '[ag_OPTIONS] PATTERN [DIRECTORY]'
+	ag --color $*|less -RFX
+}
+fn avis {|*| {.d 'Edit w/ APL key bindings'} akt vis $*}
+fn battery {
+	.d 'Show battery status'
+	let (pspath = /sys/class/power_supply; full = 0; curr = 0; \
+		ef; ec; en) {
+		for d ($pspath/BAT?) {
+			access -d $d && {
+				ef = `{cat $d/energy_full_design}
+				ec = `{cat $d/energy_full}
+				en = `{cat $d/energy_now}
+				full = `($full+$ec)
+				curr = `($curr+$en)
+				printf '%s %s (%.2f)'\n \
+					`{basename $d} `{cat $d/status} \
+					`(1.0*$ec/$ef)
+			}
+		}
+		!~ $curr 0 && printf '%.1f%%'\n `(100.0*$curr/$full)
+	}
+}
+fn binclock {tput civis; /usr/bin/binclock; tput cnorm}
+fn c clear
+fn cookie {
+	.d 'Fortune'
+	let (subjects = art computers cookie definitions goedel \
+			humorists literature people pets platitudes \
+			politics science wisdom) {
+		fortune -n 200 -s $subjects
+	}
+}
+fn dl-clean {
+	.d 'Remove advertising asset files left behind by WebKit browser'
+	let (pat = *^(\; \? \% \=)^* zrt_lookup.html*; files) {
+		files = `{ls $pat >[2]/dev/null|sort|uniq}
+		!~ $#files 0 && rm -I -v $files
+	}
+}
+fn doc {|*|
+	.d 'pushd to documentation directory of package'
+	.a 'PACKAGE_NAME_GLOB'
+	if {!~ $* ()} {
+		let (pl) {
+			pl = `{find /usr/share/doc /usr/local/share/doc \
+				-mindepth 1 -maxdepth 1 -type d \
+				|grep -i '/usr.*/share/doc.*'^$*}
+			if {~ $#pl 1} {
+				pushd $pl
+			} else if {~ $#pl ???*} {
+				throw error doc 'more than 99 matches'
+			} else {
+				for p ($pl) {echo `{basename $p}}
+				echo $#pl matches
+			}
+		}
+	}
+}
+fn gallery {|*|
+	.d 'Random slideshow'
+	.a 'PATH [DELAY]'
+	let (dir = $(1); time = $(2)) {
+		~ $time () && time = 5
+		if {~ `consoletype vt} {
+			fbi -l <{find $dir -type f|shuf} -t $time --autodown \
+				--noverbose --blend 500 >[2]/dev/null
+		} else {
+			find $dir -type f|shuf|sxiv -qifb -sd -S$time \
+				>[2]/dev/null
+		}
+	}
+}
+fn help {|*|
+	.d 'Help for xs function'
+	.a 'NAME'
+	let (nm = $*(1); st) {
+		st = <={vars -f|grep '^fn-'$nm'\b' \
+			| sed 's/{\.\(a\|d\) [^}]*}/\n&\n/g' \
+			| grep -e '^{\.\(a\|\d\)' | sed 's/''''/''/g'}
+		~ $^st '0 0 0 1 0' && {echo 'no help for' $nm; whatis $nm}
+		~ $^st '0 1 0 1 0' && echo 'no function' $nm
+	}
+}
+fn la {|*| ls -a $*}
+fn ll {|*| ls -lh $*}
+fn load {cat /proc/loadavg}
+fn lpman {|man|
+	.d 'Print a man page'
+	.a 'PAGE'
+	env MANWIDTH=72 man $man | sed 's/^.*/    &/' \
+		| lpr -o page-top=30 -o page-bottom=30
+}
+fn ls {|*| /usr/bin/ls --color=auto $*}
+fn lt {|*| ls -lhtr $*}
+fn mdv {|*|
+	.d 'Markdown file viewer'
+	.a 'MARKDOWN_FILE'
+	if {!~ $#* 1 || !access -f $*} {
+		throw error mdv 'usage: mdv MARKDOWN_FILE'
+	} else {
+		markdown $* | w3m -X -T text/html -no-mouse -no-proxy \
+			-o confirm_qq=0 -o document_root=`pwd
+	}
+}
+fn meson-help {web https://mesonbuild.com/}
+fn mpc {|*|
+	.d 'Music player'
+	/usr/bin/mpc -f '%artist% - %album% - %track% %title%' $*
+}
+fn mpv {|*|
+	.d 'Movie player'
+	.a '[mpv_OPTIONS] FILE ...'
+	let (embed; video_driver) {
+		if {~ $DISPLAY ()} {
+			video_driver = drm
+		} else {
+			embed = --wid=$XEMBED
+			video_driver = opengl-hq
+		}
+		/usr/bin/mpv --vo $video_driver $embed --no-stop-screensaver $*
+	}
+}
+fn mpvl {|*|
+	.d 'Movie player w/ volume leveler'
+	.a '[mpv_OPTIONS] FILE ...'
+	let (afconf = 'lavfi=[highpass=f=100,dynaudnorm=f=100:r=0.7:c=1' \
+		^':m=20.0:b=1],volume=-9') {
+		mpv --af=$afconf $*
+	}
+}
+fn net {
+	.d 'Network status'
+	nmcli --fields startup,networking,running,state,connectivity \
+		--colors no general status
+	nmcli --colors no --fields name,type,device \
+		connection show --active
+}
+fn ninja-help {web https://ninja-build.org/}
+fn noise {|*|
+	.d 'Audio noise generator'
+	.a '[white|pink|brown [LEVEL_DB]]'
+	let (pc = $*(1); pl = $*(2); color = pink; pad = -6; level = -20; \
+		volume) {
+		~ $pc brown && {color = brown; pad = 0}
+		~ $pc pink && {color = pink; pad = -6}
+		~ $pc white && {color = white; pad = -12}
+		if {~ $pl -* || ~ $pl 0} {level = $pl} else {level = -20}
+		volume = `($level + $pad)
+		play </dev/zero -q -t s32 -r 22050 -c 2 - synth $color^noise \
+			tremolo 0.05 30 vol $volume dB
+	}
+}
+fn on {who -Huw}
+fn open xdg-open
+fn panel {|*|
+	.d 'Query/set Intel backlight intensity'
+	.a '[1..100]'
+	if {access -d /sys/class/backlight/intel_backlight} {
+		let (b = $*; bp = /sys/class/backlight/intel_backlight; mb) {
+			mb = `{cat $bp/max_brightness}
+			if {~ $#* 0} {
+				let (ab; p; i; f) {
+					ab = `{cat $bp/brightness}
+					p = `(1.0*$ab*100/$mb)
+					(i f) = <={~~ `($p+0.5) *.*}
+					echo $i
+				}
+			} else {
+				if {~ $* 0} {b = 1}
+				sudo su -c 'echo '^`($mb*$b/100)^' >'^$bp \
+					^'/brightness'
+			}
+		}
+	} else {throw error panel 'no Intel backlight'}
+}
+fn pt {|*|
+	.d 'ps for user; only processes with terminal'
+	.a '[[-fFcyM] USERNAME]'
+	.pu $*|awk '{if ($14 != "?") print}'|less -FX
+}
+fn .pu {|*|
+	let (flags) {
+		while {~ $*(1) -*} {
+			~ $*(1) -[fFcyM] && flags = $flags $*(1)
+			* = $(2 ...)
+		}
+		ps -Hlj $flags -U^`{if {~ $#* 0} {echo $USER} else {echo $*}}
+	}
+}
+fn pu {|*|
+	.d 'ps for user'
+	.a '[[-fFCyM] USERNAME]'
+	.pu $*|less -FX
+}
+fn screensaver {|*|
+	.d 'Query/set display screensaver enable'
+	.a '[on|off]'
+	let (error = false) {
+		if {~ $DISPLAY ()} {
+			if {!~ $#* 0} {
+				switch $* (
+				on {setterm -blank 15 -powerdown 15 >>/dev/tty}
+				off {setterm -blank 0 -powerdown 0 >>/dev/tty}
+				{error = true})
+			}
+		} else {
+			if {~ $#* 0} {
+				let (timeout) {
+					timeout = `{xset q|grep timeout \
+						|awk '{print $2}'}
+					{if {~ $timeout 0} {echo Off} \
+					else {echo On}}
+				}
+			} else {
+				switch $* (
+				on {xset +dpms; xset s on}
+				off {xset -dpms; xset s off}
+				{error = true})
+			}
+		}
+		if $error {throw error screensaver 'on or off'}
+	}
+}
+fn startwm {
+	.d 'Start X window manager'
+	if {!~ $DISPLAY ()} {
+		throw error startwm 'already running'
+	} else if {!~ `tty *tty*} {
+		throw error startwm 'run from console'
+	} else {
+		cd; exec startx -- -logverbose 0 >~/.startx.log >[2=1]
+	}
+}
+fn svis {|*|
+	.d 'Edit file under sudo'
+	.a '[vis_OPTIONS] [FILE ...]'
+	sudo /usr/local/bin/vis $*
+}
+fn thermal {
+	.d 'Summarize system thermal status'
+	sensors|grep -e '^Physical' -e '^Core' -e '^fan'
+}
+fn title {|*|
+	.d 'Set terminal title'
+	.a '[TITLE]'
+	$&echo -n \e]0\;^$^*^\a
+}
+fn treec {|*|
+	.d 'Display filesystem tree'
+	.a 'DIRECTORY'
+	tree --du -hpugDFC $* | less -RFX
+}
+fn tsmwd {
+	.d 'Return to tsm working directory'
+	if {!~ $TSMWD ()} {cd $TSMWD; echo $TSMWD} else echo .
+}
+fn tss {|*|
+	.d 'Terminal screen size utility'
+	.a '-u  # update ROWS and COLUMNS environment vars'
+	.a '-d  # delete ROWS and COLUMNS environment vars'
+	.a '-q  # display ROWS and COLUMNS environment vars'
+	.a '(none)  # show terminal size'
+	switch $* (
+	-d {COLUMNS = ; ROWS =}
+	-u {(ROWS COLUMNS) = (`{tput lines} `{tput cols})}
+	-q {var COLUMNS ROWS}
+	{})
+	~ $* () && {printf '%sx%s'\n `{tput cols} `{tput lines}}
+}
+fn u2o {|*|
+	.d 'Unicode text to octal escapes'
+	.a 'TEXT'
+	{echo -n $*|hexdump -b|grep -Eo '( [0-7]+)+'|tr ' ' \\\\}
+}
+fn ulu {|*|
+	.d 'Unicode lookup'
+	.a 'PATTERN'
+	let (cpnm = /usr/lib64/perl5/vendor_perl/Unicode/CharName.pm; \
+		l = go; hex; desc; char) {
+		egrep -i '^[0-9a-f]{4,} .*'^$* $cpnm | until {~ $l ()} {
+			l = <=%read
+			~ $l () || {
+				(hex desc) = <={~~ $l *\ *}
+				hex = `{printf %8s $hex|tr ' ' 0}
+				char = `{printf `{eval echo '\U'^$hex}}
+				printf %s\tU+%s\t%s\n $char $hex $desc
+			}
+		} | less -FX
+	}
+}
+fn vidshuffle {|*|
+	.d 'Shuffle videos under directory'
+	.a 'DIRECTORY'
+	let (dir = $(1); filt = $(2); scale) {
+		~ $filt () && filt = '*'
+		~ `consoletype vt && scale = --vf scale=`{fbset \
+			|grep -o '[0-9]\+[0-9]\+'|tr x :}
+		mpvl --really-quiet $scale --fs --playlist <{find $dir \
+			-type f -iname $filt|shuf \
+			|awk '/^[^/]/ {print "'`pwd'/"$0} /^\// {print}'}
+	}
+}
+fn wallpaper {|*|
+	.d 'Set wallpaper'
+	.a 'FILE'
+	.a 'DELAY_MINUTES DIRECTORY'
+	if {~ $DISPLAY ()} {
+		throw error wallpaper 'X only'
+	} else {
+		switch $#* (
+		1 {	let (f) {
+				access -f $* && f = $*
+				access -d $* && wallpaper `{find $* \( -name \
+					'*.jpg' -o -name '*.png' \) \
+					|shuf|head -1}
+				!~ $f () && {
+					pkill xdesktopwaves
+					display -window root $f
+				}
+			}
+		}
+		2 {	let (m = $*(1); d = $*(2)) {
+				access -d $d && {
+					pkill -f 'while true \{wallpaper'
+					setsid xs -c \
+					'while true {wallpaper ' \
+					^$d^'; sleep '^`($m*60)^'}' &
+				}
+			}
+		}
+		{	pkill -f 'while true \{wallpaper'
+			xsetroot -solid 'Cadet Blue'
+			setsid ~/.spectrwm/animate
+		})
+	}
+}
+fn web {|*|
+	.d 'Open web URL'
+	.a 'URL'
+	let (error = false) {
+		switch $#* (
+		0 web-browser
+		1 {web-browser $*}
+		{throw error web 'spaces not allowed in URL'}
+		)
+	}
+}
+fn where {
+	.d 'Summarize user, host, tty, shell pid and working directory'
+	printf '%s@%s[%s;%d]:%s'\n \
+		$USER `{hostname -s} <={~~ `tty /dev/*} $pid `pwd
+}
+fn xaos {|*|
+	.d 'Fractal explorer'
+	let (dr) {
+		if {~ $DISPLAY ()} {dr = aa} else {dr = 'GTK+ Driver'}
+		/usr/bin/xaos -driver $dr $*
+	}
+}
+fn zathura {|*|
+	.d 'Document viewer'
+	xembed -e /usr/bin/zathura $* >/dev/null >[2=1]
+}
+
+fn .herald {
+	let (fn-nl = {printf \n}; fn-isconsole = {~ `tty *tty*}) {
+		.as
+		cookie; nl
+		isconsole && {on; nl; net; nl; thermal; battery; load; nl}
+		.ab
+		where
+		.an
+	}
+}
+.herald
+
+# This code is in two parts. See the top of this file.
+# ref: /usr{/local}/share/doc/xs/NOTES
+result $force_locale && {exec xs}
+# end
