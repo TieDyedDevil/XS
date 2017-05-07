@@ -52,6 +52,8 @@ project('xs', 'cpp')
   install_data(['AUTHORS', 'CHANGES', 'COPYING', 'GOTCHAS', 'INSTALL',
 		'NOTES', 'README', 'SYSTEMD_LOCALE'],
 	install_dir: 'share/doc/xs')
+  install_data(['samples/_xsrc', 'samples/colors'],
+	install_dir: 'share/doc/xs/samples')
 
 run_target('trip',
 	command: ['sh', '-c', './trip.xs'],
