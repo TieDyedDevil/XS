@@ -3,16 +3,10 @@ The eXtensible Shell (xs)
 rc (Plan9) => es => xs
 
 Both ancestors are still present, but
-not actively maintained:
-
-@web http://tobold.org/article/rc
-
-@web https://wryun.github.io/es-shell/
+not actively maintained.
 
 Xs development inactive since 2015.
 Still packaged in Fedora (F20).
-
-@dnf -C info xs|less
 
 Released version (xs 1.0) has serious
 flaws in implementation and man page.
@@ -49,15 +43,13 @@ API, much of xs is written in xs.
 Two-stage compile-/link-time bootstrap.
 
 @touch ../dump.cxx ../initial.xs
-@make -C ..
+@cd .. && ./build.sh
 
 Many primitives can be replaced by
 user-defined functions written in xs.
 
 REPL is written in xs and can be
 replaced by user.
-
-@less +/Read-eval-print\ loops ../initial.xs
 
 Command-line editing and history is
 provided by GNU readline.
@@ -81,20 +73,23 @@ Improved over v1.0:
   - many bug fixes
   - expanded test suite
 
+Changes:
+  - Replace autotools with Meson/Ninja
+  - Moving toward POSIX-only support
+
 Deficits:
   - no job control (^Z, fg, bg, disown)
-  - debugger needs to be rewritten
   - weak/incomplete tests
   - size (3+ MB?!) [blame Boost?]
   - ...
 
 Repo:
   https://github.com/TieDyedDevil/XS
-  (branch: cleanup-1)
+  (branch: cleanup-2)
 
 My .xsrc:
   https://github.com/TieDyedDevil/Fi3/\
 blob/master/files/_xsrc
 
-Requirements: C++, Autotools, yacc,
+Requirements: C++, Meson/Ninja, bison,
 libgc, libffi, libreadline, libboost*

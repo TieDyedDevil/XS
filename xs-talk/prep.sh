@@ -1,6 +1,6 @@
 #! /usr/bin/env xs
 
 pushd ~/Documents/XS
-make
+./build.sh
 popd
 
