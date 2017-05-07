@@ -1,4 +1,4 @@
-#!./xs
+#! ./build/xs
 VERBOSE = false
 FORK = true
 PLATFORM = `{uname -m}

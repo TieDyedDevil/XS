@@ -3,29 +3,17 @@ Prerequisites
 
 Xs requires the boost, ffi, gc (Boehm) and readline libraries.
 
-You'll need a C++ compiler, the GNU Autotools and YACC or Bison, plus
+You'll need a C++ compiler, the Meson/Ninja build system and Bison, plus
 the developer packages of the libraries noted above, in order to build xs.
 
 Basic Installation
 ------------------
 
-Xs uses the GNU configure system for configuration.  This means that on
-nearly all platforms, it should just build and work fine. To do this,
-just type:
+To build and install xs, do:
 
-   % autoreconf -i
-   % ./configure
-   % make
-
-Problems with building
-----------------------
-
-  (Is this still true?)
-
-The HP-UX yacc program seems to dislike the use of LOCAL in parse.yxx.
-It is not clear to me why this is the case.  FSF's bison works fine.
-This has not been `fixed' because it is not clear what is `broken'.
-This may also be other dependencies that I do not understand.
+   $ ./build.sh
+   $ ./build.sh check
+   $ ./build.sh install
 
 Setting xs as your default shell
 --------------------------------
