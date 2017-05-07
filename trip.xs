@@ -1,11 +1,9 @@
-# trip.xs -- take a tour of xs
-# Invoke as "path-to-new-xs < trip.xs"
+#! ./build/xs
 
 # this trip doesn't tour much of the code at all.  xs needs a real
 # set of regression tests, soon.
 
-#xs = $0
-xs = ./xs
+xs = ./build/xs
 echo tripping $xs
 tmp = /tmp/trip.$pid
 rm -f $tmp

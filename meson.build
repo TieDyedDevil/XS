@@ -52,10 +52,11 @@ install_man('xs.1')
 install_data(['AUTHORS', 'CHANGES', 'COPYING', 'GOTCHAS', 'INSTALL',
 		'NOTES', 'README', 'SYSTEMD_LOCALE'],
 	install_dir: 'share/doc/xs')
+run_target('trip',
+	command: ['sh', '-c', './trip.xs'],
+	depends: xs)
 run_target('check',
-	command: ['sh', '-c', './test.xs'],
+	command: ['sh', '-c', './xs_tests.xs'],
 	depends: xs)
 run_target('fuzz',
-	command: ['zzuf', '-O', 'copy', '-s', '1:10000', '-r', '0.001:0.050',
-		'-vic', xs, '-p', '-n', '~/.xsrc'])
-
+	command: ['sh', '-c', './fuzz.sh'])

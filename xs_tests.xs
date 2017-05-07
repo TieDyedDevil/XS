@@ -78,7 +78,7 @@ fn match-re { |result|
     eval '~ `` '''' output *'^$^result^'*'
 }
 let (dir = `pwd
-     logfile = `pwd^/xs.log) 
+     logfile = `pwd^/xs_tests.log)
 {
     echo $dir
     fn log { |msg|
