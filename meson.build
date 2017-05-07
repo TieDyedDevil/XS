@@ -7,21 +7,21 @@ readline_lib = compiler.find_library('readline')
 custom_target('git_date.hxx',
 	build_always: true,
 	output: 'git_date.hxx',
-	command: ['../git_date.sh'])
+	command: ['../generators/git_date.sh'])
 custom_target('git_hash.hxx',
 	build_always: true,
 	output: 'git_hash.hxx',
-	command: ['../git_hash.sh'])
+	command: ['../generators/git_hash.sh'])
 custom_target('git_url.hxx',
 	build_always: true,
 	output: 'git_url.hxx',
-	command: ['../git_url.sh'])
+	command: ['../generators/git_url.sh'])
 parse_cxx = custom_target('parse.cxx',
 	output: ['parse.cxx', 'parse.hxx'],
-	command: ['../mkparse.sh'])
+	command: ['../generators/mkparse.sh'])
 sigmsgs_cxx = custom_target('sigmsgs.cxx',
 	output: 'sigmsgs.cxx',
-	command: ['../mksignal.sh', '@OUTPUT@'])
+	command: ['../generators/mksignal.sh', '@OUTPUT@'])
 xsdump = executable('xsdump', ['access.cxx', 'closure.cxx', 'conv.cxx',
 		'dump.cxx', 'eval.cxx', 'fd.cxx', 'glob.cxx', 'glom.cxx',
 		'heredoc.cxx', 'input.cxx', 'list.cxx', 'main.cxx',
@@ -36,7 +36,7 @@ initial_cxx = custom_target('initial.cxx',
 	input: 'initial.xs',
 	output: 'initial.cxx',
 	depends: xsdump,
-	command: ['../initial.sh', '@INPUT@', '@OUTPUT@'])
+	command: ['../generators/initial.sh', '@INPUT@', '@OUTPUT@'])
 xs = executable('xs', ['access.cxx', 'closure.cxx', 'conv.cxx', 'eval.cxx',
 		'fd.cxx', 'glob.cxx', 'glom.cxx', 'heredoc.cxx',
 		initial_cxx, 'input.cxx', 'list.cxx', 'main.cxx',
