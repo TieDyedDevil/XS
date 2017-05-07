@@ -50,7 +50,7 @@ project('xs', 'cpp')
 	install: true)
   install_man('xs.1')
   install_data(['AUTHORS', 'CHANGES', 'COPYING', 'GOTCHAS', 'INSTALL',
-		'NOTES', 'README', 'SYSTEMD_LOCALE'],
+		'NOTES', 'README', 'SYSTEMD_LOCALE', 'TODO'],
 	install_dir: 'share/doc/xs')
   install_data(['samples/_xsrc', 'samples/colors'],
 	install_dir: 'share/doc/xs/samples')
