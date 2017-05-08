@@ -90,7 +90,7 @@ let (dir = `pwd
 
     rm -f $logfile
     for file ($dir/xs_tests/*.xs) {
-	log2 Running $file
+	log2 File $file
 	local (FILE = $file; XS = $dir/build/xs) . $DOTARGS $FILE
     }
 
