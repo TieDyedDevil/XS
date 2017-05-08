@@ -87,9 +87,23 @@ static void vers(void) {
 	exit(0);
 }
 
+/* initgc -- initialize gc with just one marker */
+static void initgc(void) {
+	const char *name = "GC_MARKERS";
+	char *save = getenv(name);
+	if (save) save = strndup(save, 7);
+	setenv(name, "1", 1);
+	GC_init();
+	if (save) {
+		setenv(name, save, 1);
+		free(save);
+	}
+	else unsetenv(name);
+}
+
 /* main -- initialize, parse command arguments, and start running */
 int main(int argc, char **argv) {
-	GC_init();
+	initgc();
 	int c;
 	volatile int ac;
 	char **volatile av;
