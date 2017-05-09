@@ -90,14 +90,15 @@ static void vers(void) {
 /* initgc -- initialize gc with just one marker */
 static void initgc(void) {
 	const char *name = "GC_MARKERS";
-	char *save = getenv(name);
-	if (save) save = strndup(save, 7);
+	char save[8];
+	char *old = getenv(name);
+	if (old) {
+		strncpy(save, old, sizeof(save));
+		save[sizeof(save)-1] = '\0';
+	}
 	setenv(name, "1", 1);
 	GC_init();
-	if (save) {
-		setenv(name, save, 1);
-		free(save);
-	}
+	if (old) setenv(name, save, 1);
 	else unsetenv(name);
 }
 
