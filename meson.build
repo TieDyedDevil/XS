@@ -1,11 +1,7 @@
 project('xs', 'cpp')
-  # These compiler flags are for clang++.
-  # If you'd prefer gcc, adjust this list and edit ./build.sh.
-  quiet_compile_flags = ['-Wno-unused-variable', '-Wno-unused-private-field',
-	'-Wno-varargs', '-Wno-unused-function', '-Wno-non-virtual-dtor',
-	'-Wno-char-subscripts']
-  boost_dep = dependency('boost')
   compiler = meson.get_compiler('cpp')
+  quiet_compile_flags = ['-Wno-all', '-Wno-varargs']
+  boost_dep = dependency('boost')
   ffi_lib = compiler.find_library('ffi')
   gc_lib = compiler.find_library('gc')
   readline_lib = compiler.find_library('readline')
