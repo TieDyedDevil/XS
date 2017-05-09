@@ -1,4 +1,4 @@
 #! /usr/bin/env sh
 
-[ -d build ] || env CXX=clang++ meson build
+[ -d build ] || meson build
 ninja -C build "$@"
