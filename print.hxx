@@ -2,6 +2,7 @@
 
 struct Format {
 public:
+	virtual ~Format() {};
     /* for the formatting routines */
 	va_list args;
 	long flags, f1, f2;
