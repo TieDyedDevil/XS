@@ -182,21 +182,21 @@ static void inittab(void) {
 	for (i = 0; i < MAXCONV; i++)
 		fmttab[i] = badconv;
 
-	fmttab['s'] = sconv;
-	fmttab['c'] = cconv;
-	fmttab['d'] = dconv;
-	fmttab['o'] = oconv;
-	fmttab['x'] = xconv;
-	fmttab['%'] = pctconv;
+	fmttab[(unsigned char)'s'] = sconv;
+	fmttab[(unsigned char)'c'] = cconv;
+	fmttab[(unsigned char)'d'] = dconv;
+	fmttab[(unsigned char)'o'] = oconv;
+	fmttab[(unsigned char)'x'] = xconv;
+	fmttab[(unsigned char)'%'] = pctconv;
 
-	fmttab['u'] = uconv;
-	fmttab['h'] = hconv;
-	fmttab['l'] = longconv;
-	fmttab['#'] = altconv;
-	fmttab['-'] = leftconv;
-	fmttab['.'] = dotconv;
+	fmttab[(unsigned char)'u'] = uconv;
+	fmttab[(unsigned char)'h'] = hconv;
+	fmttab[(unsigned char)'l'] = longconv;
+	fmttab[(unsigned char)'#'] = altconv;
+	fmttab[(unsigned char)'-'] = leftconv;
+	fmttab[(unsigned char)'.'] = dotconv;
 
-	fmttab['0'] = zeroconv;
+	fmttab[(unsigned char)'0'] = zeroconv;
 	for (i = '1'; i <= '9'; i++)
 		fmttab[i] = digitconv;
 }

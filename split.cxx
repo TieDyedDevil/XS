@@ -26,7 +26,7 @@ extern void startsplit(const char *sep, bool coalescef) {
 
 		memzero(isifs, sizeof isifs);
 
-		isifs['\0'] = true;
+		isifs[(unsigned char)'\0'] = true;
 		for (int c; (c = (*(unsigned const char *)sep)) != '\0'; sep++)
 			isifs[c] = true;
 	}

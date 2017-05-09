@@ -1,6 +1,6 @@
 project('xs', 'cpp')
   compiler = meson.get_compiler('cpp')
-  quiet_compile_flags = ['-Wno-all', '-Wno-varargs']
+  quiet_compile_flags = ['-Wno-varargs']
   boost_dep = dependency('boost')
   ffi_lib = compiler.find_library('ffi')
   gc_lib = compiler.find_library('gc')

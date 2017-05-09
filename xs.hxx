@@ -235,7 +235,6 @@ public:
 	Dyvar(const char *name, List *defn);
 	~Dyvar();
 private:
-	Dyvar *next;
 	const char *name;
 	List *defn;
 	int flags;
@@ -276,7 +275,9 @@ class Dict : public Dict_map,
 {
 public:
     Var*& operator[](std::string index) {
+#if ASSERTIONS
         int icount = count(index);
+#endif
         Var*& res = Dict_map::operator[](index);
         assert (res != NULL || icount == 0);
         return res;

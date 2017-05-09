@@ -80,13 +80,6 @@ static void usage(void) {
 	exit(1);
 }
 
-/* vers -- print version and exit */
-static void vers(void) NORETURN;
-static void vers(void) {
-	eprint("%s\n", version);
-	exit(0);
-}
-
 /* initgc -- initialize gc with just one marker */
 static void initgc(void) {
 	const char *name = "GC_MARKERS";
