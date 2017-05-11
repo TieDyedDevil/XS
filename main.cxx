@@ -98,11 +98,12 @@ static void initgc(void) {
 }
 
 /* shlevel -- set or update the SHLVL environment variable */
-static void shlevel(void) {
+static void shlevel(int loginshell) {
 	const char *name = "SHLVL";
 	char *last = getenv(name);
 	char next[8];
-	if (last) snprintf(next, sizeof(next), "%d", atoi(last)+1);
+	if (!loginshell && last)
+		snprintf(next, sizeof(next), "%d", atoi(last)+1);
 	else strcpy(next, "1");
 	setenv(name, next, 1);
 }
@@ -182,7 +183,7 @@ getopt_done:
 		initinput();
 		initprims();
 
-		shlevel();
+		shlevel(loginshell);
 
 		runinitial();
 
