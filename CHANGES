@@ -7,6 +7,9 @@ Restrict the garbage collector to a single marking thread. Given the
 extremely low marker CPU utilization, it makes no sense to allocate
 one thread per CPU.
 
+Load ~/.xsin for interactive shells. If a login shell, ~/.xsrc is
+loaded before ~/.xsin.
+
 Removed the ./xsdebug script, which was still es code and not usable
 with xs.
 

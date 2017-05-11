@@ -1632,7 +1632,11 @@ looks to find its initialization file,
 .Cr .xsrc ,
 if
 .I xs
-has been started up as a login shell.
+has been started up as a login shell, and
+.Cr .xsin ,
+if
+.I xs
+is an interactive shell.
 Like
 .Cr path
 and
@@ -2946,7 +2950,8 @@ rather than using it as the name of a file to source.
 .Cr \-i
 Force
 .I xs
-to be an interactive shell.
+to be an interactive shell after loading
+.Cr $home/.xsin .
 Normally
 .I xs
 is only interactive if it
@@ -3024,6 +3029,7 @@ later will probably not work. In general, trying to manipulate the scope
 of variables through similar techniques will probably not do what one expects.
 .SH FILES
 .Cr $home/.xsrc ,
+.Cr $home/.xsin ,
 .Cr /dev/null
 .SH BUGS
 The interpreter should be properly tail recursive;

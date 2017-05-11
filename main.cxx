@@ -37,8 +37,9 @@ static void initpid(void) {
 }
 
 /* runxsrc -- run the user's profile, if it exists */
-static void runxsrc(void) {
-	char *xsrc = str("%L/.xsrc", varlookup("home", NULL), "\001");
+static void runxsrc(int xsin) {
+	const char *fmt = xsin ? "%L/.xsin" : "%L/.xsrc";
+	char *xsrc = str(fmt, varlookup("home", NULL), "\001");
 	int fd = eopen(xsrc, oOpen);
 	if (fd != -1) {
 		try {
@@ -179,10 +180,12 @@ getopt_done:
 		initenv(environ, isprotected);
 
 		if (loginshell)
-			runxsrc();
+			runxsrc(0);
 
-		if (runflags & run_interactive)
+		if (runflags & run_interactive) {
 			inithistory();
+			runxsrc(1);
+		}
 
 		if (cmd == NULL && !cmd_stdin && optind < ac) {
 			int fd;
