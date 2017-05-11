@@ -1,6 +1,7 @@
 /* main.cxx -- initialization for xs */
 
 #include "xs.hxx"
+#include <stdio.h>
 
 extern int optind;
 extern char *optarg;
@@ -96,6 +97,16 @@ static void initgc(void) {
 	else unsetenv(name);
 }
 
+/* shlevel -- set or update the SHLVL environment variable */
+static void shlevel(void) {
+	const char *name = "SHLVL";
+	char *last = getenv(name);
+	char next[8];
+	if (last) snprintf(next, sizeof(next), "%d", atoi(last)+1);
+	else strcpy(next, "1");
+	setenv(name, next, 1);
+}
+
 /* main -- initialize, parse command arguments, and start running */
 int main(int argc, char **argv) {
 	initgc();
@@ -170,6 +181,8 @@ getopt_done:
 	try {
 		initinput();
 		initprims();
+
+		shlevel();
 
 		runinitial();
 
