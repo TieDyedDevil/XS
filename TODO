@@ -1,5 +1,4 @@
-- Finish removing autotools-isms...
-  - Favor POSIX/Linux.
+- Isolate/fix spurious 'wait: No child processes'
 - Add job control (SIGTSTP, fg, bg, disown).
 - Add tests.
 - Add supporting documentation:
