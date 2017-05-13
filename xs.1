@@ -407,7 +407,7 @@ continuations, they are ideal for long commands. For example:
 .PP
 Finally, note that there are some uses of parentheses
 not following ordinary list rules: in let/local/%closure bindings,
-and in assignments
+and in assignments.
 .SS Concatenation
 Two lists may be joined by the concatenation operator
 .Rc ( ^ ).
@@ -438,9 +438,9 @@ A list may be assigned to a variable, using the notation
 .Ic var " = " list
 .De
 .PP
-Unfortunately, whitespace is required 
-around the assignment operator, this allows
-it to be treated as a normal string character normally.
+Whitespace is required 
+around the assignment operator; this allows
+it to be treated as a normal string character.
 This is true also for assignment in let-forms and the like.
 Any sequence of non-special characters, except a sequence including
 only digits, may be used as a variable name.
@@ -467,7 +467,7 @@ prints
 .Cr foo
 .De
 .PP
-A variable's definition may also be removed by
+A variable's definition may be removed by
 assigning the empty list to a variable:
 .Ds
 .Ic var " ="
@@ -657,6 +657,9 @@ returns the first 10 elements of
 Constructed variables, such as
 .Cr $(a$b) ,
 may not be subscripted.
+.PP
+Subscripted variables may not be used on the left-hand side
+of the assignment operator.
 .SS "Free Carets"
 .I Xs
 inserts carets (concatenation operators) for free in certain situations,
@@ -725,6 +728,7 @@ will always echo just a star.
 In order for non-literal metacharacters to be expanded, an
 .Cr eval
 statement must be used in order to rescan the input.)
+.PP
 Pattern matching occurs according to the following rules:
 a
 .Cr "*"
@@ -904,20 +908,17 @@ are not allowed within an arithmetic expression.
 Parentheses can be used in normal infix fashion to alter order of evaluation.
 Absent parentheses, evaluation follows the usual precedence.
 .PP
-Numbers can be entered in floating-point or integer, but are always decimal.
-Calculation rules are similar to C - any operation involving floats
-produces a float, any operation with only integers produces an integer;
-this includes division and modulus, so 
-.Ds
-.Cr "echo `(1 / 2)"
-.Cr "echo `(1.0 / 2)"
-.Cr "echo `(5 % 3)"
-.Cr "echo `(5.0 / 3)"
-.De
+Numbers can be written as floating-point or integer, but are always decimal.
+Scientific notation (e.g. 1.23e11) will be used to print very large and
+small floating-point values, but is not allowed in literal numbers.
 .PP
-produce 0, 0.5 (with trailing zeros), 2 and 2.0 (with trailing zeros) respectively.
-Integers will wrap around at the same point as the native platform's int,
-and floats at the same point as the native platform's double.
+Any arithmetic operation involving floats produces a float;
+any operation with only integers produces an integer.
+.PP
+Integers have the behavior of the native platform's
+.Cr long .
+Floats have the behavior of the native platform's
+.Cr double .
 .PP
 .IR xs 's
 floats are stored with limited (typically 6 signicant digits) precision.
@@ -1015,6 +1016,10 @@ If any element of a list is not equal to
 (or the empty string), that list is considered false.
 .PP
 The return value of an assignment operation is the assigned value.
+Thus,
+.Cr "b = <={a = 7}"
+assigns the same value to both
+.Cr a " and " b .
 .SS "Logical Operators"
 There are a number of operators in
 .I Xs
@@ -1334,8 +1339,8 @@ is bound (dynamically, see below) to the name of the function.
 .PP
 Lambdas are just another form of code fragment, and, as such, can be
 exported in the environment, passed as arguments, etc.
-The central difference between the two forms is that lambdas bind their arguments,
-while simple brace-enclosed groups just ignore theirs.
+The difference between the two forms is that lambdas bind their arguments,
+while simple brace-enclosed groups ignore theirs.
 .SS "Local Variables"
 Variable assignments may be made local to a set of commands with the
 .Cr local
@@ -1373,7 +1378,7 @@ statement:
 .Cr "let (\fIvar\fP = \fIvalue\fP; \fIvar\fP = \fIvalue ...\fP) \fIcommand\fP"
 .De
 .PP
-(Also, the "= value" can be left out with same effect as "var =")
+The "= value" can be left out with same effect as "var =".
 .PP
 All references to any of the variables defined in a
 .Cr let
