@@ -3,6 +3,8 @@ xs 1.0 to xs 1.1
 
 Switched to the Meson/Ninja build system.
 
+%read is renamed to read.
+
 Restrict the garbage collector to a single marking thread. Given the
 extremely low marker CPU utilization, it makes no sense to allocate
 one thread per CPU.

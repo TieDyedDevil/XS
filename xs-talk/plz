@@ -3,10 +3,10 @@
 clear
 cat $*|while true {
 	let (l; c) {
-		l = <=%read
+		l = <=read
 		~ $l () && break
 		if {~ $l ''} {
-			c = <={</dev/tty %read}
+			c = <={</dev/tty read}
 			~ $c q && break
 		} else {
 			echo $l

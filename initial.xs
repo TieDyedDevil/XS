@@ -69,7 +69,7 @@ fn-throw	= $&throw
 fn-umask	= $&umask
 fn-wait		= $&wait
 
-fn-%read	= $&read
+fn-read	= $&read
 
 
 
