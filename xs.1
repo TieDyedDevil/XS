@@ -1508,7 +1508,7 @@ Primitives can be used with the syntax
 .De
 .PP
 A primitive can be used anywhere a lambda is expected.
-The list of primitives is returned as the result of running
+The list of primitives is returned as the result of
 the primitive
 .Cr $&primitives .
 .PP
@@ -2028,7 +2028,7 @@ Escape is useful to replace return/break like constructs; for example
 .De
 .TP
 \&
-will exit the function with result 0 when it reached the return. 
+will exit the function with result 0 when it reaches the return. 
 .TP
 .Cr "eval \fIlist\fP"
 Concatenates the elements of
@@ -2239,7 +2239,7 @@ Also displays the remaining stack.
 Print formatted text. Valid conversions are those of
 .IR printf (3p),
 including floating-point conversions. Length modifiers are
-not supported. Backslash escapes are not interpreted by
+not supported. Backslash escapes in the format are not interpreted by
 .IR printf .
 .TP
 .Cr "pushd \fR[\fP\fIdir\fP\fR]\fP"
