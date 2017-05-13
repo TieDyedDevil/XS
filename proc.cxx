@@ -105,7 +105,7 @@ top:
 				while ((deadpid = dowait(&proc->status)) != pid)
 					if (deadpid != -1)
 						reap(deadpid, proc->status);
-					else if (errno != EINTR && errno != ECHILD) {
+					else if (errno != EINTR) {
 						fail("xs:ewait", "wait: %s", esstrerror(errno));
 					}
 					else if (interruptible)
