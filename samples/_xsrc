@@ -6,34 +6,10 @@ LC_ALL = en_US.utf8
 
 path = /usr/local/bin /usr/bin /usr/sbin $home/.local/bin $home/bin
 history = $home/.xshistory
-CC = clang
-CXX = clang++
-BROWSER = web-browser
-http_proxy = http://localhost:8118/
-EDITOR = vis
-VISUAL = $EDITOR
-DVTM_EDITOR = $EDITOR
-PARINIT = 'rTbgqR B=.,?_A_a Q=_s>|*-+ d1'
-SHLVL =
 
 access -d ~/.xsrc.d && {for f ~/.xsrc.d/*.xs {. $f}}
 
-tty -s && stty start undef stop undef
-
 let (dc) {dc = `{env TERM=ansi dircolors -c}; eval $dc(2) \= $dc(3)}
-
-if {~ $SSH_TTY ()} {
-	pgrep -xc pulseaudio >/dev/null || {
-		pulseaudio --start
-		pacmd load-module module-switch-on-connect
-		pacmd load-module module-dbus-protocol
-	}
-	pgrep -xc mpd >/dev/null || {
-		rm -f ~/.mpd/mpd.log
-		mpd
-	}
-	~/.monitor/monitor
-}
 
 fn .ab {tput bold}
 fn .ad {tput dim}
@@ -81,7 +57,9 @@ fn .tattr {|*|
 	}
 }
 
-if {~ $prompt_parts ()} {_op = \> \| xs} else {_op = $prompt_parts}
+if {!~ $(pr$initial_prompt) ()} {_op = $(pr$initial_prompt) ''} \
+else {_op = \> \| xs}
+_oa = `.ab
 local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 	fn prompt {|x|
 		.d 'Alter prompt'
@@ -91,9 +69,25 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 		.a 'PT'
 		.a '-a bold|normal|dim|italic'
 		.a '-a red|green|yellow|blue|magenta|cyan'
+		.a '-l  # list defined prompts'
+		.a '-n NUM'
+		.a '(none)  # restore initial prompt'
 		if {~ $x(1) -o} {
 			if {~ $#x 4} {_op = $x(2 ...)} \
 			else {throw error prompt 'P1 P2 PT'}
+		}
+		if {~ $x(1) -l} {
+			let (n = 1) {
+				while {!~ $(pr$n) ()} {
+					printf '%d %s %s'\n $n $(pr$n)
+					n = `($n + 1)
+				}
+			}
+		}
+		if {~ $x(1) -n} {
+			let (n = $x(2)) {
+				!~ $(pr$n) () && prompt $(pr$n)
+			}
 		}
 		if {~ $x(1) -a} {
 			if {~ $#x 2} {
@@ -103,11 +97,14 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 				}
 			} else {throw error prompt 'bold|normal|dim|italic' \
 				^'|red|green|yellow|blue|magenta|cyan'}
-		} else if {~ $#x 2 3} {_p1@$pid = $x(1); _p2@$pid = $x(2)}
-		if {~ $#x 3 1} {_pt@$pid = $x($#x)}
+		} else if {~ $#x 2 3 && !~ $x(1) -*} {
+			_p1@$pid = $x(1); _p2@$pid = $x(2)
+		}
+		if {~ $#x 3 1 && !~ $x(1) -*} {_pt@$pid = $x($#x)}
 		if {~ $x ()} {
 			_p1@$pid = $_op(1); _p2@$pid = $_op(2)
 			_pt@$pid = $_op(3)
+			_pa@$pid = $_oa
 		}
 		if {~ $(_pt@$pid) () ''} {
 			_pr@$pid = ($(_p1@$pid)^' ' $(_p2@$pid)^' ')
@@ -119,7 +116,7 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 	fn %prompt {
 		.an; tput ed
 		~ $(_pr@$pid) () && {
-			_pa@$pid = `.ab; prompt; _n@$pid = 0; _s@$pid = -1
+			_pa@$pid = $_oa; prompt; _n@$pid = 0; _s@$pid = -1
 		}
 		let ((p1 p2) = $(_pr@$pid); sn) {
 			if {~ $(_n@$pid) -1} {
@@ -145,39 +142,11 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 	fn se {.d 'Prompt seqnum enable'; _n@$pid = 0; _s@$pid = -1}
 }
 
-pr1 = \u252c \u251c
-#    1┬
-#    1├
-#    2┬
-pr2 = \u253c \u251c
-#    1┼
-#    1├
-#    2┼
-pr3 = \u256a \u251c
-#    1╪
-#    1├
-#    2╪
-pr4 = \u250c \u251c
-#    1┌
-#    1├
-#    2┌
-pr5 = \u2510 \u251c
-#    1┐
-#    1├
-#    2┐
-pr6 = \u00bb \u203a
-#    1»
-#    1›
-#    2»
-pr7 = \u0394 \u00a6
-#    1Δ
-#    1¦
-#    2Δ
-
 fn rp {
 	.d 'Random prompt'
-	let (np = 7; na = 10; att = (normal bold dim italic red green blue
+	let (np = 1; na = 10; att = (normal bold dim italic red green blue
 					magenta yellow cyan); r; i; a) {
+		while {!~ $(pr$np) ()} {np = `($np + 1)}; np = `($np - 1)
 		r = <=$&random
 		i = `($r % $np + 1)
 		prompt $(pr$i) $(_pt@$pid)
@@ -228,6 +197,11 @@ fn youtube {|*|
 	.a '[QUERY]'
 	.web-query https://youtube.com/ results\?search_query= $*
 }
+
+fn --
+
+fn meson-help {web https://mesonbuild.com/}
+fn ninja-help {web https://ninja-build.org/}
 
 fn --
 
@@ -379,7 +353,6 @@ fn mdv {|*|
 			-o confirm_qq=0 -o document_root=`pwd
 	}
 }
-fn meson-help {web https://mesonbuild.com/}
 fn mpc {|*|
 	.d 'Music player'
 	/usr/bin/mpc -f '%artist% - %album% - %track% %title%' $*
@@ -412,7 +385,6 @@ fn net {
 	nmcli --colors no --fields name,type,device \
 		connection show --active
 }
-fn ninja-help {web https://ninja-build.org/}
 fn noise {|*|
 	.d 'Audio noise generator'
 	.a '[white|pink|brown [LEVEL_DB]]'
@@ -450,6 +422,7 @@ fn panel {|*|
 		}
 	} else {throw error panel 'no Intel backlight'}
 }
+fn pn {ps haux|cut -d' ' -f1|sort|uniq}
 fn pt {|*|
 	.d 'ps for user; only processes with terminal'
 	.a '[[-fFcyM] USERNAME]'
@@ -653,5 +626,5 @@ fn .herald {
 
 # This code is in two parts. See the top of this file.
 # ref: /usr{/local}/share/doc/xs/NOTES
-result $force_locale && {exec xs}
+result $force_locale && {SHLVL = `($SHLVL-1); exec xs}
 # end
