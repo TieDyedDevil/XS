@@ -6,6 +6,6 @@ they're either documented as intentional or fixed.
     a program that tries to catch ECHILD from a $&wait won't
     work.) I'm fairly certain that the spurious ECHILD reports
     come from a process spawned internal to xs; perhaps as a
-    result of calling %access.
+    result of calling $&backquote.
 
   - Is there any reason not to rename %read to read?
