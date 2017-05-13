@@ -528,7 +528,7 @@ fn ulu {|*|
 	let (cpnm = /usr/lib64/perl5/vendor_perl/Unicode/CharName.pm; \
 		l = go; hex; desc; char) {
 		egrep -i '^[0-9a-f]{4,} .*'^$* $cpnm | until {~ $l ()} {
-			l = <=%read
+			l = <=read
 			~ $l () || {
 				(hex desc) = <={~~ $l *\ *}
 				hex = `{printf %8s $hex|tr ' ' 0}
