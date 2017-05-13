@@ -1,3 +1,11 @@
 This file is a place to collect observations about xs behavior until
 they're either documented as intentional or fixed.
 
+  - The hack of ignoring ECHILD in ewait() solves a cosmetic
+    problem, but is likely the wrong thing to do. (For example,
+    a program that tries to catch ECHILD from a $&wait won't
+    work.) I'm fairly certain that the spurious ECHILD reports
+    come from a process spawned internal to xs; perhaps as a
+    result of calling %access.
+
+  - Is there any reason not to rename %read to read?
