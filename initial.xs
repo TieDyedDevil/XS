@@ -673,21 +673,31 @@ let (dlist = .) {
 # History list
 #
 
-fn history {|*|
-	if {access -f $history} {
-		if {~ $#* 0} {
-			cat $history|nl
-		} else if {~ $* -c} {
-			true > $history
-		} else if {~ $*(1) -d} {
-			{~ $#* 2} && let (n = $*(2)) && ed -s $history <<EOF
+let (hsave) {
+	fn history {|*|
+		if {~ $* -n && ~ $hsave ()} {
+			hsave = $history
+			history =
+		} else if {~ $* -y} {
+			!~ $hsave () && {
+				history = $hsave
+				hsave =
+			}
+		} else if {!~ $history () && access -f $history} {
+			if {~ $#* 0} {
+				cat $history|nl
+			} else if {~ $* -c} {
+				true > $history
+			} else if {~ $*(1) -d} {
+				{~ $#* 2} && let (n = $*(2)) && ed -s $history <<EOF
 $n
 d
 w
 q
 EOF
-		} else {
-			cat $history|nl|tail -n $*
+			} else if {~ $* [0-9]*} {
+				cat $history|nl|tail -n $*
+			}
 		}
 	}
 }

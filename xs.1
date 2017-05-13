@@ -2096,7 +2096,7 @@ in the parent directory
 .Rc ( .. ),
 but leaves the shell in the current directory.
 .TP
-.Cr "history \fR[\fI#\fR | -c | -d \fI#\fR]\fP"
+.Cr "history \fR[\fI#\fR | -c | -d \fI#\fR | -n | -y]\fP"
 Display or modify the history list. (See the
 .I history
 variable in
@@ -2109,7 +2109,15 @@ option clears the history list, while
 .I -d #
 deletes the
 .IR # 'th
-history item.
+history item. History recording may temporarily be turned off and on with the
+.I -n
+and
+.I -y
+options. When history has been turned off using the
+.I -n
+option, it may only be turned back on using the
+.I -y
+option in the same shell; not in a subshell.
 .TP
 .Cr "if \fR[\fP\fItest then-action\fR]\fP \fR[else \fPelse-action\fR]\fP"
 Evaluates the command
