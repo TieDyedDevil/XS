@@ -2798,11 +2798,11 @@ builtin functions with the same names:
 .ta 1.75i 3.5i
 .Ds
 .ft \*(Cf
-access	forever	result
-catch	fork	throw
-echo	if	umask
-exec	newpgrp	wait
-exit	printf	
+access	fork	throw
+catch	if	umask
+echo	newpgrp	wait
+exec	printf	
+forever	result	
 .ft R
 .De
 .PP
@@ -2878,6 +2878,13 @@ sethistory	setnoexport	setsignals
 .ft R
 .De
 .PP
+The
+.Cr setmaxevaldepth
+primitive implements the settor function for the
+.Cr max-eval-depth
+variable, which is used to limit the depth of the interpreter's
+evaluation stack.
+.PP
 Some primitives are included in
 .I xs
 conditionally, based on compile-time configuration options.
@@ -2916,21 +2923,6 @@ The garbage collector in
 .I xs
 runs rather frequently;
 there should be no reason for a user to issue this command.
-.TP
-.Cr "$&noreturn \fIlambda args ...\fP"
-Call the
-.IR lambda ,
-but in such a way that it does not catch the
-.Cr return
-exception.
-This primitive exists in order that some control-flow
-operations in
-.I xs
-(e.g.,
-.Cr while
-and
-.Cr "&&" )
-can be implemented as lambdas rather than primitives.
 .TP
 .Cr "$&primitives"
 Returns a list of the names of xs primitives.
