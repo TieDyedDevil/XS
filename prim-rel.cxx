@@ -14,10 +14,9 @@ static int isfloat(const char *s) {
 }
 
 PRIM(cmp) {
-	if (list == NULL || list->next == NULL)
-		fail("$&cmp", "usage: $&cmp a b");
-	const char *a = getstr(list->term);
-	const char *b = getstr(list->next->term);
+	const char *a = list == NULL ? "" : getstr(list->term);
+	const char *b = (list == NULL || list->next == NULL)
+				? "" : getstr(list->next->term);
 	long r;
 	if (isnumber(a) && isnumber(b)) {
 		if (isfloat(a) || isfloat(b)) {
