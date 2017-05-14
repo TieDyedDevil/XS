@@ -1669,6 +1669,10 @@ The initial value of
 .Cr ifs
 is space-tab-newline.
 .TP
+.Cr max-eval-depth
+This sets a limit on how many levels deep the interpreter's evaluation
+stack may become.
+.TP
 .Cr noexport
 A list of variables which
 .I xs
@@ -1802,6 +1806,19 @@ This is for compatibility with other Unix programs, such as
 .IR sh (1).
 .Cr $PATH
 is assumed to be a colon-separated list.
+.PP
+Also for compatibility,
+.I xs
+maintains the value of the
+.Cr SHLVL
+variable, creating it with a value of
+.Cr I
+if needed and incrementing the value when a new
+.I xs
+is spawned. Unlike the other variables in this section, the
+value of
+.Cr SHLVL
+has no influence upon the behavior of the interpreter.
 .SH "SYNTACTIC SUGAR"
 .I xs
 internally rewrites much of the syntax presented thus far
