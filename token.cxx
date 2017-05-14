@@ -26,7 +26,7 @@ static char *buf = NULL;
 
 /*
  *	Special characters (i.e., "non-word") in xs:
- *		\t \n # : ; & | ^ $ ` ' ! { } ( ) < > \ 
+ *		\t \n # ; & | ^ $ ` ' ! { } ( ) < > \ 
  */
 
 extern const char nw[] = {
