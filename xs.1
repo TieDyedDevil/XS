@@ -1550,6 +1550,17 @@ interpreter catch this exception and print the message.
 is the name of the routine (typically a primitive) which
 raised the error.
 .TP
+.Cr "exit \fR[\fP\fIreturn-code\fP\fR]\fP"
+Exits
+.I xs
+with
+.Cr return-code ,
+or with
+.Cr 0
+if
+.Cr return-code
+is not specified.
+.TP
 .Cr retry
 When raised from a signal catcher,
 causes the body of the
