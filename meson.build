@@ -52,13 +52,13 @@ project('xs', 'cpp')
 	install_dir: 'share/doc/xs/samples')
 
 run_target('trip',
-	command: ['sh', '-c', './trip.xs'],
+	command: ['sh', '-c', './tests/trip.xs'],
 	depends: xs)
 
 run_target('check',
-	command: ['sh', '-c', './xs_tests.xs'],
+	command: ['sh', '-c', './tests/xs_tests.xs'],
 	depends: xs)
 
 run_target('fuzz',
-	command: ['sh', '-c', './fuzz.sh'],
+	command: ['sh', '-c', './tests/fuzz.sh'],
 	depends: xs)

@@ -1,4 +1,7 @@
 #! ./build/xs
+PGM = $0
+HERE = `pwd^/`{dirname $PGM}
+XS = $HERE/../build/xs
 VERBOSE = false
 FORK = true
 PLATFORM = `{uname -m}
@@ -77,10 +80,9 @@ fn match-re { |result|
     log2 Match_re....
     eval '~ `` '''' output *'^$^result^'*'
 }
-let (dir = `pwd
-     logfile = `pwd^/xs_tests.log)
+let (logfile = `pwd^/tests/xs_tests.log)
 {
-    echo $dir
+    echo $HERE
     fn log { |msg|
         echo $msg | tee -a $logfile
     }
@@ -89,20 +91,20 @@ let (dir = `pwd
     }
 
     rm -f $logfile
-    for file ($dir/xs_tests/*.xs) {
+    for file ($HERE/xs_tests/*.xs) {
 	log2 File $file
-	local (FILE = $file; XS = $dir/build/xs) . $DOTARGS $FILE
+	local (FILE = $file) . $DOTARGS $FILE
     }
 
-    let (platform_tests = `{ls $dir/xs_tests/platform/$PLATFORM/*.xs >[2]/dev/null}) {
+    let (platform_tests = `{ls $HERE/xs_tests/platform/$PLATFORM/*.xs >[2]/dev/null}) {
         if {!~ $platform_tests ()} {
             log '-------  Begin' $PLATFORM 'platform tests'
             for file ($platform_tests) {
                 log2 Running $file
-                local (FILE = $file; XS = $dir/build/xs) . $DOTARGS $FILE
+                local (FILE = $file) . $DOTARGS $FILE
             }
         } else log '-------  No' $PLATFORM 'platform tests'
     }
-    cd $dir
+    cd $HERE
 }
 results
