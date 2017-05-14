@@ -1,12 +1,15 @@
 Since you're coming to xs from another shell, there are some things that
 you'll need to know.
 
-  * ~/.xsrc is the only initialization file, executed only when xs starts
-    as a login shell.
+  * ~/.xsrc is executed only when xs starts as a login shell.
+  * ~/.xsin is executed when xs starts as an interactive shell. If xs is
+    also a login shell, ~/.xsrc runs first.
   * Apostrophe (') is the only paired quoting character.
   * There are *no* escapes or substitutions of any kind inside '...'.
   * To include a ' inside of '...', double the interior ', e.g. 'Frank''s'.
   * Quote (") has no meaning for quoting. It is accepted as a word constituent.
+  * *+,-./:=?@[]_~" is a valid variable name. (These are all the non-special
+    punctuation characters.)
   * Substitution inside of a word is done using caret (^) for concatenation,
     e.g.:
     'foo is '^$foo
