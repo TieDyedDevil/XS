@@ -2477,7 +2477,12 @@ is respectively less than, equal to or greater than
 .IR b .
 If either argument is non-numeric, then the arguments are compared
 lexicographically, honoring the locale's collation order.
-An empty list is treated as an empty string.
+.TP
+\&
+The result is not defined for list arguments, except that
+comparisons may be made against the empty list.
+The result in this case is 0 if both arguments
+are either an empty list or an empty string, and nonzero otherwise.
 .TP
 .Cr "%count \fIlist\fP"
 Returns the number of arguments to the primitive.
