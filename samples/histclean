@@ -1,0 +1,31 @@
+#! /usr/bin/env xs
+
+# Clean the $history file by removing:
+#  a) leading and trailing blanks
+#  b) one-word commands
+#  c) syntactically invalid commands
+#  d) consecutive repetitions of commands
+
+if {!~ $history () && access -f $history} {
+	hstfile = $history
+	history -n
+	lc_start = `{cat $hstfile | wc -l}
+	tmpfile = `mktemp
+	count = 0
+	line = go
+	until {~ $line ()} {
+		count = `($count + 1)
+		~ `($count % 100) 0 && {printf . >[1=2]}
+		line = <=read
+		line = `` '' {echo $line | sed 's/^ \+//;s/ \+$//'|tr -d \n}
+		drop = <={{!~ $line *\ *} \
+				|| {echo $line | !xs -n >[2]/dev/null} \
+				|| {$line :eq $prev}}
+		result $drop || {echo $line; prev = $line}
+	} <$hstfile >$tmpfile
+	cp $tmpfile $hstfile
+	rm $tmpfile
+	lc_finish = `{cat $hstfile | wc -l}
+	printf \n'Removed %d lines'\n `($lc_start - $lc_finish)
+	history -y
+}
