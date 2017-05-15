@@ -48,8 +48,12 @@ project('xs', 'cpp')
   install_data(['AUTHORS', 'CHANGES', 'COPYING', 'GOTCHAS', 'INSTALL',
 		'NOTES', 'README', 'SYSTEMD_LOCALE', 'TODO'],
 	install_dir: 'share/doc/xs')
-  install_data(['samples/_xsrc', 'samples/colors'],
+  install_data(['samples/_xsrc', 'samples/_xsin', 'samples/colors',
+		'samples/histclean'],
 	install_dir: 'share/doc/xs/samples')
+  install_data(['samples/_xsrc.d/daemons.xs', 'samples/_xsrc.d/env.xs',
+		'samples/_xsrc.d/prompt.xs'],
+	install_dir: 'share/doc/xs/samples/_xsrc.d')
 
 run_target('trip',
 	command: ['sh', '-c', './tests/trip.xs'],
