@@ -1,6 +1,10 @@
 project('xs', 'cpp')
   compiler = meson.get_compiler('cpp')
-  compile_flags = ['-Wall', '-Wextra']
+  if compiler.get_id() == 'clang'
+	compile_flags = ['-Wall', '-Wextra']
+  else
+	compile_flags = []
+  endif
   boost_dep = dependency('boost')
   ffi_lib = compiler.find_library('ffi')
   gc_lib = compiler.find_library('gc')
