@@ -1,6 +1,6 @@
 project('xs', 'cpp')
   compiler = meson.get_compiler('cpp')
-  quiet_compile_flags = ['-Wno-varargs']
+  compile_flags = ['-Wall', '-Wextra']
   boost_dep = dependency('boost')
   ffi_lib = compiler.find_library('ffi')
   gc_lib = compiler.find_library('gc')
@@ -33,7 +33,7 @@ project('xs', 'cpp')
 		'util.cxx', 'var.cxx', 'version.cxx']
   common_dependencies = [boost_dep, readline_lib, gc_lib, ffi_lib]
   xsdump = executable('xsdump', ['dump.cxx', common_sources],
-	cpp_args: quiet_compile_flags,
+	cpp_args: compile_flags,
 	dependencies: common_dependencies)
   initial_cxx = custom_target('initial.cxx',
 	input: 'initial.xs',
@@ -41,7 +41,7 @@ project('xs', 'cpp')
 	depends: xsdump,
 	command: ['../generators/initial.sh', '@INPUT@', '@OUTPUT@'])
   xs = executable('xs', [initial_cxx, common_sources],
-	cpp_args: quiet_compile_flags,
+	cpp_args: compile_flags,
 	dependencies: common_dependencies,
 	install: true)
   install_man('xs.1')

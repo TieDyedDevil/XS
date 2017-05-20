@@ -77,7 +77,8 @@ static List *assign(Tree* varform, Tree* valueform, Binding* binding) {
 
 /* letbindings -- create a new Binding containing let-bound (lexical) variables */
 static Binding *letbindings(Tree* defn, Binding* binding,
-				Binding* context, int evalflags) {
+				Binding* context,
+				int __attribute__((unused)) evalflags) {
 	Tree* assign;
 	List *vars, *values, *value;
 	const char* name;

@@ -284,7 +284,7 @@ struct FD_format : public Format {
 		return buf - bufbegin;
 	}
 
-	void grow(size_t s) {
+	void grow(size_t __attribute__((unused)) s) {
 		size_t n = buf - bufbegin;
 		char *obuf = bufbegin;
 	

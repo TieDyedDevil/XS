@@ -169,7 +169,7 @@ static bool getfds(int fd[2], int c, int default0, int default1) {
 }
 
 static inline void bufput(int pos, char val) {
-	while (pos >= bufsize)
+	while ((unsigned long)pos >= bufsize)
 		buf = reinterpret_cast<char*>(
 			erealloc(buf, bufsize *= 2));
 	buf[pos] = val;

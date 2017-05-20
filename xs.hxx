@@ -155,8 +155,8 @@ extern List* sortlist(List* list);
 
 /* tree.cxx */
 
-extern Tree *mk(NodeKind , ...);
-
+extern Tree *mk(int, ...);
+/* ... Tree *mk(NodeKind, ...); */
 
 /* closure.cxx */
 

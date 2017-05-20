@@ -8,7 +8,11 @@ static Tree* newtree() {
 }
 
 /* mk -- make a new node; used to generate the parse tree */
-extern Tree *mk (NodeKind  t, ...) {
+extern Tree *mk (int t, ...) {
+	/* t is NodeKind, which is incompatible with va_start because the
+           compiler gets to decide the default promotion. So we declare
+	   t as int and check the range here. It won't stop you from
+	   passing the wrong type, but it's the best we can do. */
 	va_list ap;
 	Tree* n;
 
@@ -40,7 +44,7 @@ extern Tree *mk (NodeKind  t, ...) {
 		n->u[1].i = va_arg(ap, int);
 		break;
  	}
-	n->kind = t;
+	n->kind = (NodeKind)t;
 	va_end(ap);
 	
 	return n;

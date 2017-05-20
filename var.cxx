@@ -306,7 +306,7 @@ extern void initenv(char **envp, bool isprotected) {
 	for (std::string envstr; *envp != NULL ; envp++) {
 		envstr = *envp;
 		size_t eq_index = envstr.find('=');
-		if (eq_index == -1) {
+		if (eq_index == (unsigned long)-1) {
 			env.push_back(*envp);
 			continue;
 		}

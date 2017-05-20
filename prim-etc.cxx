@@ -119,7 +119,7 @@ PRIM(printf) {
 		}
 		if (ffi_prep_cif(&cif, FFI_DEFAULT_ABI, i, &ffi_type_sint, args) == FFI_OK) {
 			ffi_call(&cif, FFI_FN(snprintf), &rc, values);
-			if ((int)rc >= outsz) fail("$&printf", "printf: output too long");
+			if ((unsigned long)rc >= outsz) fail("$&printf", "printf: output too long");
 			print("%s", out);
 		}
 	} else fail("$&printf", "printf: format missing");
