@@ -1,4 +1,4 @@
-/* config.hxx -- xs(1) configuration parameters */
+/* xsconfig.hxx -- xs(1) configuration parameters */
 
 /*
  * Compile time options

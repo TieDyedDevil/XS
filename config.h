@@ -144,27 +144,6 @@
 /* "Enable lisp tree dumping" */
 /* #undef LISPTREES */
 
-/* Name of package */
-#define PACKAGE "xs"
-
-/* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT ""
-
-/* Define to the full name of this package. */
-#define PACKAGE_NAME "xs"
-
-/* Define to the full name and version of this package. */
-#define PACKAGE_STRING "xs 1.1"
-
-/* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME "xs"
-
-/* Define to the home page for this package. */
-#define PACKAGE_URL "https://github.com/TieDyedDevil/XS"
-
-/* Define to the version of this package. */
-#define PACKAGE_VERSION "1.1"
-
 /* Define as the return type of signal handlers (`int' or `void'). */
 #define RETSIGTYPE void
 
