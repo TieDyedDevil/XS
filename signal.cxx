@@ -283,7 +283,7 @@ extern void sigchk(void) {
 		exit(1);
 
 	for (sig = 0;; sig++) {
-		if (caught[sig] != 0) {
+		if (sig < NSIG && caught[sig] != 0) {
 			--sigcount;
 			caught[sig] = 0;
 			break;
