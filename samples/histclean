@@ -17,7 +17,7 @@ if {!~ $history () && access -f $history} {
 	line = go
 	until {~ $line ()} {
 		count = `($count + 1)
-		~ `($count % 100) 0 && {printf . >[1=2]}
+		~ `($count % 100) 0 && {printf \r%d%% `(100*$count/$lc_start) >[1=2]}
 		line = <=read
 		line = `` '' {echo $line | sed 's/^ \+//;s/ \+$//'|tr -d \n}
 		drop = <={{!~ $line *\ *} \
@@ -36,6 +36,6 @@ if {!~ $history () && access -f $history} {
 	cp $tmpfile $hstfile
 	rm $tmpfile
 	lc_finish = `{cat $hstfile | wc -l}
-	printf \n'Removed %d lines'\n `($lc_start - $lc_finish)
+	printf \r'Removed %d lines'\n `($lc_start - $lc_finish)
 	history -y
 }
