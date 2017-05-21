@@ -5,6 +5,8 @@
 #  b) one-word commands
 #  c) syntactically invalid commands
 #  d) consecutive repetitions of commands
+#  e) if the remaining file has at least 1,500 lines,
+#     remove duplicates from the first 2/3 of the file.
 
 if {!~ $history () && access -f $history} {
 	hstfile = $history
@@ -23,6 +25,14 @@ if {!~ $history () && access -f $history} {
 				|| {$line :eq $prev}}
 		result $drop || {echo $line; prev = $line}
 	} <$hstfile >$tmpfile
+	lc_pass1 = `{cat $tmpfile | wc -l}
+	if {$lc_pass1 :ge 1500} {
+		len0 = `($lc_pass1*2/3)
+		prefix = /tmp/$pid^_
+		split -l $len0 -d -a 1 $tmpfile $prefix
+		cat <{cat $prefix^0 | sort | uniq | shuf} $prefix^1 > $tmpfile
+		rm $prefix^?
+	}
 	cp $tmpfile $hstfile
 	rm $tmpfile
 	lc_finish = `{cat $hstfile | wc -l}
