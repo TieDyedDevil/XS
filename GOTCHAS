@@ -1,15 +1,9 @@
 Since you're coming to xs from another shell, there are some things that
-you'll need to know.
+you'll need to know. There's a lot more in TUTORIAL.md .
 
   * ~/.xsrc is executed only when xs starts as a login shell.
   * ~/.xsin is executed when xs starts as an interactive shell. If xs is
     also a login shell, ~/.xsrc runs first.
-  * Apostrophe (') is the only paired quoting character.
-  * There are *no* escapes or substitutions of any kind inside '...'.
-  * To include a ' inside of '...', double the interior ', e.g. 'Frank''s'.
-  * Quote (") has no meaning for quoting. It is accepted as a word constituent.
-  * *+,-./:=?@[]_~" is a valid variable name. (These are all the non-special
-    punctuation characters.)
   * Substitution inside of a word is done using caret (^) for concatenation,
     e.g.:
     'foo is '^$foo
@@ -17,20 +11,7 @@ you'll need to know.
     'My File.'^*
     xs will also insert a caret when it can do so unambiguously (see Free
     Carets in xs(1)). Thus the above may be written without carets.
-  * All values are lists. Variable expansion preserves whitespace.
-  * Use the backquote (`) operator to run a command and get its output
-    as a list. $ifs determines how to split the command's output text.
-    The status of the command is in $bqstatus.
-  * To change $ifs for one command, use the double-backquote (``) operator,
-    e.g.:
-    xy = `` x `{echo 37x42}
-    assigns the two-item list 37 42 to the variable xy.
   * Use the <= operator to run a command and get its exit code.
-  * The assignment operator (=) must always be surrounded by spaces.
-    These are valid words: a=foo grack= =flink =ergh=
-  * $#foo returns the number of list items.
-  * Use $^foo to flatten $foo into a one-item list with a blank between
-    each pair of original list items.
   * The concatenation operator generates the cross-product of lists, e.g.:
     ls foo.^[ch]
     and
