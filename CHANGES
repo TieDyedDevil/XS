@@ -3,6 +3,9 @@ xs 1.0 to xs 1.1
 
 Switched to the Meson/Ninja build system.
 
+Subscripting allows range bounds to be reversed; this returns the
+specified elements in reverse order.
+
 %read is renamed to read.
 
 Restrict the garbage collector to a single marking thread. Given the

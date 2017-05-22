@@ -92,6 +92,7 @@ static List *subscript(List* list, List* subs) {
 	int lo, hi, len = length(list), counter = 1;
 	List *result = NULL, *current = list;
 	List **prevp = &result;
+	int r = 0;
 
 	if (subs != NULL && streq(getstr(subs->term), "...")) {
 		lo = 1;
@@ -100,6 +101,7 @@ static List *subscript(List* list, List* subs) {
 
 	 /* prevp could point to pointer in structure which is forwarded */
 	while (subs != NULL) {
+		r = 0;
 		lo = atoi(getstr(subs->term));
 		if (lo < 1) {
 			fail("xs:subscript", "bad subscript: %s", getstr(subs->term));
@@ -125,10 +127,20 @@ static List *subscript(List* list, List* subs) {
 			current = list;
 			counter = 1;
 		}
+		if (lo > hi) { r = 1; int t = lo; lo = hi; hi = t; }
+		List **spp = prevp;
 		while (counter < lo) ++counter, current = current->next;
 		for (; counter <= hi; ++counter, current = current->next) {
 			*prevp = mklist(current->term, NULL);
 			prevp = &(*prevp)->next;
+		}
+		if (r) {
+			*spp = reverse(*spp);
+			List *f = *spp;
+			while (f) {
+				prevp = &(f->next);
+				f = f->next;
+			}
 		}
 	}
 	
