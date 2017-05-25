@@ -117,7 +117,7 @@ PRIM(printf) {
 				break;
 			}
 		}
-		if (ffi_prep_cif(&cif, FFI_DEFAULT_ABI, i, &ffi_type_sint, args) == FFI_OK) {
+		if (ffi_prep_cif_var(&cif, FFI_DEFAULT_ABI, 3, i, &ffi_type_sint, args) == FFI_OK) {
 			ffi_call(&cif, FFI_FN(snprintf), &rc, values);
 			if ((unsigned long)rc >= outsz) fail("$&printf", "printf: output too long");
 			print("%s", out);
