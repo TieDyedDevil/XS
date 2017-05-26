@@ -339,13 +339,108 @@ a code point computed at run time:
 ǝ
 ```
 
-Looking at the from the inside out, we're constructing a word like
-`\uNNNN`. This is how `xs` names a Unicode code point. The value of
-`$cp` is lambda-bound; that's the `|cp|` notation in the inner program
-fragment. `eval` expects a string, but `\uNNNN` is a word. `echo` does
-what it always does: it prints a string. `eval` parses and evaluates the
-given text, producing the `ǝ` as a word. Now look at the two program
+Looking at the above example from the inside out, we're constructing
+a word like `\uNNNN`. This is how `xs` names a Unicode code point. The
+value of `$cp` is lambda-bound; that's the `|cp|` notation in the inner
+program fragment. `eval` expects a string, but `\uNNNN` is a word. `echo`
+does what it always does: it prints a string. `eval` parses and evaluates
+the given text, producing the `ǝ` as a word. Now look at the two program
 fragments. The inner fragment, the lambda expression, is in the command
 position; `01dd` is its argument, which gets bound to `cp` in the lambda
 list. The backquote says "run this command." Finally, the leftmost `echo`
 prints the `ǝ` character.
+
+A statement in `xs` is simply a command followed by the command's
+arguments. A statement is terminated by any of:
+
+    * a newline
+    * a semicolon
+    * the closing brace of a program fragment
+    * a "special" character (see above)
+
+Note that it's the most restrictive syntactic feature that determines
+the end of a statement. Consider this code:
+
+
+```
+{ foo a b c; bar x y
+  qux 17 39 }
+```
+
+The `foo` statement ends at `;`, the `bar` statement ends at the newline
+and the `qux` statement ends at `}`.
+
+The following are not equivalent:
+
+```
+{ bagley parsimony fletch
+  grackle }
+```
+
+and
+
+```
+{ bagley parsimony fletch grackle }
+```
+
+The former is two separate statements; the latter only one. We can, however, rewrite the first to be equivalent to the second by using line continuation:
+
+```
+{ bagley parsimony fletch \
+  grackle }
+```
+
+The backslash-newline sequence reads as a blank space.
+
+Parentheses may be used to bound a list. A list so bounded may span
+newlines. The following assignments are all equivalent:
+
+```
+l = a b c d e f
+l = a b c \
+    d e f
+l = (a b c
+     d e f)
+```
+
+Remember, too, that `xs` lists are flat (that is: alway a list; never
+a tree) and that empty lists "disappear" as a component of a list. The
+following are equivalent:
+
+```
+m = (a b (c d (e) () f))
+m = a b c d e f
+m = ((((a b c d e f))))
+```
+
+Also, a list is not a program fragment, nor vice versa. Consider:
+
+```
+; (echo 1
+   echo 2)
+1 echo 2
+; {echo 1
+   echo 2}
+1
+2
+```
+
+We've seen that a command may be a program (e.g. `ls`) or a lambda. A
+lambda is just an unnamed `xs` function. We can also name `xs`
+functions. The simplest case is to name a variable prefixed by `fn-`:
+
+```
+fn-ll = ls -l
+```
+
+You can also use the `fn` keyword to define a named `xs` function. This
+is exactly equivalent to the previous example:
+
+```
+fn ll {ls -l}
+```
+
+A program not in a directory on `$PATH` may be used as a command by
+naming an absolute or relative path to the program. In the case of a
+relative path, `xs` differs from many other shells by requiring that
+the path begins with a `.`.
