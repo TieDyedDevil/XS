@@ -425,6 +425,11 @@ Also, a list is not a program fragment, nor vice versa. Consider:
 2
 ```
 
+The above example also illustrates how `xs`'s input reader handles a
+continuation line. In both cases we typed an unfinished statement on
+the first line; `xs` responded by printing its continuation prompt,
+which is by default empty.
+
 We've seen that a command may be a program (e.g. `ls`) or a lambda. A
 lambda is just an unnamed `xs` function. We can also name `xs`
 functions. The simplest case is to name a variable prefixed by `fn-`:
@@ -443,4 +448,73 @@ fn ll {ls -l}
 A program not in a directory on `$PATH` may be used as a command by
 naming an absolute or relative path to the program. In the case of a
 relative path, `xs` differs from many other shells by requiring that
-the path begins with a `.`.
+the path begins with a `.` (dot).
+
+`xs` has all of the usual control-flow constructs, plus a few that you
+don't usually see in shells.
+
+The simplest control flow is a sequence. `xs` evaluates one statement
+after another. Statements may be separated by a newline or a `;`.
+
+Then there's conditional sequencing, provided by the familiar `&&` and
+`||` operators. `&&` evaluates the statement to its right only if the
+statement to its left has a true return code. `||` evaluates the statement
+to its right only if the statement to its left has a false return code.
+
+The `!` operator negates the return code of the statement to its right. As
+in most programming languages, `!` has higher precedence than the other
+boolean operators.
+
+Like other shells, `xs` has wilcard matching, more commonly referred to
+as "globbing". `*` and `?` match any sequence of characters (including
+an empty sequence) or any individual character, respectively, in a
+filename. `*` and `?` do not match `.` at the beginning of a filename,
+nor do they match the `/` path separator.
+
+Characters bracketed by `[` and `]` form a class that matches any one
+character between the brackets. A negative class, i.e. a class that
+matches any character *not* listed, is introduced by a `~` (*not* `^`
+as in other shells) immediately following the open bracket.
+
+Remember that there are no special characters within `'...'` in xs.
+
+For the case where you'd like to match something other other than
+a filename, `xs` provides a match operator. The syntax of the match
+operator is:
+
+```
+~ <subject> <pattern>...
+```
+
+where <subject> is typically a variable, a backquote expression or other
+statement that produces a string value. The <subject> is followed by one
+or more patterns. `xs` does not match patterns against filenames in this
+case; there's no need to (nor should you) quote the <pattern>s. (However,
+a literal wilcard in the <subject> *is* expanded as described in the
+previous paragraphs.)
+
+You can specify the empty list as a pattern. But remember how `xs`
+collapses empty lists within a list: you can't match *either* a pattern
+or an empty list. This expression, for example, matches *only* `f?b`:
+
+```
+~ $v f?b ()
+```
+
+The pattern match operator returns true if <subject> matches any of
+the <pattern>s. In the case where <subject> is a list, we obtain a true
+result if any of the <subject>s match any of the <pattern>s. All in all,
+`~` is a pretty powerful tool. It's also fast. In particular, think of
+`~` rather than a relational operator when you need to match a specific
+numeric or string value.
+
+There's also `~~`, the pattern extraction operator, used like this:
+
+```
+~~ <subject> <pattern>...
+```
+
+The <subject> is matched against <pattern>s; only the portions of
+<subject> that match wilcards in <pattern>s are returned as the value of
+`~~`. When pattern is a list, the result is the concatentation of all
+matches for the first list item, then the second, and so on.
