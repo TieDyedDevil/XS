@@ -41,8 +41,7 @@ if {!~ $history () && access -f $history} {
 		rm $prefix^?
 		lc_pass2 = `{cat $tmpfile | wc -l}
 		if {$lc_pass2 :gt 3000} {
-			len0 = `($lc_pass2-3000)
-			split -l $len0 -d -a 1 $tmpfile $prefix
+			tail -n 3000 $tmpfile > $prefix^1
 			cat $prefix^1 > $tmpfile
 			rm $prefix^?
 		}
