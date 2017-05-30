@@ -518,3 +518,21 @@ The <subject> is matched against <pattern>s; only the portions of
 <subject> that match wilcards in <pattern>s are returned as the value of
 `~~`. When <subject> is a list, the result is the concatentation of all
 <pattern> matches for the first list item, then the second, and so on.
+
+```
+Next:
+  - ^ and (...)
+  - higher-level control-flow
+  - startup
+    - login
+    - interactive
+    - batch
+    - other flags
+  - extensibility
+    - primitives
+    - hooks
+    - settors
+  - pointer to sample code
+  - pointer to manual
+  - pointer to repo, issue tracker
+```
