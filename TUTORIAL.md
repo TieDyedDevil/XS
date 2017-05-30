@@ -516,5 +516,5 @@ There's also `~~`, the pattern extraction operator, used like this:
 
 The <subject> is matched against <pattern>s; only the portions of
 <subject> that match wilcards in <pattern>s are returned as the value of
-`~~`. When pattern is a list, the result is the concatentation of all
-matches for the first list item, then the second, and so on.
+`~~`. When <subject> is a list, the result is the concatentation of all
+<pattern> matches for the first list item, then the second, and so on.
