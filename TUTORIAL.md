@@ -519,9 +519,59 @@ The <subject> is matched against <pattern>s; only the portions of
 `~~`. When <subject> is a list, the result is the concatentation of all
 <pattern> matches for the first list item, then the second, and so on.
 
+Globbing is handy, but it can't handle the cases where you'd like to
+match specific substrings in file and directory names. This is where `xs`
+lists come in handy when combined with the concatenation operator, `^`.
+
+This command:
+
 ```
+ls (foo bar baz qux)^*.abc
+
+```
+
+lists all files having names matching `foo*.abc`, `bar*.abc`, `baz*.abc`
+and `qux*.abc`.
+
+Of course, you can combine list concatenation with other forms of
+globbing, such as:
+
+```
+vi *^(mem wan)^.[ch]
+```
+
+You can even concatenate multiple lists; `xs` will generate the cross
+product of the lists. This:
+
+```
+mv (base config alt)^-^(session client wrapper)^.^(lisp fasl) archive/
+```
+
+moves all of the following files from the current directory to the
+`archive/` subdirectory:
+
+```
+base-session.lisp
+base-session.fasl
+base-client.lisp
+base-client.fasl
+base-wrapper.lisp
+base-wrapper.fasl
+config-session.lisp
+config-session.fasl
+config-client.lisp
+config-client.fasl
+config-wrapper.lisp
+config-wrapper.fasl
+alt-session.lisp
+alt-session.fasl
+alt-client.lisp
+alt-client.fasl
+alt-wrapper.lisp
+alt-wrapper.fasl
+```
+
 Next:
-  - ^ and (...)
   - higher-level control-flow
   - startup
     - login
