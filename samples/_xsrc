@@ -532,8 +532,9 @@ fn ulu {|*|
 			~ $l () || {
 				(hex desc) = <={~~ $l *\ *}
 				hex = `{printf %8s $hex|tr ' ' 0}
-				char = `{printf `{eval echo '\U'^$hex}}
-				printf %s\tU+%s\t%s\n $char $hex $desc
+				uni = `{eval echo '\U'^$hex >[2]/dev/null}
+				if {!result $bqstatus} {uni = !UTF-8}
+				printf %s\tU+%s\t%s\n $uni $hex $desc
 			}
 		} | less -FX
 	}
@@ -595,6 +596,7 @@ fn web {|*|
 		)
 	}
 }
+fn whats /usr/bin/whatis
 fn where {
 	.d 'Summarize user, host, tty, shell pid and working directory'
 	printf '%s@%s[%s;%d]:%s'\n \
