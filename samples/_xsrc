@@ -246,6 +246,12 @@ fn vtfbfit {
 
 fn --
 
+fn acplt {
+	.d 'Adjust console palette.'
+	if {~ $TERM linux} {
+		printf %s \e]R\e]P46060f0
+	} else echo 'Console only'
+}
 fn agl {|*|
 	.d 'Search tree for pattern in files'
 	.a '[ag_OPTIONS] PATTERN [DIRECTORY]'
