@@ -249,7 +249,7 @@ fn --
 fn acplt {
 	.d 'Adjust console palette.'
 	if {~ $TERM linux} {
-		printf %s \e]R\e]P46060f0
+		printf %s \e]R\e]P45f87d7 # xterm equiv: SteelBlue3
 	} else echo 'Console only'
 }
 fn agl {|*|
