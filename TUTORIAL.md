@@ -571,8 +571,38 @@ alt-wrapper.lisp
 alt-wrapper.fasl
 ```
 
+In addition to the boolean control-flow operators we've already
+encountered, `xs` provides a number of familiar constructs:
+
+```
+if <test> <consequent> [else <alternative>]
+eval <list>
+false
+for <list> <command>
+result <arg>...
+switch <case-and-action>... <default-action>
+true
+until <test> <body>
+while <test> <body><M-`>
+
+exec <command>
+exit [<status>]
+fork <command>
+wait [<pid>]
+
+catch <catcher> <body>
+escape <lambda>
+forever <command>
+map <action> <list>
+omap <action> <list>
+throw <exception> <arg>...
+unwind-protect <body> <cleanup>
+```
+
+```
 Next:
-  - higher-level control-flow
+  - access
+  - relops
   - startup
     - login
     - interactive
@@ -585,4 +615,7 @@ Next:
   - pointer to sample code
   - pointer to manual
   - pointer to repo, issue tracker
+
+Manual:
+  - add `for` to list of builtins
 ```
