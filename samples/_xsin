@@ -1,1 +1,2 @@
 stty start undef stop undef
+~ $TERM st-256color && TERM = st
