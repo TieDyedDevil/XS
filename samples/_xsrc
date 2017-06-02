@@ -114,7 +114,17 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 		}
 	}
 	fn %prompt {
-		~ $TERM linux && printf %s \e]R\e]P45f87d7 # blue = SteelBlue3
+		~ $TERM linux && {
+			printf %s \e]R
+			printf %s \e]P0000000 # black = Black
+			printf %s \e]P1cd0000 # red = Red3
+			printf %s \e]P200cd00 # green = Green3
+			printf %s \e]P3cdcd00 # yellow = Yellow3
+			printf %s \e]P45f87d7 # blue = SteelBlue3
+			printf %s \e]P5cd00cd # magenta = Magenta3
+			printf %s \e]P600cdcd # cyan = Cyan3
+			printf %s \e]P7e5e5e5 # white = Gray90
+		}
 		.an; tput ed
 		~ $(_pr@$pid) () && {
 			_pa@$pid = $_oa; prompt; _n@$pid = 0; _s@$pid = -1
