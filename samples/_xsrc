@@ -114,6 +114,7 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 		}
 	}
 	fn %prompt {
+		~ $TERM linux && printf %s \e]R\e]P45f87d7 # blue = SteelBlue3
 		.an; tput ed
 		~ $(_pr@$pid) () && {
 			_pa@$pid = $_oa; prompt; _n@$pid = 0; _s@$pid = -1
@@ -246,12 +247,6 @@ fn vtfbfit {
 
 fn --
 
-fn acplt {
-	.d 'Adjust console palette.'
-	if {~ $TERM linux} {
-		printf %s \e]R\e]P45f87d7 # xterm equiv: SteelBlue3
-	} else echo 'Console only'
-}
 fn agl {|*|
 	.d 'Search tree for pattern in files'
 	.a '[ag_OPTIONS] PATTERN [DIRECTORY]'
