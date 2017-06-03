@@ -2106,6 +2106,10 @@ the last command executed.)
 .Cr "false"
 Always returns a false (non-zero) return value.
 .TP
+.TP
+.Cr "for \fIbinding\fP ... { \fIcommand\fP }
+See the earlier description of for loops.
+.TP
 .Cr "forever \fIcmd\fP"
 Runs the command repeatedly, until the shell exits or the
 command raises an exception.
@@ -3005,6 +3009,12 @@ Normally
 is only interactive if it
 is run with commands coming from standard input and
 standard input is connected to a terminal.
+If
+.I xs
+also runs
+.Cr $home/.xsrc ,
+it does so before running
+.Cr $home/.xsin .
 .TP
 .Cr \-l
 Run
