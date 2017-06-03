@@ -819,25 +819,78 @@ only within the body. Bindings are separated by newline or `;`. The
 assignment may be elided; this is equivalent to writing `<name> =`,
 which binds the name to `()`.
 
-```
-Next:
-  - access
-  - relops
-  - startup
-    - login
-    - interactive
-    - batch
-    - other flags
-  - local
-  - extensibility
-    - primitives
-    - hooks
-    - settors
-  - pointer to initial.xs
-  - pointer to sample code
-  - pointer to manual
-  - pointer to repo, issue tracker
+Other shells usually collect all manner of tests under one builtin
+that handles file accessibility and relational operators under a single
+built-in function. `xs` separates these tests. We've already encountered
+the match operator, `~`. The built-in function `access` tests given
+paths against various criteria:
 
-Manual:
-  - add `for` to list of builtins
+```
+access [-n <name>] [-1|-e] [-r|-w|-x] [-f|-d|-c|-b|-l|-s|-p] <path>...
+```
+
+The `rwx` flags test accessibility. The `fdcblsp` flags test the file's
+type. The accessibility flags may be combined. `access` uses only the
+rightmost type flag.
+
+Normally, `access` returns a list of boolean results, one for each
+<path>. Rather than return a canonical `false` value where appropriate,
+`xs` returns the text of the error code that was obtained by trying
+to access <path> according to the given criteria. That text is still
+logically false, but it provides additional information that you may
+choose to use.
+
+When we provide the `-1` flag, `access` stops at the first <path> that
+meets the criteria and returns not a boolean, but the path itself. If
+no <path> meets the criteria, `access` returns `()`. When `-e` is used
+together with `-1`, `access` signals an error if no <path> meets the
+given criteria.
+
+With the `-n <name>` option, the <path>s are treated as a list of
+directories and <name> is taken as the name of a file to be found in
+those directories. Otherwise, all other behaviors are the same with the
+`-n` option. In other words, `access -n <name> <criteria> <path>...`
+finds <name>d file(s) in <path>s that meet the specified criteria. The
+`-1` and `-e` options may also be given, with their usual effects.
+
+Finally, `xs` has the usual relational operators. These are named `:lt`,
+`:le`, `:gt`, `:ge`, `:eq` and `:ne` in order to avoid confusion with
+other `xs` usage of the usual tokens.
+
+Numeric relational comparisons coerce both values to floats if either
+is a float, and both values to strings if either is a string. String
+comparisons are performed using the current locale's collating order.
+
+The relational operators expect a pair of singleton values. The result of
+using list arguments is undefined, except that `()` may be compared using
+`:eq` or `:ne` (although the `~` operator is preferred in this case).
+
+`xs` executes commands in one or two startup files, depending upon how
+`xs` is invoked.
+
+As a startup shell (i.e. as started by the OS as a result of just having
+logged in) or when invoke with the `-l` flag, `xs` is a login shell. When
+invoked as a login shell, `xs` reads `~/.xsrc`.
+
+As an interactive shell, `xs` reads `~/.xsin`. `xs` is interactive as
+a login shell, when invoked from the command line (i.e. with a terminal
+attached to standard input) and when invoked with the `-i` flag.
+
+If `xs` reads both `~/.xsrc` and `~/.xsin`, it always does so in that
+order.
+
+This concludes our brief introduction to the `xs` shell. You'll find
+much more information in `xs(1)` and in various files installed to
+`xs`'s documentation directory.
+
+If you're interested in extending or modifying `xs`'s behavior, take
+a look at `xs(1)`'s explanation of hooks, primitives and syntactic
+rewrites. The `initial.xs` file (in the source repository) defines a
+significant portion of `xs` using `xs` code and contains good examples
+of some of the more complex `xs` features.
+
+The source code repository and issue tracker is at:
+
+```
+https://github.com/TieDyedDevil/XS
 ```
