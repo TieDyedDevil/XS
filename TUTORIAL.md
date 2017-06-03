@@ -572,32 +572,252 @@ alt-wrapper.fasl
 ```
 
 In addition to the boolean control-flow operators we've already
-encountered, `xs` provides a number of familiar constructs:
+encountered, `xs` provides a number of familiar constructs. Starting
+with the conditionals, we have:
 
 ```
 if <test> <consequent> [else <alternative>]
-eval <list>
-false
-for <list> <command>
-result <arg>...
-switch <case-and-action>... <default-action>
-true
-until <test> <body>
-while <test> <body><M-`>
+switch <value> <case-and-action>... [<default-action>]
+```
 
+Unlike many other languages, `xs` ends a statement at a newline. This
+means that these statements must either be written on one line, or
+extended to subsequent lines using a backslash continuation. You may also
+satisfy `xs`'s all-one-line requirement by using a program fragment to
+span lines, such as:
+
+```
+if ~ $TERM linux {
+    echo 'I''m in the console.'
+} else {
+    echo 'Maybe I''m on a pty...'
+}
+```
+
+For the `switch` statement, usual practice is to enclose all of the case
+and actions and the default action within a list, like this:
+
+```
+switch $x (
+    1 {echo one}
+    2 {echo two}
+    {echo many})
+```
+
+`xs` provides these iteration constructs:
+
+```
+for <var-and-list>... <command>
+until <test> <body>
+while <test> <body>
+```
+
+In the simplest case, the `for` loop looks quite familiar:
+
+```
+for i `{seq 5} {printf 'i is %d'\n $i}
+```
+
+But you can provide multiple iteration variables:
+
+```
+for i `{seq 5}; j (a b c) {printf '%d is %s'\n $i $j}
+```
+
+The `for` loop continues to iterate until the *longest* list has been
+exhausted, substituting an empty list value for each list that has run
+out of elements.
+
+The `while` and `until` loops complement each other: `while` executes
+the body until the test is true; `until` runs the body while the test
+is false.
+
+The next couple of control constructs have to do with altering the
+interpreter's behavior.
+
+```
+eval <list>
+result <arg>...
+```
+
+`eval` turn the given list into a string, separating the words with
+blanks, and then feeds that string to the interpreter. The interpreter
+processes the string as `xs` statements.
+
+`result` is an identity function; it returns whatever it's given. If
+this seems useless, consider the following. Let's say your program sets
+a variable that you want to use elsewhere to condition the execution of
+a brief statement. You could use an `if` statement, of course:
+
+```
+if $cond do_something
+```
+
+You might also try to write the expression-oriented form like this:
+
+```
+$cond && do_something
+```
+
+The above won't work. Recall that `xs` tries to evaluate the first word
+or a statement as a command or a function, of which a boolean value is
+neither. The solution is to use the built-in function `result`:
+
+```
+result $cond && do_something
+```
+
+While on the subject of booleans, note that `xs` provides functions that
+evaluate to boolean values:
+
+```
+false
+true
+```
+
+The next group of `xs` functions deals with process manipulation. These
+have the same meaning as in other shells.
+
+```
 exec <command>
-exit [<status>]
 fork <command>
 wait [<pid>]
+```
 
+The variable `$apid` is the PID of the process most recently forked,
+while `$apids` is a list of processes for which `xs` has not yet
+`wait`ed. Please consult `xs(1)` for lower-level functions that manipulate
+processes.
+
+The `exit` command causes `xs` to terminate and return a specific status
+to its caller. If no status is given, `xs` returns zero. This is unlike
+some other shells that use the status of the last-executed command.
+
+```
+exit [<status>]
+```
+
+Most shells provide a mechanism to execute a command upon receipt of
+a signal. `xs` integrates signal handling into an exception framework
+reminiscent of higher-level languages.
+
+```
 catch <catcher> <body>
+throw <exception> <arg>...
+```
+
+The `catch` function establishes a handler for the code in its body. If
+the body signals an exception, or if a signal is received, the catcher
+receives the exception as an argument. You'd use a lambda to bind the
+exception for use by the catcher:
+
+```
+catch {|e v| printf 'exception was %s %s'\n $e $v} {exit 99}
+
+```
+
+Yes, `exit` is an exception. Here's a list of all the built-in exceptions:
+
+```
+eof
+error <source> <message>
+exit <status>
+signal <name>
+```
+
+You can `throw` any of these exceptions. You can also define your own:
+
+```
+catch {|e v| printf 'caught %s %s'\n} {throw foo 'my exception'}
+```
+
+If you need to, you can throw an exception from within the catcher;
+the next handler up the chain (i.e. an active catch established earlier)
+will receive the newly-thrown exception.
+
+```
+retry
+```
+
+Within a catcher, the `retry` exception is treated specially: it causes
+the body to be run again. This can be useful for a structured retry
+of a failed operation. Beware, though: if the body has not cleared the
+original condition that caused the original exception, throwing `retry`
+from the catcher will cause an uninterruptible loop.
+
+Since we've already mentioned lambdas a few times, let's quickly review
+the finer points.
+
+```
+{|<lambda-list>| <body>}
+```
+
+The lambda-list is just a list of names that are bound to arguments to
+the lambda. For example:
+
+```
+{|a b c| echo $a $b $c} 1 2 3
+```
+
+prints `1 2 3`. If there are more names than arguments, the additional
+names are bound to `()`. If there are more arguments than names, the
+final name is bound to all of the remaining arguments.
+
+There are a few more control-flow constructs to cover.
+
+```
 escape <lambda>
 forever <command>
-map <action> <list>
-omap <action> <list>
-throw <exception> <arg>...
 unwind-protect <body> <cleanup>
 ```
+
+Non-local exits may be defined by `escape`. This allows your program
+to exit from multiple levels of lexically nested statements. Here's
+an example:
+
+```
+fn count {|n|
+  {escape { |fn-return|
+    i = 0
+    while true {
+      i = `($i+1)
+      echo $i
+      if {~ $i 5} {return}
+    }
+  }}
+}
+```
+
+Note that `xs` doesn't have a built-in `return` function like other
+shells. The `escape` mechanism gives you more control at the expense of
+slightly more verbose code. Also, the name is not important: you could
+replace `return` with any other unused name.
+
+The `map` and `omap` functions apply a function or command to each
+element of a list.
+
+```
+map <action> <list>
+omap <action> <list>
+```
+
+`map` returns a list of the action's results, while `omap` returns a
+list of the action's outputs.
+
+Controlling the visibility of names can be useful in a large shell
+program. When you use a variable in one part of the program, you'd like
+some assurance that you won't clobber its value in another unrelated
+piece of code. Other shells may provide a `local` keyword to use within
+function declarations. `xs` lets you declare local names anywhere.
+
+```
+let (<binding>...) <body>
+```
+
+A binding is an assignment, except that any name so bound is visible
+only within the body. Bindings are separated by newline or `;`. The
+assignment may be elided; this is equivalent to writing `<name> =`,
+which binds the name to `()`.
 
 ```
 Next:
@@ -608,10 +828,12 @@ Next:
     - interactive
     - batch
     - other flags
+  - local
   - extensibility
     - primitives
     - hooks
     - settors
+  - pointer to initial.xs
   - pointer to sample code
   - pointer to manual
   - pointer to repo, issue tracker
