@@ -2260,20 +2260,11 @@ with a single argument for each element of \fIlist\fP.
 Since lists auto-expand, list
 contains the rest of the arguments to the command.
 Returns the list of results of each action.
-If action returns a list, it is expanded inside
-into a new process group.
-This builtin is useful for making
-.I xs
-behave like a job-control shell in a hostile environment.
-One example is the NeXT Terminal program, which implicitly assumes
-that each shell it forks will put itself into a new process group.
-Note that the controlling tty for the process must be on standard error
-(file descriptor 2) when this operation is run.
 .TP
 .Cr "omap \fIaction\fP \fIlist\fP
 Like
-.I map
-, but return the list of the outputs of action, in the same form as if
+.IR map ,
+but return the list of the outputs of action, in the same form as if
 `` '' action (i.e. with an empty input field separator list) were called.
 .TP
 .Cr "popd"
