@@ -248,7 +248,7 @@ Here are two more things you can do with lists:
 a b c d e f g h i j
 ```
 
-$#<name> returns the number of items in a list. $^<name> returns a
+$#<name\> returns the number of items in a list. $^<name\> returns a
 one-element list composed of all the items in the original list,
 separated with spaces. Let's make that a bit more clear:
 
@@ -264,7 +264,7 @@ a b c d e f g h i j
 not matching a field separator is part of a word; a character matching
 a field separator ends the word and begins a new word with the next
 non-separator character. In `xs` the field separators are determined by
-the value of `$ifs`, which normally contains <space>, <tab> and <newline>
+the value of `$ifs`, which normally contains <space\>, <tab\> and <newline\>
 (or, in `xs`: `\ \t\n`).
 
 Now that we've introduced `$ifs`, we can turn our attention to the
@@ -486,11 +486,11 @@ operator is:
 ~ <subject> <pattern>...
 ```
 
-where <subject> is typically a variable, a backquote expression or other
-statement that produces a string value. The <subject> is followed by one
+where <subject\> is typically a variable, a backquote expression or other
+statement that produces a string value. The <subject\> is followed by one
 or more patterns. `xs` does not match patterns against filenames in this
-case; there's no need to (nor should you) quote the <pattern>s. (However,
-a literal wilcard in the <subject> *is* expanded as described in the
+case; there's no need to (nor should you) quote the <pattern\>s. (However,
+a literal wilcard in the <subject\> *is* expanded as described in the
 previous paragraphs.)
 
 You can specify the empty list as a pattern. But remember how `xs`
@@ -501,9 +501,9 @@ or an empty list. This expression, for example, matches *only* `f?b`:
 ~ $v f?b ()
 ```
 
-The pattern match operator returns true if <subject> matches any of
-the <pattern>s. In the case where <subject> is a list, we obtain a true
-result if any of the <subject>s match any of the <pattern>s. All in all,
+The pattern match operator returns true if <subject\> matches any of
+the <pattern\>s. In the case where <subject\> is a list, we obtain a true
+result if any of the <subject\>s match any of the <pattern\>s. All in all,
 `~` is a pretty powerful tool. It's also fast. In particular, think of
 `~` rather than a relational operator when you need to match a specific
 numeric or string value.
@@ -514,10 +514,10 @@ There's also `~~`, the pattern extraction operator, used like this:
 ~~ <subject> <pattern>...
 ```
 
-The <subject> is matched against <pattern>s; only the portions of
-<subject> that match wilcards in <pattern>s are returned as the value of
-`~~`. When <subject> is a list, the result is the concatentation of all
-<pattern> matches for the first list item, then the second, and so on.
+The <subject\> is matched against <pattern\>s; only the portions of
+<subject\> that match wilcards in <pattern\>s are returned as the value of
+`~~`. When <subject\> is a list, the result is the concatentation of all
+<pattern\> matches for the first list item, then the second, and so on.
 
 Globbing is handy, but it can't handle the cases where you'd like to
 match specific substrings in file and directory names. This is where `xs`
@@ -834,23 +834,23 @@ type. The accessibility flags may be combined. `access` uses only the
 rightmost type flag.
 
 Normally, `access` returns a list of boolean results, one for each
-<path>. Rather than return a canonical `false` value where appropriate,
+<path\>. Rather than return a canonical `false` value where appropriate,
 `xs` returns the text of the error code that was obtained by trying
-to access <path> according to the given criteria. That text is still
+to access <path\> according to the given criteria. That text is still
 logically false, but it provides additional information that you may
 choose to use.
 
-When we provide the `-1` flag, `access` stops at the first <path> that
+When we provide the `-1` flag, `access` stops at the first <path\> that
 meets the criteria and returns not a boolean, but the path itself. If
-no <path> meets the criteria, `access` returns `()`. When `-e` is used
-together with `-1`, `access` signals an error if no <path> meets the
+no <path\> meets the criteria, `access` returns `()`. When `-e` is used
+together with `-1`, `access` signals an error if no <path\> meets the
 given criteria.
 
-With the `-n <name>` option, the <path>s are treated as a list of
-directories and <name> is taken as the name of a file to be found in
+With the `-n <name>` option, the <path\>s are treated as a list of
+directories and <name\> is taken as the name of a file to be found in
 those directories. Otherwise, all other behaviors are the same with the
 `-n` option. In other words, `access -n <name> <criteria> <path>...`
-finds <name>d file(s) in <path>s that meet the specified criteria. The
+finds <name\>d file(s) in <path\>s that meet the specified criteria. The
 `-1` and `-e` options may also be given, with their usual effects.
 
 Finally, `xs` has the usual relational operators. These are named `:lt`,
