@@ -545,6 +545,15 @@ fn u2o {|*|
 	.a 'TEXT'
 	{echo -n $*|hexdump -b|grep -Eo '( [0-7]+)+'|tr ' ' \\\\}
 }
+fn uh {
+	.d 'Undo history'
+	!~ $history () && {
+		let (li = `{cat $history|wc -l}) {
+			history -d $li >/dev/null
+			history -d `($li-1)
+		}
+	}
+}
 fn ulu {|*|
 	.d 'Unicode lookup'
 	.a 'PATTERN'
