@@ -274,7 +274,7 @@ fn agl {|*|
 	.a '[ag_OPTIONS] PATTERN [DIRECTORY]'
 	ag --color $*|less -RFX
 }
-fn avis {|*| {.d 'Edit w/ APL key bindings'} akt vis $*}
+fn avis {|*| .d 'Edit w/ APL key bindings'; akt vis $*}
 fn battery {
 	.d 'Show battery status'
 	let (pspath = /sys/class/power_supply; full = 0; curr = 0; \
