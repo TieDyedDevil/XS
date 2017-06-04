@@ -49,6 +49,7 @@ if {!~ $history () && access -f $history} {
 	cp $tmpfile $hstfile
 	rm $tmpfile
 	lc_finish = `{cat $hstfile | wc -l}
-	printf \r'Removed %d lines'\n `($lc_start - $lc_finish)
+	printf \r'Removed %d lines; %d remain'\n \
+			`($lc_start - $lc_finish) `{cat $hstfile | wc -l}
 	history -y
 }
