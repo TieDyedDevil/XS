@@ -557,9 +557,10 @@ fn ulu {|*|
 				hex = `{printf %8s $hex|tr ' ' 0}
 				uni = `{eval echo '\U'^$hex >[2]/dev/null}
 				if {!result $bqstatus} {uni = !UTF-8}
-				printf %s\tU+%s\t%s\n $uni $hex $desc
+				!~ $desc \<control\> && \
+					printf %s\tU+%s\t%s\n $uni $hex $desc
 			}
-		} | less -FX
+		} | env LESSUTFBINFMT=*n!PRINT less -FXS
 	}
 }
 fn vidshuffle {|*|
