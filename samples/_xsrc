@@ -104,7 +104,7 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 				while {!~ $(pr$n) ()} {
 					printf '%d %s %s'\n $n $(pr$n)
 					n = `($n + 1)
-				}
+				} | pr -8 -t
 			}
 		}
 		if {~ $x(1) -n} {
