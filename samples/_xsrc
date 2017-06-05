@@ -407,6 +407,7 @@ fn mpvl {|*|
 		mpv --af=$afconf $*
 	}
 }
+fn mutt {|*| env TERM=st /usr/bin/mutt $*} # mutt won't override st colors
 fn net {
 	.d 'Network status'
 	nmcli --fields startup,networking,running,state,connectivity \
