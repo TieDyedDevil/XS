@@ -364,6 +364,12 @@ fn lpman {|man|
 	env MANWIDTH=72 man $man | sed 's/^.*/    &/' \
 		| lpr -o page-top=30 -o page-bottom=30
 }
+fn lpmd {|md|
+	.d 'Print a markdown file'
+	.a 'FILE'
+	markdown $md | w3m -T text/html -cols 72 | sed 's/^.*/    &/' \
+		| lpr -o page-top=30 -o page-bottom=30
+}
 fn ls {|*| /usr/bin/ls --color=auto $*}
 fn lt {|*| ls -lhtr $*}
 fn mdv {|*|
