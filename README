@@ -1,12 +1,13 @@
-Xs - The eXtensible Shell
-=========================
+The eXtensible Shell: xs version 1.1
+====================================
 
-Xs is a cleanly-designed shell with functional programming. It is
-based on the source code for the es project, which was in the public
-domain and derived from rc, which was also in the public domain. The
-changes in xs can also be considered to be in the public domain.
+Xs is the eXtensible Shell descended from Plan9's rc, featuring
+a programming language having Lisp-like semantics (lists, function
+parameters, closures, exceptions, lexical bindings, lambdas, etc.)
+and a conventional syntax.
 
-Xs is not source-level compatible with es or rc.
+Xs is based on the source code for the es project, which was derived
+from rc. All of these are in the public domain.
 
 Ancestral Implementations
 -------------------------
