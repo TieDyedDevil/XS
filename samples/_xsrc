@@ -9,8 +9,7 @@ history = $home/.xshistory
 
 access -d ~/.xsrc.d && {for f ~/.xsrc.d/*.xs {. $f}}
 
-let (dc) {dc = `{env TERM=ansi dircolors -c}; eval $dc(2) \= $dc(3)}
-
+## Terminal presentation
 fn .ab {tput bold}
 fn .ad {tput dim}
 fn .ai {tput sitm}
@@ -40,28 +39,6 @@ fn .palette {
 		tput initc 7 229 229 229 # white = Gray90
 	}
 }
-
-fn .d {|*|} # docstring
-fn .a {|*|} # argstring
-
-fn lb {
-	.d 'List local functions and binaries'
-	.ab; echo \* ~/.xsrc; .an
-	cat ~/.xsrc|grep '^fn'|cut -d' ' -f2|grep -v -e '^\.' -e '^%' \
-		|tr \n ' '|par 72j
-	echo
-	.ab; echo \* ~/bin; .an
-	ls ~/bin|tr \n ' '|par 72j
-	echo
-	.ab; echo \* /usr/local/bin; .an
-	ls /usr/local/bin|tr \n ' '|par 72j
-}
-
-fn prompt
-fn sc
-fn sd
-fn se
-
 fn .tattr {|*|
 	let (cs) {
 		switch $* (
@@ -79,6 +56,29 @@ fn .tattr {|*|
 		~ $cs () || printf %s $cs
 	}
 }
+
+## Help tags
+fn .d {|*|} # docstring
+fn .a {|*|} # argstring
+
+fn lb {
+	.d 'List local functions and binaries'
+	.ab; echo \* ~/.xsrc; .an
+	cat ~/.xsrc|grep '^fn'|cut -d' ' -f2|grep -v -e '^\.' -e '^%' \
+		|tr \n ' '|par 72j
+	echo
+	.ab; echo \* ~/bin; .an
+	ls ~/bin|tr \n ' '|par 72j
+	echo
+	.ab; echo \* /usr/local/bin; .an
+	ls /usr/local/bin|tr \n ' '|par 72j
+}
+
+## Prompt control
+fn prompt
+fn sc
+fn sd
+fn se
 
 if {!~ $(pr$initial_prompt) ()} {_op = $(pr$initial_prompt) ''} \
 else {_op = \> \| xs}
@@ -164,7 +164,6 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 	fn sd {.d 'Prompt seqnum disable'; _s@$pid = $(_n@$pid); _n@$pid = -1}
 	fn se {.d 'Prompt seqnum enable'; _n@$pid = 0; _s@$pid = -1}
 }
-
 fn rp {
 	.d 'Random prompt'
 	let (np = 1; na = 10; att = (normal bold dim italic red green blue
@@ -185,6 +184,7 @@ fn rp {
 
 fn --
 
+## Web lookups
 fn .web-query {|site path query|
 	if {~ $#query 0} {
 		web-browser $site
@@ -223,11 +223,13 @@ fn youtube {|*|
 
 fn --
 
+## Online documentation
 fn meson-help {web https://mesonbuild.com/}
 fn ninja-help {web https://ninja-build.org/}
 
 fn --
 
+## Framebuffer resize
 fn .fbset {|*| ~ $TERM linux && fbset -a -g $* $* 32}
 fn vtfhd {
 	.d 'Set framebuffer size 1920x1080 (16:9)'
@@ -269,6 +271,7 @@ fn vtfbfit {
 
 fn --
 
+## Utilities, overrides and aliases
 fn agl {|*|
 	.d 'Search tree for pattern in files'
 	.a '[ag_OPTIONS] PATTERN [DIRECTORY]'
@@ -669,4 +672,5 @@ fn .herald {
 # This code is in two parts. See the top of this file.
 # ref: /usr{/local}/share/doc/xs/NOTES
 result $force_locale && {SHLVL = `($SHLVL-1); exec xs}
+force_locale =
 # end
