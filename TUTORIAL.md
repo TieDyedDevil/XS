@@ -44,7 +44,7 @@ There are a few things to note in the preceding example:
 
     * The `xs` prompt is `;`. The man page explains this. Don't worry:
       you can change the prompt.
-    * Words are quoted using `'`, which is quoted by doubling it.
+    * Words are quoted using `'`, which is escaped by doubling it.
       That's everything you need to know about `xs` quoting. Take a
       moment, if you will, to compare that to what you know about
       quoting in other shells.
@@ -269,7 +269,7 @@ the value of `$ifs`, which normally contains <space\>, <tab\> and <newline\>
 
 Now that we've introduced `$ifs`, we can turn our attention to the
 backquote (`) operator. As in other shells, backquote captures the
-output of a command or function. The syntax is slightly different that
+output of a command or function. The syntax is slightly different than
 what you've seen elsewhere:
 
 ```
@@ -660,7 +660,7 @@ $cond && do_something
 ```
 
 The above won't work. Recall that `xs` tries to evaluate the first word
-or a statement as a command or a function, of which a boolean value is
+of a statement as a command or a function, of which a boolean value is
 neither. The solution is to use the built-in function `result`:
 
 ```
@@ -706,7 +706,7 @@ catch <catcher> <body>
 throw <exception> <arg>...
 ```
 
-The `catch` function establishes a handler for the code in its body. If
+The `catch` function establishes a catcher for the code in its body. If
 the body signals an exception, or if a signal is received, the catcher
 receives the exception as an argument. You'd use a lambda to bind the
 exception for use by the catcher:
@@ -752,7 +752,7 @@ the finer points.
 {|<lambda-list>| <body>}
 ```
 
-The lambda-list is just a list of names that are bound to arguments to
+The <lambda-list/> is just a list of names that are bound to arguments to
 the lambda. For example:
 
 ```
@@ -793,6 +793,12 @@ shells. The `escape` mechanism gives you more control at the expense of
 slightly more verbose code. Also, the name is not important: you could
 replace `return` with any other unused name.
 
+`forever` is a loop from which exceptions and signals cannot escape.
+This finds use in the read-eval-print loop of an interactive `xs` shell.
+
+`unwind-protect` assures that cleanup code runs regardless of the success
+or failure of code in the body.
+
 The `map` and `omap` functions apply a function or command to each
 element of a list.
 
@@ -817,13 +823,15 @@ let (<binding>...) <body>
 A binding is an assignment, except that any name so bound is visible
 only within the body. Bindings are separated by newline or `;`. The
 assignment may be elided; this is equivalent to writing `<name> =`,
-which binds the name to `()`.
+which binds the name to `()`. All bindings are done at the same time;
+you can't have a later binding depend upon an earlier binding in the
+same `let`.
 
 Other shells usually collect all manner of tests under one builtin
 that handles file accessibility and relational operators under a single
-built-in function. `xs` separates these tests. We've already encountered
+function. `xs` separates these tests. We've already encountered
 the match operator, `~`. The built-in function `access` tests given
-paths against various criteria:
+filesystem paths against various criteria:
 
 ```
 access [-n <name>] [-1|-e] [-r|-w|-x] [-f|-d|-c|-b|-l|-s|-p] <path>...
@@ -857,7 +865,7 @@ Finally, `xs` has the usual relational operators. These are named `:lt`,
 `:le`, `:gt`, `:ge`, `:eq` and `:ne` in order to avoid confusion with
 other `xs` usage of the usual tokens.
 
-Numeric relational comparisons coerce both values to floats if either
+Relational comparisons coerce both values to floats if either
 is a float, and both values to strings if either is a string. String
 comparisons are performed using the current locale's collating order.
 
@@ -869,7 +877,7 @@ using list arguments is undefined, except that `()` may be compared using
 `xs` is invoked.
 
 As a startup shell (i.e. as started by the OS as a result of just having
-logged in) or when invoke with the `-l` flag, `xs` is a login shell. When
+logged in) or when invoked with the `-l` flag, `xs` is a login shell. When
 invoked as a login shell, `xs` reads `~/.xsrc`.
 
 As an interactive shell, `xs` reads `~/.xsin`. `xs` is interactive as
