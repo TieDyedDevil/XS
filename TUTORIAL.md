@@ -647,10 +647,18 @@ processes the string as `xs` statements.
 `result` is an identity function; it returns whatever it's given. If
 this seems useless, consider the following. Let's say your program sets
 a variable that you want to use elsewhere to condition the execution of
-a brief statement. You could use an `if` statement, of course:
+a brief statement. Your first thought may be to write this:
 
 ```
 if $cond do_something
+```
+
+The above doesn't work because `if` expects a statement, not a variable,
+for its condition. We use `result` to return the value of `$cond` in
+this corrected code:
+
+```
+if {result $cond} do_something
 ```
 
 You might also try to write the expression-oriented form like this:
