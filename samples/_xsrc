@@ -319,7 +319,7 @@ fn doc {|*|
 	.a 'PACKAGE_NAME_GLOB'
 	if {!~ $* ()} {
 		let (pl) {
-			pl = `{find /usr/share/doc /usr/local/share/doc \
+			pl = `{find -L /usr/share/doc /usr/local/share/doc \
 				-mindepth 1 -maxdepth 1 -type d \
 				|grep -i '/usr.*/share/doc.*'^$*}
 			if {~ $#pl 1} {
@@ -339,10 +339,11 @@ fn gallery {|*|
 	let (dir = $(1); time = $(2)) {
 		~ $time () && time = 5
 		if {~ `consoletype vt} {
-			fbi -l <{find $dir -type f|shuf} -t $time --autodown \
+			fbi -l <{find -L $dir -type f|shuf} \
+				-t $time --autodown \
 				--noverbose --blend 500 >[2]/dev/null
 		} else {
-			find $dir -type f|shuf|sxiv -qifb -sd -S$time \
+			find -L $dir -type f|shuf|sxiv -qifb -sd -S$time \
 				>[2]/dev/null
 		}
 	}
@@ -589,7 +590,7 @@ fn vidshuffle {|*|
 		~ $filt () && filt = '*'
 		~ `consoletype vt && scale = --vf scale=`{fbset \
 			|grep -o '[0-9]\+[0-9]\+'|tr x :}
-		mpvl --really-quiet $scale --fs --playlist <{find $dir \
+		mpvl --really-quiet $scale --fs --playlist <{find -L $dir \
 			-type f -iname $filt|shuf \
 			|awk '/^[^/]/ {print "'`pwd'/"$0} /^\// {print}'}
 	}
@@ -604,9 +605,9 @@ fn wallpaper {|*|
 		switch $#* (
 		1 {	let (f) {
 				access -f $* && f = $*
-				access -d $* && wallpaper `{find $* \( -name \
-					'*.jpg' -o -name '*.png' \) \
-					|shuf|head -1}
+				access -d $* && wallpaper \
+					`{find -L $* \( -name '*.jpg' \
+					-o -name '*.png' \) |shuf|head -1}
 				!~ $f () && {
 					pkill xdesktopwaves
 					display -window root $f
