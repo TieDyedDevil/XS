@@ -230,7 +230,9 @@ fn ninja-help {web https://ninja-build.org/}
 fn --
 
 ## Framebuffer resize
-fn .fbset {|*| ~ $TERM linux && fbset -a -g $* $* 32}
+fn .fbset {|*|
+	if {~ $TERM linux} {fbset -a -g $* $* 32} else {echo 'not a vt'}
+}
 fn vtfhd {
 	.d 'Set framebuffer size 1920x1080 (16:9)'
 	.fbset 1920 1080
@@ -266,7 +268,7 @@ fn vtfbfit {
 			hv = `` x {echo -n $best}
 			.fbset $hv
 		}
-	}
+	} else {echo 'not a vt'}
 }
 
 fn --
