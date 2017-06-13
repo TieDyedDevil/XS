@@ -365,6 +365,14 @@ fn help {|*|
 		~ $^st '0 1 0 1 0' && echo 'no function' $nm
 	}
 }
+fn import-abook {|*|
+	.d 'Import vcard to abook'
+	.a 'VCARD_FILE'
+	mv ~/.abook/addressbook ~/.abook/addressbook-OLD
+	abook --convert --infile $* --informat vcard --outformat abook \
+		--outfile ~/.abook/addressbook
+	chmod 600 ~/.abook/addressbook
+}
 fn la {|*| ls -a $*}
 fn ll {|*| ls -lh $*}
 fn load {cat /proc/loadavg}
