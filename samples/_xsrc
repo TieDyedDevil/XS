@@ -38,8 +38,9 @@ fn .palette {
 		tput initc 6 0 205 205 # cyan = Cyan3
 		tput initc 7 229 229 229 # white = Gray90
 		if {~ $TERM yaft-256color} {
-			tput initc 12 99 185 255 # blue
-			tput initc 15 255 255 255 # white
+			tput initc 7 208 208 208 # normal white
+			tput initc 12 99 185 255 # bright blue
+			tput initc 15 255 255 255 # bright white
 		}
 	}
 }
