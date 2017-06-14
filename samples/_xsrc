@@ -345,10 +345,12 @@ fn gallery {|*|
 	.a 'PATH [DELAY]'
 	let (dir = $(1); time = $(2)) {
 		~ $time () && time = 5
-		if {~ `consoletype vt} {
+		if {~ $TERM linux} {
 			fbi -l <{find -L $dir -type f|shuf} \
 				-t $time --autodown \
 				--noverbose --blend 500 >[2]/dev/null
+		} else if {~ $DISPLAY () && ~ `consoletype pty} {
+			echo 'first, exit' <={~~ $TERM *-256color *}
 		} else {
 			find -L $dir -type f|shuf|sxiv -qifb -sd -S$time \
 				>[2]/dev/null
