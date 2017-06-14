@@ -350,7 +350,12 @@ fn gallery {|*|
 				-t $time --autodown \
 				--noverbose --blend 500 >[2]/dev/null
 		} else if {~ $DISPLAY () && ~ `consoletype pty} {
-			echo 'first, exit' <={~~ $TERM *-256color *}
+			mpv --image-display-duration $time --really-quiet \
+				--playlist <{find -L $dir -type f \
+				|grep -e .jpg\$ -e .png\$|shuf|awk \
+				'/^[^/]/ {print "'`pwd'/"$0} /^\// {print}'} \
+				>[2]/dev/null
+
 		} else {
 			find -L $dir -type f|shuf|sxiv -qifb -sd -S$time \
 				>[2]/dev/null
