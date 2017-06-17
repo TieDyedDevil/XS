@@ -3,12 +3,13 @@
 # Clean the $history file by removing:
 #  a) leading and trailing blanks
 #  b) one-word commands
-#  c) syntactically invalid commands
-#  d) consecutive repetitions of commands
-#  e) if the remaining file has at least 1,500 but fewer than 3,000 lines,
+#  c) commands that match specific patterns
+#  d) syntactically invalid commands
+#  e) consecutive repetitions of commands
+#  f) if the remaining file has at least 1,500 but fewer than 3,000 lines,
 #     remove duplicates from the first 2/3 of the file; if there are at
 #     least 3,000 lines, remove duplicates from all but the last 500 lines.
-#  f) if, after step (e) the remaining file has more than 3,000 lines,
+#  g) if, after step (e) the remaining file has more than 3,000 lines,
 #     delete all but the last 3,000 lines.
 
 if {!~ $history () && access -f $history} {
@@ -23,7 +24,8 @@ if {!~ $history () && access -f $history} {
 		~ `($count % 100) 0 && {printf \r%d%% `(100*$count/$lc_start) >[1=2]}
 		line = <=read
 		line = `` '' {echo $line | sed 's/^ \+//;s/ \+$//'|tr -d \n}
-		drop = <={{!~ $line *\ *} \
+		drop = <={{!~ $line *\ *} || {~ $line rm\ * cp\ * mv\ * la\ * \
+					ll\ * ls\ * lt\ * history\ *} \
 				|| {echo $line | !xs -n >[2]/dev/null} \
 				|| {$line :eq $prev}}
 		result $drop || {echo $line; prev = $line}
