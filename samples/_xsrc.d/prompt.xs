@@ -1,4 +1,5 @@
-initial_prompt = 1
+initial_prompt = 4
+initial_attrib = yellow
 
 pr1 = \u252c \u251c
 #    1┬
