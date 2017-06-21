@@ -187,6 +187,7 @@ fn rp {
 		prompt -a $att($i)
 	}
 }
+fn .xsin-rp {%prompt; rp; _n@$pid = 0}
 
 fn --
 
@@ -372,6 +373,17 @@ fn help {|*|
 			| grep -e '^{\.\(a\|\d\)' | sed 's/''''/''/g'}
 		~ $^st '0 0 0 1 0' && {echo 'no help for' $nm; whatis $nm}
 		~ $^st '0 1 0 1 0' && echo 'no function' $nm
+	}
+}
+fn image {|*|
+	.d 'Display image'
+	.a 'FILE ...'
+	if {~ $TERM linux} {
+		fbi --noverbose $*
+	} else if {~ $DISPLAY () && ~ `consoletype pty} {
+		mpv --image-display-duration inf --really-quiet $*
+	} else {
+		sxiv -qfb $*
 	}
 }
 fn import-abook {|*|
