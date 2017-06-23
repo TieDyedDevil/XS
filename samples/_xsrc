@@ -632,7 +632,7 @@ fn vidshuffle {|*|
 }
 fn wallpaper {|*|
 	.d 'Set wallpaper'
-	.a 'FILE'
+	.a 'FILE-OR-DIRECTORY'
 	.a 'DELAY_MINUTES DIRECTORY'
 	if {~ $DISPLAY ()} {
 		throw error wallpaper 'X only'
