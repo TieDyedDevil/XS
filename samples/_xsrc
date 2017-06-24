@@ -1,7 +1,7 @@
 # This code is in two parts. See the bottom of this file.
 # ref: /usr{/local}/share/doc/xs/NOTES
 ~ $LC_ALL () && {force_locale = <=true}
-LC_ALL = en_US.utf8
+LC_ALL = en_US.UTF-8
 # end
 
 path = /usr/local/bin /usr/bin /usr/sbin $home/.local/bin $home/bin
