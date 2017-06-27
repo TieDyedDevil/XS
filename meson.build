@@ -2,8 +2,10 @@ project('xs', 'cpp')
   compiler = meson.get_compiler('cpp')
   if compiler.get_id() == 'clang'
 	compile_flags = ['-Wall', '-Wextra']
+	link_flags = ['-Wl,-s']
   else
 	compile_flags = []
+	link_flags = []
   endif
   boost_dep = dependency('boost')
   ffi_lib = compiler.find_library('ffi')
@@ -46,6 +48,7 @@ project('xs', 'cpp')
 	command: ['../generators/initial.sh', '@INPUT@', '@OUTPUT@'])
   xs = executable('xs', [initial_cxx, common_sources],
 	cpp_args: compile_flags,
+	link_args: link_flags,
 	dependencies: common_dependencies,
 	install: true)
   install_man('xs.1')
