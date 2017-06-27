@@ -1,7 +1,7 @@
 project('xs', 'cpp')
   compiler = meson.get_compiler('cpp')
   if compiler.get_id() == 'clang'
-	compile_flags = ['-Wall', '-Wextra']
+	compile_flags = ['-Wall', '-Wextra', '-O3']
 	link_flags = ['-Wl,-s']
   else
 	compile_flags = []
