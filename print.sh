@@ -9,4 +9,6 @@ fi
 for f in *.[0-9]*; do
 	man -l -Tpdf $f | lpr
 done
-$LPR meson.build [[:upper:]]* *.h *.hxx *.cxx `find -type f generators samples tests` print.sh
+$LPR meson.build build.sh [[:upper:]]* *.h *.hxx *.cxx initial.xs \
+	`find generators samples tests xs-talk -type f -a \! -name \*.log` \
+	print.sh
