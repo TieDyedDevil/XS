@@ -3,8 +3,8 @@
 #include "xs.hxx"
 #include "print.hxx"
 
-/* Should be the > than he the largest numerical value of any normal english character used for fmttab */
-/* So for ASCII-derived, 128 should work */
+/* Should be the > than he the largest numerical value of any normal english
+ * character used for fmttab. So for ASCII-derived, 128 should work */
 #define	MAXCONV 128
 
 /*

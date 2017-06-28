@@ -65,7 +65,9 @@ static const char *dumpstring(const char *string) {
 		else {
 			int c;
 			print("{ ");
-			for (const char *s = string; (c = *(unsigned const char *) s) != '\0'; s++) {
+			for (const char *s = string;
+                             (c = *(unsigned const char *) s) != '\0';
+                             s++) {
 				switch (c) {
 				case '\a':	print("'\\a'");		break;
 				case '\b':	print("'\\b'");		break;
@@ -75,7 +77,9 @@ static const char *dumpstring(const char *string) {
 				case '\t':	print("'\\t'");		break;
 				case '\'':	print("'\\''");		break;
 				case '\\':	print("'\\\\'");	break;
-				default:	print(isprint(c) ? "'%c'" :"%d", c); break;
+				default:	print(isprint(c)
+                                                      ? "'%c'" : "%d", c);
+                                                                        break;
 				}
 				print(", ");
 			}
@@ -131,18 +135,21 @@ static const char *dumptree(Tree *tree) {
 		    case nWord: case nQword: case nPrim:
 		    case nInt: case nFloat:
 			print("static Tree_s %s = { n%s, { { %s } } };\n",
-			      name + 1, nodename(tree->kind), dumpstring(tree->u[0].s));
+			      name + 1, nodename(tree->kind),
+                              dumpstring(tree->u[0].s));
 			break;
 		    case nCall: case nThunk: case nVar: case nArith:
 			print("static Tree_p %s = { n%s, { { (Tree *) %s } } };\n",
-			      name + 1, nodename(tree->kind), dumptree(tree->u[0].p));
+			      name + 1, nodename(tree->kind),
+                              dumptree(tree->u[0].p));
 			break;
 		    case nPlus: case nMinus: case nMult: case nDivide: case nModulus:
 		    case nAssign:  case nConcat: case nClosure: case nFor:
 		    case nLambda: case nLet: case nList:  case nLocal:
 		    case nVarsub: case nMatch: case nExtract:
 			print("static Tree_pp %s = { n%s, { { (Tree *) %s }, { (Tree *) %s } } };\n",
-			      name + 1, nodename(tree->kind), dumptree(tree->u[0].p), dumptree(tree->u[1].p));
+			      name + 1, nodename(tree->kind),
+                              dumptree(tree->u[0].p), dumptree(tree->u[1].p));
 		}
 		cvars.insert(name);
 	}
@@ -223,7 +230,8 @@ static void dumpvar(const char *key, Var *var) {
 static std::stringstream varbuf;
 
 static void dumpdef(const char *name, Var *var) {
-	varbuf << str("\t{ %s, (List *) %s },\n", dumpstring(name), dumplist(var->defn));
+	varbuf << str("\t{ %s, (List *) %s },\n", dumpstring(name),
+                      dumplist(var->defn));
 }
 
 static void dumpfunctions(const char *key, Var *value) {

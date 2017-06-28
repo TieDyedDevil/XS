@@ -71,7 +71,8 @@ List* dirmatch(const char* prefix,
 		return NULL;
 
 	List* list = NULL; 
-	 /* The structure containing t->next could be forwarded, making prevp a bad pointer */
+	 /* The structure containing t->next could be forwarded,
+            making prevp a bad pointer */
 	List **prevp = &list;
 	Dirent *dp;
 	while ((dp = readdir(dirp)) != NULL)
@@ -90,7 +91,8 @@ List* dirmatch(const char* prefix,
 }
 
 /* listglob -- glob a directory plus a filename pattern into a list of names */
-static List* listglob(List* list, const char *pattern, const char *quote, size_t slashcount) {
+static List* listglob(List* list, const char *pattern, const char *quote,
+                      size_t slashcount) {
 	List* result; 
 	List **prevp;
 
@@ -131,15 +133,19 @@ static List* glob1(const char* pattern, const char* quote) {
 	const char *s = pattern;
 	if (*s == '/')
 		while (*s == '/')
-			dir.push_back(*s++), qdir.push_back(quote == UNQUOTED ? 'r' : *q++);
+			dir.push_back(*s++),
+                        qdir.push_back(quote == UNQUOTED ? 'r' : *q++);
 	else
 		while (*s != '/' && *s != '\0')
-			dir.push_back(*s++), qdir.push_back(quote == UNQUOTED ? 'r' : *q++); /* get first directory component */
+			dir.push_back(*s++),
+                        qdir.push_back(quote == UNQUOTED ? 'r' : *q++);
+                        /* get first directory component */
 
 	/*
-	 * Special case: no slashes in the pattern, i.e., open the current directory.
-	 * Remember that w cannot consist of slashes alone (the other way *s could be
-	 * zero) since doglob gets called iff there's a metacharacter to be matched
+	 * Special case: no slashes in the pattern, i.e., open the current
+         * directory. Remember that w cannot consist of slashes alone (the
+         * other way *s could be zero) since doglob gets called iff there's
+         * a metacharacter to be matched
 	 */
 	if (*s == '\0') return dirmatch("", ".", dir.c_str(), qdir.c_str());
 
@@ -153,7 +159,8 @@ static List* glob1(const char* pattern, const char* quote) {
 			slashcount++; /* skip slashes */
 		std::string pat, qpat;
 		while (*s != '/' && *s != '\0')
-			pat.push_back(*s++), qpat.push_back(quote == UNQUOTED ? 'r' : *q++); /* get pat */
+			pat.push_back(*s++),
+                        qpat.push_back(quote == UNQUOTED ? 'r' : *q++); /* get pat */
 		matched = listglob(matched, pat.c_str(), qpat.c_str(), slashcount);
 	} while (*s != '\0' && matched != NULL);
 

@@ -102,7 +102,8 @@ extern void panic(const char *fmt, ...) NORETURN;
 #define	gcnew(type)	new (UseGC) type
 #define galloc	GC_MALLOC
 
-extern char *gcndup(const char* s, size_t n);	/* util.cxx: copy a counted string into gc space */
+/* util.cxx: copy a counted string into gc space */
+extern char *gcndup(const char* s, size_t n);
 
 /* copy a 0-terminated string into gc space */
 inline char *gcdup(const char *s) {
@@ -284,7 +285,8 @@ public:
     }
 };
 
-extern void dictforall(Dict* dict, void (*proc)(void *, const char *, void *), void* arg);
+extern void dictforall(Dict* dict, void (*proc)(void *, const char *, void *),
+                       void* arg);
 /* conv.cxx */
 
 extern void initconv(void);
@@ -293,7 +295,8 @@ extern void initconv(void);
 
 /* str.cxx */
 
-extern char *str(const char *fmt, ...);	/* create a gc space string by printing */
+/* create a gc space string by printing */
+extern char *str(const char *fmt, ...);
 extern StrList* mkstrlist(const char* str, StrList* next);
 
 

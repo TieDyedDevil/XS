@@ -32,7 +32,8 @@ extern Tree *snarfheredoc(const char *eof, bool quoted) {
 	Tree *tree, **tailp;
 	stringstream buf;
 
-	assert(quoted || strchr(eof, '$') == NULL);	/* can never be typed (whew!) */
+        /* can never be typed (whew!) */
+	assert(quoted || strchr(eof, '$') == NULL);
 	if (strchr(eof, '\n') != NULL) {
 		yyerror("here document eof-marker contains a newline");
 		return NULL;
@@ -47,7 +48,9 @@ extern Tree *snarfheredoc(const char *eof, bool quoted) {
 			;
 		if (*s == '\0' && (c == '\n' || c == EOF)) {
 			if (!(buf.tellp() == 0 && tree != NULL))
-				*tailp = treecons(mk(nQword, gcdup(buf.str().c_str())), NULL);
+				*tailp = treecons(mk(nQword,
+                                                     gcdup(buf.str().c_str())),
+                                                  NULL);
 			break;
 		}
 		if (s != (unsigned char *) eof)
@@ -62,7 +65,9 @@ extern Tree *snarfheredoc(const char *eof, bool quoted) {
 				Tree *var;
 				UNGETC(c);
 				if (buf.tellp() > 0) {
-					*tailp = treecons(mk(nQword, gcdup(buf.str().c_str())), NULL);
+					*tailp = treecons(mk(nQword,
+                                                             gcdup(buf.str().c_str())),
+                                                          NULL);
 					tailp = &(*tailp)->CDR;
 				}
 				var = getherevar();

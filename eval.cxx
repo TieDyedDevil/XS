@@ -11,7 +11,8 @@ static void failexec(const char* file, const List* args) {
 	fn = varlookup("fn-%exec-failure", NULL);
 	if (fn != NULL) {
 		int olderror = errno;
-		const List* list = append(fn, mklist(mkstr(file), const_cast<List*>(args)));
+		const List* list = append(fn, mklist(mkstr(file),
+                                          const_cast<List*>(args)));
 		
 		eval(list, NULL, 0);
 		errno = olderror;

@@ -31,7 +31,8 @@ static int treecount(Tree *tree) {
 }
 
 /* binding -- print a binding statement */
-static void binding(Format *f, const char *keyword, Tree *tree, const char *assigner="=", bool surround_paren=true) {
+static void binding(Format *f, const char *keyword, Tree *tree,
+                    const char *assigner="=", bool surround_paren=true) {
 	fmtprint(f, "%s", keyword);
 	if (surround_paren) fmtprint(f, "(");
 	const char *sep = "";
@@ -40,7 +41,8 @@ static void binding(Format *f, const char *keyword, Tree *tree, const char *assi
 		Tree *binding = np->u[0].p;
 		assert(binding != NULL);
 		assert(binding->kind == nAssign);
-		fmtprint(f, "%s%#T %s (%T)", sep, binding->u[0].p, assigner, binding->u[1].p);
+		fmtprint(f, "%s%#T %s (%T)", sep, binding->u[0].p, assigner,
+                         binding->u[1].p);
 		sep = ";";
 	}
 	if (surround_paren) fmtprint(f, ")");
@@ -224,7 +226,8 @@ static void enclose(Format *f, Binding *binding, const char *sep) {
 		Binding *next = binding->next;
 		enclose(f, next, ";");
 		if (!closure_bindings.count(binding))
-			closure_bindings[binding] = (static_cast<uint64_t>(time(NULL)) << 32) | rand();
+			closure_bindings[binding] =
+                                (static_cast<uint64_t>(time(NULL)) << 32) | rand();
 		fmtprint(f, "__id__ = %0lx;", closure_bindings[binding]);
 		fmtprint(f, "%S = %#L%s", binding->name, binding->defn, " ", sep);
 	}
@@ -251,7 +254,8 @@ static bool Cconv(Format *f) {
 #if 0
 	int i;
 	Chain me, *cp;
-	assert(tree->kind == nThunk || tree->kind == nLambda || tree->kind == nPrim);
+	assert(tree->kind == nThunk || tree->kind == nLambda
+               || tree->kind == nPrim);
 	assert(binding == NULL || tree->kind != nPrim);
 
 	for (cp = chain, i = 0; cp != NULL; cp = cp->next, i++)
@@ -356,7 +360,9 @@ quoteit:
 /* %Z -- print a StrList */
 static bool Zconv(Format *f) {
 	char *sep = va_arg(f->args, char *);
-	for (StrList *lp = va_arg(f->args, StrList *), *next; lp != NULL; lp = next) {
+	for (StrList *lp = va_arg(f->args, StrList *), *next;
+             lp != NULL;
+             lp = next) {
 		next = lp->next;
 		fmtprint(f, "%s%s", lp->str, next == NULL ? "" : sep);
 	}

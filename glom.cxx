@@ -61,7 +61,8 @@ static const char *qcat(const char* q1,
 	return s;
 }
 
-#define DUAL_ITERATE(list, quote) for(; list != NULL; list = list->next, quote = quote->next)
+#define DUAL_ITERATE(list, quote) \
+        for(; list != NULL; list = list->next, quote = quote->next)
 
 /* qconcat -- cartesion cross product concatenation; also produces a quote list */
 static List *qconcat(List* list1, List* list2,
@@ -104,7 +105,8 @@ static List *subscript(List* list, List* subs) {
 		r = 0;
 		lo = atoi(getstr(subs->term));
 		if (lo < 1) {
-			fail("xs:subscript", "bad subscript: %s", getstr(subs->term));
+			fail("xs:subscript", "bad subscript: %s",
+                             getstr(subs->term));
 		}
 		subs = subs->next;
 		if (subs != NULL && streq(getstr(subs->term), "...")) {
@@ -115,7 +117,9 @@ static List *subscript(List* list, List* subs) {
 			else {
 				hi = atoi(getstr(subs->term));
 				if (hi < 1) {
-					fail("xs:subscript", "bad subscript: %s", getstr(subs->term));
+					fail("xs:subscript",
+                                             "bad subscript: %s",
+                                             getstr(subs->term));
 				}
 				if (hi > len)
 					hi = len;
@@ -167,24 +171,28 @@ static List *glom1(Tree* tree, Binding* binding) {
 			break;
 		case nThunk:
 		case nLambda:
-			list = mklist(mkterm(NULL, mkclosure(tree, binding)), NULL);
+			list = mklist(mkterm(NULL, mkclosure(tree, binding)),
+                                      NULL);
 			tree = NULL;
 			break;
 		case nPrim:
-			list = mklist(mkterm(NULL, mkclosure(tree, NULL)), NULL);
+			list = mklist(mkterm(NULL, mkclosure(tree, NULL)),
+                                      NULL);
 			tree = NULL;
 			break;
 		case nVar: {
 			List* var = glom1(tree->u[0].p, binding);
 			tree = NULL;
 			for (; var != NULL; var = var->next) {
-				list = listcopy(varlookup(getstr(var->term), binding));
+				list = listcopy(varlookup(getstr(var->term),
+                                                binding));
 				if (list != NULL) {
 					if (result == NULL)
 						tail = result = list;
 					else
 						tail->next = list;
-					for (; tail->next != NULL; tail = tail->next)
+					for (; tail->next != NULL;
+                                             tail = tail->next)
 						;
 				}
 				list = NULL;
@@ -193,8 +201,11 @@ static List *glom1(Tree* tree, Binding* binding) {
 		}
 		case nVarsub:
 			list = glom1(tree->u[0].p, binding);
-			if (list == NULL) fail("xs:glom", "null variable name in subscript");
-			if (list->next != NULL) fail("xs:glom", "multi-word variable name in subscript");
+			if (list == NULL) fail("xs:glom",
+                                               "null variable name in subscript");
+			if (list->next != NULL)
+                                fail("xs:glom",
+                                     "multi-word variable name in subscript");
 
 			{
 				const char* name = getstr(list->term);
@@ -291,7 +302,8 @@ extern List *glom2(Tree* tree, Binding* binding, StrList **quotep) {
 				tail->next = list;
 				qtail->next = qlist;
 			}
-			for (; tail->next != NULL; tail = tail->next, qtail = qtail->next)
+			for (; tail->next != NULL;
+                             tail = tail->next, qtail = qtail->next)
 				;
 			assert(qtail->next == NULL);
 		}
@@ -332,7 +344,8 @@ static int toint(List *x) {
 	try {
 		return lexical_cast<int>(getstr(x->term));
 	} catch (boost::bad_lexical_cast) {
-		fail("glom:arith:toint", "Could not handle integer input ( maybe too large? )");
+		fail("glom:arith:toint",
+                     "Could not handle integer input ( maybe too large? )");
 	}
 }
 static double todouble(List *x) {

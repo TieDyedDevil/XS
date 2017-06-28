@@ -39,7 +39,8 @@ static int rangematch(const char *p, const char *q, char c) {
 	for (; *p != ']' || ISQUOTED(q, 0); p++, q++) {
 		if (*p == '\0')
 			return RANGE_ERROR;	/* bad syntax */
-		if (p[1] == '-' && !ISQUOTED(q, 1) && ((p[2] != ']' && p[2] != '\0') || ISQUOTED(q, 2))) {
+		if (p[1] == '-' && !ISQUOTED(q, 1) && ((p[2] != ']'
+                    && p[2] != '\0') || ISQUOTED(q, 2))) {
 			/* check for [..-..] but ignore [..-] */
 			if (c >= *p && c <= p[2])
 				matched = true;
@@ -66,9 +67,12 @@ extern bool match(const char *s, const char *p, const char *q) {
 			case '?':
 				if (*s++ == '\0') return false;
 			case '*':
-				while (p[i] == '*' && (q == UNQUOTED || q[i] == 'r'))	// collapse multiple stars
+				while (p[i] == '*'
+                                       && (q == UNQUOTED || q[i] == 'r'))
+                                        // collapse multiple stars
 					i++;
-				if (p[i] == '\0') 	/* star at end of pattern? */
+				if (p[i] == '\0')
+                                        /* star at end of pattern? */
 					return true;
 				while (*s != '\0')
 					if (match(s++, p + i, TAILQUOTE(q, i)))
@@ -78,7 +82,8 @@ extern bool match(const char *s, const char *p, const char *q) {
 				if (*s == '\0')
 					return false;
 				int j;
-				switch (j = rangematch(p + i, TAILQUOTE(q, i), *s)) {
+				switch (j = rangematch(p + i,
+                                                       TAILQUOTE(q, i), *s)) {
 				default:
 					i += j;
 					break;
@@ -178,7 +183,9 @@ static List *extractsinglematch(const char *subject, const char *pattern,
 					const char *q = TAILQUOTE(quoting, i);
 					assert(*s != '\0');
 					if (match(s, pattern + i, q)) {
-						result = mklist(mkstr(gcndup(begin, s - begin)), result);
+						result = mklist(mkstr(gcndup(begin,
+                                                                             s - begin)),
+                                                                result);
 						return haswild(pattern + i, q)
 							? extractsinglematch(s, pattern + i, q, result)
 							: result;

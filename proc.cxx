@@ -97,7 +97,8 @@ static void reap(int pid, int status) {
 /* ewait -- wait for a specific process to die, or any process if pid == 0 */
 extern int ewait(int pid, bool interruptible, void *rusage) {
 top:
-	for (list<Proc>::iterator proc = proclist.begin(); proc != proclist.end(); ++proc)
+	for (list<Proc>::iterator proc = proclist.begin();
+             proc != proclist.end(); ++proc)
 		if (proc->pid == pid || (pid == 0 && !proc->alive)) {
 			int status;
 			if (proc->alive) {
@@ -108,7 +109,8 @@ top:
 					else if (errno == ECHILD)
 						break;
 					else if (errno != EINTR) {
-						fail("xs:ewait", "wait: %s", esstrerror(errno));
+						fail("xs:ewait", "wait: %s",
+                                                     esstrerror(errno));
 					}
 					else if (interruptible)
 						SIGCHK();
@@ -122,7 +124,8 @@ top:
 				printstatus(proc->pid, status);
 #if HAVE_WAIT3
 			if (rusage != NULL)
-				memcpy(rusage, &proc->rusage, sizeof (struct rusage));
+				memcpy(rusage, &proc->rusage,
+                                       sizeof(struct rusage));
 #else
 			assert(rusage == NULL);
 #endif

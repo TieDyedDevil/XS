@@ -37,7 +37,8 @@ extern int print(const char *fmt, ...);
 extern int eprint(const char *fmt, ...);
 extern int fprint(int fd, const char *fmt, ...);
 
-extern char *strv(const char *fmt, va_list args);	/* varargs interface to str() */
+/* varargs interface to str() */
+extern char *strv(const char *fmt, va_list args);
 
 #define	FPRINT_BUFSIZ	1024
 

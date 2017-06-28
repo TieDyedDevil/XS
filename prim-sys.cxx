@@ -207,11 +207,13 @@ static void printlimit(const Limit *limit, bool hard) {
 		const Suffix *suf = limit->suffix;
 
 		iterate (suf)
-			if (lim % suf->amount == 0 && (lim != 0 || suf->amount > 1)) {
+			if (lim % suf->amount == 0
+                            && (lim != 0 || suf->amount > 1)) {
 				lim /= suf->amount;
 				break;
 			}
-		print("%-8s\t%d%s\n", limit->name, lim, (suf == NULL || lim == 0) ? "" : suf->name);
+		print("%-8s\t%d%s\n", limit->name, lim,
+                      (suf == NULL || lim == 0) ? "" : suf->name);
 	}
 }
 
@@ -242,7 +244,8 @@ static LIMIT_T parselimit(const Limit *limit, const char *s) {
 		if (x != NULL && *x != '\0')
 			for (;; suf = suf->next) {
 				if (suf == NULL)
-					fail("$&limit", "%s %s: bad limit value", limit->name, s);
+					fail("$&limit", "%s %s: bad limit value",
+                                             limit->name, s);
 				if (streq(suf->name, x)) {
 					lim *= suf->amount;
 					break;
@@ -301,7 +304,8 @@ PRIM(time) {
 	time_t t0, t1;
 	struct rusage r;
 
-	GC_gcollect();	/* do a garbage collection first to ensure reproducible results */
+        /* do a garbage collection first to ensure reproducible results */
+	GC_gcollect();
 	t0 = time(NULL);
 	pid = efork(true, false);
 	if (pid == 0)
@@ -314,8 +318,10 @@ PRIM(time) {
 	eprint(
 		"%6ldr %5ld.%ldu %5ld.%lds\t%L\n",
 		(long long) t1 - t0,
-		(long long) r.ru_utime.tv_sec, (long long) (r.ru_utime.tv_usec / 100000),
-		(long long) r.ru_stime.tv_sec, (long long) (r.ru_stime.tv_usec / 100000),
+		(long long) r.ru_utime.tv_sec,
+                (long long) (r.ru_utime.tv_usec / 100000),
+		(long long) r.ru_stime.tv_sec,
+                (long long) (r.ru_stime.tv_usec / 100000),
 		list, " "
 	);
 
@@ -325,7 +331,8 @@ PRIM(time) {
 
 	int pid, status;
 
-	GC_gcollect();	/* do a garbage collection first to ensure reproducible results */
+        /* do a garbage collection first to ensure reproducible results */
+	GC_gcollect();
 	pid = efork(true, false);
 	if (pid == 0) {
 		clock_t t0, t1;
@@ -408,7 +415,8 @@ PRIM(execfailure) {
 				
 				return NULL;
 			}
-		while (s < end && (c = *s) != ' ' && c != '\t' && c != '\n' && c != '\r');
+		while (s < end && (c = *s) != ' ' && c != '\t'
+                       && c != '\n' && c != '\r');
 		*s++ = '\0';
 		if (c == '\n' || c == '\r')
 			break;

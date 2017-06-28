@@ -63,20 +63,20 @@ static void runxsrc(int xsin) {
 static void usage(void) NORETURN;
 static void usage(void) {
 	eprint(
-		"usage: xs [-c command] [-silevxnpo] [file [args ...]]\n"
-		"	-c cmd	execute argument\n"
-		"	-s	read commands from standard input; stop option parsing\n"
-		"	-i	interactive shell\n"
-		"	-l	login shell\n"
-		"	-e	exit if any command exits with false status\n"
-		"	-v	print input to standard error\n"
-		"	-x	print commands to standard error before executing\n"
-		"	-n	just parse; don't execute\n"
-		"	-p	don't load functions from the environment\n"
-		"	-o	don't open stdin, stdout, and stderr if they were closed\n"
-		"	-d	don't ignore SIGQUIT or SIGTERM\n"
+"usage: xs [-c command] [-silevxnpo] [file [args ...]]\n"
+"	-c cmd	execute argument\n"
+"	-s	read commands from standard input; stop option parsing\n"
+"	-i	interactive shell\n"
+"	-l	login shell\n"
+"	-e	exit if any command exits with false status\n"
+"	-v	print input to standard error\n"
+"	-x	print commands to standard error before executing\n"
+"	-n	just parse; don't execute\n"
+"	-p	don't load functions from the environment\n"
+"	-o	don't open stdin, stdout, and stderr if they were closed\n"
+"	-d	don't ignore SIGQUIT or SIGTERM\n"
 #if LISPTREES
-		"	-L	print parser results in LISP format\n"
+"	-L	print parser results in LISP format\n"
 #endif
 	);
 	exit(1);

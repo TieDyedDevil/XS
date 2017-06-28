@@ -10,7 +10,7 @@
  * constants
  */
 
-#define	BUFSIZE		((size_t) 1024)		/* buffer size to fill reads into */
+#define	BUFSIZE		((size_t) 1024)	/* buffer size to fill reads into */
 
 
 /*
@@ -89,14 +89,15 @@ static int lines() {
 
 static void update_hist() {
 	if (historyfd == -1) return;
-	// This tries it's best to load all the changes made to the history file each time
-	// only once
-	// But it may load multiple times, especially if you operate on two interactive
-	// shells at once (on the other hand, how common is that?!?),
-	// or write a very long history file
-	// Also, see the ++hist_from, which isn't even guaranteed to be correct due to sync issues
+	// This tries it's best to load all the changes made to the history
+        // file each time only once. But it may load multiple times,
+        // especially if you operate on two interactive shells at once (on
+        // the other hand, how common is that?!?), or write a very long
+        // history file. Also, see the ++hist_from, which isn't even
+        // guaranteed to be correct due to sync issues.
 	int l = lines();
-	if (l < hist_from) hist_from = 0; // history file was definately truncated/replaced
+	if (l < hist_from) hist_from = 0;
+        // history file was definately truncated/replaced
 	read_history_range(history, hist_from, -1);
 	hist_from = l;
 }
@@ -197,7 +198,8 @@ static int ungetfill(Input *in) {
 extern void unget(Input *in, int c) {
 	if (yylloc.last_column == 0) {
 	    --yylloc.last_line;
-	    if (yylloc.first_line > yylloc.last_line) yylloc.first_line = yylloc.last_line;
+	    if (yylloc.first_line > yylloc.last_line)
+                    yylloc.first_line = yylloc.last_line;
 	} else {
 	    --yylloc.last_column;
 	    if (yylloc.first_column > yylloc.last_column) 
@@ -297,7 +299,9 @@ static char ** get_completions(const char *text, int start, int end) {
 		path[l_path] = '/';
 		path[l_path + 1] = '\0';
 
-		char * glob_string = reinterpret_cast<char*>(ealloc(sizeof(char) * (end - start + 2)));
+		char * glob_string =
+                        reinterpret_cast<char*>(ealloc(sizeof(char)
+                                                * (end - start + 2)));
 		memcpy(glob_string, text, (end - start) * sizeof(char));
 		*(glob_string + end - start) = '*';
 		*(glob_string + end - start + 1) = '\0';
@@ -309,7 +313,9 @@ static char ** get_completions(const char *text, int start, int end) {
 		if (l == 0) continue;
 
 		results_size += l;
-		results = reinterpret_cast<char**>(erealloc(results, results_size * sizeof(char*)));
+		results =
+                        reinterpret_cast<char**>(erealloc(results,
+                                                          results_size * sizeof(char*)));
 		for (List* i = glob_result; i != NULL; i = i->next, ++result_p) {
 			/* Can't directly use basename, because readline
 			 * needs to free() the result
@@ -322,8 +328,9 @@ static char ** get_completions(const char *text, int start, int end) {
 	foreach (Dict::value_type x, vars)
 		lvars = mklist(mkstr(gcdup(x.first.c_str())), lvars);
 
-	/* Match (some) variables - can't easily match lexical/local because that would require partially
-	 * parsing/evaluating the input (which would contain a let/local somewhere in it) */
+	/* Match (some) variables - can't easily match lexical/local because
+         * that would require partially parsing/evaluating the input (which
+         * would contain a let/local somewhere in it) */
 	int matchvar = *text == '$';
 	for (; lvars; lvars = lvars->next) {
 		const char* str = getstr(lvars->term);
@@ -331,7 +338,8 @@ static char ** get_completions(const char *text, int start, int end) {
 		if (matchvar) {
 			char var[512];
 			if (strncmp("fn-", str, 3) == 0
-			   || strncmp(text + 1, str, (end - start) - 1) != 0) continue;
+			   || strncmp(text + 1, str, (end - start) - 1) != 0)
+                                continue;
 			*var = '$';
 			strncpy(var+1, str, sizeof(var)-1);
 			if (var[sizeof(var)-1] != '\0') continue;
@@ -342,7 +350,9 @@ static char ** get_completions(const char *text, int start, int end) {
 			amatch = strdup(str + 3);
 		}
 		++results_size;
-		results = reinterpret_cast<char**>(erealloc(results, results_size * sizeof(char*)));
+		results =
+                        reinterpret_cast<char**>(erealloc(results,
+                                                 results_size * sizeof(char*)));
 		results[result_p++] = amatch;
 	}
 
@@ -355,7 +365,9 @@ static char ** get_completions(const char *text, int start, int end) {
 			fn = rl_filename_completion_function(text, state++);
 			if (fn != NULL) {
 				++results_size;
-				results = reinterpret_cast<char**>(erealloc(results, results_size * sizeof(char*)));
+				results =
+                                        reinterpret_cast<char**>(erealloc(results,
+                                                                          results_size * sizeof(char*)));
 				results[result_p++] = strdup(fn);
 			}
 		} while (fn != NULL);
@@ -395,7 +407,9 @@ static int fdfill(Input *in) {
 				while (in->buflen < (unsigned) nread)
 					in->buflen *= 2;
 				efree(in->bufbegin);
-				in->bufbegin = reinterpret_cast<unsigned char*>(erealloc(in->bufbegin, in->buflen));
+				in->bufbegin =
+                                        reinterpret_cast<unsigned char*>(erealloc(in->bufbegin,
+                                                                                  in->buflen));
 			}
 			memcpy(in->bufbegin, rlinebuf, nread - 1);
 			in->bufbegin[nread - 1] = '\n';
@@ -412,7 +426,9 @@ static int fdfill(Input *in) {
 		in->fd = EOF_FD;
 		in->runflags &= ~run_interactive;
 		if (nread == -1)
-			fail("$&parse", "%s: %s", in->name == NULL ? "xs" : in->name, esstrerror(errno));
+			fail("$&parse", "%s: %s",
+                             in->name == NULL ? "xs" : in->name,
+                             esstrerror(errno));
 		return EOF;
 	}
 

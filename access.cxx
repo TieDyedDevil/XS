@@ -52,7 +52,8 @@ static int testperm_real(struct stat *stat, int perm) {
 		: (perm <<
 			((tperm_uid == stat->st_uid)
 				? USER
-				: ((tperm_gid == stat->st_gid  || ingroupset(stat->st_gid))
+				: ((tperm_gid == stat->st_gid
+                                   || ingroupset(stat->st_gid))
 					? GROUP
 					: OTHER)));
 	return (stat->st_mode & mask) ? 0 : EACCES;
@@ -69,7 +70,7 @@ static int testfile(const char *path, int perm, mode_t type) {
 		if (stat(path, &st) == -1)
 			return errno;
 	if (type != 0 && (st.st_mode & S_IFMT) != type)
-		return EACCES;		/* what is an appropriate return value? */
+		return EACCES;	/* what is an appropriate return value? */
 	return testperm(&st, perm);
 }
 
@@ -84,7 +85,8 @@ PRIM(access) {
 	int c, perm = 0, type = 0, estatus = ENOENT;
 	bool first = false, exception = false;
 	const char *suffix = NULL;
-	const char * const usage = "access [-n name] [-1e] [-rwx] [-fdcblsp] path ...";
+	const char * const usage =
+		"access [-n name] [-1e] [-rwx] [-fdcblsp] path ...";
 
 	
 	esoptbegin(list, "$&access", usage);
@@ -111,7 +113,8 @@ PRIM(access) {
 #endif
 		default:
 			esoptend();
-			fail("$&access", "access -%c is not supported on this system", c);
+			fail("$&access",
+                             "access -%c is not supported on this system", c);
 		}
 	list = esoptend();
 

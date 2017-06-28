@@ -114,19 +114,22 @@ extern Sigeffect esignal(int sig, Sigeffect effect) {
 		switch (effect) {
 		case sig_ignore:
 			if (setsignal(sig, SIG_IGN) == SIG_ERR) {
-				eprint("$&setsignals: cannot ignore %s\n", signame(sig));
+				eprint("$&setsignals: cannot ignore %s\n",
+                                       signame(sig));
 				return old;
 			}
 			break;
 		case sig_special:
 			if (sig != SIGINT && sig != SIGWINCH) {
-				eprint("$&setsignals: special handler not defined for %s\n", signame(sig));
+				eprint("$&setsignals: special handler not defined for %s\n",
+                                       signame(sig));
 				return old;
 			}
 		case sig_catch:
 		case sig_noop:
 			if (setsignal(sig, catcher) == SIG_ERR) {
-				eprint("$&setsignals: cannot catch %s\n", signame(sig));
+				eprint("$&setsignals: cannot catch %s\n",
+                                       signame(sig));
 				return old;
 			}
 			break;
@@ -237,7 +240,8 @@ extern List *mksiglist(void) {
 	while (--sig > 0) {
 		int prefix;
 		switch (effects[sig]) {
-		default: panic("mksiglist: bad sigeffects for %s: %d", signame(sig), effects[sig]);
+		default: panic("mksiglist: bad sigeffects for %s: %d",
+                               signame(sig), effects[sig]);
 		case sig_default:	continue;
 		case sig_catch:		prefix = '\0';	break;
 		case sig_ignore:	prefix = '-';	break;
@@ -304,7 +308,8 @@ extern void sigchk(void) {
 	case sig_special:
 		switch (sig) {
 		case SIGINT:
-			/* this is the newline you see when you hit ^C while typing a command */
+			/* this is the newline you see when you hit ^C
+                           while typing a command */
 			if (sigint_newline)
 				eprint("\n");
 			sigint_newline = true;

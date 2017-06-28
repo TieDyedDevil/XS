@@ -44,7 +44,7 @@ static const List* redir(List* (*rop)(int *fd, List* list),
 	return result;
 }
 
-#define	REDIR(name)	static List* CONCAT(redir_,name)(int *srcfdp, List* list)
+#define	REDIR(name) static List* CONCAT(redir_,name)(int *srcfdp, List* list)
 
 static void argcount(const char *s) NORETURN;
 static void argcount(const char *s) {
@@ -169,7 +169,7 @@ REDIR(here) {
 	doc = (list == tail) ? NULL : list;
 	*tailp = NULL;
 
-	if ((pid = pipefork(p, NULL)) == 0) {		/* child that writes to pipe */
+	if ((pid = pipefork(p, NULL)) == 0) {	/* child that writes to pipe */
 		try {
 			close(p[0]);
 			fprint(p[1], "%L", doc, "");
@@ -213,7 +213,8 @@ PRIM(pipe) {
 	for (;; list = list->next) {
 		int p[2], pid;
 		
-		pid = (list->next == NULL) ? efork(true, false) : pipefork(p, &inpipe);
+		pid = (list->next == NULL)
+                        ? efork(true, false) : pipefork(p, &inpipe);
 
 		if (pid == 0) {		/* child */
 			try {
@@ -223,12 +224,14 @@ PRIM(pipe) {
 					mvfd(inpipe, infd);
 				}
 				if (list->next != NULL) {
-					int fd = getnumber(getstr(list->next->term));
+					int fd =
+                                                getnumber(getstr(list->next->term));
 					releasefd(fd);
 					mvfd(p[1], fd);
 					close(p[0]);
 				}
-				exit(exitstatus(eval1(list->term, evalflags | eval_inchild)));
+				exit(exitstatus(eval1(list->term,
+                                                      evalflags | eval_inchild)));
 			} catch (List *e) {
 				eprint("Received error in %%pipe child process:\n");
 				print_exception(e);

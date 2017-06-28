@@ -21,7 +21,7 @@ static bool goterror = false;
 static size_t bufsize = 0;
 static char *buf = NULL;
 
-#define	InsertFreeCaret()	STMT(if (w != NW) { w = NW; UNGETC(c); return '^'; })
+#define	InsertFreeCaret() STMT(if (w != NW) { w = NW; UNGETC(c); return '^'; })
 
 
 /*
@@ -195,7 +195,8 @@ static int yylex_arithmetic() {
 		bool floating = false;
 		size_t i = 0;
 		do {
-		    	if (c == '.') floating = true;  // TODO: Does this work with other localities?
+		    	if (c == '.') floating = true;
+                        // TODO: Does this work with other localities?
 		    	bufput(i++, c);
 		} while (c = GETC(), isdigit(c) || c =='.');
 		UNGETC(c);
@@ -243,7 +244,8 @@ static int yylex_normal() {
 	static bool param_block = false;
 	int c;
 
-	/* rc variable-names may contain only alnum, '*' and '_', so use dnw if we are scanning one. */
+	/* rc variable-names may contain only alnum, '*' and '_', so use dnw
+           if we are scanning one. */
 	const char *meta = (dollar ? dnw : nw);
 	dollar = false;
 	if (newline) {
@@ -376,7 +378,9 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 				if (!isxdigit(c))
 					break;
 				n = (n << 4)
-				  | (c - (isdigit(c) ? '0' : ((islower(c) ? 'a' : 'A') - 0xA)));
+				  | (c - (isdigit(c)
+                                     ? '0'
+                                     : ((islower(c) ? 'a' : 'A') - 0xA)));
 				--dc;
 			}
 			if (dc != 0 || n == 0)
@@ -393,7 +397,9 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 				if (!isxdigit(c))
 					break;
 				n = (n << 4)
-				  | (c - (isdigit(c) ? '0' : ((islower(c) ? 'a' : 'A') - 0xA)));
+				  | (c - (isdigit(c)
+                                     ? '0'
+                                     : ((islower(c) ? 'a' : 'A') - 0xA)));
 				--dc;
 			}
 			if (dc != 0 || n == 0)
@@ -512,7 +518,8 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 		if (!getfds(p, c, 1, 0))
 			return ERROR;
 		if (p[1] == CLOSED) {
-			scanerror("expected digit after '='");	/* can't close a pipe */
+			scanerror("expected digit after '='");
+                        /* can't close a pipe */
 			return ERROR;
 		}
 		yylval.tree = mk(nPipe, p[0], p[1]);
@@ -582,7 +589,8 @@ extern void inityy(void) {
 #endif
 	yylex_fun = yylex_normal;
 	w = NW;
-	if (bufsize > BUFMAX) {	// return memory to the system if the buffer got too large
+	if (bufsize > BUFMAX) {
+                // return memory to the system if the buffer got too large
 		efree(buf);
 		buf = NULL;
 	}

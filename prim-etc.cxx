@@ -83,12 +83,16 @@ PRIM(printf) {
 		while (list) {
 			nextconv(&fcp);
 			if (!validconv(*fcp))
-				fail("$&printf", "printf: invalid format specifier: %c", *fcp);
+				fail("$&printf",
+                                     "printf: invalid format specifier: %c",
+                                     *fcp);
 			const char *arg = getstr(list->term);
 			if (!textconv(*fcp) && isnumber(arg)) {
 				if (floatconv(*fcp) || isfloat(arg)) {
 					if (integralconv(*fcp))
-						fail("$&printf", "printf: %%%c: integral value required", *fcp);
+						fail("$&printf",
+                                                     "printf: %%%c: integral value required",
+                                                     *fcp);
 					args[i] = &ffi_type_double;
 					doubles[i] = strtod(arg, NULL);
 					values[i] = &doubles[i];
@@ -99,13 +103,16 @@ PRIM(printf) {
 				}
 			} else if (charconv(*fcp)) {
 				if (arg[1] != '\0')
-					fail("$&printf", "printf: %%c: character value required");
+					fail("$&printf",
+                                             "printf: %%c: character value required");
 				args[i] = &ffi_type_schar;
 				chars[i] = *arg;
 				values[i] = &chars[i];
 			} else {
 				if (!stringconv(*fcp))
-					fail("$&printf", "printf: %%%c: numeric value required", *fcp);
+					fail("$&printf",
+                                             "printf: %%%c: numeric value required",
+                                             *fcp);
 				args[i] = &ffi_type_pointer;
 				strings[i] = gcdup(arg);
 				values[i] = &strings[i];
@@ -117,9 +124,11 @@ PRIM(printf) {
 				break;
 			}
 		}
-		if (ffi_prep_cif_var(&cif, FFI_DEFAULT_ABI, 3, i, &ffi_type_sint, args) == FFI_OK) {
+		if (ffi_prep_cif_var(&cif, FFI_DEFAULT_ABI, 3, i,
+                                     &ffi_type_sint, args) == FFI_OK) {
 			ffi_call(&cif, FFI_FN(snprintf), &rc, values);
-			if ((unsigned long)rc >= outsz) fail("$&printf", "printf: output too long");
+			if ((unsigned long)rc >= outsz)
+                                fail("$&printf", "printf: output too long");
 			print("%s", out);
 		}
 	} else fail("$&printf", "printf: format missing");
@@ -412,7 +421,8 @@ PRIM(setmaxevaldepth) {
 		fail("$&setmaxevaldepth", "usage: $&setmaxevaldepth [limit]");
 	n = strtol(getstr(list->term), &s, 0);
 	if (n < 0 || (s != NULL && *s != '\0'))
-		fail("$&setmaxevaldepth", "max-eval-depth must be set to a positive integer");
+		fail("$&setmaxevaldepth",
+                     "max-eval-depth must be set to a positive integer");
 	if (n < MINmaxevaldepth)
 		n = (n == 0) ? MAXmaxevaldepth : MINmaxevaldepth;
 	maxevaldepth = n;

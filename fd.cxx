@@ -133,7 +133,8 @@ extern void registerfd(int *fdp, bool closeonfork) {
 #endif
 	if (rescount >= resmax) {
 		resmax += 10;
-		reserved = reinterpret_cast<Reserve*>(erealloc(reserved, resmax * sizeof (Reserve)));
+		reserved = reinterpret_cast<Reserve*>(erealloc(reserved,
+                                                      resmax*sizeof (Reserve)));
 	}
 	reserved[rescount].fdp = fdp;
 	reserved[rescount].closeonfork = closeonfork;
@@ -202,7 +203,8 @@ extern int newfd(void) {
 			int fd = dup(i);
 			if (fd == -1) {
 				if (errno != EBADF)
-					fail("$&newfd", "newfd: %s", esstrerror(errno));
+					fail("$&newfd", "newfd: %s",
+                                             esstrerror(errno));
 				return i;
 			} else if (isdeferred(fd)) {
 				int n = newfd();
