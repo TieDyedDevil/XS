@@ -7,7 +7,7 @@ else
 fi
 
 for f in *.[0-9]*; do
-:#	man -l -Tpdf $f | lpr
+	man -l -Tpdf $f | lpr
 done
 $LPR meson.build build.sh [[:upper:]]* *.h *.hxx *.cxx initial.xs \
 	`find generators samples tests xs-talk -type f -a \! -name \*.log` \
