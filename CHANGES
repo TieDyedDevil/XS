@@ -127,9 +127,10 @@ Readline now has tab-complete for functions & binaries in path.
 
 The init-file is now .xsrc (since es and xs are not compatible).
 
-[implementation] The Ref() macros have been replaced with the Ref RAII-style class, which is much cleaner
-and removed the need for RefEnd()s. varbegin()/varend() are wrapped around by
-a similar class. (This is the most significant reason for using c++.)
+[implementation] The Ref() macros have been replaced with the Ref RAII-style
+class, which is much cleaner and removed the need for RefEnd()s.
+varbegin()/varend() are wrapped around by a similar class. (This is the most
+significant reason for using c++.)
 
 Many old compatibility cludges (like reiser cpp support) have been dropped.
 
@@ -870,7 +871,8 @@ through the hook %whatis.  for example,
 	local (whatis = <>{%whatis %whatis})
 		fn %whatis prog {
 			local (what-it-is = <>{$whatis $prog}) {
-				if {!~ $prog (/* $path-cache) && ~ $what-it-is(1) /*} {
+				if {!~ $prog (/* $path-cache)
+					&& ~ $what-it-is(1) /*} {
 					path-cache = $path-cache $prog
 					fn-$prog = $what-it-is
 				}

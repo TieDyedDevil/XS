@@ -70,9 +70,10 @@ sed -n '
 		mesg["SIGXCPU"]		= "exceeded CPU time limit"
 		mesg["SIGXFSZ"]		= "exceeded file size limit"
 		
-		# these signals are dubious, but we may as well provide clean messages
-		# for them.  most of them occur on only one system, or, more likely,
-		# are duplicates of one of the previous messages.
+		# these signals are dubious, but we may as well provide clean
+		# messages for them. most of them occur on only one system,
+		# or, more likely, are duplicates of one of the previous
+		# messages.
 
 		mesg["SIGAIO"]		= "base lan I/O available"
 		mesg["SIGDANGER"]	= "danger - system page space full"
@@ -97,8 +98,9 @@ sed -n '
 		nomesg["SIGPIPE"] = 1
 
 
-		# set ignore["SIGNAME"] to explicitly ignore a named signal (usually, this
-		# is just for things that look like signals but really are not)
+		# set ignore["SIGNAME"] to explicitly ignore a named signal
+		# (usually, this is just for things that look like signals
+		# but really are not)
 
 		ignore["SIGALL"]	= 1
 		ignore["SIGARRAYSIZE"]	= 1
@@ -115,8 +117,8 @@ sed -n '
 		ignore["SIGSETS"]	= 1
 		ignore["SIGSTKSZ"]	= 1
 		
-		# upper to lowercase translation table:  can someone give me an easier
-		# way to do this that works in ancient versions of awk?
+		# upper to lowercase translation table: can someone give me an
+		# easier way to do this that works in ancient versions of awk?
 		
 		for (i = 65; i <= 90; i++)	# 'A' to 'Z'
 			uppertolower[sprintf("%c", i)] = sprintf("%c", i + 32)
@@ -131,16 +133,16 @@ sed -n '
 				str = str " " $i
 			mesg[$1] = str
 		}
-		# hack to print SIGIOT or SIGILL as "abort" if that is the most common
-		# way of triggering it.
+		# hack to print SIGIOT or SIGILL as "abort" if that is the
+		# most common way of triggering it.
 		if ($1 == "SIGABRT" && $2 ~ /^SIG/)
 			mesg[$2] = mesg[$1]
 	}
 	END {
 		for (i = 1; i <= nsig; i++) {
 			signal = signame[i]
-			# gawk, at very least, provides a tolower function, but this should
-			# be portable.  sigh.
+			# gawk, at very least, provides a tolower function,
+			# but this should be portable. sigh.
 			lcname = ""
 			for (j = 1; j <= length(signal); j++) {
 				c = substr(signal, j, 1)
@@ -149,7 +151,8 @@ sed -n '
 				lcname = lcname c
 			}
 			print "#ifdef", signal
-			printf "\t{ %s,\t\"%s\",\t\"%s\" },\n", signal, lcname, mesg[signal]
+			printf "\t{ %s,\t\"%s\",\t\"%s\" },\n", signal,
+				lcname, mesg[signal]
 			print "#endif"
 		}
 	}

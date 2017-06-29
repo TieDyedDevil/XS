@@ -383,7 +383,9 @@ and
 { bagley parsimony fletch grackle }
 ```
 
-The former is two separate statements; the latter only one. We can, however, rewrite the first to be equivalent to the second by using line continuation:
+The former is two separate statements; the latter only one. We can,
+however, rewrite the first to be equivalent to the second by using
+line continuation:
 
 ```
 { bagley parsimony fletch \

@@ -214,7 +214,8 @@ fn-until = { |cond body|
 
 fn-switch = { |value args| escape { |fn-return|
 	if {~ $args ()} {
-		throw error switch 'usage: switch value [case1 action1] [case2 action2]...default'
+		throw error switch \
+		'usage: switch value [case1 action1] [case2 action2]...default'
 	}
 	for (cond action) $args {
 		if {~ $action ()} { 
@@ -266,7 +267,8 @@ fn-cd = { |dir|
 				if {~ $#home 0} {
 					result 'cd: no home directory'
 				} {
-					result 'cd: home directory must be one word'
+					result 'cd: home directory must'\
+						^' be one word'
 				}
 			}
 		}
@@ -317,7 +319,8 @@ fn-vars = { |*|
 				-e		{export	= true}
 				-p		{priv	= true}
 				-i		{intern = true}
-				{throw error vars 'vars: illegal option:' $i '-- usage: vars -[vfsepia]'}
+				{throw error vars 'vars: illegal option:' $i \
+					'-- usage: vars -[vfsepia]'}
 		)}
 
 		let (dovar) {
@@ -332,7 +335,8 @@ fn-vars = { |*|
 			if {$export || $priv} {
 				for var (<= $&vars) {
 					# if not exported but in priv
-					if {if {~ $var $noexport} $priv else $export} {
+					if {if {~ $var $noexport} $priv \
+						else $export} {
 						$dovar $var
 					}
 				}
@@ -370,8 +374,10 @@ fn-%cmp = $&cmp
 #
 #		$#var                  <={%count $var}
 #		$^var                  <={%flatten ' ' $var}
-#		`{cmd args}            <={%backquote <={%flatten '' $ifs} {cmd args}}
-#		``ifs {cmd args}       <={%backquote <={%flatten '' ifs} {cmd args}}
+#		`{cmd args}            <={%backquote <={%flatten '' $ifs}
+#						{cmd args}}
+#		``ifs {cmd args}       <={%backquote <={%flatten '' ifs}
+#						{cmd args}}
 
 fn-%count	= $&count
 fn-%flatten	= $&flatten
@@ -444,7 +450,8 @@ fn-fn = { |name body rest|
 		throw error fn 'fn: trailing arguments: ' $rest
 	} 
 	if {~ $name ()} {
-		throw error fn 'fn: missing arguments: correct form: fn name { |args| body }'
+		throw error fn 'fn: missing arguments: correct form:'\
+			^' fn name { |args| body }'
 	}
 	fn-$name = $body
 }
@@ -641,11 +648,13 @@ if {~ <=$&primitives writeto} {
 let (dlist = .) {
 	fn pushd { |dir|
 		~ $#dir 0 || ~ $#dir 1 || (throw error pushd 
-				Wrong number of arguments '('$#dir, should be 0 or 1')'
+				'Wrong number of arguments ('$#dir\
+				^', should be 0 or 1)'
 				\n'Usage: pushd [directory]')
 
 		~ $dlist . && dlist = `/bin/pwd
-		~ $#dir 0 && !~ $#dlist 0 && !~ $#dlist 1 && {dir = $dlist(2); dlist = $dlist(1 3 ...)}
+		~ $#dir 0 && !~ $#dlist 0 && !~ $#dlist 1 \
+			&& {dir = $dlist(2); dlist = $dlist(1 3 ...)}
 		~ $#dir 0 && dir = `/bin/pwd
 
 		dir = `{fork {cd $dir; pwd}} # Canonicalize the path
@@ -689,7 +698,8 @@ let (hsave) {
 			} else if {~ $* -c} {
 				true > $history
 			} else if {~ $*(1) -d} {
-				{~ $#* 2} && let (n = $*(2)) && ed -s $history <<EOF
+				{~ $#* 2} && let (n = $*(2)) \
+					&& ed -s $history <<EOF
 $n
 d
 w
@@ -783,10 +793,12 @@ fn %interactive-loop { escape { |fn-return|
 				error { echo >[1=2] $msg
 					$fn-%dispatch false } 
 				signal { if {!~ $type sigint sigterm sigquit} {
-						echo >[1=2] 'caught unexpected signal:' $type
+						echo >[1=2] 'caught unexpected'\
+							^' signal:' $type
 				         }
                                 }
-				{ echo >[1=2] 'uncaught exception:' $e $type $msg })
+				{ echo >[1=2] 'uncaught exception:' \
+					$e $type $msg })
 			throw retry # restart forever loop
 		} {
 			forever {
