@@ -29,14 +29,16 @@ fn .palette {
 		printf %s \e]P7e5e5e5 # white = Gray90
 	} else {
 		tput oc
-		tput initc 0 0 0 0 # black = Black
-		tput initc 1 205 0 0 # red = Red3
-		tput initc 2 0 205 0 # green = Green3
-		tput initc 3 205 205 0 # yellow = Yellow3
-		tput initc 4 95 135 215 # blue = SteelBlue3
-		tput initc 5 205 0 205 # magenta = Magenta3
-		tput initc 6 0 205 205 # cyan = Cyan3
-		tput initc 7 229 229 229 # white = Gray90
+		if {!~ $TERM st*} {
+			tput initc 0 0 0 0 # black = Black
+			tput initc 1 205 0 0 # red = Red3
+			tput initc 2 0 205 0 # green = Green3
+			tput initc 3 205 205 0 # yellow = Yellow3
+			tput initc 4 95 135 215 # blue = SteelBlue3
+			tput initc 5 205 0 205 # magenta = Magenta3
+			tput initc 6 0 205 205 # cyan = Cyan3
+			tput initc 7 229 229 229 # white = Gray90
+		}
 		if {~ $TERM yaft-256color} {
 			tput initc 7 208 208 208 # normal white
 			tput initc 12 99 185 255 # bright blue
