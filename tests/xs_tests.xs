@@ -96,7 +96,8 @@ let (logfile = `pwd^/tests/xs_tests.log)
 	local (FILE = $file) . $DOTARGS $FILE
     }
 
-    let (platform_tests = `{ls $HERE/xs_tests/platform/$PLATFORM/*.xs >[2]/dev/null}) {
+    let (platform_tests = \
+		`{ls $HERE/xs_tests/platform/$PLATFORM/*.xs >[2]/dev/null}) {
         if {!~ $platform_tests ()} {
             log '-------  Begin' $PLATFORM 'platform tests'
             for file ($platform_tests) {

@@ -14,7 +14,8 @@ run 'Character Unicode escapes' {
 conds { match '0 ~ 0 ~ ∢ 𓀀' }
 
 run 'Character invalid escapes' {
-    let (n = 0; ec = '\x \x7 \xq \x00 \01 \128 \u \u001 \u123q \u0000 \U \U0000001 \U0001234q \U00000000') {
+    let (n = 0; ec = '\x \x7 \xq \x00 \01 \128 \u \u001 \u123q \u0000 \U '\
+		^'\U0000001 \U0001234q \U00000000') {
         for c $ec {
             catch { |e|
                 n = `($n + 1)

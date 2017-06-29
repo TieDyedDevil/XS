@@ -38,12 +38,18 @@ fn expect { |*|
 
 # lexical tests
 
-errorcheck 'tokenizer error'	{$xs -c 'echo hi |[2'} 'expected ''='' or '']'' after digit'
-errorcheck 'tokenizer error'	{$xs -c 'echo hi |[92=]'} 'expected digit after ''='''
-errorcheck 'tokenizer error'	{$xs -c 'echo hi |[a]'} 'expected digit after ''['''
-errorcheck 'tokenizer error'	{$xs -c 'echo hi |[2-'} 'expected ''='' or '']'' after digit'
-errorcheck 'tokenizer error'	{$xs -c 'echo hi |[2=99a]'} 'expected '']'' after digit'
-errorcheck 'tokenizer error'	{$xs -c 'echo hi |[2=a99]'} 'expected digit or '']'' after ''='''
+errorcheck 'tokenizer error'	{$xs -c 'echo hi |[2'} \
+					'expected ''='' or '']'' after digit'
+errorcheck 'tokenizer error'	{$xs -c 'echo hi |[92=]'} \
+					'expected digit after ''='''
+errorcheck 'tokenizer error'	{$xs -c 'echo hi |[a]'} \
+					'expected digit after ''['''
+errorcheck 'tokenizer error'	{$xs -c 'echo hi |[2-'} \
+					'expected ''='' or '']'' after digit'
+errorcheck 'tokenizer error'	{$xs -c 'echo hi |[2=99a]'} \
+					'expected '']'' after digit'
+errorcheck 'tokenizer error'	{$xs -c 'echo hi |[2=a99]'} \
+					'expected digit or '']'' after ''='''
 errorcheck 'tokenizer error'	{$xs -c 'echo ''hi'} 'eof in quoted string'
 
 
@@ -99,12 +105,14 @@ if {!~ `umask 027 0027} {
 fn bytes { |*| for i $* { let(x  =  `{wc -c $i}) echo $x(1) } }
 echo foo > foo > bar
 if {!~ `{bytes foo} 0} { fail double redirection created non-empty empty file }
-if {!~ `{bytes bar} 4} { fail 'double redirection created wrong sized file:' `{bytes bar} }
+if {!~ `{bytes bar} 4} { fail 'double redirection created wrong sized file:'
+				`{bytes bar} }
 rm -f foo bar
 echo -n >1 >[2]2 >[1=2] foo
 x  =  `` '' {cat 1}
 if {!~ $#x 0} { fail 'dup created non-empty empty file:' `` '' {cat 1} }
-if {!~ `` '' {cat 2} foo} { fail 'dup put wrong contents in file :' `` '' {cat 2} }
+if {!~ `` '' {cat 2} foo} { fail 'dup put wrong contents in file :'
+				`` '' {cat 2} }
 rm -f 1 2
 
 expect error from cat, closing stdin
@@ -190,5 +198,6 @@ eof
 errorcheck 'incomplete heredoc'	{$xs -c 'cat<<eof'} 'pending' 
 errorcheck 'incomplete heredoc'	{$xs -c 'cat<<eof'\n} 'incomplete'
 
-errorcheck 'bad heredoc marker'	{$xs -c 'cat<<(eof eof)'} 'not a single literal word'
+errorcheck 'bad heredoc marker'	{$xs -c 'cat<<(eof eof)'} \
+						'not a single literal word'
 errorcheck 'bad heredoc marker'	{$xs -c 'cat<<'''\n''''\n} 'contains a newline'
