@@ -647,6 +647,7 @@ fn wallpaper {|*|
 	.d 'Set wallpaper'
 	.a 'FILE-OR-DIRECTORY'
 	.a 'DELAY_MINUTES DIRECTORY'
+	.a '(none)  # restore root window'
 	if {~ $DISPLAY ()} {
 		throw error wallpaper 'X only'
 	} else {
