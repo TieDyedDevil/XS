@@ -449,6 +449,17 @@ fn mpvl {|*|
 	}
 }
 fn mutt {|*| env TERM=st /usr/bin/mutt $*} # mutt won't override st colors
+fn name {|*|
+	.d 'Set prompt text and terminal title.'
+	.a '[NAME]'
+	if {~ $* ()} {
+		prompt ''
+		title xs
+	} else {
+		prompt $*
+		title $*
+	}
+}
 fn net {
 	.d 'Network status'
 	nmcli --fields startup,networking,running,state,connectivity \
