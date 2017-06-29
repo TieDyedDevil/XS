@@ -120,13 +120,15 @@ extern bool listmatch(List* subject, List* pattern, StrList* quote) {
 			return true;
 		for (; pattern; pattern = pattern->next, quote = quote->next) {
 			/* one or more stars match null */
-			const char *pw = getstr(pattern->term), *qw = quote->str;
+			const char *pw = getstr(pattern->term),
+						*qw = quote->str;
 			if (*pw != '\0' && qw != QUOTED) {
 				int i;
 				bool matched = true;
 				for (i = 0; pw[i] != '\0'; i++)
 					if (pw[i] != '*'
-					    || (qw != UNQUOTED && qw[i] != 'r')) {
+					    || (qw != UNQUOTED
+						&& qw[i] != 'r')) {
 						matched = false;
 						break;
 					}
@@ -183,17 +185,21 @@ static List *extractsinglematch(const char *subject, const char *pattern,
 					const char *q = TAILQUOTE(quoting, i);
 					assert(*s != '\0');
 					if (match(s, pattern + i, q)) {
-						result = mklist(mkstr(gcndup(begin,
-                                                                             s - begin)),
-                                                                result);
+						result = mklist(mkstr(
+							gcndup(begin,
+							       s - begin)),
+							result);
 						return haswild(pattern + i, q)
-							? extractsinglematch(s, pattern + i, q, result)
+							? extractsinglematch(
+								s, pattern+i,
+								q, result)
 							: result;
 					}
 				}
 			    }
 			    case '[': {
-				int j = rangematch(pattern + i, TAILQUOTE(quoting, i), *s);
+				int j = rangematch(pattern + i,
+						   TAILQUOTE(quoting, i), *s);
 				assert(j != RANGE_FAIL);
 				if (j == RANGE_ERROR) {
 					assert(*s == '[');
@@ -226,7 +232,8 @@ extern List *extractmatches(List *subjects, List *patterns, StrList *quotes) {
 	List *result;
 	List **prevp = &result;
 
-	for (List *subject = subjects; subject != NULL; subject = subject->next) {
+	for (List *subject = subjects; subject != NULL;
+	     subject = subject->next) {
 		List *pattern;
 		StrList *quote;
 		for (pattern = patterns, quote = quotes;
@@ -237,9 +244,10 @@ extern List *extractmatches(List *subjects, List *patterns, StrList *quotes) {
 			match = extractsinglematch(getstr(subject->term),
 						   pat, quote->str, NULL);
 			if (match != NULL) {
-				/* match is returned backwards, so reverse it */
+				/* match is returned backwards; reverse it */
 				match = reverse(match);
-				for (*prevp = match; match != NULL; match = *prevp)
+				for (*prevp = match; match != NULL;
+				     match = *prevp)
 					prevp = &match->next;
 				break;
 			}

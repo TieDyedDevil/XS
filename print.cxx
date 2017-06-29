@@ -64,7 +64,8 @@ static bool sconv(Format *format) {
 	return false;
 }
 
-char *utoa(unsigned long long u, char *t, unsigned int radix, const char *digit) {
+char *utoa(unsigned long long u, char *t, unsigned int radix,
+		const char *digit) {
 	if (u >= radix) {
 		t = utoa(u / radix, t, radix, digit);
 		u %= radix;
@@ -73,7 +74,8 @@ char *utoa(unsigned long long u, char *t, unsigned int radix, const char *digit)
 	return t;
 }
 
-static void intconv(Format *format, unsigned int radix, int upper, const char *altform) {
+static void intconv(Format *format, unsigned int radix, int upper,
+			const char *altform) {
 	static const char * table[] = {
 		"0123456789abcdefghijklmnopqrstuvwxyz",
 		"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",

@@ -66,7 +66,8 @@ extern Tree *snarfheredoc(const char *eof, bool quoted) {
 				UNGETC(c);
 				if (buf.tellp() > 0) {
 					*tailp = treecons(mk(nQword,
-                                                             gcdup(buf.str().c_str())),
+                                                             gcdup(buf.str().\
+								c_str())),
                                                           NULL);
 					tailp = &(*tailp)->CDR;
 				}
@@ -90,7 +91,8 @@ extern Tree *snarfheredoc(const char *eof, bool quoted) {
 	return tree->CDR == NULL ? tree->CAR : tree;
 }
 
-/* readheredocs -- read all the heredocs at the end of a line (or fail if at end of file) */
+/* readheredocs -- read all the heredocs at the end of a line
+   (or fail if at end of file) */
 extern bool readheredocs(bool endfile) {
 	while (!hereq.empty()) {
 		Tree *marker = hereq.top();
@@ -107,7 +109,8 @@ extern bool readheredocs(bool endfile) {
 	return true;
 }
 
-/* queueheredoc -- add a heredoc to the queue to process at the end of the line */
+/* queueheredoc -- add a heredoc to the queue to process at the end
+   of the line */
 extern bool queueheredoc(Tree *t) {
 	assert(hereq.empty() || hereq.top()->kind == nList);
 	assert(t->kind == nList);

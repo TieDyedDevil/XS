@@ -121,7 +121,8 @@ extern List *varlookup2(const char *name1, const char *name2, Binding *bp) {
 static List *callsettor(const char* name, List* defn) {
 	List* settor;
 
-	if (specialvar(name) || (settor = varlookup2("set-", name, NULL)) == NULL)
+	if (specialvar(name)
+		|| (settor = varlookup2("set-", name, NULL)) == NULL)
 		return defn;
 
 	Dyvar p("0", mklist(mkstr(name), NULL));
@@ -237,11 +238,16 @@ extern List *listvars(bool internal) {
 	if (internal) {
 		foreach (Dict::value_type x, vars)
 			if (x.second->flags & var_isinternal)
-				varlist = mklist(mkstr(gcdup(x.first.c_str())), varlist);
+				varlist = mklist(
+						mkstr(gcdup(x.first.c_str())),
+							varlist);
 	} else { // external only
 		foreach (Dict::value_type x, vars)
-			if ((x.second->flags & var_isinternal) == 0 && !specialvar(x.first))
-				varlist = mklist(mkstr(gcdup(x.first.c_str())), varlist);
+			if ((x.second->flags & var_isinternal) == 0
+				&& !specialvar(x.first))
+				varlist = mklist(
+						mkstr(gcdup(x.first.c_str())),
+							varlist);
 	}
 	
 	return (varlist = sortlist(varlist));
@@ -275,7 +281,7 @@ static void importvar(const char* name, const char* value) {
 						char *str =
 						  reinterpret_cast<char*>(
 						  galloc(offset
-							    + strlen(str2) + 1));
+							    + strlen(str2)+1));
 						memcpy(str, word, offset - 1);
 						str[offset - 1]
 						  = ENV_SEPARATOR;

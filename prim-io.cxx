@@ -224,16 +224,18 @@ PRIM(pipe) {
 					mvfd(inpipe, infd);
 				}
 				if (list->next != NULL) {
-					int fd =
-                                                getnumber(getstr(list->next->term));
+					int fd = getnumber(
+						getstr(list->next->term));
 					releasefd(fd);
 					mvfd(p[1], fd);
 					close(p[0]);
 				}
 				exit(exitstatus(eval1(list->term,
-                                                      evalflags | eval_inchild)));
+                                                      evalflags |
+							eval_inchild)));
 			} catch (List *e) {
-				eprint("Received error in %%pipe child process:\n");
+				eprint("Received error in %%pipe"
+				       " child process:\n");
 				print_exception(e);
 				exit(9);
 			}
@@ -276,9 +278,11 @@ PRIM(readfrom) {
 		try {
 			close(p[0]);
 			mvfd(p[1], 1);
-			exit(exitstatus(eval1(input, evalflags &~ eval_inchild)));
+			exit(exitstatus(eval1(input,
+						evalflags &~ eval_inchild)));
 		} catch (List *e) {
-			eprint("Received exception in %%readfrom (<{}) child process:\n");
+			eprint("Received exception in %%readfrom (<{})"
+			       " child process:\n");
 			print_exception(e);
 			exit(9);
 		}
@@ -319,9 +323,11 @@ PRIM(writeto) {
 		try {
 			close(p[1]);
 			mvfd(p[0], 0);
-			exit(exitstatus(eval1(output, evalflags &~ eval_inchild)));
+			exit(exitstatus(eval1(output,
+					evalflags &~ eval_inchild)));
 		} catch (List *e) {
-			eprint("Received error in %%writeto (>{}) child process:\n");
+			eprint("Received error in %%writeto (>{})"
+			       " child process:\n");
 			print_exception(e);
 			exit(9);
 		}
@@ -380,9 +386,11 @@ PRIM(backquote) {
 		try {
 			mvfd(p[1], 1);
 			close(p[0]);
-			exit(exitstatus(eval(list, NULL, evalflags | eval_inchild)));
+			exit(exitstatus(eval(list, NULL,
+						evalflags | eval_inchild)));
 		} catch (List *e) {
-			eprint("%%backquote received exception from child process: ");
+			eprint("%%backquote received exception from"
+			       " child process: ");
 			print_exception(e);
 			exit(9);
 		}

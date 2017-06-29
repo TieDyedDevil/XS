@@ -34,10 +34,12 @@ extern Tree *treeconsend(Tree *head, Tree *tail) {
 	return treeappend(head, treecons(tail, NULL));
 }
 
-/* treeconsend2 -- destructive add node at end for tree lists or nothing if tail is NULL */
+/* treeconsend2 -- destructive add node at end for tree lists or nothing
+   if tail is NULL */
 extern Tree *treeconsend2(Tree *head, Tree *tail) {
 	if (tail == NULL) {
-		assert(head == NULL || head->kind == nList || head->kind == nRedir);
+		assert(head == NULL || head->kind == nList
+			|| head->kind == nRedir);
 		return head;
 	}
 	return treeappend(head, treecons(tail, NULL));
@@ -47,13 +49,15 @@ extern Tree *treeconsend2(Tree *head, Tree *tail) {
 extern Tree *thunkify(Tree *tree) {
 	if (tree != NULL && (
 		   (tree->kind == nThunk)
-		|| (tree->kind == nList && tree->CAR->kind == nThunk && tree->CDR == NULL)
+		|| (tree->kind == nList && tree->CAR->kind == nThunk
+			&& tree->CDR == NULL)
 	))
 		return tree;
 	return mk(nThunk, tree);
 }
 
-/* firstis -- check if the first word of a literal command matches a known string */
+/* firstis -- check if the first word of a literal command matches
+   a known string */
 static bool firstis(Tree *t, const char *s) {
 	if (t == NULL || t->kind != nList)
 		return false;
@@ -69,9 +73,11 @@ extern Tree *prefix(const char *s, Tree *t) {
 	return treecons(mk(nWord, s), t);
 }
 
-/* flatten -- flatten the output of the glommer so we can pass the result as a single element */
+/* flatten -- flatten the output of the glommer so we can pass the
+   result as a single element */
 extern Tree *flatten(Tree *t, const char *sep) {
-	return mk(nCall, prefix("%flatten", treecons(mk(nQword, sep), treecons(t, NULL))));
+	return mk(nCall, prefix("%flatten", treecons(mk(nQword, sep),
+							treecons(t, NULL))));
 }
 
 /* backquote -- create a backquote command */
@@ -124,7 +130,8 @@ extern Tree *mkpipe(Tree *t1, int outfd, int infd, Tree *t2) {
 	pipetail = firstis(t2, "%pipe");
 	tail = prefix(str("%d", outfd),
 		      prefix(str("%d", infd),
-			     pipetail ? t2->CDR : treecons(thunkify(t2), NULL)));
+			     pipetail ? t2->CDR : treecons(thunkify(t2),
+								NULL)));
 	if (firstis(t1, "%pipe"))
 		return treeappend(t1, tail);
 	t1 = thunkify(t1);
@@ -203,7 +210,8 @@ extern Tree *mkredir(Tree *cmd, Tree *file) {
 
 /* mkclose -- make a %close node with a placeholder */
 extern Tree *mkclose(int fd) {
-	return prefix("%close", prefix(str("%d", fd), treecons(&placeholder, NULL)));
+	return prefix("%close", prefix(str("%d", fd), treecons(&placeholder,
+								NULL)));
 }
 
 /* mkdup -- make a %dup node with a placeholder */
@@ -214,13 +222,15 @@ extern Tree *mkdup(int fd0, int fd1) {
 				    treecons(&placeholder, NULL))));
 }
 
-/* redirappend -- destructively add to the list of redirections, before any other nodes */
+/* redirappend -- destructively add to the list of redirections,
+   before any other nodes */
 extern Tree *redirappend(Tree *tree, Tree *r) {
 	Tree *t, **tp;
 	for (; r->kind == nRedir; r = r->CDR)
 		tree = treeappend(tree, r->CAR);
 	assert(r->kind == nList);
-	for (t = tree, tp = &tree; t != NULL && t->kind == nRedir; t = *(tp = &t->CDR))
+	for (t = tree, tp = &tree; t != NULL && t->kind == nRedir;
+		t = *(tp = &t->CDR))
 		;
 	assert(t == NULL || t->kind == nList);
 	*tp = mk(nRedir, r, t);
@@ -233,15 +243,18 @@ extern Tree *relop(Tree *left, Tree *right, Relation rel) {
 	switch (rel) {
 	case Less: match = mk(nWord, "-1"); break;
 	case LessEqual:
-		match = treecons(mk(nWord, "-1"), treecons(mk(nWord, "0"), NULL));
+		match = treecons(mk(nWord, "-1"), treecons(mk(nWord, "0"),
+								NULL));
 		break;
 	case Greater: match = mk(nWord, "1"); break;
 	case GreaterEqual:
-		match = treecons(mk(nWord, "1"), treecons(mk(nWord, "0"), NULL));
+		match = treecons(mk(nWord, "1"), treecons(mk(nWord, "0"),
+								NULL));
 		break;
 	case Equal: match = mk(nWord, "0"); break;
 	case NotEqual:
-		match = treecons(mk(nWord, "-1"), treecons(mk(nWord, "1"), NULL));
+		match = treecons(mk(nWord, "-1"), treecons(mk(nWord, "1"),
+								NULL));
 		break;
 	}
 	return mk(nMatch, mk(nCall, treecons(mk(nWord, "%cmp"),

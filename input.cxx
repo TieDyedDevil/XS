@@ -57,7 +57,7 @@ static const char *error = NULL;
 
 /* yyerror -- yacc error entry point */
 extern void yyerror(const char *s) {
-	if (error == NULL)   /* first error is generally the most informative */
+	if (error == NULL) /* first error is generally the most informative */
 		error = locate(input, s);
 }
 
@@ -113,7 +113,8 @@ static void loghistory(const char *cmd, size_t len) {
 	if (historyfd == -1) {
 		historyfd = eopen(history, oAppend);
 		if (historyfd == -1) {
-			eprint("history(%s): %s\n", history, esstrerror(errno));
+			eprint("history(%s): %s\n", history,
+			       esstrerror(errno));
 			vardef("history", NULL, NULL);
 			return;
 		}
@@ -266,7 +267,8 @@ static rl_quote_func_t * default_quote_function ;
 static char * quote_func(char *text, int match_Type, char *quote_pointer) {
 	char *pos;
 	if ((pos = strstr(text, "~"))) {
-		/* Expand ~, otherwise quoting will make the filename invalid */
+		/* Expand ~, otherwise quoting will make the
+		   filename invalid */
 		std::string home = varlookup("HOME", NULL)->term->str;
 		home += (pos + 1); // Add rest of path
 		/* consider gc usage here? */
@@ -306,7 +308,8 @@ static char ** get_completions(const char *text, int start, int end) {
 		*(glob_string + end - start) = '*';
 		*(glob_string + end - start + 1) = '\0';
 
-		List* glob_result = dirmatch(path, path, glob_string, UNQUOTED);
+		List* glob_result = dirmatch(path, path, glob_string,
+					     UNQUOTED);
 		efree(path);
 
 		int l = length(glob_result);
@@ -315,12 +318,15 @@ static char ** get_completions(const char *text, int start, int end) {
 		results_size += l;
 		results =
                         reinterpret_cast<char**>(erealloc(results,
-                                                          results_size * sizeof(char*)));
-		for (List* i = glob_result; i != NULL; i = i->next, ++result_p) {
+                                                          results_size \
+							  * sizeof(char*)));
+		for (List* i = glob_result; i != NULL;
+		     i = i->next, ++result_p) {
 			/* Can't directly use basename, because readline
 			 * needs to free() the result
 			 */
-			results[result_p] = strdup(simple_basename(i->term->str));
+			results[result_p] =
+				strdup(simple_basename(i->term->str));
 		}
 	}
 
@@ -346,13 +352,14 @@ static char ** get_completions(const char *text, int start, int end) {
 			amatch = strdup(var);
 		} else {
 			if (strncmp("fn-", str, 3) != 0
-			   || strncmp(text, str + 3, end - start) != 0) continue;
+			   || strncmp(text, str + 3, end - start) != 0)
+				continue;
 			amatch = strdup(str + 3);
 		}
 		++results_size;
-		results =
-                        reinterpret_cast<char**>(erealloc(results,
-                                                 results_size * sizeof(char*)));
+		results = reinterpret_cast<char**>(
+			erealloc(results,
+				 results_size * sizeof(char*)));
 		results[result_p++] = amatch;
 	}
 
@@ -365,9 +372,9 @@ static char ** get_completions(const char *text, int start, int end) {
 			fn = rl_filename_completion_function(text, state++);
 			if (fn != NULL) {
 				++results_size;
-				results =
-                                        reinterpret_cast<char**>(erealloc(results,
-                                                                          results_size * sizeof(char*)));
+				results = reinterpret_cast<char**>(
+					erealloc(results,
+					results_size * sizeof(char*)));
 				results[result_p++] = strdup(fn);
 			}
 		} while (fn != NULL);
@@ -408,8 +415,9 @@ static int fdfill(Input *in) {
 					in->buflen *= 2;
 				efree(in->bufbegin);
 				in->bufbegin =
-                                        reinterpret_cast<unsigned char*>(erealloc(in->bufbegin,
-                                                                                  in->buflen));
+					reinterpret_cast<unsigned char*>(
+						erealloc(in->bufbegin,
+						in->buflen));
 			}
 			memcpy(in->bufbegin, rlinebuf, nread - 1);
 			in->bufbegin[nread - 1] = '\n';
@@ -555,7 +563,8 @@ extern const List *runfd(int fd, const char *name, int flags) {
 	in.fd = fd;
 	registerfd(&in.fd, true);
 	in.buflen = BUFSIZE;
-	in.bufbegin = in.buf = reinterpret_cast<unsigned char*>(ealloc(in.buflen));
+	in.bufbegin = in.buf =
+		reinterpret_cast<unsigned char*>(ealloc(in.buflen));
 	in.bufend = in.bufbegin;
 	in.name = (name == NULL) ? str("fd %d", fd) : name;
 
@@ -642,7 +651,9 @@ extern Tree *parsestring(const char *str) {
 
 /* isinteractive -- is the innermost input source interactive? */
 extern bool isinteractive(void) {
-	return input == NULL ? false : ((input->runflags & run_interactive) != 0);
+	return input == NULL
+		? false
+		: ((input->runflags & run_interactive) != 0);
 }
 
 /*
@@ -674,7 +685,8 @@ extern void initinput(void) {
 	yylloc.first_line = yylloc.last_line = 1;
 	yylloc.first_column = yylloc.last_column = 0;
 
-	/* mark the historyfd as a file descriptor to hold back from forked children */
+	/* mark the historyfd as a file descriptor to hold back
+	   from forked children */
 	registerfd(&historyfd, true);
 
 #if READLINE

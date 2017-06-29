@@ -113,8 +113,8 @@ static void scanerror(const char *s) {
 
 /*
  * getfds
- *	Scan in a pair of integers for redirections like >[2=1]. CLOSED represents
- *	a closed file descriptor (i.e., >[2=]).
+ *	Scan in a pair of integers for redirections like >[2=1].
+ *	CLOSED represents a closed file descriptor (i.e., >[2=]).
  *
  *	This function makes use of unsigned compares to make range tests in
  *	one compare operation.
@@ -224,7 +224,8 @@ static int yylex_arithmetic() {
 			bufput(i++, c);
 		UNGETC(c);
 		if (i == 0) {
-			scanerror("Variable with no name inside arithmetic expression");
+			scanerror("Variable with no name inside"
+					" arithmetic expression");
 			return ERROR;
 		}
 

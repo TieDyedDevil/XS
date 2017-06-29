@@ -160,15 +160,18 @@ static List* glob1(const char* pattern, const char* quote) {
 		std::string pat, qpat;
 		while (*s != '/' && *s != '\0')
 			pat.push_back(*s++),
-                        qpat.push_back(quote == UNQUOTED ? 'r' : *q++); /* get pat */
-		matched = listglob(matched, pat.c_str(), qpat.c_str(), slashcount);
+			/* get pat */
+                        qpat.push_back(quote == UNQUOTED ? 'r' : *q++);
+		matched = listglob(matched, pat.c_str(), qpat.c_str(),
+				   slashcount);
 	} while (*s != '\0' && matched != NULL);
 
 	
 	return matched;
 }
 
-/* glob0 -- glob a list, (destructively) passing through entries we don't care about */
+/* glob0 -- glob a list, (destructively) passing through entries we
+   don't care about */
 static List* glob0(List* list, StrList* quote) {
 	List* result; 
 	List* expand1;
@@ -181,7 +184,8 @@ static List* glob0(List* list, StrList* quote) {
 		if (
 			quote->str == QUOTED
 			|| !haswild((str = getstr(list->term)), quote->str)
-                        || (expand1 = glob1(str, quote->str)) == NULL // No matches
+			// No matches
+                        || (expand1 = glob1(str, quote->str)) == NULL
 		) {
 			*prevp = list;
 			prevp = &list->next;
@@ -219,7 +223,8 @@ static char *expandhome(char* string, StrList* quote) {
 
 	if (list != NULL) {
 		if (list->next != NULL)
-			fail("xs:expandhome", "%%home returned more than one value");
+			fail("xs:expandhome",
+			     "%%home returned more than one value");
 		char* home = gcdup(getstr(list->term));
 		if (c == '\0') {
 			string = home;
@@ -229,14 +234,17 @@ static char *expandhome(char* string, StrList* quote) {
 			size_t homelen = strlen(home);
 			size_t len = pathlen - slash + homelen;
 			{
-				char* t = reinterpret_cast<char*>(galloc(len + 1));
+				char* t =
+					reinterpret_cast<char*>(galloc(len+1));
 				memcpy(t, home, homelen);
-				memcpy(&t[homelen], &string[slash], pathlen - slash);
+				memcpy(&t[homelen], &string[slash],
+				       pathlen-slash);
 				t[len] = '\0';
 				string = t;
 			}
 			if (quote->str == UNQUOTED) {
-				char *q = reinterpret_cast<char*>(galloc(len + 1));
+				char *q =
+					reinterpret_cast<char*>(galloc(len+1));
 				memset(q, 'q', homelen);
 				memset(&q[homelen], 'r', pathlen - slash);
 				q[len] = '\0';
@@ -244,9 +252,11 @@ static char *expandhome(char* string, StrList* quote) {
 			} else if (strchr(quote->str, 'r') == NULL)
 				quote->str = QUOTED;
 			else {
-				char *q = reinterpret_cast<char*>(galloc(len + 1));
+				char *q =
+					reinterpret_cast<char*>(galloc(len+1));
 				memset(q, 'q', homelen);
-				memcpy(&q[homelen], &quote->str[slash], pathlen - slash);
+				memcpy(&q[homelen], &quote->str[slash],
+				       pathlen-slash);
 				q[len] = '\0';
 				quote->str = q;
 			}
@@ -255,7 +265,8 @@ static char *expandhome(char* string, StrList* quote) {
 	return string;
 }
 
-/* glob -- globbing prepass (glob if we need to, and dispatch for tilde expansion) */
+/* glob -- globbing prepass (glob if we need to, and dispatch for
+   tilde expansion) */
 extern List* glob(List* list, StrList* quote) {
 	List* lp;
 	StrList* qp;

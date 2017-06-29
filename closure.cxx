@@ -35,7 +35,8 @@ static Chain *chain = NULL;
 
 static Binding *extract(Tree *tree, Binding *bindings) {
 	static std::map<uint64_t, Binding *, std::less<uint64_t>,
-	    traceable_allocator< std::pair<const uint64_t, Binding*> > > bindmap;
+	    traceable_allocator< std::pair<const uint64_t, Binding*> > >
+		bindmap;
 
 	for (; tree != NULL; tree = tree->u[1].p) {
 		Tree *iddefn = tree->u[0].p;
@@ -57,18 +58,23 @@ static Binding *extract(Tree *tree, Binding *bindings) {
 					const char *prim = word->u[0].s;
 					if (streq(prim, "nestedbinding")) {
 						int i, count;
-						if (
-							(defn = defn->u[1].p) == NULL
-						     || defn->u[0].p->kind != nWord
-						     || (count = (atoi(defn->u[0].p->u[0].s))) < 0
-						) {
-							fail("$&parse", "improper use of $&nestedbinding");
+						if ((defn = defn->u[1].p) == NULL
+						    || defn->u[0].p->kind != nWord
+						    || (count =
+							(atoi(defn->u[0].\
+							p->u[0].s))) < 0) {
+							fail("$&parse",
+					"improper use of $&nestedbinding");
 							NOTREACHED;
 						}
 						Chain *cp;
-						for (cp = chain, i = 0;; cp = cp->next, i++) {
+						for (cp = chain, i = 0;
+							;
+							cp = cp->next, i++) {
 							if (cp == NULL) {
-								fail("$&parse", "bad count in $&nestedbinding: %d", count);
+								fail("$&parse",
+					"bad count in $&nestedbinding: %d",
+								     count);
 								NOTREACHED;
 							}
 							if (i == count)
@@ -76,7 +82,10 @@ static Binding *extract(Tree *tree, Binding *bindings) {
 						}
 						term = mkterm(NULL, cp->closure);
 					} else {
-						fail("$&parse", "bad unquoted primitive in %%closure: $&%s", prim);
+						fail("$&parse",
+						     "bad unquoted primitive"
+						     " in %%closure: $&%s",
+						     prim);
 						NOTREACHED;
 					}
 				} else
@@ -87,8 +96,10 @@ static Binding *extract(Tree *tree, Binding *bindings) {
 			const char *id_s = iddefn->u[1].p->u[0].p->u[0].s;
 			int id = strtoll(id_s, NULL, 16);
 
-			if (!bindmap.count(id)) bindmap[id] = mkbinding(name->u[0].s, list, bindings);
-			// The closure should include the same outer bindings as we expect
+			if (!bindmap.count(id)) bindmap[id] =
+				mkbinding(name->u[0].s, list, bindings);
+			// The closure should include the same outer
+			// bindings as we expect
 			assert (bindings == bindmap[id]->next); 
 			bindings = bindmap[id];
 		}

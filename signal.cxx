@@ -121,7 +121,8 @@ extern Sigeffect esignal(int sig, Sigeffect effect) {
 			break;
 		case sig_special:
 			if (sig != SIGINT && sig != SIGWINCH) {
-				eprint("$&setsignals: special handler not defined for %s\n",
+				eprint("$&setsignals: special handler not"
+				       " defined for %s\n",
                                        signame(sig));
 				return old;
 			}
@@ -165,7 +166,8 @@ extern void initsignals(bool interactive, bool allowdumps) {
 	for (sig = 0; sig < nsignals; sig++)
 		if (signals[sig].sig < 1 || NSIG <= signals[sig].sig)
 			panic(
-				"initsignals: bad signal in sigmsgs.cxx: %s (see mksignal)",
+				"initsignals: bad signal in sigmsgs.cxx: %s"
+				" (see mksignal)",
 				signals[sig].name
 			);
 
@@ -190,7 +192,8 @@ extern void initsignals(bool interactive, bool allowdumps) {
 #if 0
 		else
 			panic(
-				"initsignals: bad incoming signal value for %s: %x",
+				"initsignals: bad incoming signal value"
+				" for %s: %x",
 				signame(sig), h
 			);
 #endif
@@ -326,7 +329,8 @@ extern void sigchk(void) {
 	case sig_noop:
 		break;
 	default:
-		/* panic("sigchk: caught %L with sigeffect %d", e, " ", sigeffect[sig]); */
+		/* panic("sigchk: caught %L with sigeffect %d", e, " ",
+				sigeffect[sig]); */
 		break;
 	}
 }

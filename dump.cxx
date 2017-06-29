@@ -139,15 +139,17 @@ static const char *dumptree(Tree *tree) {
                               dumpstring(tree->u[0].s));
 			break;
 		    case nCall: case nThunk: case nVar: case nArith:
-			print("static Tree_p %s = { n%s, { { (Tree *) %s } } };\n",
+			print("static Tree_p %s = { n%s, { { (Tree *) %s }"
+			      " } };\n",
 			      name + 1, nodename(tree->kind),
                               dumptree(tree->u[0].p));
 			break;
-		    case nPlus: case nMinus: case nMult: case nDivide: case nModulus:
-		    case nAssign:  case nConcat: case nClosure: case nFor:
-		    case nLambda: case nLet: case nList:  case nLocal:
-		    case nVarsub: case nMatch: case nExtract:
-			print("static Tree_pp %s = { n%s, { { (Tree *) %s }, { (Tree *) %s } } };\n",
+		    case nPlus: case nMinus: case nMult: case nDivide:
+		    case nModulus: case nAssign:  case nConcat: case nClosure:
+		    case nFor: case nLambda: case nLet: case nList:
+		    case nLocal: case nVarsub: case nMatch: case nExtract:
+			print("static Tree_pp %s = { n%s, { { (Tree *) %s },"
+                              " { (Tree *) %s } } };\n",
 			      name + 1, nodename(tree->kind),
                               dumptree(tree->u[0].p), dumptree(tree->u[1].p));
 		}
@@ -263,7 +265,8 @@ static void printheader(const List *title) {
 	)
 		panic("dumpstate: Tree union sizes do not match struct sizes");
 
-	print("/* %L */\n\n#include \"xs.hxx\"\n#include \"term.hxx\"\n\n", title, " ");
+	print("/* %L */\n\n#include \"xs.hxx\"\n#include \"term.hxx\"\n\n",
+	      title, " ");
 	print("%s\n\n", PPSTRING(TreeTypes));
 }
 
@@ -273,13 +276,18 @@ extern void runinitial(void) {
 	const List *title = runfd(0, "initial.xs", 0);
 
 	printheader(title);
-	foreach (Dict::value_type var, vars) dumpvar(var.first.c_str(), var.second);
+	foreach (Dict::value_type var, vars) dumpvar(var.first.c_str(),
+		 var.second);
 
 	/* these must be assigned in this order, or things just won't work */
-	varbuf << "\nstatic const struct { const char *name; List *value; } defs[] = {\n";
-	foreach (Dict::value_type var, vars) dumpfunctions(var.first.c_str(), var.second);
-	foreach (Dict::value_type var, vars) dumpsettors(var.first.c_str(), var.second);
-	foreach (Dict::value_type var, vars) dumpvariables(var.first.c_str(), var.second);
+	varbuf << "\nstatic const struct { const char *name; List *value; }"
+		  " defs[] = {\n";
+	foreach (Dict::value_type var, vars) dumpfunctions(var.first.c_str(),
+		 var.second);
+	foreach (Dict::value_type var, vars) dumpsettors(var.first.c_str(),
+		 var.second);
+	foreach (Dict::value_type var, vars) dumpvariables(var.first.c_str(),
+		 var.second);
 	varbuf << "\t{ NULL, NULL }\n"
 		  "};\n\n";
 	print(varbuf.str().c_str());

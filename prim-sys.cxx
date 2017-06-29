@@ -176,7 +176,8 @@ static const Limit limits[] = {
 	{ "memorysize",		RLIMIT_VMEM,	sizesuf },
 #endif
 
-#ifdef RLIMIT_MEMLOCK	/* 4.4bsd adds an unimplemented limit on non-pageable memory */
+#ifdef RLIMIT_MEMLOCK	/* 4.4bsd adds an unimplemented limit
+			   on non-pageable memory */
 	{ "lockedmemory",	RLIMIT_CORE,	sizesuf },
 #endif
 
@@ -231,21 +232,24 @@ static LIMIT_T parselimit(const Limit *limit, const char *s) {
 		char *u;
 		lim = strtol(s, &u, 0) * 60;
 		if (u != t)
-			fail("$&limit", "%s %s: bad limit value", limit->name, s);
+			fail("$&limit", "%s %s: bad limit value",
+				limit->name, s);
 		char *x;
 		lim += strtol(u + 1, &x, 0);
 		if (x != NULL && *x == ':')
 			lim = lim * 60 + strtol(x + 1, &x, 0);
 		if (x != NULL && *x != '\0')
-			fail("$&limit", "%s %s: bad limit value", limit->name, s);
+			fail("$&limit", "%s %s: bad limit value",
+				limit->name, s);
 	} else {
 		char *x;
 		lim = strtol(s, &x, 0);
 		if (x != NULL && *x != '\0')
 			for (;; suf = suf->next) {
 				if (suf == NULL)
-					fail("$&limit", "%s %s: bad limit value",
-                                             limit->name, s);
+					fail("$&limit",
+						"%s %s: bad limit value",
+						limit->name, s);
 				if (streq(suf->name, x)) {
 					lim *= suf->amount;
 					break;
@@ -288,7 +292,8 @@ PRIM(limit) {
 			else
 				rlim.rlim_cur = n;
 			if (setrlimit(lim->flag, &rlim) == -1)
-				fail("$&limit", "setrlimit: %s", esstrerror(errno));
+				fail("$&limit", "setrlimit: %s",
+					esstrerror(errno));
 		}
 	}
 	return ltrue;
@@ -345,7 +350,8 @@ PRIM(time) {
 		t0 = times(&tms);
 		pid = efork(true, false);
 		if (pid == 0)
-			exit(exitstatus(eval(list, NULL, evalflags | eval_inchild)));
+			exit(exitstatus(eval(list, NULL,
+						evalflags | eval_inchild)));
 
 		status = ewaitfor(pid);
 		t1 = times(&tms);
@@ -358,8 +364,10 @@ PRIM(time) {
 		eprint(
 			"%6ldr %5ld.%ldu %5ld.%lds\t%L\n",
 			(t1 - t0 + ticks / 2) / ticks,
-			tms.tms_cutime / ticks, ((tms.tms_cutime * 10) / ticks) % 10,
-			tms.tms_cstime / ticks, ((tms.tms_cstime * 10) / ticks) % 10,
+			tms.tms_cutime / ticks,
+			((tms.tms_cutime * 10) / ticks) % 10,
+			tms.tms_cstime / ticks,
+			((tms.tms_cstime * 10) / ticks) % 10,
 			list, " "
 		);
 		exit(status);

@@ -91,7 +91,8 @@ PRIM(printf) {
 				if (floatconv(*fcp) || isfloat(arg)) {
 					if (integralconv(*fcp))
 						fail("$&printf",
-                                                     "printf: %%%c: integral value required",
+                                                     "printf: %%%c: integral"
+						     " value required",
                                                      *fcp);
 					args[i] = &ffi_type_double;
 					doubles[i] = strtod(arg, NULL);
@@ -104,14 +105,16 @@ PRIM(printf) {
 			} else if (charconv(*fcp)) {
 				if (arg[1] != '\0')
 					fail("$&printf",
-                                             "printf: %%c: character value required");
+                                             "printf: %%c: character"
+					     " value required");
 				args[i] = &ffi_type_schar;
 				chars[i] = *arg;
 				values[i] = &chars[i];
 			} else {
 				if (!stringconv(*fcp))
 					fail("$&printf",
-                                             "printf: %%%c: numeric value required",
+                                             "printf: %%%c: numeric"
+					     " value required",
                                              *fcp);
 				args[i] = &ffi_type_pointer;
 				strings[i] = gcdup(arg);
