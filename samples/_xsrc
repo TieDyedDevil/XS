@@ -570,7 +570,8 @@ fn svis {|*|
 }
 fn thermal {
 	.d 'Summarize system thermal status'
-	sensors >[2]/dev/null | grep -e '^Physical' -e '^Core' -e '^fan'
+	sensors >[2]/dev/null | grep -e '^Physical' -e '^Core' -e '^fan' \
+		| sed 's/ *(.*$//'
 }
 fn title {|*|
 	.d 'Set terminal title'
