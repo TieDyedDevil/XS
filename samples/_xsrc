@@ -13,11 +13,13 @@ access -d ~/.xsrc.d && {for f ~/.xsrc.d/*.xs {. $f}}
 fn .ab {tput bold}
 fn .ad {tput dim}
 fn .ah {tput setab 8}
+fn .ahe {tput setab 0}
 fn .ai {tput sitm}
 fn .af {|n| tput setaf $n}
 fn .an {tput sgr0}
 fn .as {if {~ $TERM linux} .ad else .ai}
 fn .au {tput smul}
+fn .aue {tput rmul}
 fn .ci {tput civis}
 fn .cn {tput cnorm}
 fn .ed {tput ed}
