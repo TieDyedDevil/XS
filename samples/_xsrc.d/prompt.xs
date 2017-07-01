@@ -1,5 +1,6 @@
 initial_prompt = 4
 initial_attrib = yellow
+initial_sequence = underline
 
 pr1 = \u252c \u251c
 #    1┬

@@ -4,6 +4,8 @@ if {!~ $(pr$initial_prompt) ()} {_op = $(pr$initial_prompt) ''} \
 else {_op = \> \| xs}
 if {!~ $initial_attrib ()} {_oa = `{.tattr $initial_attrib}} \
 else {_oa = `{.tattr bold}}
+if {!~ $initial_sequence ()} {_ob = underline} \
+else {_ob = $initial_sequence}
 local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 	fn prompt {|x|
 		.d 'Alter prompt'
@@ -62,6 +64,7 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 			_p1@$pid = $_op(1); _p2@$pid = $_op(2)
 			_pt@$pid = $_op(3)
 			_pa@$pid = $_oa
+			_pb@$pid = $_ob
 		}
 		if {~ $(_pt@$pid) () ''} {
 			_pr@$pid = ($(_p1@$pid)^' ' $(_p2@$pid)^' ')
@@ -74,7 +77,7 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 		.palette; .an; .ed
 		~ $(_pr@$pid) () && {
 			_pa@$pid = $_oa; prompt; _n@$pid = 0; _s@$pid = -1
-			_pb@$pid = underline
+			_pb@$pid = $_ob
 		}
 		let ((p1 p2) = $(_pr@$pid); sn) {
 			if {~ $(_n@$pid) -1} {
