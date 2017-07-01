@@ -100,7 +100,9 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 		.a 'P1 P2'
 		.a 'PT'
 		.a '-a bold|normal|dim|italic'
-		.a '-a red|green|yellow|blue|magenta|cyan'
+		.a '-a red|green|blue'
+		.a '-a yellow|magenta|cyan'
+		.a '-s underline|highlight|normal'
 		.a '-l  # list defined prompts'
 		.a '-n NUM'
 		.a '(none)  # restore initial prompt'
@@ -119,6 +121,17 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 		if {~ $x(1) -n} {
 			let (n = $x(2)) {
 				!~ $(pr$n) () && prompt $(pr$n)
+			}
+		}
+		if {~ $x(1) -s} {
+			if {~ $x(2) underline} {
+				_pb@$pid = underline
+			} else if {~ $x(2) highlight} {
+				_pb@$pid = highlight
+			} else if {~ $x(2) normal} {
+				_pb@$pid = normal
+			} else {
+				throw error prompt 'underline|highlight|normal'
 			}
 		}
 		if {~ $x(1) -a} {
@@ -149,6 +162,7 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 		.palette; .an; tput ed
 		~ $(_pr@$pid) () && {
 			_pa@$pid = $_oa; prompt; _n@$pid = 0; _s@$pid = -1
+			_pb@$pid = underline
 		}
 		let ((p1 p2) = $(_pr@$pid); sn) {
 			if {~ $(_n@$pid) -1} {
@@ -157,7 +171,12 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 				let (seq = $(_n@$pid)) {
 					_n@$pid = `($seq+1)
 					sn = `` '' {printf %3d $(_n@$pid)}
-					sn = `{tput smul}^$sn^`{tput rmul}
+					if {~ $(_pb@$pid) underline} {
+						sn = `{tput smul}^$sn^`{tput rmul}
+					}
+					if {~ $(_pb@$pid) highlight} {
+						sn = `{tput setab 8}^$sn^`{tput setab 0}
+					}
 				}
 				prompt = $sn$p1 $sn$p2
 			}
