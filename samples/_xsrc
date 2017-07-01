@@ -14,6 +14,7 @@ fn .ab {tput bold}
 fn .ad {tput dim}
 fn .ai {tput sitm}
 fn .af {|n| tput setaf $n}
+fn .ag {|n| tput setab $n}
 fn .an {tput sgr0}
 fn .as {if {~ $TERM linux} .ad else .ai}
 fn .palette {
@@ -140,8 +141,8 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 		if {~ $(_pt@$pid) () ''} {
 			_pr@$pid = ($(_p1@$pid)^' ' $(_p2@$pid)^' ')
 		} else {
-			_pr@$pid = ($(_pt@$pid)^$(_p1@$pid)^' '
-				  $(_pt@$pid)^$(_p2@$pid)^' ')
+			_pr@$pid = ('―'^$(_pt@$pid)^'―'^$(_p1@$pid)^' '
+				    '―'^$(_pt@$pid)^'―'^$(_p2@$pid)^' ')
 		}
 	}
 	fn %prompt {
@@ -156,12 +157,9 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 				let (seq = $(_n@$pid)) {
 					_n@$pid = `($seq+1)
 					sn = `` '' {printf %3d $(_n@$pid)}
+					sn = `{tput smul}^$sn^`{tput rmul}
 				}
-				if {~ $(_pt@$pid) '' ()} {
-					prompt = $sn$p1 $sn$p2
-				} else {
-					prompt = $sn' '$p1 $sn' '$p2
-				}
+				prompt = $sn$p1 $sn$p2
 			}
 			prompt = ($(_pa@$pid)^$prompt(1)^`.an
 				  $(_pa@$pid)^$prompt(2)^`.an)
