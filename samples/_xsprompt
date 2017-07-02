@@ -4,8 +4,8 @@ if {!~ $(pr$initial_prompt) ()} {_op = $(pr$initial_prompt) ''} \
 else {_op = \> \| xs}
 if {!~ $initial_attrib ()} {_oa = `{.tattr $initial_attrib}} \
 else {_oa = `{.tattr bold}}
-if {!~ $initial_sequence ()} {_ob = underline} \
-else {_ob = $initial_sequence}
+if {!~ $initial_sequence ()} {_ob = $initial_sequence} \
+else {_ob = underline}
 local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 	fn prompt {|x|
 		.d 'Alter prompt'
