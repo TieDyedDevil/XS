@@ -213,12 +213,13 @@ fn battery {
 	}
 }
 fn c clear
-fn clock {
+fn clo {
 	.ci
 	stty intr q
 	unwind-protect {
 		watch -t -n 1 -p banner \`date +%A%n%T%n%x\`
 	} {
+		clear
 		stty intr \^C
 		.cn
 	}
