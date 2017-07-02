@@ -212,8 +212,17 @@ fn battery {
 		!~ $curr 0 && printf '%.1f%%'\n `(100.0*$curr/$full)
 	}
 }
-fn binclock {.ci; /usr/bin/binclock; .cn}
 fn c clear
+fn clock {
+	.ci
+	stty intr q
+	unwind-protect {
+		watch -t -n 1 -p banner \`date +%A%n%T%n%x\`
+	} {
+		stty intr \^C
+		.cn
+	}
+}
 fn cookie {
 	.d 'Fortune'
 	let (subjects = art computers cookie definitions goedel \
