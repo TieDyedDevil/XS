@@ -1,6 +1,5 @@
-initial_prompt = 17
-initial_attrib = bold
-initial_sequence = highlight
+# index of prompt, prompt attribute, sequence attribute
+prompt_init = 17 bold highlight
 
 pr1 = \u252c \u251c
 #    1┬
