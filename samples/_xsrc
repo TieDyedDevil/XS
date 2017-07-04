@@ -636,6 +636,5 @@ fn .herald {
 
 # This code is in two parts. See the top of this file.
 # ref: /usr{/local}/share/doc/xs/NOTES
-force_locale =
-result $force_locale && {SHLVL = `($SHLVL-1); exec xs}
+result $force_locale && {force_locale = ; SHLVL = `($SHLVL-1); exec xs}
 # end
