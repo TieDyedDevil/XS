@@ -376,8 +376,6 @@ fn name {|*|
 }
 fn net {
 	.d 'Network status'
-	nmcli --fields startup,networking,running,state,connectivity \
-		--colors no general status
 	nmcli --fields name,type,device \
 		connection show --active
 }
@@ -624,12 +622,9 @@ fn zathura {|*|
 
 fn .herald {
 	let (fn-nl = {printf \n}; fn-isconsole = {~ `tty *tty*}) {
-		.as
-		cookie; nl
+		.as; cookie; .an; nl
 		isconsole && {on; nl; net; nl; thermal; battery; load; nl}
-		.ab
-		where
-		.an
+		.ab; where; .an
 	}
 }
 .herald
