@@ -378,7 +378,7 @@ fn net {
 	.d 'Network status'
 	nmcli --fields startup,networking,running,state,connectivity \
 		--colors no general status
-	nmcli --colors no --fields name,type,device \
+	nmcli --fields name,type,device \
 		connection show --active
 }
 fn noise {|*|
