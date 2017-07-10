@@ -107,6 +107,11 @@ static void shlevel(void) {
 	setenv(name, next, 1);
 }
 
+static volatile bool loginshell = false;
+bool islogin() {
+	return loginshell;
+}
+
 /* main -- initialize, parse command arguments, and start running */
 int main(int argc, char **argv) {
 	initgc();
@@ -118,7 +123,7 @@ int main(int argc, char **argv) {
 	volatile bool isprotected = false;	/* -p */
 	volatile bool allowquit = false;	/* -d */
 	volatile bool cmd_stdin = false;		/* -s */
-	volatile bool loginshell = false;	/* -l or $0[0] == '-' */
+	/* loginshell: see above */		/* -l or $0[0] == '-' */
 	bool keepclosed = false;		/* -o */
 	const char *volatile cmd = NULL;	/* -c */
 

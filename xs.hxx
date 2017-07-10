@@ -90,6 +90,10 @@ public: void sort() {
  * our programming environment
  */
 
+/* main.cxx */
+
+extern bool islogin();
+
 /* print.cxx -- see print.hxx for more */
 
 extern int print(const char *fmt, ...);

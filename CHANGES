@@ -15,6 +15,8 @@ one thread per CPU.
 Load ~/.xsin for interactive shells. If a login shell, ~/.xsrc is
 loaded before ~/.xsin.
 
+Added $&islogin and %is-login.
+
 Removed the ./xsdebug script, which was still es code and not usable
 with xs.
 

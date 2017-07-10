@@ -413,6 +413,10 @@ PRIM(isinteractive) {
 	return isinteractive() ? ltrue : lfalse;
 }
 
+PRIM(islogin) {
+	return islogin() ? ltrue : lfalse;
+}
+
 PRIM(setmaxevaldepth) {
 	char *s;
 	long n;
@@ -473,6 +477,7 @@ extern void initprims_etc(Prim_dict& primdict) {
 	X(internals);
 	X(result);
 	X(isinteractive);
+	X(islogin);
 	X(exitonfalse);
 	X(setmaxevaldepth);
 	initrandom();

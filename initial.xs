@@ -783,6 +783,7 @@ if {~ <=$&primitives execfailure} {fn-%exec-failure = $&execfailure}
 fn-%parse	= $&parse
 fn-%batch-loop	= $&batchloop
 fn-%is-interactive = $&isinteractive
+fn-%is-login       = $&islogin
 
 fn %interactive-loop { escape { |fn-return|
 	let (result = <=true) {
