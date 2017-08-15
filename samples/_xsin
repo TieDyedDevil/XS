@@ -1,2 +1,10 @@
-stty start undef stop undef
-.xsin-rp
+if {~ `tty *tty1} {
+	startwm
+} else {
+	stty start undef stop undef
+	%is-login && .herald
+	if {!~ $history () && ~ `{wc -l $history} [4-9]???} {
+		echo 'Consider histclean'
+	}
+	.xsin-rp
+}

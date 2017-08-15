@@ -1,101 +1,15 @@
 # This code is in two parts. See the bottom of this file.
-# ref: /usr{/local}/share/doc/xs/NOTES
+# ref: /usr{/local}/share/doc/xs/SYSTEMD_LOCALE
+result $force_locale && { # locale hack
 ~ $LC_ALL () && {force_locale = <=true}
 LC_ALL = en_US.UTF-8
+LANG = $LC_ALL
 # end
 
 path = /usr/local/bin /usr/bin /usr/sbin $home/.local/bin $home/bin
 history = $home/.xshistory
 
 access -d ~/.xsrc.d && {for f ~/.xsrc.d/*.xs {. $f}}
-
-## Terminal presentation
-fn .ab {tput bold}
-fn .ad {tput dim}
-fn .ah {tput setab 8}
-fn .ahe {tput setab 0}
-fn .ai {tput sitm}
-fn .af {|n| tput setaf $n}
-fn .an {tput sgr0}
-fn .as {if {~ $TERM linux} .ad else .ai}
-fn .au {tput smul}
-fn .aue {tput rmul}
-fn .ci {tput civis}
-fn .cn {tput cnorm}
-fn .ed {tput ed}
-fn .palette {
-	if {~ $TERM linux} {
-		printf %s \e]R
-		printf %s \e]P0000000 # black = Black
-		printf %s \e]P1cd0000 # red = Red3
-		printf %s \e]P200cd00 # green = Green3
-		printf %s \e]P3cdcd00 # yellow = Yellow3
-		printf %s \e]P45f87d7 # blue = SteelBlue3
-		printf %s \e]P5cd00cd # magenta = Magenta3
-		printf %s \e]P600cdcd # cyan = Cyan3
-		printf %s \e]P7e5e5e5 # white = Gray90
-	} else {
-		tput oc
-		if {!~ $TERM st*} {
-			tput initc 0 0 0 0 # black = Black
-			tput initc 1 205 0 0 # red = Red3
-			tput initc 2 0 205 0 # green = Green3
-			tput initc 3 205 205 0 # yellow = Yellow3
-			tput initc 4 95 135 215 # blue = SteelBlue3
-			tput initc 5 205 0 205 # magenta = Magenta3
-			tput initc 6 0 205 205 # cyan = Cyan3
-			tput initc 7 229 229 229 # white = Gray90
-		}
-		if {~ $TERM yaft-256color} {
-			tput initc 7 208 208 208 # normal white
-			tput initc 12 99 185 255 # bright blue
-			tput initc 15 255 255 255 # bright white
-		}
-	}
-}
-fn .tattr {|*|
-	let (cs) {
-		switch $* (
-		bold {cs = `.ab}
-		normal {cs = `.an}
-		dim {cs = `.ad}
-		italic {cs = `.ai}
-		red {cs = `{.af 1}}
-		green {cs = `{.af 2}}
-		yellow {cs = `{.af 3}}
-		blue {cs = `{.af 4}}
-		magenta {cs = `{.af 5}}
-		cyan {cs = `{.af 6}}
-		)
-		~ $cs () || printf %s $cs
-	}
-}
-
-## Help tags
-fn .d {|*|} # docstring
-fn .a {|*|} # argstring
-
-fn lb {
-	.d 'List local functions and binaries'
-	.ab; echo \* ~/.xsrc; .an
-	cat ~/.xsrc|grep '^fn'|cut -d' ' -f2|grep -v -e '^\.' -e '^%' \
-		|tr \n ' '|par 72j
-	echo
-	.ab; echo \* ~/bin; .an
-	ls ~/bin|tr \n ' '|par 72j
-	echo
-	.ab; echo \* /usr/local/bin; .an
-	ls /usr/local/bin|tr \n ' '|par 72j
-}
-
-## Prompt control
-fn prompt
-fn sc
-fn sd
-fn se
-. ~/.xsprompt
-
-fn --
 
 ## Web lookups
 fn .web-query {|site path query|
@@ -110,91 +24,53 @@ fn .web-query {|site path query|
 }
 fn amazon {|*|
 	.d 'Search Amazon'
+	.c 'web'
 	.a '[QUERY]'
 	.web-query https://amazon.com/ s/\?field-keywords= $*
 }
 fn google {|*|
 	.d 'Search Google'
+	.c 'web'
 	.a '[QUERY]'
 	.web-query https://google.com/ search\?q= $*
 }
 fn scholar {|*|
 	.d 'Search Google Scholar'
+	.c 'web'
 	.a '[QUERY]'
 	.web-query https://scholar.google.com/ scholar\?hl=en\&q= $*
 }
 fn wikipedia {|*|
 	.d 'Search Wikipedia'
+	.c 'web'
 	.a '[QUERY]'
 	.web-query https://en.wikipedia.org/ wiki/Special:Search\?search= $*
 }
 fn youtube {|*|
 	.d 'Search YouTube'
+	.c 'web'
 	.a '[QUERY]'
 	.web-query https://youtube.com/ results\?search_query= $*
 }
 
 fn --
 
-## Online documentation
-fn meson-help {web https://mesonbuild.com/}
-fn ninja-help {web https://ninja-build.org/}
-
-fn --
-
-## Framebuffer resize
-fn .fbset {|*|
-	if {~ $TERM linux} {fbset -a -g $* $* 32} else {echo 'not a vt'}
-}
-fn vtfhd {
-	.d 'Set framebuffer size 1920x1080 (16:9)'
-	.fbset 1920 1080
-}
-fn vtqfhd {
-	.d 'Set framebuffer size 3840x2160 (16:9)'
-	.fbset 3840 2160
-}
-fn vtqhd {
-	.d 'Set framebuffer size 2560x1440 (16:9)'
-	.fbset 2560 1440
-}
-fn vtuwqhd {
-	.d 'Set framebuffer size 3440x1440 (21:9)'
-	.fbset 3440 1440
-}
-fn vtuw-uxga {
-	.d 'Set framebuffer size 2560x1080 (21:9)'
-	.fbset 2560 1080
-}
-fn vtwxga {
-	.d 'Set framebuffer size 1366x768 (16:9)'
-	.fbset 1366 768
-}
-fn vtfbfit {
-	.d 'Fit framebuffer to largest display'
-	if {~ $TERM linux} {
-		let (best; hv) {
-			best = `{cat /sys/class/drm/*/modes \
-				|grep -Eo '[[:digit:]]+x[[:digit:]]+' \
-				|sort -gr|uniq|head -1}
-			echo Using $best
-			hv = `` x {echo -n $best}
-			.fbset $hv
-		}
-	} else {echo 'not a vt'}
-}
-
-fn --
-
 ## Utilities, overrides and aliases
-fn agl {|*|
+fn ag {|*|
 	.d 'Search tree for pattern in files'
+	.c 'alias'
 	.a '[ag_OPTIONS] PATTERN [DIRECTORY]'
-	ag --color $*|less -RFX
+	/usr/bin/ag --pager='less -RFX' $*
 }
-fn avis {|*| .d 'Edit w/ APL key bindings'; akt vis $*}
+fn avis {|*|
+	.d 'Edit w/ APL key bindings'
+	.c 'alias'
+	.a '[vis_OPTIONS|FILE]...'
+	akt vis $*
+}
 fn battery {
 	.d 'Show battery status'
+	.c 'system'
 	let (pspath = /sys/class/power_supply; full = 0; curr = 0; \
 		ef; ec; en) {
 		for d ($pspath/BAT?) {
@@ -212,25 +88,42 @@ fn battery {
 		!~ $curr 0 && printf '%.1f%%'\n `(100.0*$curr/$full)
 	}
 }
-fn c clear
-fn clo {
-	.ci
-	stty intr q
-	unwind-protect {
-		watch -t -n 1 -p banner \`date +%A%n%T%n%x\`
-	} {
-		clear
-		stty intr \^C
-		.cn
-	}
+fn c {
+	.d 'Clear screen'
+	.c 'alias'
+	clear
 }
 fn cookie {
 	.d 'Fortune'
+	.c 'system'
 	let (subjects = art computers cookie definitions goedel \
 			humorists literature people pets platitudes \
 			politics science wisdom) {
 		fortune -n 200 -s $subjects
 	}
+}
+fn cs {
+	.d 'List compose sequences'
+	.c 'system'
+	{grep '^<Multi_key>' /usr/share/X11/locale/en_US.UTF-8/Compose | \
+		grep -v -e '<dead' -e '<kana_' -e '<hebrew_' -e '<Arabic_' \
+			-e '<Cyrillic_' -e '<Greek_' -e '<Ukrainian_' \
+			-e '<KP_' -e '<ae>' -e '<AE>' -e '<ezh>' -e '<EZH>' \
+			-e '<underbar>' -e '<.\?acute>' -e '<.\?tilde>' \
+			-e '<.\?ring>' -e '<.\?diaeresis>' -e '<.\?grave>' \
+			-e '<.\?cedilla>' -e '<.\?horn>' -e '<.\?circumflex>' \
+			-e '<.\?breve>' -e '<.\?macron>' -e '<.\?acute>' \
+			-e '<.\?caron>' -e '<.\?slash>' -e '<.\?oblique>' \
+			-e '<U\([0-9A-Fa-f]\)\+>' \
+		| grep -v -e '"   \(ascii[^ ]\+\|brace[^ ]\+\|at\|bar\) ' \
+		| grep -v -e 'U1F595' -e 'U1F596'} >[2]/dev/null | less -FX
+	# a/o 20170807, st exits upon trying to render \U0001f595 or \U0001f596
+}
+fn d {
+	.d 'Date/time (local and UTC)'
+	.c 'system'
+	date
+	date -u
 }
 fn dl-clean {
 	.d 'Remove advertising asset files left behind by WebKit browser'
@@ -241,6 +134,7 @@ fn dl-clean {
 }
 fn doc {|*|
 	.d 'pushd to documentation directory of package'
+	.c 'system'
 	.a 'PACKAGE_NAME_GLOB'
 	if {!~ $* ()} {
 		let (pl) {
@@ -260,6 +154,7 @@ fn doc {|*|
 }
 fn gallery {|*|
 	.d 'Random slideshow'
+	.c 'media'
 	.a 'PATH [DELAY]'
 	let (dir = $(1); time = $(2)) {
 		~ $time () && time = 5
@@ -280,19 +175,9 @@ fn gallery {|*|
 		}
 	}
 }
-fn help {|*|
-	.d 'Help for xs function'
-	.a 'NAME'
-	let (nm = $*(1); st) {
-		st = <={vars -f|grep '^fn-'$nm'\b' \
-			| sed 's/{\.\(a\|d\) [^}]*}/\n&\n/g' \
-			| grep -e '^{\.\(a\|\d\)' | sed 's/''''/''/g'}
-		~ $^st '0 0 0 1 0' && {echo 'no help for' $nm; whatis $nm}
-		~ $^st '0 1 0 1 0' && echo 'no function' $nm
-	}
-}
 fn image {|*|
 	.d 'Display image'
+	.c 'media'
 	.a 'FILE ...'
 	if {~ $TERM linux} {
 		fbi --noverbose $*
@@ -310,39 +195,93 @@ fn import-abook {|*|
 		--outfile ~/.abook/addressbook
 	chmod 600 ~/.abook/addressbook
 }
-fn la {|*| ls -a $*}
-fn ll {|*| ls -lh $*}
-fn load {cat /proc/loadavg}
+fn la {|*|
+	.c 'alias'
+	ls -a $*
+}
+fn ll {|*|
+	.c 'alias'
+	ls -lh $*
+}
+fn load {
+	.d '1/5/15m loadavg; proc counts; last PID'
+	.c 'system'
+	cat /proc/loadavg
+}
 fn lpman {|man|
 	.d 'Print a man page'
 	.a 'PAGE'
-	env MANWIDTH=72 man $man | sed 's/^.*/    &/' \
-		| lpr -o page-top=30 -o page-bottom=30
+	env MANWIDTH=80 man $man | sed 's/^.*/    &/' \
+		| lpr -o page-top=60 -o page-bottom=60 \
+			-o page-left=60 -o lpi=8 -o cpi=12
 }
 fn lpmd {|md|
 	.d 'Print a markdown file'
 	.a 'FILE'
-	markdown $md | w3m -T text/html -cols 72 | sed 's/^.*/    &/' \
-		| lpr -o page-top=30 -o page-bottom=30
+	markdown $md | w3m -T text/html -cols 80 | sed 's/^.*/    &/' \
+		| lpr -o page-top=60 -o page-bottom=60 \
+			-o page-left=60 -o lpi=8 -o cpi=12
 }
-fn ls {|*| /usr/bin/ls --color=auto $*}
-fn lt {|*| ls -lhtr $*}
+fn ls {|*|
+	.c 'alias'
+	/usr/bin/ls --color=auto $*
+}
+fn lt {|*|
+	.c 'alias'
+	ls -lhtr $*
+}
+fn luc {
+	.d 'List user commands'
+	.c 'system'
+	echo `.ab^'* xs'^`.an
+	vars -f | grep -o '^fn-[^ ]\+' | cut -d- -f2- | grep '^[a-z]' \
+		| tr \n \  | par 72j
+	echo `.ab^'* bin'^`.an
+	ls ~/bin | tr \n \  | par 72j
+}
+fn m {
+	.d 'Show currently playing track'
+	.c 'media'
+	let (mi = `mktemp) {
+		mpc > $mi
+		if {grep -q '\[playing\]' $mi} {
+			printf '%s   {%s}'\n `` \n {cat $mi|head -1} \
+				`` \n {cat $mi|tail -n+2|head -1|xargs echo \
+					|cut -d' ' -f3-}
+		} else {echo 'Not playing'}
+	}
+}
+fn mamel {
+	.d 'List installed MAME games'
+	.c 'system'
+	ls /usr/share/mame/roms|sed 's/\.zip$//'|column
+}
 fn mdv {|*|
 	.d 'Markdown file viewer'
+	.c 'media'
 	.a 'MARKDOWN_FILE'
 	if {!~ $#* 1 || !access -f $*} {
 		throw error mdv 'usage: mdv MARKDOWN_FILE'
 	} else {
-		markdown $* | w3m -X -T text/html -no-mouse -no-proxy \
-			-o confirm_qq=0 -o document_root=`pwd
+		markdown -f fencedcode $* | w3m -X -T text/html -no-mouse \
+			-no-proxy -o confirm_qq=0 -o document_root=`pwd
 	}
+}
+fn mons {
+	.d 'List attached monitors recognized by bspwm'
+	.c 'system'
+	grep -f <{map {|*| echo \^$*} `{bspc query -M --names}} <{xrandr} \
+		|sed 's/ \(dis\)\?connected / /'|sed 's/ (.*) / /' \
+		|sed 's/mm x /x/'|awk '{printf("%s\t%9s\t%s\n", $1, $3, $2)}'
 }
 fn mpc {|*|
 	.d 'Music player'
+	.c 'media'
 	/usr/bin/mpc -f '%artist% - %album% - %track% %title%' $*
 }
 fn mpv {|*|
 	.d 'Movie player'
+	.c 'media'
 	.a '[mpv_OPTIONS] FILE ...'
 	let (embed; video_driver) {
 		if {~ $DISPLAY ()} {
@@ -356,19 +295,29 @@ fn mpv {|*|
 }
 fn mpvl {|*|
 	.d 'Movie player w/ volume leveler'
+	.c 'media'
 	.a '[mpv_OPTIONS] FILE ...'
 	let (afconf = 'lavfi=[highpass=f=100,dynaudnorm=f=100:r=0.7:c=1' \
 		^':m=20.0:b=1],volume=-9') {
 		mpv --af=$afconf $*
 	}
 }
-fn mutt {|*| env TERM=st /usr/bin/mutt $*} # mutt won't override st colors
+fn mutt {|*|
+	.c 'alias'
+	# mutt won't override st colors
+	env TERM=st /usr/bin/mutt $*
+}
+fn n {
+	.d 'Play next track'
+	.c 'media'
+	mpc next
+}
 fn name {|*|
 	.d 'Set prompt text and terminal title.'
 	.a '[NAME]'
 	if {~ $* ()} {
 		prompt ''
-		title xs
+		title `{echo $TERM|sed 's/-256color.*//'}
 	} else {
 		prompt $*
 		title $*
@@ -376,6 +325,7 @@ fn name {|*|
 }
 fn net {
 	.d 'Network status'
+	.c 'system'
 	nmcli --fields name,type,device \
 		connection show --active
 }
@@ -393,10 +343,48 @@ fn noise {|*|
 			tremolo 0.05 30 vol $volume dB
 	}
 }
-fn on {who -Huw}
-fn open xdg-open
+fn o {
+	.d 'List open windows per desktop'
+	.c 'system'
+	for d `{bspc query -D --names} {
+		let (wl = `{bspc query -N -n .window -d $d}) {
+			if {!~ $wl ()} {
+				echo `.au^Desktop^`.an `.ab^$d^`.an
+				for w $wl {printf \t%s\n `` \n {xtitle $w}}
+			}
+		}
+	} | less -RFX
+}
+fn oc {
+	.d 'Onscreen clock'
+	.d 'alias'
+	.ci
+	stty intr q
+	unwind-protect {
+		watch -t -n 1 -p banner \`date +%A%n%T%n%x\`
+	} {
+		clear
+		stty intr \^C
+		.cn
+	}
+}
+fn on {
+	.d 'List console logins'
+	.c 'system'
+	who -Huw
+}
+fn open {|*|
+	.c 'alias'
+	xdg-open $*
+}
+fn p {
+	.d 'Pulse Audio mixer'
+	.c 'alias'
+	pamixer
+}
 fn panel {|*|
 	.d 'Query/set Intel backlight intensity'
+	.c 'system'
 	.a '[1..100]'
 	if {access -d /sys/class/backlight/intel_backlight} {
 		let (b = $*; bp = /sys/class/backlight/intel_backlight; mb) {
@@ -416,9 +404,37 @@ fn panel {|*|
 		}
 	} else {throw error panel 'no Intel backlight'}
 }
-fn pn {ps haux|cut -d' ' -f1|sort|uniq}
+fn pn {
+	.d 'Users with active processes'
+	.c 'system'
+	ps haux|cut -d' ' -f1|sort|uniq
+}
+fn prs {|*|
+	.d 'Display process info'
+	.c 'system'
+	.a '[-f] [prtstat_OPTIONS] NAME'
+	!~ $* () && {
+		let (pgrep_option = -x) {
+			{~ $*(1) -f} && {
+				pgrep_option = $*(1)
+				* = $*(2 ...)
+			}
+			let (pids = `{pgrep $pgrep_option $*}) {
+				if {!~ $pids ()} {
+					for pid $pids {
+						!~ $#pids 1 && echo '========'
+						prtstat $pid
+					} | less -FX
+				} else {
+					echo 'not found'
+				}
+			}
+		}
+	}
+}
 fn pt {|*|
 	.d 'ps for user; only processes with terminal'
+	.c 'system'
 	.a '[[-fFcyM] USERNAME]'
 	.pu $*|awk '{if ($14 != "?") print}'|less -FX
 }
@@ -433,11 +449,13 @@ fn .pu {|*|
 }
 fn pu {|*|
 	.d 'ps for user'
+	.c 'system'
 	.a '[[-fFCyM] USERNAME]'
 	.pu $*|less -FX
 }
 fn screensaver {|*|
 	.d 'Query/set display screensaver enable'
+	.c 'system'
 	.a '[on|off]'
 	let (error = false) {
 		if {~ $DISPLAY ()} {
@@ -467,6 +485,7 @@ fn screensaver {|*|
 }
 fn startwm {
 	.d 'Start X window manager'
+	.c 'system'
 	if {!~ $DISPLAY ()} {
 		throw error startwm 'already running'
 	} else if {!~ `tty *tty*} {
@@ -477,21 +496,65 @@ fn startwm {
 }
 fn svis {|*|
 	.d 'Edit file under sudo'
-	.a '[vis_OPTIONS] [FILE ...]'
+	.c 'alias'
+	.a '[vis_OPTIONS|FILE] ...'
 	sudo /usr/local/bin/vis $*
+}
+fn swapm {
+	.d 'Exchange positions of monitors'
+	.c 'system'
+	let ((m1 m2) = `{
+		grep -f <{map {|*| echo \^$*} `{bspc query -M --names}} \
+			<{xrandr} \
+			|sed 's/ \(dis\)\?connected / /'|sed 's/ (.*) / /' \
+			|awk '{printf("%s\t%s\n", $1, $2)}' \
+			|sort -n -t+ -k2|cut -f1}) {
+			!~ $m2 () && {
+				xrandr --output $m2 --left-of $m1
+				echo $m2 $m1
+			}
+	}
+}
+fn topc {
+	.d 'List top %CPU processes'
+	.c 'system'
+	ps auxk-%cpu|head -11
+}
+fn topm {
+	.d 'List top %MEM processes'
+	.c 'system'
+	ps auxk-%mem|head -11
+}
+fn topr {
+	.d 'List top RSS processes'
+	.c 'system'
+	ps auxk-rss|head -11
+}
+fn topt {
+	.d 'List top TIME processes'
+	.c 'system'
+	ps auxk-time|head -11
+}
+fn topv {
+	.d 'List top VSZ processes'
+	.c 'system'
+	ps auk-vsz|head -11
 }
 fn thermal {
 	.d 'Summarize system thermal status'
+	.c 'system'
 	sensors >[2]/dev/null | grep -e '^Physical' -e '^Core' -e '^fan' \
 		| sed 's/ *(.*$//'
 }
 fn title {|*|
 	.d 'Set terminal title'
+	.c 'system'
 	.a '[TITLE]'
 	$&echo -n \e]0\;^$^*^\a
 }
 fn treec {|*|
 	.d 'Display filesystem tree'
+	.c 'alias'
 	.a 'DIRECTORY'
 	tree --du -hpugDFC $* | less -RFX
 }
@@ -519,6 +582,7 @@ fn u2o {|*|
 }
 fn uh {
 	.d 'Undo history'
+	.c 'system'
 	!~ $history () && {
 		let (li = `{cat $history|wc -l}) {
 			history -d $li >/dev/null
@@ -544,8 +608,14 @@ fn ulu {|*|
 		} | env LESSUTFBINFMT=*n!PRINT less -FXS
 	}
 }
+fn upgrade {
+	.d 'Upgrade Fedora packages'
+	.c 'system'
+	sudo dnf upgrade -y --refresh
+}
 fn vidshuffle {|*|
 	.d 'Shuffle videos under directory'
+	.c 'media'
 	.a 'DIRECTORY'
 	let (dir = $(1); filt = $(2); scale) {
 		~ $filt () && filt = '*'
@@ -558,41 +628,59 @@ fn vidshuffle {|*|
 }
 fn wallpaper {|*|
 	.d 'Set wallpaper'
-	.a 'FILE-OR-DIRECTORY'
-	.a 'DELAY_MINUTES DIRECTORY'
+	.c 'system'
+	.a '[-m MONITOR] FILE-OR-DIRECTORY'
+	.a '[-m MONITOR] DELAY_MINUTES DIRECTORY'
 	.a '(none)  # restore root window'
 	if {~ $DISPLAY ()} {
 		throw error wallpaper 'X only'
 	} else {
-		switch $#* (
-		1 {	let (f) {
-				access -f $* && f = $*
-				access -d $* && wallpaper \
-					`{find -L $* \( -name '*.jpg' \
-					-o -name '*.png' \) |shuf|head -1}
-				!~ $f () && {
-					pkill xdesktopwaves
-					display -window root $f
+		local (pageopt = $pageopt) {
+			let (geom; mon; monopt) {
+				if {~ $*(1) -m} {
+					mon = $*(2)
+					monopt = $*(1 2); monopt = $^monopt
+					* = $*(3 ...)
+					geom = `{grep \^$mon <{xrandr}| \
+						cut -d' ' -f3}
 				}
+				!~ $geom () && pageopt = -page $geom
+				switch $#* (
+				1 {	let (f) {
+						access -f $* && f = $*
+						access -d $* && wallpaper \
+							`{find -L $* \
+							\( -name '*.jpg' \
+							-o -name '*.png' \) \
+							|shuf|head -1}
+						!~ $f () && {
+							display -window root \
+								$pageopt $f
+						}
+					}
+				}
+				2 {	let (m = $*(1); d = $*(2); \
+						p = 'while true {wallpaper '; \
+						f = 'while true \{wallpaper') {
+						access -d $d && {
+							pkill -f $f
+							setsid xs -c \
+							$p^$monopt^' ' \
+							^$d^'; sleep ' \
+							^`($m*60)^'}' &
+						}
+					}
+				}
+				{	pkill -f 'while true \{wallpaper'
+					xsetroot -solid 'Slate Gray'
+				})
 			}
 		}
-		2 {	let (m = $*(1); d = $*(2)) {
-				access -d $d && {
-					pkill -f 'while true \{wallpaper'
-					setsid xs -c \
-					'while true {wallpaper ' \
-					^$d^'; sleep '^`($m*60)^'}' &
-				}
-			}
-		}
-		{	pkill -f 'while true \{wallpaper'
-			xsetroot -solid 'Cadet Blue'
-			setsid ~/.spectrwm/animate
-		})
 	}
 }
 fn web {|*|
 	.d 'Open web URL'
+	.c 'web'
 	.a 'URL'
 	let (error = false) {
 		switch $#* (
@@ -602,9 +690,13 @@ fn web {|*|
 		)
 	}
 }
-fn whats /usr/bin/whatis
+fn whats {|*|
+	.c 'alias'
+	/usr/bin/whatis $*
+}
 fn where {
 	.d 'Summarize user, host, tty, shell pid and working directory'
+	.c 'system'
 	printf '%s@%s[%s;%d]:%s'\n \
 		$USER `{hostname -s} <={~~ `tty /dev/*} $pid `pwd
 }
@@ -620,16 +712,12 @@ fn zathura {|*|
 	xembed -e /usr/bin/zathura $* >/dev/null >[2=1]
 }
 
-fn .herald {
-	let (fn-nl = {printf \n}; fn-isconsole = {~ `tty *tty*}) {
-		.as; cookie; .an; nl
-		isconsole && {on; nl; net; nl; thermal; battery; load; nl}
-		.ab; where; .an
-	}
-}
-.herald
-
 # This code is in two parts. See the top of this file.
-# ref: /usr{/local}/share/doc/xs/NOTES
-result $force_locale && {force_locale = ; SHLVL = `($SHLVL-1); exec xs}
+# ref: /usr{/local}/share/doc/xs/SYSTEMD_LOCALE
+result $force_locale && {
+	force_locale = <=false
+	SHLVL = `($SHLVL-1)
+	exec xs -l
+}
+} # locale hack
 # end
