@@ -58,7 +58,10 @@ project('xs', 'cpp')
   install_data(['samples/_xsrc', 'samples/_xsin', 'samples/colors',
 		'samples/histclean'],
 	install_dir: 'share/doc/xs/samples')
-  install_data(['samples/_xsrc.d/daemons.xs', 'samples/_xsrc.d/env.xs',
+  install_data(['samples/_xsrc.d/attrs.xs', 'samples/_xsrc.d/console.xs',
+		'samples/_xsrc.d/env.xs', 'samples/_xsrc.d/help.xs',
+		'samples/_xsrc.d/herald.xs',
+		'samples/_xsrc.d/prompt-config.xs',
 		'samples/_xsrc.d/prompt.xs'],
 	install_dir: 'share/doc/xs/samples/_xsrc.d')
 
