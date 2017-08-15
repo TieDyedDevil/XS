@@ -8,10 +8,16 @@ file to comment out the Environment=... line, I think it's safer
 to include the following code in your ~/.xsrc file.
 
 	-- begin ~/.xsrc --
+	result $force_locale && { # locale hack
 	{~ $LC_ALL ()} && {force_locale = <=true}
 	LC_ALL = en_US.utf8
 	
 	# ... your code goes here ...
 	
-	if {result $force_locale} {exec xs}
+	result $force_locale && {
+		force_locale = <=false
+		SHLVL = `($SHLVL-1)
+		exec xs -l
+	}
+	} # locale hack
 	-- end ~/.xsrc --
