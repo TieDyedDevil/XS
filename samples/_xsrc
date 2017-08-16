@@ -1,10 +1,12 @@
-# This code is in two parts. See the bottom of this file.
+# systemd doesn't set locale, so we must...
 # ref: /usr{/local}/share/doc/xs/SYSTEMD_LOCALE
-result $force_locale && { # locale hack
-~ $LC_ALL () && {force_locale = <=true}
-LC_ALL = en_US.UTF-8
-LANG = $LC_ALL
-# end
+~ $LC_ALL () && {
+	LC_ALL = en_US.UTF-8
+	LANG = $LC_ALL
+	SHLVL = `($SHLVL-1)
+	exec xs -l
+}
+# end locale hack
 
 path = /usr/local/bin /usr/bin /usr/sbin $home/.local/bin $home/bin
 history = $home/.xshistory
@@ -208,6 +210,15 @@ fn load {
 	.c 'system'
 	cat /proc/loadavg
 }
+fn lock {
+	.d 'Lock screen'
+	.c 'system'
+	if {~ $DISPLAY ()} {
+		vlock
+	} else {
+		~/.local/bin/lock
+	}
+}
 fn lpman {|man|
 	.d 'Print a man page'
 	.a 'PAGE'
@@ -347,10 +358,14 @@ fn o {
 	.d 'List open windows per desktop'
 	.c 'system'
 	for d `{bspc query -D --names} {
-		let (wl = `{bspc query -N -n .window -d $d}) {
+		let (wl = `{bspc query -N -n .window -d $d}; vf) {
 			if {!~ $wl ()} {
 				echo `.au^Desktop^`.an `.ab^$d^`.an
-				for w $wl {printf \t%s\n `` \n {xtitle $w}}
+				for w $wl {
+					if {~ `{bspc query -N -n $w^.hidden} \
+						()} { vf = v } else { vf = h }
+					printf %s\t%s\n $vf `` \n {xtitle $w}
+				}
 			}
 		}
 	} | less -RFX
@@ -452,6 +467,11 @@ fn pu {|*|
 	.c 'system'
 	.a '[[-fFCyM] USERNAME]'
 	.pu $*|less -FX
+}
+fn remake {
+	.d 'Remake K source projects as needed'
+	.c 'system'
+	sudo -E /usr/local/bin/xs -c 'cd /usr/local/src; ./remake'
 }
 fn screensaver {|*|
 	.d 'Query/set display screensaver enable'
@@ -711,13 +731,3 @@ fn zathura {|*|
 	.d 'Document viewer'
 	xembed -e /usr/bin/zathura $* >/dev/null >[2=1]
 }
-
-# This code is in two parts. See the top of this file.
-# ref: /usr{/local}/share/doc/xs/SYSTEMD_LOCALE
-result $force_locale && {
-	force_locale = <=false
-	SHLVL = `($SHLVL-1)
-	exec xs -l
-}
-} # locale hack
-# end
