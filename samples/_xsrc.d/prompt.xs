@@ -12,7 +12,7 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 	fn prompt {|x|
 		.d 'Alter prompt'
 		.c 'prompt'
-		.a '-o P1 P2 PT'
+		.a '-o P1 P2 PT # redefine initial prompt'
 		.a 'P1 P2 PT'
 		.a 'P1 P2'
 		.a 'PT'
@@ -136,4 +136,3 @@ fn rp {
 		prompt -a $att($i)
 	}
 }
-fn .xsin-rp {%prompt; rp; _n@$pid = 0}

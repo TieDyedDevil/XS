@@ -1,7 +1,4 @@
 ## Framebuffer resize
-fn .fbset {|*|
-	if {~ $TERM linux} {fbset -a -g $* $* 32} else {echo 'not a vt'}
-}
 fn vtfhd {
 	.d 'Set framebuffer size 1920x1080 (16:9)'
 	.c 'framebuffer'

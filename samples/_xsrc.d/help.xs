@@ -1,8 +1,3 @@
-## Help tags
-fn .d {|*|} # docstring
-fn .c {|*|} # category
-fn .a {|*|} # argstring
-
 # Help functions
 fn help {|*|
 	.d 'Help for xs function'
