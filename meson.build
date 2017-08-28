@@ -1,4 +1,4 @@
-project('xs', 'cpp')
+project('xs', ['cpp', 'c'])
   compiler = meson.get_compiler('cpp')
   if compiler.get_id() == 'clang'
 	compile_flags = ['-Wall', '-Wextra', '-O3']
@@ -51,7 +51,10 @@ project('xs', 'cpp')
 	link_args: link_flags,
 	dependencies: common_dependencies,
 	install: true)
-  install_man('xs.1')
+  xs_pprint = executable('xs_pprint', ['xs_pprint.c'],
+	cpp_args: compile_flags,
+	install: true)
+  install_man(['xs.1', 'xs_pprint.1')
   install_data(['AUTHORS', 'CHANGES', 'COPYING', 'GOTCHAS', 'INSTALL',
 		'NOTES', 'README', 'SYSTEMD_LOCALE', 'TODO', 'TUTORIAL.md'],
 	install_dir: 'share/doc/xs')

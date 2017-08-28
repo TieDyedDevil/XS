@@ -1,0 +1,16 @@
+.TH xs_pprint 1
+.SH NAME
+xs_pprint \- Prettyprint canonical xs function
+.SH DESCRIPTION
+.B xs_pprint
+is a filter (standard input to standard output) that indents
+.B xs
+function code, changing the code from its canonical form (e.g. as the
+result of
+.IR whatis )
+to a form that uses indentation to illustrate the relationships among the
+nodes of the syntax tree. Note well that the output is, in the general case,
+not valid
+.B xs
+code; the prettyprinter makes no attempt to insert line continuations.
+
