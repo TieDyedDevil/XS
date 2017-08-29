@@ -342,7 +342,7 @@ restart:
 		goto done;
 	}
 
-	/* the logic here is duplicated in $&whatis */
+	/* the logic here is duplicated in $&whats */
 
 	name = getstr(list->term);
 	fn = varlookup2("fn-", name, binding);
@@ -354,7 +354,7 @@ restart:
 	if (isabsolute(name)) {
 		const char *error = checkexecutable(name);
 		if (error)
-			fail("$&whatis", "%s: %s", name, error);
+			fail("$&whats", "%s: %s", name, error);
 		list = forkexec(name, list, flags & eval_inchild);
 		goto done;
 	}

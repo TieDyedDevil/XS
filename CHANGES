@@ -8,6 +8,9 @@ specified elements in reverse order.
 
 %read is renamed to read.
 
+whatis is renamed to whats in order to avoid collision with the whatis
+command for man pages.
+
 Restrict the garbage collector to a single marking thread. Given the
 extremely low marker CPU utilization, it makes no sense to allocate
 one thread per CPU.

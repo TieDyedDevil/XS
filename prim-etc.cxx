@@ -211,10 +211,10 @@ PRIM(flatten) {
 	return list;
 }
 
-PRIM(whatis) {
+PRIM(whats) {
 	/* the logic in here is duplicated in eval() */
 	if (list == NULL || list->next != NULL)
-		fail("$&whatis", "usage: $&whatis program");
+		fail("$&whats", "usage: $&whats program");
 	Term* term = list->term;
 	if (getclosure(term) == NULL) {
 		const char* prog = getstr(term);
@@ -224,7 +224,7 @@ PRIM(whatis) {
 		else if (isabsolute(prog)) {
 				const char *error = checkexecutable(prog);
 				if (error != NULL)
-					fail("$&whatis", "%s: %s", prog, error);
+					fail("$&whats", "%s: %s", prog, error);
 		}
 		else return pathsearch(term);
 	}
@@ -463,7 +463,7 @@ extern void initprims_etc(Prim_dict& primdict) {
 	X(exec);
 	X(dot);
 	X(flatten);
-	X(whatis);
+	X(whats);
 	X(sethistory);
 	X(split);
 	X(fsplit);

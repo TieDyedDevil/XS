@@ -167,15 +167,15 @@ fn-%newfd	= $&newfd
 fn-%run         = $&run
 fn-%split       = $&split
 fn-%var		= $&var
-fn-%whatis	= $&whatis
+fn-%whats	= $&whats
 
 #	These builtins are only around as a matter of convenience, so
 #	users don't have to type the infamous <= (nee <>) operator.
-#	Whatis also protects the used from exceptions raised by %whatis.
+#	Whatis also protects the used from exceptions raised by %whats.
 
 fn-var	=	{ |args| for i $args { echo <={%var $i} } }
 
-fn-whatis = { |args|
+fn-whats = { |args|
 	let (result) {
 		for i $args {
 			catch { |e from message|
@@ -185,7 +185,7 @@ fn-whatis = { |args|
 				echo >[1=2] $message
 				result = $result 1
 			} {
-				echo <={%whatis $i}
+				echo <={%whats $i}
 				result = $result 0
 			}
 		}
