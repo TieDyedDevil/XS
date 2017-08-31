@@ -189,4 +189,4 @@ if {$#* :eq 0} {
     dispatch `{tput colors}
 } else {
     dispatch $1
-}
+} | less -RFX

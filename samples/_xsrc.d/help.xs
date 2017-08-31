@@ -1,9 +1,9 @@
 # Help functions
 fn help {|*|
 	.d 'Help for xs function'
-	.c 'help'
 	.a 'NAME'
 	.a '-c [CATEGORY]'
+	.c 'help'
 	if {~ $* -c} {
 		switch $#* (
 		1 {vars -f | sed 's/{\.c [^}]*}/\n&\n/g' | grep -e '^{\.c' \
@@ -22,7 +22,7 @@ fn help {|*|
 				| grep -e '^{\.\(a\|c\|\d\)' \
 				| sed 's/''''/''/g'}
 			~ $^st '0 0 0 1 0' && {echo 'no help for' $nm; \
-						whatis $nm}
+						whats $nm}
 			~ $^st '0 1 0 1 0' && echo 'no function' $nm
 		}
 	} | less -RFX

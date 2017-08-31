@@ -27,10 +27,12 @@ fn cookie {
 		fortune -n 200 -s $subjects
 	}
 }
-fn cs {
+fn cs {|*|
 	.d 'List compose sequences'
+	.a '[-a]  # show all variations'
 	.c 'system'
-	{grep '^<Multi_key>' /usr/share/X11/locale/en_US.UTF-8/Compose | \
+	%with-read-lines <{grep '^<Multi_key>' \
+				/usr/share/X11/locale/en_US.UTF-8/Compose | \
 		grep -v -e '<dead' -e '<kana_' -e '<hebrew_' -e '<Arabic_' \
 			-e '<Cyrillic_' -e '<Greek_' -e '<Ukrainian_' \
 			-e '<KP_' -e '<ae>' -e '<AE>' -e '<ezh>' -e '<EZH>' \
@@ -42,8 +44,30 @@ fn cs {
 			-e '<U\([0-9A-Fa-f]\)\+>' \
 		| grep -v -e '"   \b\(ascii[^ ]\+\|brace[^ ]\+\|at\|bar\|' \
 			^'apostrophe\|numbersign\|bracket\(left\|right\)\) ' \
-		| grep -v -e 'U1F595' -e 'U1F596'} >[2]/dev/null | less -FX
-	# a/o 20170807, st exits upon trying to render \U0001f595 or \U0001f596
+		| sed 's/^\(.\+ # \). . \(.\+\)$/\1\2/' \
+		| if {~ $*(1) -a} cat else {uniq -f 4} \
+	} {|*|
+		kf = /usr/include/X11/keysymdef.h
+		ksym = `{echo $*|sed 's|^[^:]\+:[[:space:]]\+"[^"]\+"' \
+				^'[[:space:]]\+\([^ ]\+\).*$|\1|'}
+		if {grep -q 'U[[:xdigit:]]\+\b' <{echo $ksym}} {
+			echo $*
+		} else {
+			ksd = `{grep 'XK_'^$ksym^'\b' $kf}
+			if {~ $#ksd 0} {
+				echo $*
+			} else {
+				kuc = `{echo $ksd \
+					|grep -o ' *U+[[:xdigit:]]\+ ' \
+					|tr -d +|head -1}
+				echo $*|sed 's|^\([^:]\+: \+"[^"]\+" \+\)' \
+					^'[[:alpha:]]\+\(.*\)$|\1'^$kuc^'\2|'
+			}
+		}
+	} | expand | awk -F: '{printf "%-48.48s:%s\n", ' \
+				^'gensub(/^(.*) +$/, "\\1", "g", $1), ' \
+				^'gensub(/ +/, " ", "g", $2)}' \
+		| env LESSUTFBINFMT='*s?' less -SFX
 }
 fn d {
 	.d 'Date/time (local and UTC)'
@@ -61,8 +85,8 @@ fn dl-clean {
 }
 fn doc {|*|
 	.d 'pushd to documentation directory of package'
-	.c 'system'
 	.a 'PACKAGE_NAME_GLOB'
+	.c 'system'
 	if {!~ $* ()} {
 		let (pl) {
 			pl = `{find -L /usr/share/doc /usr/local/share/doc \
@@ -87,6 +111,11 @@ fn import-abook {|*|
 	abook --convert --infile $* --informat vcard --outformat abook \
 		--outfile ~/.abook/addressbook
 	chmod 600 ~/.abook/addressbook
+}
+fn latest {
+	.d 'List latest START processes for current user'
+	.c 'system'
+	ps auk-start_time -U $USER|less -FX
 }
 fn lock {
 	.d 'Lock screen'
@@ -129,8 +158,8 @@ fn mamel {
 }
 fn mdv {|*|
 	.d 'Markdown file viewer'
-	.c 'system'
 	.a 'MARKDOWN_FILE'
+	.c 'system'
 	if {!~ $#* 1 || !access -f $*} {
 		throw error mdv 'usage: mdv MARKDOWN_FILE'
 	} else {
@@ -195,7 +224,7 @@ fn o {
 }
 fn oc {
 	.d 'Onscreen clock'
-	.d 'system'
+	.c 'system'
 	%with-quit {
 		%without-cursor {
 			watch -t -n 1 -p banner \`date +%A%n%T%n%x\`
@@ -204,8 +233,8 @@ fn oc {
 }
 fn panel {|*|
 	.d 'Query/set Intel backlight intensity'
-	.c 'system'
 	.a '[1..100]'
+	.c 'system'
 	if {access -d /sys/class/backlight/intel_backlight} {
 		let (b = $*; bp = /sys/class/backlight/intel_backlight; mb) {
 			mb = `{cat $bp/max_brightness}
@@ -229,10 +258,18 @@ fn pn {
 	.c 'system'
 	ps haux|cut -d' ' -f1|sort|uniq
 }
+fn pp {|*|
+	.d 'Prettyprint xs function'
+	.a 'NAME'
+	.c 'system'
+	catch {|e|
+		echo 'not a function'
+	} {%pprint $*; printf \n} | less -FXS
+}
 fn prs {|*|
 	.d 'Display process info'
-	.c 'system'
 	.a '[-f] [prtstat_OPTIONS] NAME'
+	.c 'system'
 	!~ $* () && {
 		let (pgrep_option = -x) {
 			{~ $*(1) -f} && {
@@ -254,23 +291,29 @@ fn prs {|*|
 }
 fn pt {|*|
 	.d 'ps for user; only processes with terminal'
-	.c 'system'
 	.a '[[-fFcyM] USERNAME]'
+	.c 'system'
 	.pu $*|awk '{if ($14 != "?") print}'|less -FX
 }
 fn pu {|*|
 	.d 'ps for user'
-	.c 'system'
 	.a '[[-fFCyM] USERNAME]'
+	.c 'system'
 	.pu $*|less -FX
 }
 fn screensaver {|*|
 	.d 'Query/set display screensaver enable'
-	.c 'system'
 	.a '[on|off]'
+	.a '(none)  # show current'
+	.c 'system'
 	let (error = false) {
 		if {~ $DISPLAY ()} {
-			if {!~ $#* 0} {
+			if {!~ `tty */tty*} {throw error screensaver 'not a tty'}
+			if {~ $#* 0} {
+				timeout = `{cat /sys/module/kernel/parameters/consoleblank}
+				if {~ $timeout 0} {echo Off} \
+				else {echo On}
+			} else {
 				switch $* (
 				on {setterm -blank 15 -powerdown 15 >>/dev/tty}
 				off {setterm -blank 0 -powerdown 0 >>/dev/tty}
@@ -281,8 +324,8 @@ fn screensaver {|*|
 				let (timeout) {
 					timeout = `{xset q|grep timeout \
 						|awk '{print $2}'}
-					{if {~ $timeout 0} {echo Off} \
-					else {echo On}}
+					if {~ $timeout 0} {echo Off} \
+					else {echo On}
 				}
 			} else {
 				switch $* (
@@ -358,18 +401,13 @@ fn thermal {
 }
 fn title {|*|
 	.d 'Set terminal title'
-	.c 'system'
 	.a '[TITLE]'
+	.c 'system'
 	$&echo -n \e]0\;^$^*^\a
-}
-fn treec {|*|
-	.d 'Display filesystem tree'
-	.c 'alias'
-	.a 'DIRECTORY'
-	tree --du -hpugDFC $* | less -RFX
 }
 fn tsmwd {
 	.d 'Return to tsm working directory'
+	.c 'system'
 	if {!~ $TSMWD ()} {cd $TSMWD; echo $TSMWD} else echo .
 }
 fn tss {|*|
@@ -406,12 +444,10 @@ fn ulu {|*|
 	.d 'Unicode lookup'
 	.a 'PATTERN'
 	.c 'system'
-	let (cpnm = /usr/lib64/perl5/vendor_perl/Unicode/CharName.pm; \
-		l = go; hex; desc; char) {
-		egrep -i '^[0-9a-f]{4,} .*'^$* $cpnm | until {~ $l ()} {
-			l = <=read
-			~ $l () || {
-				(hex desc) = <={~~ $l *\ *}
+	let (ud = /usr/share/unicode/ucd/UnicodeData.txt) {
+		%with-read-lines <{egrep -i -o '^[0-9a-f]{4,};[^;]*' \
+						^$*^'[^;]*;' $ud} {|l|
+			let ((hex desc) = <={~~ $l *\;*\;}) {
 				hex = `{printf %8s $hex|tr ' ' 0}
 				uni = `{eval echo '\U'^$hex >[2]/dev/null}
 				if {!result $bqstatus} {uni = !UTF-8}

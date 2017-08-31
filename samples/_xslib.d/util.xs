@@ -154,10 +154,71 @@ fn %with-tempfile {|name body|
 
 fn %aset {|n i v|
 	# Emulate indexed assignment.
-	$n[$i] = $v
+	\xff^$n[$i] = $v
 }
 
 fn %aref {|n i|
 	# Emulate indexed retrieval.
-	result $($n[$i])
+	result $(\xff^$n[$i])
+}
+
+let (g = 0) {
+	fn %gensym {
+	# Generate a "unique" name.
+		let (n = \xff\xff^`{printf G%04u $g}) {
+			g = `($g+1)
+			result $n
+		}
+	}
+}
+
+fn %with-read-lines {|file body|
+	# Run body with each line from file.
+	# Body must be a lambda; its argument is bound to the line content.
+	cat $file|let (__l = <=read) {
+		while {!~ $__l ()} {
+			$body $__l
+			__l = <=read
+		}
+	}
+}
+
+fn %with-read-chars {|line body|
+	# Run body with each character from line.
+	# Body must be a lambda; its argument is bound to the next character.
+	let (i = 0; lc = <={%fsplit '' $line}) {
+		let (ll = $#lc; __c) {
+			let (fn-nextc = {
+				i = `($i+1)
+				if {$i :le $ll} {
+					result <={__c = $lc($i)}
+				} else {
+					result <={__c = ()}
+				}}) {
+				while {!~ <=nextc ()} {
+					$body $__c
+				}
+			}
+		}
+	}
+}
+
+fn %pprint {|fn-name|
+	# Pretty print named function
+	~ $(fn-$fn-name) () && {throw error %pprint 'not a function'}
+	printf fn\ %s $fn-name
+	let (depth = 1; q = 0) {
+		%with-read-chars $(fn-$fn-name) {|c|
+			~ $c '''' && {q = `(($q+1)%2)}
+			~ $q 0 && switch $c (
+			'{'	{
+				printf %c\n '\'
+				for i `{seq `($depth*4)} {printf ' '}
+				depth = `($depth+1)
+				}
+			'}'	{depth = `($depth-1)}
+			)
+			printf %c $c
+		}
+	}
 }

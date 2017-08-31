@@ -1,13 +1,13 @@
 fn ag {|*|
 	.d 'Search tree for pattern in files'
-	.c 'alias'
 	.a '[ag_OPTIONS] PATTERN [DIRECTORY]'
+	.c 'alias'
 	/usr/bin/ag --pager='less -RFX' $*
 }
 fn avis {|*|
 	.d 'Edit w/ APL key bindings'
-	.c 'alias'
 	.a '[vis_OPTIONS|FILE]...'
+	.c 'alias'
 	akt vis $*
 }
 fn c {
@@ -17,8 +17,9 @@ fn c {
 }
 fn calc {|*|
 	.d 'Evaluate arithmetic expression'
+	.a 'nickle_EXPRESSION'
 	.c 'alias'
-	nickle -e $*
+	~ $#* 0 || nickle -e $*
 }
 fn la {|*|
 	.c 'alias'
@@ -73,18 +74,20 @@ fn remake {
 }
 fn svis {|*|
 	.d 'Edit file under sudo'
-	.c 'alias'
 	.a '[vis_OPTIONS|FILE] ...'
+	.c 'alias'
 	sudo /usr/local/bin/vis $*
+}
+fn treec {|*|
+	.d 'Display filesystem tree'
+	.a 'DIRECTORY'
+	.c 'alias'
+	tree --du -hpugDFC $* | less -RFX
 }
 fn upgrade {
 	.d 'Upgrade Fedora packages'
 	.c 'alias'
 	sudo dnf upgrade -y --refresh
-}
-fn whats {|*|
-	.c 'alias'
-	/usr/bin/whatis $*
 }
 fn xaos {|*|
 	.d 'Fractal explorer'

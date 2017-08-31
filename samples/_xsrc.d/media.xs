@@ -1,7 +1,12 @@
+fn b {
+	.d 'Stop playing track'
+	.c 'media'
+	mpc pause
+}
 fn gallery {|*|
 	.d 'Random slideshow'
-	.c 'media'
 	.a 'PATH [DELAY]'
+	.c 'media'
 	let (dir = $(1); time = $(2)) {
 		~ $time () && time = 5
 		if {~ $TERM linux} {
@@ -23,8 +28,8 @@ fn gallery {|*|
 }
 fn image {|*|
 	.d 'Display image'
-	.c 'media'
 	.a 'FILE ...'
+	.c 'media'
 	if {~ $TERM linux} {
 		fbi --noverbose $*
 	} else if {~ $DISPLAY () && ~ `consoletype pty} {
@@ -36,10 +41,12 @@ fn image {|*|
 fn m {
 	.d 'Show currently playing track'
 	.c 'media'
-	let (mi = `mktemp) {
+	%with-tempfile mi {
 		mpc > $mi
 		if {grep -q '\[playing\]' $mi} {
-			printf '%s  |%s'\n `` \n {cat $mi|head -1} \
+			printf '%s|  '^`.as^'%s'^`.an^'  |%s'\n \
+				`` \n {cat $mi|head -1|cut -d\| -f1} \
+				`` \n {cat $mi|head -1|cut -d\| -f2|cut -c3-} \
 				`` \n {cat $mi|tail -n+2|head -1|xargs echo \
 					|cut -d' ' -f3-}
 		} else {echo 'Not playing'}
@@ -52,8 +59,8 @@ fn mpc {|*|
 }
 fn mpv {|*|
 	.d 'Movie player'
-	.c 'media'
 	.a '[mpv_OPTIONS] FILE ...'
+	.c 'media'
 	let (embed; video_driver) {
 		if {~ $DISPLAY ()} {
 			video_driver = drm
@@ -61,15 +68,16 @@ fn mpv {|*|
 			embed = --wid=$XEMBED
 			video_driver = opengl-hq
 		}
-		/usr/bin/mpv --vo $video_driver $embed --no-stop-screensaver $*
+		/usr/bin/mpv --profile $video_driver $embed \
+			--no-stop-screensaver $*
 	}
 }
 fn mpvl {|*|
 	.d 'Movie player w/ volume leveler'
-	.c 'media'
 	.a '[mpv_OPTIONS] FILE ...'
+	.c 'media'
 	let (afconf = 'lavfi=[highpass=f=100,dynaudnorm=f=100:r=0.7:c=1' \
-		^':m=20.0:b=1],volume=-9') {
+		^':m=20.0:b=1]') {
 		mpv --af=$afconf $*
 	}
 }
@@ -78,10 +86,15 @@ fn n {
 	.c 'media'
 	if {~ `mpc \[playing\]} {mpc next} else {mpc play}
 }
+fn played {
+	.d 'List recently-played tracks'
+	.c 'media'
+	cat ~/.mpd/mpd.log|cut -c24-|grep '^played'|tail -n 15|tac|nl|tac
+}
 fn vidshuffle {|*|
 	.d 'Shuffle videos under directory'
-	.c 'media'
 	.a 'DIRECTORY'
+	.c 'media'
 	let (dir = $(1); filt = $(2); scale) {
 		~ $filt () && filt = '*'
 		~ `consoletype vt && scale = --vf scale=`{fbset \

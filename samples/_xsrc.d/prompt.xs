@@ -11,7 +11,6 @@ let (pi_p = $prompt_init(1); pi_a = $prompt_init(2); pi_s = $prompt_init(3)) {
 local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 	fn prompt {|x|
 		.d 'Alter prompt'
-		.c 'prompt'
 		.a '-o P1 P2 PT # redefine initial prompt'
 		.a 'P1 P2 PT'
 		.a 'P1 P2'
@@ -23,6 +22,7 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 		.a '-l  # list defined prompts'
 		.a '-n NUM'
 		.a '(none)  # restore initial prompt'
+		.c 'prompt'
 		if {~ $x(1) -o} {
 			if {~ $#x 4} {_op = $x(2 ...)} \
 			else {throw error prompt 'P1 P2 PT'}

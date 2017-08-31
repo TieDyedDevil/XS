@@ -1,7 +1,7 @@
 fn web {|*|
 	.d 'Open web URL'
-	.c 'web'
 	.a 'URL'
+	.c 'web'
 	let (error = false) {
 		switch $#* (
 		0 web-browser
@@ -24,14 +24,14 @@ fn .web-query {|site path query|
 }
 fn amazon {|*|
 	.d 'Search Amazon'
-	.c 'web'
 	.a '[QUERY]'
+	.c 'web'
 	.web-query https://amazon.com/ s/\?field-keywords= $*
 }
 fn google {|*|
 	.d 'Search Google'
-	.c 'web'
 	.a '[QUERY]'
+	.c 'web'
 	.web-query https://google.com/ search\?q= $*
 }
 fn guardian {
@@ -41,19 +41,19 @@ fn guardian {
 }
 fn scholar {|*|
 	.d 'Search Google Scholar'
-	.c 'web'
 	.a '[QUERY]'
+	.c 'web'
 	.web-query https://scholar.google.com/ scholar\?hl=en\&q= $*
 }
 fn wikipedia {|*|
 	.d 'Search Wikipedia'
-	.c 'web'
 	.a '[QUERY]'
+	.c 'web'
 	.web-query https://en.wikipedia.org/ wiki/Special:Search\?search= $*
 }
 fn youtube {|*|
 	.d 'Search YouTube'
-	.c 'web'
 	.a '[QUERY]'
+	.c 'web'
 	.web-query https://youtube.com/ results\?search_query= $*
 }
