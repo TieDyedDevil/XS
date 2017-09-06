@@ -246,10 +246,9 @@ int Input::get() {
 #if READLINE
 /* callreadline -- readline wrapper */
 static char *callreadline() {
-#if 0
-	/* I'll leave this here for a little while, until I'm certain
-	   that the simple readline() call (see the #else, below) is
-	   correct.
+#if 1
+	/* I'll leave this here for a little while, until I figure
+	   out how to get both SIGWINCH and ^C working properly.
 
 	   I think that all of this signal munging around readline()
 	   may have been necessary with some earlier readline(), or
@@ -257,6 +256,10 @@ static char *callreadline() {
 	   replacement. At any rate, the modern GNU readline() does
 	   all of its signal handling without the application's
 	   cooperation.
+
+	   Calling readline() alone cleans up the SIGWINCH handling,
+	   but then ^C doesn't restart readline(). What we really need
+	   is for SIGWINCH to bypass readline() while ^C restarts it.
 
 	   Note that this is unrelated to the earlier addition of a
 	   SIGWINCH handler because readline() as of version 6.3 no
