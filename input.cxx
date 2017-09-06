@@ -246,6 +246,22 @@ int Input::get() {
 #if READLINE
 /* callreadline -- readline wrapper */
 static char *callreadline() {
+#if 0
+	/* I'll leave this here for a little while, until I'm certain
+	   that the simple readline() call (see the #else, below) is
+	   correct.
+
+	   I think that all of this signal munging around readline()
+	   may have been necessary with some earlier readline(), or
+	   perhaps with the BSD editline's "drop-in" readline()
+	   replacement. At any rate, the modern GNU readline() does
+	   all of its signal handling without the application's
+	   cooperation.
+
+	   Note that this is unrelated to the earlier addition of a
+	   SIGWINCH handler because readline() as of version 6.3 no
+	   longer handles that signal.
+	*/
 	char *r;
 	rl_already_prompted = interrupted;
 	interrupted = false;
@@ -261,6 +277,9 @@ static char *callreadline() {
 		errno = EINTR;
 	SIGCHK();
 	return r;
+#else
+	return readline(continued_input ? prompt2 : prompt);
+#endif
 }
 
 static rl_quote_func_t * default_quote_function ;
