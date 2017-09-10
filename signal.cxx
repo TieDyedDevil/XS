@@ -74,13 +74,19 @@ static void catcher(int sig) {
 	if (hasforked)
 		/* exit unconditionally on a signal in a child process */
 		exit(1);
-	if (caught[sig] == 0) {
-		caught[sig] = true;
-		++sigcount;
+	/* We bypass the xs signal mechanism for SIGWINCH; there's nothing
+	   xs needs to know about this signal and terminal_size() is safe
+	   to call. */
+	if (sig == SIGWINCH) terminal_size();
+	else {
+		if (caught[sig] == 0) {
+			caught[sig] = true;
+			++sigcount;
+		}
+		interrupted = true;
+		if (slow)
+			xs_longjmp(slowlabel, 1);
 	}
-	interrupted = true;
-	if (slow)
-		xs_longjmp(slowlabel, 1);
 }
 
 
@@ -320,7 +326,6 @@ extern void sigchk(void) {
 			NOTREACHED;
 			break;
 		case SIGWINCH:
-			terminal_size();
 			break;
 		default:
 			assert(0);

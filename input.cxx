@@ -246,25 +246,6 @@ int Input::get() {
 #if READLINE
 /* callreadline -- readline wrapper */
 static char *callreadline() {
-#if 1
-	/* I'll leave this here for a little while, until I figure
-	   out how to get both SIGWINCH and ^C working properly.
-
-	   I think that all of this signal munging around readline()
-	   may have been necessary with some earlier readline(), or
-	   perhaps with the BSD editline's "drop-in" readline()
-	   replacement. At any rate, the modern GNU readline() does
-	   all of its signal handling without the application's
-	   cooperation.
-
-	   Calling readline() alone cleans up the SIGWINCH handling,
-	   but then ^C doesn't restart readline(). What we really need
-	   is for SIGWINCH to bypass readline() while ^C restarts it.
-
-	   Note that this is unrelated to the earlier addition of a
-	   SIGWINCH handler because readline() as of version 6.3 no
-	   longer handles that signal.
-	*/
 	char *r;
 	rl_already_prompted = interrupted;
 	interrupted = false;
@@ -280,9 +261,6 @@ static char *callreadline() {
 		errno = EINTR;
 	SIGCHK();
 	return r;
-#else
-	return readline(continued_input ? prompt2 : prompt);
-#endif
 }
 
 static rl_quote_func_t * default_quote_function ;
@@ -688,6 +666,7 @@ extern bool isinteractive(void) {
 #endif
 
 /* terminal_size -- update terminal size */
+/* This must be safe to call from a signal handler. */
 void terminal_size(void) {
 	struct winsize ws;
 	if (ioctl(1, TIOCGWINSZ, &ws) == 0) {
