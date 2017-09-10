@@ -131,7 +131,7 @@ whitespace.
 For example, this `xs` code assigns a four-element list to `a`:
 
 ```
-; a = foo a\ word\ with spaces 'another word' bar
+; a = foo a\ word\ with\ spaces 'another word' bar
 ```
 
 The words in the list are
