@@ -2279,8 +2279,12 @@ Also displays the remaining stack.
 .Cr "printf \fIformat ...\fP"
 Print formatted text. Valid conversions are those of
 .IR printf (3p),
-including floating-point conversions. Length modifiers are
-not supported. Backslash escapes in the format are not interpreted by
+including floating-point conversions.
+There must be a one-to-one correspondence between format specs (excluding
+.BR %% )
+and arguments; positional argument specs, variable width and precision and
+excess arguments are all disallowed.
+Backslash escapes in the format are not interpreted by
 .IR printf .
 .TP
 .Cr "pushd \fR[\fP\fIdir\fP\fR]\fP"
