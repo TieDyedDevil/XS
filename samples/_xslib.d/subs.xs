@@ -16,8 +16,9 @@ fn .fbset {|*|
 
 # Help tags
 fn .d {|*|} # docstring
-fn .c {|*|} # category
 fn .a {|*|} # argstring
+fn .c {|*|} # category
+fn .r {|*|} # related
 
 # Create a random prompt at shell startup
 fn .xsin-rp {%prompt; rp; _n@$pid = 0}

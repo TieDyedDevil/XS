@@ -1,3 +1,5 @@
+#! /usr/bin/env xs
+
 # systemd doesn't set locale, so we must...
 # ref: /usr{/local}/share/doc/xs/SYSTEMD_LOCALE
 ~ $LC_ALL () && {

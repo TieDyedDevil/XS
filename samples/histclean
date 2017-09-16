@@ -18,18 +18,18 @@ if {!~ $history () && access -f $history} {
 	lc_start = `{cat $hstfile | wc -l}
 	tmpfile = `mktemp
 	count = 0
-	line = go
-	until {~ $line ()} {
-		count = `($count + 1)
-		~ `($count % 100) 0 && {printf \r%d%% `(100*$count/$lc_start) >[1=2]}
-		line = <=read
-		line = `` '' {echo $line | sed 's/^ \+//;s/ \+$//'|tr -d \n}
-		drop = <={{!~ $line *\ *} || {~ $line rm\ * cp\ * mv\ * la\ * \
-					ll\ * ls\ * lt\ * history\ *} \
-				|| {echo $line | !xs -n >[2]/dev/null} \
-				|| {$line :eq $prev}}
-		result $drop || {echo $line; prev = $line}
-	} <$hstfile >$tmpfile
+	%without-cursor {
+		%with-read-lines $hstfile {|line|
+			count = `($count + 1)
+			~ `($count % 100) 0 && {printf \r%d%% `(100*$count/$lc_start) >[1=2]}
+			line = `` '' {echo $line | sed 's/^ \+//;s/ \+$//'|tr -d \n}
+			drop = <={{!~ $line *\ *} || {~ $line rm\ * cp\ * mv\ * la\ * \
+						ll\ * ls\ * lt\ * history\ *} \
+					|| {echo $line | !xs -n >[2]/dev/null} \
+					|| {$line :eq $prev}}
+			result $drop || {echo $line; prev = $line}
+		} >$tmpfile
+	}
 	lc_pass1 = `{cat $tmpfile | wc -l}
 	if {$lc_pass1 :ge 1500} {
 		if {$lc_pass1 :ge 3000} {

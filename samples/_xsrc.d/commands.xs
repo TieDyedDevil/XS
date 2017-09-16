@@ -31,6 +31,7 @@ fn cs {|*|
 	.d 'List compose sequences'
 	.a '[-a]  # show all variations'
 	.c 'system'
+	.r 'u2o ulu'
 	%with-read-lines <{grep '^<Multi_key>' \
 				/usr/share/X11/locale/en_US.UTF-8/Compose | \
 		grep -v -e '<dead' -e '<kana_' -e '<hebrew_' -e '<Arabic_' \
@@ -69,12 +70,6 @@ fn cs {|*|
 				^'gensub(/ +/, " ", "g", $2)}' \
 		| env LESSUTFBINFMT='*s?' less -SFX
 }
-fn d {
-	.d 'Date/time (local and UTC)'
-	.c 'system'
-	date
-	date -u
-}
 fn dl-clean {
 	.d 'Remove advertising asset files left behind by WebKit browser'
 	.c 'system'
@@ -112,14 +107,90 @@ fn import-abook {|*|
 		--outfile ~/.abook/addressbook
 	chmod 600 ~/.abook/addressbook
 }
-fn latest {
-	.d 'List latest START processes for current user'
+fn list {|*|
+	.d 'List file with syntax highlighting'
+	.a '[-s SYNTAX|-f] FILE'
+	.a '-l  # list SYNTAX names'
 	.c 'system'
-	ps auk-start_time -U $USER|less -FX
+	if {~ $* -l} {
+		ls /usr/local/share/vis/lexers/*.lua | grep -v lexer\\\.lua \
+			| xargs -I\{\} basename \{\} | sed s/\.lua\$// \
+			| column -c `{tput cols} | less -FX
+	} else if {!~ $#* 0} {
+		let (syn; \
+			lpath = /usr/local/share/vis/lexers; \
+			fallback = false; \
+			fn-canon = {|ext|
+				switch $ext (
+				1 {result man}
+				3 {result man}
+				5 {result man}
+				7 {result man}
+				ascii {result text}
+				iso-8859 {result text}
+				c {result ansi_c}
+				sh {result bash}
+				dash {result bash}
+				posix {result bash}
+				bourne-again {result bash}
+				patch {result diff}
+				md {result markdown}
+				fs {result forth}
+				4th {result forth}
+				adb {result ada}
+				ads {result ada}
+				gpr {result ada}
+				rs {result rust}
+				rst {result rest}
+				p {result pascal}
+				js {result javascript}
+				es {result rc}
+				{result $ext}
+				)
+			} \
+			) {
+			if {~ $*(1) -s} {
+				syn = $*(2)
+				* = $*(3 ...)
+			} else {
+				if {~ $(1) -f} {
+					fallback = true
+					* = $*(2 ...)
+				}
+				{~ $#* 1 && access -- $*} || \
+					{throw error list 'file?'}
+				syn = `{echo $*|sed 's/^.*\.\([^.]\+\)$/\1/'}
+				syn = <={canon $syn}
+				{~ $syn () || !access -f $lpath/^$syn^.lua} && {
+					syn = `{file -L $* | cut -d: -f2 \
+						| awk '
+/^ a .*\/env [^ ]+ script/ {print $3; next}
+/^ a .*\/[^ ]+ script/ {print gensub(/^ [^ ]+ .+\/([^ ]+) .*$/, "\\1", 1); next}
+// {print $1}
+' \
+						| tr '[[:upper:]]' '[[:lower:]]'}
+					syn = <={canon $syn}
+					access -f $lpath/^$syn^.lua || syn = ()
+				}
+				if {~ $syn ()} {
+					if $fallback {syn = null} \
+					else {throw error list \
+						'specify -s SYNTAX or -f'}
+				}
+			}
+			access -- $* || {throw error list 'file?'}
+			if {file $*|grep -q 'CR line terminators'} {
+				vis-highlight $syn <{cat $*|tr \r \n}
+			} else {
+				vis-highlight $syn $*
+			} | less -RFXS
+		}
+	}
 }
 fn lock {
 	.d 'Lock screen'
 	.c 'system'
+	.r 'screensaver'
 	if {~ $DISPLAY ()} {
 		vlock
 	} else {
@@ -145,16 +216,18 @@ fn lpmd {|md|
 fn luc {
 	.d 'List user commands'
 	.c 'system'
-	echo `.ab^'* xs'^`.an
+	{
+	printf `.as^'@ ~/.xs*'^`.an^\n
 	vars -f | grep -o '^fn-[^ ]\+' | cut -d- -f2- | grep '^[a-z]' \
-		| tr \n \  | par 72j
-	echo `.ab^'* bin'^`.an
-	ls ~/bin | tr \n \  | par 72j
+		| column -c `{tput cols}
+	printf `.as^'@ ~/bin'^`.an^\n
+	ls ~/bin | column -c `{tput cols}
+	} | less -rFX
 }
 fn mamel {
 	.d 'List installed MAME games'
-	.c 'system'
-	ls /usr/share/mame/roms|sed 's/\.zip$//'|column
+	.c 'game'
+	ls /usr/share/mame/roms|sed 's/\.zip$//'|column -c `{tput cols}
 }
 fn mdv {|*|
 	.d 'Markdown file viewer'
@@ -170,14 +243,23 @@ fn mdv {|*|
 fn mons {
 	.d 'List attached monitors recognized by bspwm'
 	.c 'system'
+	printf Name\t\t\ \ \ \ Size\t\tResolution\tGeometry\n
+	printf ----\t----------------------------\t----------\t--------\n
 	grep -f <{map {|*| echo \^$*} `{bspc query -M --names}} <{xrandr} \
 		|sed 's/ \(dis\)\?connected / /'|sed 's/ (.*) / /' \
-		|sed 's/mm x /x/'|awk '{printf("%s\t%9s\t%s\n", $1, $3, $2)}'
+		|sed 's/\([0-9]\+\)mm x \([0-9]\+\)mm/\1x\2/' \
+		|awk '{printf("%s\t%8s mm\t%4.1fx%4.1f in\t%5.0f PPI\t%s\n", ' \
+			^'$1, $3, ' \
+			^'gensub(/^([^x]+).*$/, "\\1", "g", $3) / 25.4, ' \
+			^'gensub(/^.*x([^x]+).*$/, "\\1", "g", $3) / 25.4, ' \
+			^'(gensub(/^([^x]+).*$/, "\\1", "g", $2) /' \
+			^' gensub(/^([^x]+).*$/, "\\1", "g", $3) * 25.4), $2)}'
 }
 fn name {|*|
 	.d 'Set prompt text and terminal title.'
 	.a '[NAME]'
 	.c 'system'
+	.r 'prompt title'
 	if {~ $* ()} {
 		prompt ''
 		title `{echo $TERM|sed 's/-256color.*//'}
@@ -205,7 +287,7 @@ fn o {
 	.d 'List open windows per desktop'
 	.c 'system'
 	for d `{bspc query -D --names} {
-		let (wl = `{bspc query -N -n .window -d $d}; vf) {
+		let (wl = `{bspc query -N -n .window -d $d}; vf; ti) {
 			if {!~ $wl ()} {
 				echo Desktop $d
 				for w $wl {
@@ -215,12 +297,13 @@ fn o {
 						} else {
 							vf = hidden\ 
 						}
-					printf \ \ [%s\ %s]\t%s\n \
-						$vf $w `` \n {xtitle $w}
+					ti = `` \n {xtitle $w}
+					~ $ti () && ti = ''
+					printf '  [%s %s]'\t'%s'\n $vf $w $ti
 				}
 			}
 		}
-	} | less -RFX
+	} | less -FX
 }
 fn oc {
 	.d 'Onscreen clock'
@@ -260,11 +343,15 @@ fn pn {
 }
 fn pp {|*|
 	.d 'Prettyprint xs function'
-	.a 'NAME'
+	.a '[-c] NAME'
 	.c 'system'
-	catch {|e|
+	if {~ $*(1) -c} {
+		list -s xs <{pp $*(2)}
+	} else catch {|e|
 		echo 'not a function'
-	} {%pprint $*; printf \n} | less -FXS
+	} {
+		%pprint $*
+	} | less -RFXS
 }
 fn prs {|*|
 	.d 'Display process info'
@@ -293,12 +380,14 @@ fn pt {|*|
 	.d 'ps for user; only processes with terminal'
 	.a '[[-fFcyM] USERNAME]'
 	.c 'system'
+	.r 'pu'
 	.pu $*|awk '{if ($14 != "?") print}'|less -FX
 }
 fn pu {|*|
 	.d 'ps for user'
 	.a '[[-fFCyM] USERNAME]'
 	.c 'system'
+	.r 'pt'
 	.pu $*|less -FX
 }
 fn screensaver {|*|
@@ -306,6 +395,7 @@ fn screensaver {|*|
 	.a '[on|off]'
 	.a '(none)  # show current'
 	.c 'system'
+	.r 'lock'
 	let (error = false) {
 		if {~ $DISPLAY ()} {
 			if {!~ `tty */tty*} {throw error screensaver 'not a tty'}
@@ -337,6 +427,19 @@ fn screensaver {|*|
 		if $error {throw error screensaver 'on or off'}
 	}
 }
+fn src {|*|
+	.d 'pushd to K source directories'
+	.a '[NAME]'
+	.c 'system'
+	if {~ $#* 0} {
+		find /usr/local/src -maxdepth 1 -mindepth 1 -type d \
+			|xargs -I\{\} basename \{\}|column -c `{tput cols}
+	} else {
+		if {access -d /usr/local/src/$*} {
+			pushd /usr/local/src/$*
+		} else {echo 'not in /usr/local/src'}
+	}
+}
 fn startwm {
 	.d 'Start X window manager'
 	.c 'system'
@@ -363,46 +466,17 @@ fn swapm {
 			}
 	}
 }
-fn sysmon {
-	.d 'View Monitorix stats'
-	.c 'system'
-	web http://localhost:8080/monitorix
-}
-fn topc {
-	.d 'List top %CPU processes'
-	.c 'system'
-	ps auxk-%cpu|head -11
-}
-fn topm {
-	.d 'List top %MEM processes'
-	.c 'system'
-	ps auxk-%mem|head -11
-}
-fn topr {
-	.d 'List top RSS processes'
-	.c 'system'
-	ps auxk-rss|head -11
-}
-fn topt {
-	.d 'List top TIME processes'
-	.c 'system'
-	ps auxk-time|head -11
-}
-fn topv {
-	.d 'List top VSZ processes'
-	.c 'system'
-	ps auk-vsz|head -11
-}
 fn thermal {
 	.d 'Summarize system thermal status'
 	.c 'system'
-	sensors >[2]/dev/null | grep -e '^Physical' -e '^Core' -e '^fan' \
-		| sed 's/ *(.*$//'
+	sensors >[2]/dev/null | grep -e '^Physical' -e '^Package' \
+				-e '^Core' -e '^fan' | sed 's/ *(.*$//'
 }
 fn title {|*|
 	.d 'Set terminal title'
 	.a '[TITLE]'
 	.c 'system'
+	.r 'prompt name'
 	$&echo -n \e]0\;^$^*^\a
 }
 fn tsmwd {
@@ -428,6 +502,7 @@ fn u2o {|*|
 	.d 'Unicode text to octal escapes'
 	.a 'TEXT'
 	.c 'system'
+	.r 'cs ulu'
 	{echo -n $*|hexdump -b|grep -Eo '( [0-7]+)+'|tr ' ' \\\\}
 }
 fn uh {
@@ -444,6 +519,7 @@ fn ulu {|*|
 	.d 'Unicode lookup'
 	.a 'PATTERN'
 	.c 'system'
+	.r 'cs u2o'
 	let (ud = /usr/share/unicode/ucd/UnicodeData.txt) {
 		%with-read-lines <{egrep -i -o '^[0-9a-f]{4,};[^;]*' \
 						^$*^'[^;]*;' $ud} {|l|
@@ -514,4 +590,12 @@ fn where {
 	.c 'system'
 	printf '%s@%s[%s;%d]:%s'\n \
 		$USER `{hostname -s} <={~~ `tty /dev/*} $pid `pwd
+}
+fn xaos {|*|
+	.d 'Fractal explorer'
+	.c 'system'
+	let (dr) {
+		if {~ $DISPLAY ()} {dr = aa} else {dr = 'GTK+ Driver'}
+		/usr/bin/xaos -driver $dr $*
+	}
 }

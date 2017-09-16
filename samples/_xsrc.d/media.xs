@@ -1,6 +1,7 @@
 fn b {
 	.d 'Stop playing track'
 	.c 'media'
+	.r 'm mpc n played'
 	mpc pause
 }
 fn gallery {|*|
@@ -41,6 +42,7 @@ fn image {|*|
 fn m {
 	.d 'Show currently playing track'
 	.c 'media'
+	.r 'b mpc n played'
 	%with-tempfile mi {
 		mpc > $mi
 		if {grep -q '\[playing\]' $mi} {
@@ -55,6 +57,7 @@ fn m {
 fn mpc {|*|
 	.d 'Music player'
 	.c 'media'
+	.r 'b m n played'
 	/usr/bin/mpc -f '%artist% - %album% - %track%#|  %title%' $*
 }
 fn mpv {|*|
@@ -84,11 +87,13 @@ fn mpvl {|*|
 fn n {
 	.d 'Play next track'
 	.c 'media'
+	.r 'b mpc n played'
 	if {~ `mpc \[playing\]} {mpc next} else {mpc play}
 }
 fn played {
 	.d 'List recently-played tracks'
 	.c 'media'
+	.r 'b m mpc n'
 	cat ~/.mpd/mpd.log|cut -c24-|grep '^played'|tail -n 15|tac|nl|tac
 }
 fn vidshuffle {|*|

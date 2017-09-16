@@ -4,6 +4,12 @@ fn ag {|*|
 	.c 'alias'
 	/usr/bin/ag --pager='less -RFX' $*
 }
+fn atop {|*|
+	.d 'Advanced system & process monitor'
+	.a '[atop_OPTIONS]'
+	.c 'alias'
+	sudo /usr/bin/atop $*
+}
 fn avis {|*|
 	.d 'Edit w/ APL key bindings'
 	.a '[vis_OPTIONS|FILE]...'
@@ -21,12 +27,24 @@ fn calc {|*|
 	.c 'alias'
 	~ $#* 0 || nickle -e $*
 }
+fn d {
+	.d 'Date/time (local and UTC)'
+	.c 'alias'
+	date; date -u
+}
 fn la {|*|
 	.c 'alias'
+	.r 'll ls lt'
 	ls -a $*
+}
+fn latest {
+	.d 'List latest START processes for current user'
+	.c 'alias'
+	ps auk-start_time -U $USER|less -FX
 }
 fn ll {|*|
 	.c 'alias'
+	.r 'la ls lt'
 	ls -lh $*
 }
 fn load {
@@ -36,10 +54,12 @@ fn load {
 }
 fn ls {|*|
 	.c 'alias'
+	.r 'la ll lt'
 	/usr/bin/ls --color=auto $*
 }
 fn lt {|*|
 	.c 'alias'
+	.r 'la ll ls'
 	ls -lhtr $*
 }
 fn mutt {|*|
@@ -49,9 +69,8 @@ fn mutt {|*|
 }
 fn net {
 	.d 'Network status'
-	.c 'system'
-	nmcli --fields name,type,device \
-		connection show --active
+	.c 'alias'
+	nmcli --fields name,type,device connection show --active
 }
 fn on {
 	.d 'List console logins'
@@ -70,6 +89,7 @@ fn p {
 fn remake {
 	.d 'Remake K source projects as needed'
 	.c 'alias'
+	.r 'upgrade'
 	sudo -E /usr/local/bin/xs -c 'cd /usr/local/src; ./remake'
 }
 fn svis {|*|
@@ -77,6 +97,41 @@ fn svis {|*|
 	.a '[vis_OPTIONS|FILE] ...'
 	.c 'alias'
 	sudo /usr/local/bin/vis $*
+}
+fn sysmon {
+	.d 'View Monitorix stats'
+	.c 'alias'
+	web http://localhost:8080/monitorix
+}
+fn topc {
+	.d 'List top %CPU processes'
+	.c 'alias'
+	.r 'topm topr topt topv'
+	ps auxk-%cpu|head -11
+}
+fn topm {
+	.d 'List top %MEM processes'
+	.c 'alias'
+	.r 'topc topr topt topv'
+	ps auxk-%mem|head -11
+}
+fn topr {
+	.d 'List top RSS processes'
+	.c 'alias'
+	.r 'topc topm topt topv'
+	ps auxk-rss|head -11
+}
+fn topt {
+	.d 'List top TIME processes'
+	.c 'alias'
+	.r 'topc topm topr topv'
+	ps auxk-time|head -11
+}
+fn topv {
+	.d 'List top VSZ processes'
+	.c 'alias'
+	.r 'topc topm topr topt'
+	ps auk-vsz|head -11
 }
 fn treec {|*|
 	.d 'Display filesystem tree'
@@ -87,15 +142,8 @@ fn treec {|*|
 fn upgrade {
 	.d 'Upgrade Fedora packages'
 	.c 'alias'
+	.r 'remake'
 	sudo dnf upgrade -y --refresh
-}
-fn xaos {|*|
-	.d 'Fractal explorer'
-	.c 'alias'
-	let (dr) {
-		if {~ $DISPLAY ()} {dr = aa} else {dr = 'GTK+ Driver'}
-		/usr/bin/xaos -driver $dr $*
-	}
 }
 fn zathura {|*|
 	.d 'Document viewer'

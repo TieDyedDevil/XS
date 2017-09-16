@@ -26,12 +26,14 @@ fn amazon {|*|
 	.d 'Search Amazon'
 	.a '[QUERY]'
 	.c 'web'
+	.r 'google scholar wikipedia youtube'
 	.web-query https://amazon.com/ s/\?field-keywords= $*
 }
 fn google {|*|
 	.d 'Search Google'
 	.a '[QUERY]'
 	.c 'web'
+	.r 'amazon scholar wikipedia youtube'
 	.web-query https://google.com/ search\?q= $*
 }
 fn guardian {
@@ -43,17 +45,20 @@ fn scholar {|*|
 	.d 'Search Google Scholar'
 	.a '[QUERY]'
 	.c 'web'
+	.r 'amazon google wikipedia youtube'
 	.web-query https://scholar.google.com/ scholar\?hl=en\&q= $*
 }
 fn wikipedia {|*|
 	.d 'Search Wikipedia'
 	.a '[QUERY]'
 	.c 'web'
+	.r 'amazon google scholar youtube'
 	.web-query https://en.wikipedia.org/ wiki/Special:Search\?search= $*
 }
 fn youtube {|*|
 	.d 'Search YouTube'
 	.a '[QUERY]'
 	.c 'web'
+	.r 'amazon google scholar wikipedia'
 	.web-query https://youtube.com/ results\?search_query= $*
 }

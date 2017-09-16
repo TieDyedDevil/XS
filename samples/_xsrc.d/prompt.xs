@@ -23,6 +23,7 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 		.a '-n NUM'
 		.a '(none)  # restore initial prompt'
 		.c 'prompt'
+		.r 'name title rp sc sd se'
 		if {~ $x(1) -o} {
 			if {~ $#x 4} {_op = $x(2 ...)} \
 			else {throw error prompt 'P1 P2 PT'}
@@ -105,22 +106,26 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 	fn sc {
 		.d 'Prompt seqnum continue'
 		.c 'prompt'
+		.r 'prompt rp sd se'
 		~ $(_s@$pid) -1 || _n@$pid = $(_s@$pid)
 	}
 	fn sd {
 		.d 'Prompt seqnum disable'
 		.c 'prompt'
+		.r 'prompt rp sc se'
 		_s@$pid = $(_n@$pid); _n@$pid = -1
 	}
 	fn se {
 		.d 'Prompt seqnum enable'
 		.c 'prompt'
+		.r 'prompt rp sc sd'
 		_n@$pid = 0; _s@$pid = -1
 	}
 }
 fn rp {
 	.d 'Random prompt'
 	.c 'prompt'
+	.r 'prompt sc sd se'
 	let (np = 1; na = 10; att = (normal bold dim italic red green blue
 					magenta yellow cyan); r; i; a) {
 		while {!~ $(pr$np) ()} {np = `($np + 1)}; np = `($np - 1)

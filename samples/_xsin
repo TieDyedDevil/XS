@@ -1,3 +1,5 @@
+#! /usr/bin/env xs
+
 if {~ `tty *tty1} {
 	startwm
 } else {

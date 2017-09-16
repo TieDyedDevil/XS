@@ -208,17 +208,22 @@ fn %pprint {|fn-name|
 	~ $(fn-$fn-name) () && {throw error %pprint 'not a function'}
 	printf fn\ %s $fn-name
 	let (depth = 1; q = 0) {
-		%with-read-chars $(fn-$fn-name) {|c|
-			~ $c '''' && {q = `(($q+1)%2)}
-			~ $q 0 && switch $c (
-			'{'	{
+		let ( \
+			fn-wrap = {
 				printf %c\n '\'
 				for i `{seq `($depth*4)} {printf ' '}
-				depth = `($depth+1)
-				}
-			'}'	{depth = `($depth-1)}
-			)
-			printf %c $c
+			} \
+			) {
+			%with-read-chars $(fn-$fn-name) {|c|
+				~ $c '''' && {q = `(($q+1)%2)}
+				~ $q 0 && switch $c (
+				'{'	{wrap; depth = `($depth+1)}
+				'}'	{depth = `($depth-1)}
+				'^'	{wrap}
+				)
+				printf %c $c
+			}
 		}
 	}
+	printf \n
 }

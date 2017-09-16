@@ -4,38 +4,51 @@ fn help {|*|
 	.a 'NAME'
 	.a '-c [CATEGORY]'
 	.c 'help'
-	if {~ $* -c} {
-		switch $#* (
-		1 {vars -f | sed 's/{\.c [^}]*}/\n&\n/g' | grep -e '^{\.c' \
-			| sed 's/''''/''/g' | sort | uniq}
-		2 {vars -f|grep '{\.c '''''^$*(2) \
-			| sed 's/{\.\(a\|c\|d\) [^}]*}/\n&\n/g' \
-			| sed 's/^fn-[^ ]\+/\n&\n/g' \
-			| grep -e '^\({\.\(a\|c\|\d\)\|fn-\)' \
-			| sed 's/fn-\([^ ]\+\)/'^`.ab^'; \1'^`.an^'/g' \
-			| sed 's/''''/''/g' | less -RFX}
-		)
-	} else if {~ $#* 1} {
-		let (nm = $*(1); st) {
-			st = <={vars -f|grep '^fn-'$nm'\b' \
-				| sed 's/{\.\(a\|c\|d\) [^}]*}/\n&\n/g' \
-				| grep -e '^{\.\(a\|c\|\d\)' \
-				| sed 's/''''/''/g'}
-			~ $^st '0 0 0 1 0' && {echo 'no help for' $nm; \
-						whats $nm}
-			~ $^st '0 1 0 1 0' && echo 'no function' $nm
-		}
-	} | less -RFX
+	let ( \
+		fn-ext = {
+			sed 's/{\.\(a\|c\|d\|r\) [^}]*}/\n&\n/g'
+		}; \
+		fn-fmt = {
+			sed 's/''''/''/g' | \
+			sed 's/^{\.\(.\) ''\(.*\)''}$/\1: \2/'
+		} \
+		) {
+		if {~ $* -c} {
+			switch $#* (
+			1 {vars -f | ext | grep -e '^{\.c' | fmt | sort | uniq}
+			2 {vars -f|grep '{\.c '''''^$*(2) \
+				| ext | sed 's/^fn-[^ ]\+/\n&\n/g' \
+				| grep -e '^\({\.\(a\|c\|\d\|r\)\|fn-\)' \
+				| sed 's/fn-\([^ ]\+\)/'^`.as^'; \1'^`.an^'/g' \
+				| fmt }
+			)
+		} else if {~ $#* 1} {
+			let (nm = $*(1); st) {
+				st = <={vars -f|grep '^fn-'$nm'\b' | ext \
+					| grep -e '^{\.\(a\|c\|\d\|r\)' | fmt}
+				~ $^st '0 0 0 1 0' && {echo 'no help for' $nm; \
+							whats $nm}
+				~ $^st '0 1 0 1 0' && echo 'no function' $nm
+			}
+		} | less -rFX
+	}
 }
 
 ## Online documentation
 fn meson-help {
 	.d 'meson documentation'
 	.c 'help'
+	.r 'ninja-help'
 	web http://mesonbuild.com/
 }
 fn ninja-help {
 	.d 'ninja documentation'
 	.c 'help'
+	.r 'meson-help'
 	web https://ninja-build.org/
+}
+fn valgrind-help {
+	.d 'valgrind documentation'
+	.c 'help'
+	web http://valgrind.org/
 }
