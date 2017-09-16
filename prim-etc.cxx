@@ -87,9 +87,11 @@ PRIM(printf) {
 			if (!fcp)
 				fail("$&printf",
 				     "printf: more args than fmts");
-			if (*fcp == '%')
-				/* no arg consumed; get next format spec */
+			if (*fcp == '%') {
+				/* no arg consumed; pass %; advance format */
+				++fcp;
 				goto advance;
+			}
 			if (!validconv(*fcp))
 				fail("$&printf",
                                      "printf: invalid format specifier: %c",
@@ -133,9 +135,14 @@ PRIM(printf) {
 			if (i == printf_max_varargs)
 				fail("$&printf", "printf: too many args");
 		}
-		nextconv(&fcp);
-		if (fcp && *fcp != '%')
-			fail("$&printf", "printf: more fmts than args");
+		do {
+			nextconv(&fcp);
+			if (fcp) {
+				if (*fcp == '%') ++fcp;
+				else fail("$&printf",
+					  "printf: more fmts than args");
+			}
+		} while (fcp);
 		if (ffi_prep_cif_var(&cif, FFI_DEFAULT_ABI, 3, i,
                                      &ffi_type_sint, args) == FFI_OK) {
 			ffi_call(&cif, FFI_FN(snprintf), &rc, values);
