@@ -6,7 +6,7 @@ Xs requires the boost, ffi, gc (Boehm) and readline libraries.
 To build xs you'll need the Clang C++ compiler, the Meson/Ninja build
 system, Bison and the developer packages of the libraries noted above.
 
-Xs is known to build with these library versions:
+Xs is known to build with these (minimum) library versions:
    boost        1.60
    ffi          6.0.2
    gc           1.0.3
