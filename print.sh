@@ -6,9 +6,10 @@ else
 	LPR=lpr
 fi
 
-for f in *.[0-9]*; do
+for f in man/*; do
 	man -l -Tpdf $f | lpr
 done
-$LPR meson.build build.sh [[:upper:]]* *.h *.hxx *.cxx initial.xs \
-	`find generators samples tests xs-talk -type f -a \! -name \*.log` \
-	print.sh
+$LPR README \
+	`find doc src generators samples tests xs-talk
+		-type f -a \! -name \*.log` \
+	meson.build build.sh print.sh

@@ -1,4 +1,4 @@
-/* parse.y -- grammar for xs */
+/* parse.yxx -- grammar for xs */
 
 %{
 #include "xs.hxx"
