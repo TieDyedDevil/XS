@@ -29,6 +29,7 @@ static void nextconv(char **s) {
 		const int fw = strspn(++pct, "-+ #.0123456789");
 		*s = pct + fw;
 	}
+	else *s = NULL;
 }
 
 static int validconv(char c) {
@@ -81,7 +82,14 @@ PRIM(printf) {
 		int i = 3;
 		char *fcp = (char*)fmt;
 		while (list) {
+		advance:
 			nextconv(&fcp);
+			if (!fcp)
+				fail("$&printf",
+				     "printf: more args than fmts");
+			if (*fcp == '%')
+				/* no arg consumed; get next format spec */
+				goto advance;
 			if (!validconv(*fcp))
 				fail("$&printf",
                                      "printf: invalid format specifier: %c",
@@ -122,11 +130,12 @@ PRIM(printf) {
 			}
 			list = list->next;
 			++i;
-			if (i == printf_max_varargs) {
+			if (i == printf_max_varargs)
 				fail("$&printf", "printf: too many args");
-				break;
-			}
 		}
+		nextconv(&fcp);
+		if (fcp && *fcp != '%')
+			fail("$&printf", "printf: more fmts than args");
 		if (ffi_prep_cif_var(&cif, FFI_DEFAULT_ABI, 3, i,
                                      &ffi_type_sint, args) == FFI_OK) {
 			ffi_call(&cif, FFI_FN(snprintf), &rc, values);
