@@ -9,7 +9,7 @@ fi
 for f in man/*; do
 	man -l -Tpdf $f | lpr
 done
-$LPR README \
+$LPR README INSTALL \
 	`find doc src generators samples tests xs-talk
 		-type f -a \! -name \*.log` \
 	meson.build build.sh print.sh
