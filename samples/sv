@@ -1,0 +1,27 @@
+#! /usr/bin/env xs
+
+#: run a command with sudo pre-validated
+
+PGM = $0; PGM = `{basename $PGM}
+~ $#* 0 && {
+	cat <<EOF
+usage: $PGM COMMAND
+
+Run COMMAND with pre-authorized sudo. Authorization will remain in effect for
+the duration of COMMAND.
+
+COMMAND must be quoted if it contains a pipeline or list.
+EOF
+	exit 1
+}
+
+sudo -k && sudo -v || {
+	echo sudo not authenticated
+	exit 1
+}
+while true {
+	sudo -n true
+	sleep 60
+	kill -s 0 $pid || exit 0
+} >[2]/dev/null &
+$SHELL -c $^*
