@@ -57,7 +57,7 @@ project('xs', ['cpp', 'c'])
   install_man(['man/xs.1'])
   install_data(['doc/AUTHORS', 'doc/CHANGES', 'doc/COPYING', 'doc/GOTCHAS',
 		'INSTALL', 'doc/NOTES', 'README', 'doc/SYSTEMD_LOCALE',
-		'doc/TODO', 'doc/TUTORIAL.md'],
+		'doc/TODO', 'doc/TUTORIAL.md', 'doc/XS-FOR-LISPERS'],
 	install_dir: 'share/doc/xs')
   install_data(['samples/_xsrc', 'samples/_xsin', 'samples/colors',
 		'samples/histclean', 'samples/sv'],
