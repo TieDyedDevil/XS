@@ -202,3 +202,18 @@ run 'printf %a w/ non-numeric arg' {
     printf %a foo
 }
 conds { match numeric value required }
+
+run 'printf %%' {
+    printf x%%%%y
+}
+conds { match x%%y }
+
+run 'printf w/ excess formats' {
+    printf %d%s%f 8 hello
+}
+conds { match more fmts than args }
+
+run 'printf w/ excess arguments' {
+    printf %d%s%f 8 hello 57.9 x
+}
+conds { match more args than fmts }
