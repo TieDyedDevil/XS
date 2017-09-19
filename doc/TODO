@@ -1,7 +1,5 @@
-- Isolate/fix spurious 'wait: No child processes'
 - Add job control (SIGTSTP, fg, bg, disown).
 - Add tests.
 - Update printf test suite:
-  - format/argument count mismatches
   - %%: single, multiple, at end
   - invalid formats

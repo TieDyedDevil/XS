@@ -106,8 +106,6 @@ top:
 				while ((deadpid = dowait(&proc->status)) != pid)
 					if (deadpid != -1)
 						reap(deadpid, proc->status);
-					else if (errno == ECHILD)
-						break;
 					else if (errno != EINTR) {
 						fail("xs:ewait", "wait: %s",
                                                      esstrerror(errno));
@@ -141,7 +139,6 @@ top:
 			if (interruptible)
 				SIGCHK();
 		}
-		reap(pid, status);
 		goto top;
 	}
 	fail("xs:ewait", "wait: %d is not a child of this shell", pid);
