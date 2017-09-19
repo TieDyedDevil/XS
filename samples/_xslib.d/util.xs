@@ -122,6 +122,11 @@ fn %parse-args {|*|
 	}
 }
 
+fn %argify {|*|
+	# Always return a one-element list
+	if {~ $* ()} {result ''} else {result `` '' {echo -n $*}}
+}
+
 fn %with-quit {|*|
 	# Run command with q key bound to send SIGINTR.
 	stty intr q

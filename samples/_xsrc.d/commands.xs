@@ -81,8 +81,11 @@ fn dl-clean {
 fn doc {|*|
 	.d 'pushd to documentation directory of package'
 	.a 'PACKAGE_NAME_GLOB'
+	.a '-n PACKAGE_NAME'
 	.c 'system'
-	if {!~ $* ()} {
+	if {~ $*(1) -n} {
+		doc /$*(2)^\$
+	} else if {!~ $* ()} {
 		let (pl) {
 			pl = `{find -L /usr/share/doc /usr/local/share/doc \
 				-mindepth 1 -maxdepth 1 -type d \
@@ -297,8 +300,7 @@ fn o {
 						} else {
 							vf = hidden\ 
 						}
-					ti = `` \n {xtitle $w}
-					~ $ti () && ti = ''
+					ti = <={%argify `{xtitle $w}}
 					printf '  [%s %s]'\t'%s'\n $vf $w $ti
 				}
 			}
