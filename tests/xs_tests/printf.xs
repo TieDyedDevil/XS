@@ -203,10 +203,15 @@ run 'printf %a w/ non-numeric arg' {
 }
 conds { match numeric value required }
 
-run 'printf %%' {
+run 'printf %% mid-line' {
     printf x%%%%y
 }
 conds { match x%%y }
+
+run 'printf %% end-line' {
+    printf x%%y%%
+}
+conds { match x%y% }
 
 run 'printf w/ excess formats' {
     printf %d%s%f 8 hello
@@ -217,3 +222,18 @@ run 'printf w/ excess arguments' {
     printf %d%s%f 8 hello 57.9 x
 }
 conds { match more args than fmts }
+
+run 'printf w/ invalid format' {
+    printf %z%s 8 hello
+}
+conds { match invalid format specifier }
+
+run 'printf w/ positional arg spec' {
+    printf %\$2s%\$1d 8 hello
+}
+conds { match invalid format specifier }
+
+run 'printf w/ variable width' {
+    printf %\*sworld\n -12 hello
+}
+conds { match invalid format specifier }

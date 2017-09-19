@@ -1,5 +1,2 @@
 - Add job control (SIGTSTP, fg, bg, disown).
 - Add tests.
-- Update printf test suite:
-  - %%: single, multiple, at end
-  - invalid formats
