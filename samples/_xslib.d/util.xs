@@ -233,7 +233,15 @@ fn %pprint {|fn-name|
 	printf \n
 }
 
-fn %id {
-	# name version date hash repository-url
-	result xs <={~~ <=$&version 'xs '*' (git: '*'; '*' @ '*')'}
+fn %id {|*|
+	# Without an arg, return a five-element list:
+	#   name version date hash repository-url
+	# With an arg, return the index'th item(s).
+	let (info = xs <={~~ <=$&version 'xs '*' (git: '*'; '*' @ '*')'}) {
+		if {~ $#* 0} {
+			result $info
+		} else {
+			result $info($*)
+		}
+	}
 }
