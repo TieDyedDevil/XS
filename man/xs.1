@@ -159,7 +159,8 @@
 .\" Here is more portable (though less pretty) code to deal with
 .\" the recursion.
 .\"-------
-.if !"\\$4"" .Xf \\$2 \\$1 "\\$3\\f\\$1\\$4\\*(Xi" "\\$5" "\\$6" "\\$7" "\\$8" "\\$9"
+.if !"\\$4"" .Xf \\$2 \\$1 "\\$3\\f\\$1\\$4\\*(Xi" "\\$5" "\\$6" \
+"\\$7" "\\$8" "\\$9"
 .if "\\$4"" \\$3\fR\s10
 ..
 .\"-------
@@ -898,7 +899,8 @@ For example, the result of the extraction operation
 is the list
 .Cr "(foo c bar h)" .
 .SS "Arithmetic Substitution"
-A single list element can be formed from an infix arithmetical expression like so:
+A single list element can be formed from an infix arithmetical expression
+like so:
 .Ds
 .Ci "\`( " " expression " )
 .De
@@ -970,8 +972,8 @@ followed by
 .Cr "wc \`src"
 .De
 .PP
-(This will print out a word-count of all C and Yacc source files in the current
-directory.)
+(This will print out a word-count of all C and Yacc source files in the
+current directory.)
 .PP
 In order to override the value of
 .Cr $ifs
@@ -981,8 +983,8 @@ for a single command substitution, use:
 .De
 .PP
 .Cr $ifs
-will be temporarily ignored and the command's output will be split as specified by
-the list following the double backquote.
+will be temporarily ignored and the command's output will be split as
+specified by the list following the double backquote.
 For example:
 .Ds
 .Cr "\`\` :\en {cat /etc/passwd}"
@@ -1254,8 +1256,9 @@ the same file, one can do
 .Cr "{ date; ps agux; who } > snapshot"
 .De
 .PP
-In addition, program fragments can continue across multiple physical lines
-without explicit line continuations, so the above command could also be written:
+In addition, program fragments can continue across multiple
+physical lines without explicit line continuations, so the
+above command could also be written:
 .Ds
 .Cr "{"
 .Cr "     date"
@@ -1362,7 +1365,8 @@ Variable assignments may be made local to a set of commands with the
 .Cr local
 construct:
 .Ds
-.Cr "local (\fIvar\fP = \fIvalue\fP; \fIvar\fP = \fIvalue ...\fP) \fIcommand\fP"
+.Cr "local (\fIvar\fP = \fIvalue\fP; \fIvar\fP = \fIvalue ...\fP) \
+\fIcommand\fP"
 .De
 .PP
 The command may be a program fragment, so for example:
@@ -1872,7 +1876,8 @@ rather than executing them.
 \fIcmd1\fP ; \fIcmd2\fP	%seq {\fIcmd1\fP} {\fIcmd2\fP}
 \fIcmd1\fP && \fIcmd2\fP	%and {\fIcmd1\fP} {\fIcmd2\fP}
 \fIcmd1\fP || \fIcmd2\fP	%or {\fIcmd1\fP} {\fIcmd2\fP}
-fn \fIname\fP {|\fIargs\fP| \fIcmd\fP}	fn-^\fIname\fP = {|\fIargs\fP| \fIcmd\fP}
+fn \fIname\fP {|\fIargs\fP| \fIcmd\fP}	fn-^\fIname\fP = {|\fIargs\fP| \
+\fIcmd\fP}
 .ft R
 .De
 .SS "Input/Output Commands"
@@ -1891,9 +1896,12 @@ fn \fIname\fP {|\fIargs\fP| \fIcmd\fP}	fn-^\fIname\fP = {|\fIargs\fP| \fIcmd\fP}
 \fIcmd\fP << tag \fIinput\fP tag	%here 0 \fIinput\fP {\fIcmd\fP}
 \fIcmd\fP <<< \fIstring\fP	%here 0 \fIstring\fP {\fIcmd\fP}
 \fIcmd1\fP | \fIcmd2\fP	%pipe {\fIcmd1\fP} 1 0 {\fIcmd2\fP}
-\fIcmd1\fP |[\fIm\fP=\fIn\fP] \fIcmd2\fP	%pipe {\fIcmd1\fP} \fIm\fP \fIn\fP {\fIcmd2\fP}
-\fIcmd1\fP >{ \fIcmd2\fP }	%writeto \fIvar\fP {\fIcmd2\fP} {\fIcmd1\fP $\fIvar\fP}
-\fIcmd1\fP <{ \fIcmd2\fP }	%readfrom \fIvar\fP {\fIcmd2\fP} {\fIcmd1\fP $\fIvar\fP}
+\fIcmd1\fP |[\fIm\fP=\fIn\fP] \fIcmd2\fP	%pipe {\fIcmd1\fP} \
+\fIm\fP \fIn\fP {\fIcmd2\fP}
+\fIcmd1\fP >{ \fIcmd2\fP }	%writeto \fIvar\fP {\fIcmd2\fP} \
+{\fIcmd1\fP $\fIvar\fP}
+\fIcmd1\fP <{ \fIcmd2\fP }	%readfrom \fIvar\fP {\fIcmd2\fP} \
+{\fIcmd1\fP $\fIvar\fP}
 .ft R
 .De
 .SS "Expressions"
@@ -1902,7 +1910,8 @@ fn \fIname\fP {|\fIargs\fP| \fIcmd\fP}	fn-^\fIname\fP = {|\fIargs\fP| \fIcmd\fP}
 $#\fIvar\fP	<={%count $\fIvar\fP}
 $^\fIvar\fP	<={%flatten ' ' $\fIvar\fP}
 \`{\fIcmd args\fP}	<={%backquote <={%flatten '' $ifs} {\fIcmd args\fP}}
-\`\`\fIifs\fP {\fIcmd args\fP}	<={%backquote <={%flatten '' \fIifs\fP} {\fIcmd args\fP}}
+\`\`\fIifs\fP {\fIcmd args\fP}	<={%backquote <={%flatten '' \fIifs\fP} \
+{\fIcmd args\fP}}
 .ft R
 .De
 .SS "Relational Operators"
@@ -1927,7 +1936,8 @@ Some builtin functions have names that begin with a percent character
 .Rc ( % ).
 These are commands with some special meaning to the shell,
 or are meant for use only by users customizing the shell.
-(This distinction is somewhat fuzzy, and the decisions about which functions have
+(This distinction is somewhat fuzzy, and the decisions about which
+functions have
 .Cr % -names
 are somewhat arbitrary.)
 .PP
@@ -1942,7 +1952,8 @@ as input to
 and executes its contents.
 The options are a subset of the invocation options for the shell (see below).
 .TP
-.Cr "access \fR[\fP-n \fIname\fP\fR]\fP \fR[\fP-1e\fR]\fP \fR[\fP-rwx\fR]\fP  \fR[\fP-fdcblsp\fR]\fP \fIpath ...\fP"
+.Cr "access \fR[\fP-n \fIname\fP\fR]\fP \fR[\fP-1e\fR]\fP \
+\fR[\fP-rwx\fR]\fP  \fR[\fP-fdcblsp\fR]\fP \fIpath ...\fP"
 Tests if the named paths are accessible according to the options presented.
 Normally,
 .Cr access
@@ -1951,8 +1962,8 @@ printable error message (which evaluates as false, according to shell rules)
 for files which are not accessible.
 If the
 .Cr \-1
-option is used, the name of the first file which the test succeeds for is returned;
-if the test succeeds for no file, the empty list is returned.
+option is used, the name of the first file which the test succeeds for is
+returned; if the test succeeds for no file, the empty list is returned.
 However, if the
 .Cr \-e
 option was used,
@@ -2323,7 +2334,8 @@ with the function will not work. In other words,
 .I xs
 does not support upward funargs.
 .TP
-.Cr "switch \fIvalue\fP \fI\fR[\fPcase1 action1\fR]\fP\fP...\fI\fR[\fPdefault-action\fR]\fP\fP"
+.Cr "switch \fIvalue\fP \fI\fR[\fPcase1 \
+action1\fR]\fP\fP...\fI\fR[\fPdefault-action\fR]\fP\fP"
 Go through the list of cases, 
 testing if they are equal to
 .IR value .
@@ -2820,9 +2832,10 @@ Primitives exist in
 .I xs
 so that, in the presence of spoofing and redefinitions,
 there is a way to refer to built-in behaviors.
-This ability is necessary for the shell to be able to unambiguously refer to itself,
-but is also useful for users who have otherwise made their
-environment unnecessary but don't want to kill the current shell.
+This ability is necessary for the shell to be able to unambiguously refer
+to itself, but is also useful for users who have otherwise made their
+environment unworkable (through ill-advised redefinition) but don't want
+to kill the current shell.
 .PP
 Primitives are referenced with the
 .Ds
