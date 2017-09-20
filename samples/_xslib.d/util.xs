@@ -232,3 +232,8 @@ fn %pprint {|fn-name|
 	}
 	printf \n
 }
+
+fn %id {
+	# name version date hash repository-url
+	result xs <={~~ <=$&version 'xs '*' (git: '*'; '*' @ '*')'}
+}

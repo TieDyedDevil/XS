@@ -41,6 +41,16 @@ fn guardian {
 	.c 'web'
 	web https://www.theguardian.com/us
 }
+fn jos {
+	.d 'Joel On Software'
+	.c 'web'
+	web https://www.joelonsoftware.com/
+}
+fn lwn {
+	.d 'Linux Weekly News'
+	.c 'web'
+	web https://lwn.net/
+}
 fn scholar {|*|
 	.d 'Search Google Scholar'
 	.a '[QUERY]'

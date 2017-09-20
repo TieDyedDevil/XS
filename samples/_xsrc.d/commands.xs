@@ -402,7 +402,8 @@ fn screensaver {|*|
 		if {~ $DISPLAY ()} {
 			if {!~ `tty */tty*} {throw error screensaver 'not a tty'}
 			if {~ $#* 0} {
-				timeout = `{cat /sys/module/kernel/parameters/consoleblank}
+				timeout = `{cat /sys/module/kernel/\
+					^parameters/consoleblank}
 				if {~ $timeout 0} {echo Off} \
 				else {echo On}
 			} else {

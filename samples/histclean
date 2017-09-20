@@ -21,12 +21,16 @@ if {!~ $history () && access -f $history} {
 	%without-cursor {
 		%with-read-lines $hstfile {|line|
 			count = `($count + 1)
-			~ `($count % 100) 0 && {printf \r%d%% `(100*$count/$lc_start) >[1=2]}
-			line = `` '' {echo $line | sed 's/^ \+//;s/ \+$//'|tr -d \n}
-			drop = <={{!~ $line *\ *} || {~ $line rm\ * cp\ * mv\ * la\ * \
-						ll\ * ls\ * lt\ * history\ *} \
-					|| {echo $line | !xs -n >[2]/dev/null} \
-					|| {$line :eq $prev}}
+			~ `($count % 100) 0 && {
+				printf \r%d%% `(100*$count/$lc_start) >[1=2]
+			}
+			line = `` '' {echo $line | sed 's/^ \+//;s/ \+$//' \
+					| tr -d \n}
+			drop = <={{!~ $line *\ *} || {
+				~ $line rm\ * cp\ * mv\ * la\ * \
+				ll\ * ls\ * lt\ * history\ *} \
+				| {echo $line | !xs -n >[2]/dev/null} \
+				|| {$line :eq $prev}}
 			result $drop || {echo $line; prev = $line}
 		} >$tmpfile
 	}
