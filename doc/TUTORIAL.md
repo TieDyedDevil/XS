@@ -448,9 +448,12 @@ fn ll {ls -l}
 ```
 
 A program not in a directory on `$PATH` may be used as a command by
-naming an absolute or relative path to the program. In the case of a
-relative path, `xs` differs from many other shells by requiring that
-the path begins with a `.` (dot).
+naming an absolute or relative path to the program.
+
+In the case of a relative path to the program, `xs` differs from many
+other shells by requiring that the path begins with a `.` (dot). This
+is because the word that names an `xs` function may legitimately contain
+a path-separator character.
 
 `xs` has all of the usual control-flow constructs, plus a few that you
 don't usually see in shells.
@@ -571,6 +574,25 @@ alt-client.lisp
 alt-client.fasl
 alt-wrapper.lisp
 alt-wrapper.fasl
+```
+
+Of course, if all you need is to join two lists into a longer list,
+without the cross-product operation, simply adjoin the lists:
+
+```
+; l = hello world
+; m = nice clouds
+; n = $l $m
+; echo $n
+hello world nice clouds
+; echo $l^$m
+```
+
+Contrast that with:
+
+```
+; echo $l^$m
+hellonice helloclouds worldnice worldclouds
 ```
 
 In addition to the boolean control-flow operators we've already
@@ -876,7 +898,7 @@ Finally, `xs` has the usual relational operators. These are named `:lt`,
 other `xs` usage of the usual tokens.
 
 Relational comparisons coerce both values to floats if either
-is a float, and both values to strings if either is a string. String
+is a float, and both values to strings if either is not numeric. String
 comparisons are performed using the current locale's collating order.
 
 The relational operators expect a pair of singleton values. The result of
