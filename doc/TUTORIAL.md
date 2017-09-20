@@ -89,6 +89,9 @@ by multiple bytes) using their 16-bit or 32-bit code points:
     * \uNNNN where N is a hex digit
     * \UNNNNNNNN where N is a hex digit
 
+`xs` does not permit creation of a NUL character using escapes. The
+characters `\x00`, `\000`, `\u0000` and `\U00000000` are all invalid.
+
 It's an error in `xs` to use `\` except as noted above. In the shell
 you usually use, applying `\` to escape some other character simply
 yields the escaped character. In `xs`, this happens:

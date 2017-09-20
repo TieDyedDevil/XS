@@ -341,6 +341,12 @@ for
 in {0..9, a..f, A..F}
 .IE
 .PP
+.B xs
+does not permit creation of a
+.I NUL
+character (i.e.
+.IR \ex00 ", " \e000 ", " \eu0000 " and " \eU00000000 ")."
+.PP
 The character escapes may be used with
 .Cr eval
 to create characters from codepoints at runtime.
