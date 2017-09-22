@@ -245,3 +245,51 @@ fn %id {|*|
 		}
 	}
 }
+
+fn %mkobj {
+	# Create an object; return its name
+	let (nm = go; go = go) {
+		while {!~ $($nm) ()} {nm = \xff^objid:^<=$&random}
+		$nm = obj
+		result $nm
+	}
+}
+
+fn .objcheck {|objname|
+	# Throw an error if objname does not name an object
+	if {{~ $objname ()} || {!~ $($objname) obj *\ obj}} {
+		throw error object 'Not an object: '^$objname
+	}
+}
+
+fn %objset {|objname key value|
+	# Set an object field
+	.objcheck $objname
+	%objunset $objname $key
+	$objname = $key:$value $($objname)
+}
+
+fn %objunset {|objname key|
+	# Remove an object field
+	.objcheck $objname
+	let (ov = $($objname); rv) {
+		for kv $ov {
+			{!~ $kv $key:*} && {rv = $rv $kv}
+		}
+		$objname = $rv
+	}
+}
+
+fn %objget {|objname key default|
+	# Get an object field
+	.objcheck $objname
+	let (v = <={~~ $($objname) $key:*}) {
+		if {!~ $v ()} {result $v} else {result $default}
+	}
+}
+
+fn %obj-isempty {|objname|
+	# True if object has no fields
+	.objcheck $objname
+	result <={!~ $($objname) *:*}
+}

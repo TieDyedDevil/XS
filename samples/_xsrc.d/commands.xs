@@ -536,6 +536,18 @@ fn ulu {|*|
 		} | env LESSUTFBINFMT=*n!PRINT less -FXS
 	}
 }
+fn vman {|*|
+	.d 'View man page'
+	.a 'man_OPTS'
+	.c 'system'
+	if {~ $DISPLAY ()} {
+		throw error vman 'X only'
+	} else {
+		%with-tempfile f {
+			{man -Tpdf $* >$f} && {zathura $f}
+		}
+	}
+}
 fn wallpaper {|*|
 	.d 'Set wallpaper'
 	.a '[-m MONITOR] FILE-OR-DIRECTORY'
