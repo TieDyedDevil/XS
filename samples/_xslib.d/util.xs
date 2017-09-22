@@ -293,3 +293,9 @@ fn %obj-isempty {|objname|
 	.objcheck $objname
 	result <={!~ $($objname) *:*}
 }
+
+fn %objreset {|objname|
+	# Remove all fields from an object
+	.objcheck $objname
+	$objname = obj
+}

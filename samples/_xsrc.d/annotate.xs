@@ -19,9 +19,11 @@ fn %advise {|name thunk|
 	}
 }
 
-fn fec {
+fn fec {|*|
 	.d 'Report entry counts of annotated xs functions'
+	.a '[-c]'
 	.c 'system'
+	if {~ $*(1) -c} {%objreset $fco; echo Cleared}
 	let (lines = `{echo $($fco)|tr ' ' \n|grep -vx obj|sort}) {
 		for l $lines {
 			let ((n c) = <={%split : $l}) {
