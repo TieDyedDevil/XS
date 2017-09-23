@@ -66,6 +66,7 @@ extern bool match(const char *s, const char *p, const char *q) {
 			switch (c) {
 			case '?':
 				if (*s++ == '\0') return false;
+				/* FALLTHROUGH */
 			case '*':
 				while (p[i] == '*'
                                        && (q == UNQUOTED || q[i] == 'r'))

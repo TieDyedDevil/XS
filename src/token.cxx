@@ -208,7 +208,7 @@ static int yylex_arithmetic() {
 	switch (c) {
 	case '(': 
 		++paren_count; 
-		// FALLTHROUGH
+		/* FALLTHROUGH */
 	case '+': case '-': case '/': case '*': case '%':
 		return c;
 	case ')': 
@@ -490,6 +490,7 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 	case ')':
 	case '{': 
 		if (c == '{') begin_block = true;
+		/* FALLTHROUGH */
 	case '}':
 		w = NW;
 		return c;

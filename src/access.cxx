@@ -82,6 +82,8 @@ static const char *pathcat(const char *prefix, const char *suffix) {
 }
 
 PRIM(access) {
+	(void)binding;
+	(void)evalflags;
 	int c, perm = 0, type = 0, estatus = ENOENT;
 	bool first = false, exception = false;
 	const char *suffix = NULL;

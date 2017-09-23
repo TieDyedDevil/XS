@@ -90,6 +90,7 @@ REDIR(openfile) {
 }
 
 PRIM(openfile) {
+	(void)binding;
 	caller = "$&openfile";
 	if (length(list) != 4)
 		argcount("%openfile mode fd file cmd");
@@ -111,6 +112,7 @@ REDIR(dup) {
 }
 
 PRIM(dup) {
+	(void)binding;
 	caller = "$&dup";
 	if (length(list) != 3)
 		argcount("%dup newfd oldfd cmd");
@@ -123,6 +125,7 @@ REDIR(close) {
 }
 
 PRIM(close) {
+	(void)binding;
 	caller = "$&close";
 	if (length(list) != 2)
 		argcount("%close fd cmd");
@@ -187,6 +190,7 @@ REDIR(here) {
 }
 
 PRIM(here) {
+	(void)binding;
 	caller = "$&here";
 	if (length(list) < 2)
 		argcount("%here fd [word ...] cmd");
@@ -194,6 +198,7 @@ PRIM(here) {
 }
 
 PRIM(pipe) {
+	(void)binding;
 	int n, infd, inpipe;
 	static int *pids = NULL, pidmax = 0;
 
@@ -264,6 +269,7 @@ PRIM(pipe) {
 
 #if HAVE_DEV_FD
 PRIM(readfrom) {
+	(void)binding;
 	int pid, p[2], status;
 	caller = "$&readfrom";
 	if (length(list) != 3)
@@ -308,6 +314,7 @@ PRIM(readfrom) {
 }
 
 PRIM(writeto) {
+	(void)binding;
 	int pid, p[2], status;
 
 	caller = "$&writeto";
@@ -373,6 +380,7 @@ restart:
 }
 
 PRIM(backquote) {
+	(void)binding;
 	int pid, p[2], status;
 	
 	caller = "$&backquote";
@@ -409,6 +417,8 @@ PRIM(backquote) {
 }
 
 PRIM(newfd) {
+	(void)binding;
+	(void)evalflags;
 	if (list != NULL)
 		fail("$&newfd", "usage: $&newfd");
 	return mklist(mkstr(str("%d", newfd())), NULL);
@@ -428,6 +438,9 @@ static int read1(int fd) {
 }
 
 PRIM(read) {
+	(void)list;
+	(void)binding;
+	(void)evalflags;
 	int c;
 	int fd = fdmap(0);
 

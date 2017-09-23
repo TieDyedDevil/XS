@@ -14,6 +14,9 @@ extern const List*
 }
 
 PRIM(primitives) {
+	(void)list;
+	(void)binding;
+	(void)evalflags;
 	static List *primlist = NULL;
 	if (primlist == NULL) {
 		for (Prim_dict::iterator i = prims.begin(); i != prims.end(); ++i) {

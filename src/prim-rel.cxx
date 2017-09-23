@@ -14,6 +14,8 @@ static int isfloat(const char *s) {
 }
 
 PRIM(cmp) {
+	(void)binding;
+	(void)evalflags;
 	const char *a = list == NULL ? "" : getstr(list->term);
 	const char *b = (list == NULL || list->next == NULL)
 				? "" : getstr(list->next->term);

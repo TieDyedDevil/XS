@@ -2,9 +2,9 @@
 #include <string>
 
 #define	PRIM(name)	static const List* CONCAT(prim_,name)( \
-				List* __attribute__((unused)) list, \
-				Binding* __attribute__((unused)) binding, \
-				int __attribute__((unused)) evalflags \
+				List* list, \
+				Binding* binding, \
+				int evalflags \
 			)
 #define	X(name)		primdict[STRING(name)] = CONCAT(prim_,name)
 

@@ -148,6 +148,9 @@ top:
 #include "prim.hxx"
 
 PRIM(apids) {
+	(void)list;
+	(void)binding;
+	(void)evalflags;
 	List* lp = NULL;
 	foreach (Proc &p, proclist)
 		if (p.background && p.alive) {
@@ -159,6 +162,8 @@ PRIM(apids) {
 }
 
 PRIM(wait) {
+	(void)binding;
+	(void)evalflags;
 	int pid;
 	if (list == NULL)
 		pid = 0;

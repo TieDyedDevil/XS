@@ -57,6 +57,8 @@ static int integralconv(char c) {
 }
 
 PRIM(printf) {
+	(void)binding;
+	(void)evalflags;
 	if (list != NULL) {
 		const int printf_max_varargs = 20;
 		ffi_cif cif;
@@ -155,10 +157,14 @@ PRIM(printf) {
 }
 
 PRIM(result) {
+	(void)binding;
+	(void)evalflags;
 	return list;
 }
 
 PRIM(echo) {
+	(void)binding;
+	(void)evalflags;
 	const char *eol = "\n";
 	if (list != NULL) {
 		if (termeq(list->term, "-n")) {
@@ -172,23 +178,32 @@ PRIM(echo) {
 }
 
 PRIM(count) {
+	(void)binding;
+	(void)evalflags;
 	return mklist(mkstr(str("%d", length(list))), NULL);
 }
 
 PRIM(setnoexport) {
+	(void)binding;
+	(void)evalflags;
 	setnoexport(list);
 	return list;
 }
 
 PRIM(version) {
+	(void)list;
+	(void)binding;
+	(void)evalflags;
 	return mklist(mkstr((char *) version), NULL);
 }
 
 PRIM(exec) {
+	(void)binding;
 	return eval(list, NULL, evalflags | eval_inchild);
 }
 
 PRIM(dot) {
+	(void)binding;
 	int c, fd;
 	volatile int runflags = (evalflags & eval_inchild);
 	const char * const usage = ". [-einvx] file [arg ...]";
@@ -220,6 +235,8 @@ PRIM(dot) {
 }
 
 PRIM(flatten) {
+	(void)binding;
+	(void)evalflags;
 	if (list == NULL)
 		fail("$&flatten", "usage: %%flatten separator [args ...]");
 	const char *sep = getstr(list->term);
@@ -228,6 +245,7 @@ PRIM(flatten) {
 }
 
 PRIM(whats) {
+	(void)evalflags;
 	/* the logic in here is duplicated in eval() */
 	if (list == NULL || list->next != NULL)
 		fail("$&whats", "usage: $&whats program");
@@ -248,6 +266,8 @@ PRIM(whats) {
 }
 
 PRIM(split) {
+	(void)binding;
+	(void)evalflags;
 	if (list == NULL)
 		fail("$&split", "usage: %%split separator [args ...]");
 	List* lp = list;
@@ -257,6 +277,8 @@ PRIM(split) {
 }
 
 PRIM(fsplit) {
+	(void)binding;
+	(void)evalflags;
 	if (list == NULL)
 		fail("$&fsplit", "usage: %%fsplit separator [args ...]");
 	List* lp = list;
@@ -266,6 +288,7 @@ PRIM(fsplit) {
 }
 
 PRIM(var) {
+	(void)binding;
 	if (list == NULL)
 		return NULL;
 	const char* name = getstr(list->term);
@@ -276,6 +299,8 @@ PRIM(var) {
 }
 
 PRIM(sethistory) {
+	(void)binding;
+	(void)evalflags;
 	if (list == NULL) {
 		sethistory(NULL);
 		return NULL;
@@ -348,6 +373,8 @@ const char *mzwcs(const char *prompt) {return prompt;}
 #endif
 
 PRIM(parse) {
+	(void)binding;
+	(void)evalflags;
 	List *result;
 	Tree *tree;
 	const char* prompt1 = NULL;
@@ -366,10 +393,13 @@ PRIM(parse) {
 }
 
 PRIM(exitonfalse) {
+	(void)binding;
 	return eval(list, NULL, evalflags | eval_exitonfalse);
 }
 
 PRIM(batchloop) {
+	(void)list;
+	(void)binding;
 	const List* result = ltrue;
 	List* dispatch;
 
@@ -403,11 +433,16 @@ PRIM(batchloop) {
 }
 
 PRIM(collect) {
+	(void)list;
+	(void)binding;
+	(void)evalflags;
 	GC_gcollect();
 	return ltrue;
 }
 
 PRIM(home) {
+	(void)binding;
+	(void)evalflags;
 	struct passwd *pw;
 	if (list == NULL)
 		return varlookup("home", NULL);
@@ -418,22 +453,36 @@ PRIM(home) {
 }
 
 PRIM(vars) {
+	(void)list;
+	(void)binding;
+	(void)evalflags;
 	return listvars(false);
 }
 
 PRIM(internals) {
+	(void)list;
+	(void)binding;
+	(void)evalflags;
 	return listvars(true);
 }
 
 PRIM(isinteractive) {
+	(void)list;
+	(void)binding;
+	(void)evalflags;
 	return isinteractive() ? ltrue : lfalse;
 }
 
 PRIM(islogin) {
+	(void)list;
+	(void)binding;
+	(void)evalflags;
 	return islogin() ? ltrue : lfalse;
 }
 
 PRIM(setmaxevaldepth) {
+	(void)binding;
+	(void)evalflags;
 	char *s;
 	long n;
 	if (list == NULL) {
@@ -454,6 +503,9 @@ PRIM(setmaxevaldepth) {
 
 #if READLINE
 PRIM(resetterminal) {
+	(void)list;
+	(void)binding;
+	(void)evalflags;
 	rl_reset_terminal(NULL);
 	return ltrue;
 }
@@ -464,6 +516,9 @@ static void initrandom() {
 }
 
 PRIM(random) {
+	(void)list;
+	(void)binding;
+	(void)evalflags;
 	return mklist(mkstr(str("%d", random())), NULL);
 }
 

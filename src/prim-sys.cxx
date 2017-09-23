@@ -25,6 +25,8 @@
 #include <sys/stat.h>
 
 PRIM(newpgrp) {
+	(void)binding;
+	(void)evalflags;
 	int pid;
 	if (list != NULL)
 		fail("$&newpgrp", "usage: newpgrp");
@@ -45,6 +47,7 @@ PRIM(newpgrp) {
 }
 
 PRIM(background) {
+	(void)binding;
 	int pid = efork(true, true);
 	if (pid == 0) {
 #if JOB_PROTECT
@@ -58,6 +61,7 @@ PRIM(background) {
 }
 
 PRIM(fork) {
+	(void)binding;
 	int pid, status;
 	pid = efork(true, false);
 	if (pid == 0)
@@ -69,6 +73,7 @@ PRIM(fork) {
 }
 
 PRIM(run) {
+	(void)binding;
 	if (list == NULL)
 		fail("$&run", "usage: %%run file argv0 argv1 ...");
 	const char *file = getstr(list->term);
@@ -77,6 +82,8 @@ PRIM(run) {
 }
 
 PRIM(umask) {
+	(void)binding;
+	(void)evalflags;
 	if (list == NULL) {
 		int mask = umask(0);
 		umask(mask);
@@ -98,6 +105,8 @@ PRIM(umask) {
 }
 
 PRIM(cd) {
+	(void)binding;
+	(void)evalflags;
 	if (list == NULL || list->next != NULL)
 		fail("$&cd", "usage: $&cd directory");
 	const char *dir = getstr(list->term);
@@ -107,6 +116,8 @@ PRIM(cd) {
 }
 
 PRIM(setsignals) {
+	(void)binding;
+	(void)evalflags;
 	int i;
 	Sigeffect effects[NSIG];
 	for (i = 0; i < NSIG; i++)
@@ -260,6 +271,8 @@ static LIMIT_T parselimit(const Limit *limit, const char *s) {
 }
 
 PRIM(limit) {
+	(void)binding;
+	(void)evalflags;
 	const Limit *lim = limits;
 	bool hard = false;
 
@@ -302,6 +315,7 @@ PRIM(limit) {
 
 #if BUILTIN_TIME
 PRIM(time) {
+	(void)binding;
 
 #if HAVE_WAIT3
 
@@ -385,6 +399,8 @@ PRIM(time) {
 
 #if !KERNEL_POUNDBANG
 PRIM(execfailure) {
+	(void)binding;
+	(void)evalflags;
 	int fd, len, argc;
 	char header[1024], *args[10], *s, *end, *file;
 

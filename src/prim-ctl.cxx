@@ -4,6 +4,7 @@
 #include "prim.hxx"
 
 PRIM(seq) {
+	(void)binding;
 	const List* result = ltrue;
 	iterate(list)
 		result = eval1(list->term, evalflags &~ 
@@ -14,6 +15,7 @@ PRIM(seq) {
 }
 
 PRIM(if) {
+	(void)binding;
 	iterate(list) {
 		const List *cond = eval1(list->term, 
                         evalflags & (list->next == NULL ? eval_inchild : 0));
@@ -27,6 +29,7 @@ PRIM(if) {
 }
 
 PRIM(forever) {
+	(void)binding;
 	List* body = list;
         const List *result = list;
 	for (;;) result = eval(body, NULL, evalflags & eval_exitonfalse);
@@ -34,6 +37,8 @@ PRIM(forever) {
 }
 
 PRIM(throw) {
+	(void)binding;
+	(void)evalflags;
 	if (list == NULL)
 		fail("$&throw", "usage: throw exception [args ...]");
 	throw list;
@@ -41,6 +46,7 @@ PRIM(throw) {
 }
 
 PRIM(catch) {
+	(void)binding;
 	Atomic retry;
 
 	if (list == NULL)
