@@ -1,7 +1,7 @@
 fn %advise {|name thunk|
 	# Insert a thunk at the beginning of a function
 	let (f = `` \n {var fn-$name}; c) {
-		if {echo $f|grep -wqv $thunk} {
+		if {{echo $f|grep -wqv $thunk} && {echo $f|grep -q '{.*}'}} {
 			c = `` \n {echo -- $f|sed 's/= ''\({\(|[^|]\+|\)\?' \
 				^'%seq \)\(.*}\)/= ''\1'^$thunk^' \3/'}
 			if {$c :eq $f} {
