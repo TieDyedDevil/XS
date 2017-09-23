@@ -1,6 +1,8 @@
 This file reports known issues related to the compilation toolchain.
 
-Clang 4.0.1 produces an unusable `xs` executable which passes the
-build check but fails when running the `xs` function `.annotate`
-from the sample code directory. Compile `xs` using either GCC or a
-different version of Clang.
+Clang 4.0.1 produces an unusable `xs` executable. Sometimes it'll
+fail upon startup. Sometimes it'll start and pass `./build.sh check`
+but fail when running the `xs` function `.annotate` from the `samples/`
+directory. This suggests either a compiler/library bug or (much more
+likely) some questionable `xs` code. Until this is resolved, please
+compile `xs` using either GCC or a different version of Clang.
