@@ -2,7 +2,11 @@ This file reports known issues related to the compilation toolchain.
 
 Clang 4.0.1 produces an unusable `xs` executable. Sometimes it'll
 fail upon startup. Sometimes it'll start and pass `./build.sh check`
-but fail when running the `xs` function `.annotate` from the `samples/`
-directory. This suggests either a compiler/library bug or (much more
-likely) some questionable `xs` code. Until this is resolved, please
-compile `xs` using either GCC or a different version of Clang.
+but fail when running the `xs` function `annotate` from the `samples/`
+directory. And those aren't the only failure modes. This suggests to
+me that the `xs` code has tickled either a compiler/library bug or
+(much more likely) has wandered into a region of undefined behavior
+as regards the C++ language.
+
+Until this is resolved, please compile `xs` using either GCC or a
+different version of Clang.
