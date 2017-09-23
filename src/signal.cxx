@@ -132,7 +132,7 @@ extern Sigeffect esignal(int sig, Sigeffect effect) {
                                        signame(sig));
 				return old;
 			}
-			break;
+			/* FALLTHROUGH */
 		case sig_catch:
 		case sig_noop:
 			if (setsignal(sig, catcher) == SIG_ERR) {
