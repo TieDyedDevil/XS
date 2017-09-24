@@ -1,4 +1,4 @@
-project('xs', ['cpp', 'c'])
+project('xs', ['cpp'])
   compiler = meson.get_compiler('cpp')
   compile_flags = ['-I../src', '-Wall', '-Wextra']
   link_flags = []
