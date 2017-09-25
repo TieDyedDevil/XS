@@ -35,6 +35,11 @@ fn help {|*|
 }
 
 ## Online documentation
+fn boost-help {
+	.d 'Boost documentation'
+	.c 'help'
+	web http://boost.org/doc/libs/
+}
 fn meson-help {
 	.d 'meson documentation'
 	.c 'help'
