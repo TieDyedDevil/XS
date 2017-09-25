@@ -78,7 +78,7 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 		}
 	}
 	fn %prompt {
-		.palette; .an; .ed
+		.palette; .an; .ed; .cn
 		~ $(_pr@$pid) () && {
 			_pa@$pid = $_oa; prompt; _n@$pid = 0; _s@$pid = -1
 			_pb@$pid = $_ob
