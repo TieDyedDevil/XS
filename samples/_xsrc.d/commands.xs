@@ -186,7 +186,7 @@ fn list {|*|
 				vis-highlight $syn <{cat $*|tr \r \n}
 			} else {
 				vis-highlight $syn $*
-			} | less -RFXS
+			} | nl | less -RFXS
 		}
 	}
 }

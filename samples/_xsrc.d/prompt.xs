@@ -1,7 +1,7 @@
 # Prompt control for xs
 
 let (pi_p = $prompt_init(1); pi_a = $prompt_init(2); pi_s = $prompt_init(3)) {
-	if {!~ $(pr$pi_p) ()} {_op = $(pr$pi_p) ''} \
+	if {!~ <={%aref pr $pi_p} ()} {_op = <={%aref pr $pi_p} ''} \
 	else {_op = \> \| xs}
 	if {!~ $pi_a ()} {_oa = `{.tattr $pi_a}} \
 	else {_oa = `{.tattr bold}}
@@ -30,15 +30,15 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 		}
 		if {~ $x(1) -l} {
 			let (n = 1) {
-				while {!~ $(pr$n) ()} {
-					printf '%d %s %s'\n $n $(pr$n)
+				while {!~ <={%aref pr $n} ()} {
+					printf '%d %s %s'\n $n <={%aref pr $n}
 					n = `($n + 1)
 				} | pr -8 -t
 			}
 		}
 		if {~ $x(1) -n} {
 			let (n = $x(2)) {
-				!~ $(pr$n) () && prompt $(pr$n)
+				!~ <={%aref pr $n} () && prompt <={%aref pr $n}
 			}
 		}
 		if {~ $x(1) -s} {
@@ -128,10 +128,11 @@ fn rp {
 	.r 'prompt sc sd se'
 	let (np = 1; na = 10; att = (normal bold dim italic red green blue
 					magenta yellow cyan); r; i; a) {
-		while {!~ $(pr$np) ()} {np = `($np + 1)}; np = `($np - 1)
+		while {!~ <={%aref pr $np} ()} {np = `($np + 1)}
+		np = `($np - 1)
 		r = <=$&random
 		i = `($r % $np + 1)
-		prompt $(pr$i) $(_pt@$pid)
+		prompt <={%aref pr $i} $(_pt@$pid)
 		a = ()
 		while {~ $a ()} {
 			i = `($r / 100 % $na + 1)
