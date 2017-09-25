@@ -46,14 +46,16 @@ fn m {|*|
 	.r 'b mpc n played'
 	%with-tempfile mi {
 		mpc > $mi
-		printf '%s|  '^`.as^'%s'^`.an^'  |%s %s'\n \
-			`` \n {cat $mi|head -1|cut -d\| -f1} \
-			`` \n {cat $mi|head -1|cut -d\| -f2|cut -c3-} \
-			`` \n {cat $mi|tail -n+2|head -1|xargs echo \
-				|cut -d' ' -f3-} \
-			`{grep -Eo '\[(playing|paused)\]' $mi}
-		printf %s%s%s\n `.ad <={%flatten '; ' \
-			`{cat $mi|tail -1|sed 's/: /:/g'}} `.an
+		if {!grep -o '^ERROR: .*$' $mi} {
+			printf '%s|  '^`.as^'%s'^`.an^'  |%s %s'\n \
+				`` \n {cat $mi|head -1|cut -d\| -f1} \
+				`` \n {cat $mi|head -1|cut -d\| -f2|cut -c3-} \
+				`` \n {cat $mi|tail -n+2|head -1|xargs echo \
+					|cut -d' ' -f3-} \
+				`{grep -Eo '\[(playing|paused)\]' $mi}
+			printf %s%s%s\n `.ad <={%flatten '; ' \
+				`{cat $mi|tail -1|sed 's/: /:/g'}} `.an
+		}
 	}
 }
 fn mpc {|*|
