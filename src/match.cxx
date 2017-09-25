@@ -255,6 +255,5 @@ extern List *extractmatches(List *subjects, List *patterns, StrList *quotes) {
 		}
 	}
 
-	
-	return result;
+	return NULL;
 }
