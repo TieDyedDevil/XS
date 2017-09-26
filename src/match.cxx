@@ -66,7 +66,7 @@ extern bool match(const char *s, const char *p, const char *q) {
 			switch (c) {
 			case '?':
 				if (*s++ == '\0') return false;
-				/* FALLTHROUGH */
+				break;
 			case '*':
 				while (p[i] == '*'
                                        && (q == UNQUOTED || q[i] == 'r'))
@@ -255,5 +255,5 @@ extern List *extractmatches(List *subjects, List *patterns, StrList *quotes) {
 		}
 	}
 
-	return NULL;
+	return prevp ? result : NULL;
 }
