@@ -1,0 +1,10 @@
+This directory contains a collection of `xs` scripts. Feel free to adopt or
+adapt these as needed, but be aware that not all of these scripts will be
+useful in all environments. In particular, the `daemons.xs` script is specific
+to the author's system and should be reworked or removed as needed.
+
+The _* files and directories should all be renamed, replacing the leading `_`
+with a `.`, and placed in your home directory.
+
+The other files (those not having a leading `_`) can go into any directory on
+$PATH.
