@@ -1,5 +1,5 @@
 # index of prompt, prompt attribute, sequence attribute
-prompt_init = 17 bold highlight
+prompt_init = 16 bold underline
 
 %aset pr 1 \u252c \u251c
 #    1┬

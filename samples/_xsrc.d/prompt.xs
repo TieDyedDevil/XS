@@ -53,13 +53,14 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 			}
 		}
 		if {~ $x(1) -a} {
-			if {~ $#x 2} {
+			if {{~ $#x 2} && {~ $x(2) (bold normal dim italic
+					red green blue yellow magenta cyan)}} {
 				let (svpa = $(_pa@$pid)) {
 					_pa@$pid = `{.tattr $x(2)}
 					~ $#(_pa@$pid) 0 && {_pa@$pid = $svpa}
 				}
 			} else {throw error prompt 'bold|normal|dim|italic' \
-				^'|red|green|yellow|blue|magenta|cyan'}
+				^'|red|green|blue|yellow|magenta|cyan'}
 		} else if {~ $#x 2 3 && !~ $x(1) -*} {
 			_p1@$pid = $x(1); _p2@$pid = $x(2)
 		}

@@ -348,7 +348,14 @@ fn pp {|*|
 	.a '[-c] NAME'
 	.c 'system'
 	if {~ $*(1) -c} {
-		list -s xs <{pp $*(2)}
+		%with-tempfile f {
+			pp $*(2) > $f
+			if {grep -qw 'not a function' $f} {
+				cat $f
+			} else {
+				list -s xs $f
+			}
+		}
 	} else catch {|e|
 		echo 'not a function'
 	} {

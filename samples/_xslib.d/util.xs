@@ -299,3 +299,15 @@ fn %objreset {|objname|
 	.objcheck $objname
 	$objname = obj
 }
+
+fn %mkdict {|*|
+	# Make a dictionary from a list of key/value pairs
+	let (d = <=%mkobj) {
+		while {!~ $* ()} {
+			(k v) = $*(1 2)
+			* = $*(3 ...)
+			%objset $d $k $v
+		}
+		result $d
+	}
+}
