@@ -232,6 +232,7 @@ static List *extractsinglematch(const char *subject, const char *pattern,
 extern List *extractmatches(List *subjects, List *patterns, StrList *quotes) {
 	List *result;
 	List **prevp = &result;
+	int matched = 0;
 
 	for (List *subject = subjects; subject != NULL;
 	     subject = subject->next) {
@@ -250,10 +251,11 @@ extern List *extractmatches(List *subjects, List *patterns, StrList *quotes) {
 				for (*prevp = match; match != NULL;
 				     match = *prevp)
 					prevp = &match->next;
+				matched = 1;
 				break;
 			}
 		}
 	}
 
-	return prevp ? result : NULL;
+	return matched ? result : NULL;
 }
