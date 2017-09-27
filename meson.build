@@ -68,9 +68,9 @@ project('xs', ['cpp'])
 	install_dir: 'share/doc/xs/samples/_xslib.d')
 
 run_target('check',
-	command: ['sh', '-c', './tests/xs_tests.xs'],
+	command: ['./build/xs', '-c', './tests/xs_tests.xs'],
 	depends: xs)
 
 run_target('fuzz',
-	command: ['sh', '-c', './tests/fuzz.sh'],
+	command: ['./build/xs', '-c', './tests/fuzz.xs'],
 	depends: xs)
