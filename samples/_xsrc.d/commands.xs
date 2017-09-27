@@ -124,32 +124,17 @@ fn list {|*|
 			lpath = /usr/local/share/vis/lexers; \
 			fallback = false; \
 			fn-canon = {|ext|
-				switch $ext (
-				1 {result man}
-				3 {result man}
-				5 {result man}
-				7 {result man}
-				ascii {result text}
-				iso-8859 {result text}
-				c {result ansi_c}
-				sh {result bash}
-				dash {result bash}
-				posix {result bash}
-				bourne-again {result bash}
-				patch {result diff}
-				md {result markdown}
-				fs {result forth}
-				4th {result forth}
-				adb {result ada}
-				ads {result ada}
-				gpr {result ada}
-				rs {result rust}
-				rst {result rest}
-				p {result pascal}
-				js {result javascript}
-				es {result rc}
-				{result $ext}
-				)
+				let (extm = <={%mkdict (
+					1 man 3 man 5 man 7 man ascii text
+					iso-8859 text c ansi_c sh bash
+					dash bash posix bash bourne-again bash
+					patch diff md markdown fs forth
+					4th forth adb ada ads ada gpr ada
+					rs rust rst rest p pascal
+					js javascript es rc
+					)}) {
+					result <={%objget $extm $ext $ext}
+				}
 			} \
 			) {
 			if {~ $*(1) -s} {
@@ -186,7 +171,7 @@ fn list {|*|
 				vis-highlight $syn <{cat $*|tr \r \n}
 			} else {
 				vis-highlight $syn $*
-			} | nl | less -RFXS
+			} | nl >[2]/dev/null | less -RFXS
 		}
 	}
 }

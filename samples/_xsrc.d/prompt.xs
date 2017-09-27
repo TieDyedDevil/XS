@@ -127,8 +127,11 @@ fn rp {
 	.d 'Random prompt'
 	.c 'prompt'
 	.r 'prompt sc sd se'
-	let (np = 1; na = 10; att = (normal bold dim italic red green blue
-					magenta yellow cyan); r; i; a) {
+	let (np = 1; na = 10; nb = 3; \
+			att = (normal bold dim italic red green blue
+				magenta yellow cyan); \
+			bkg = (normal highlight underline); \
+			r; i; a; s) {
 		while {!~ <={%aref pr $np} ()} {np = `($np + 1)}
 		np = `($np - 1)
 		r = <=$&random
@@ -136,10 +139,13 @@ fn rp {
 		prompt <={%aref pr $i} $(_pt@$pid)
 		a = ()
 		while {~ $a ()} {
+			r = <=$&random
 			i = `($r / 100 % $na + 1)
 			a = `{.tattr $att($i)}
-			r = <=$&random
 		}
 		prompt -a $att($i)
+		r = <=$&random
+		i = `($r / 100 % $nb + 1)
+		prompt -s $bkg($i)
 	}
 }

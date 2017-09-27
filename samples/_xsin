@@ -1,6 +1,7 @@
 #! /usr/bin/env xs
 
 if {~ `tty *tty1} {
+	screensaver on
 	startwm
 } else {
 	stty start undef stop undef
