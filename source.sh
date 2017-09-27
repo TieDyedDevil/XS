@@ -9,7 +9,7 @@ fi
 FILES="\
 	README INSTALL \
 	`find doc src generators samples tests xs-talk man \
-		-type f -a \! -name \*.log` \
+		-type f -a \! -name \*.log | grep -v badfuzz.xs` \
 	meson.build build.sh source.sh \
 "
 
