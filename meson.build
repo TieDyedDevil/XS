@@ -67,10 +67,6 @@ project('xs', ['cpp'])
 		'samples/_xslib.d/util.xs'],
 	install_dir: 'share/doc/xs/samples/_xslib.d')
 
-run_target('trip',
-	command: ['sh', '-c', './tests/trip.xs'],
-	depends: xs)
-
 run_target('check',
 	command: ['sh', '-c', './tests/xs_tests.xs'],
 	depends: xs)
