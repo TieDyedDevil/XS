@@ -55,7 +55,7 @@ project('xs', ['cpp'])
 		'doc/TODO', 'doc/TUTORIAL.md', 'doc/XS-FOR-LISPERS'],
 	install_dir: 'share/doc/xs')
   install_data(['samples/_xsrc', 'samples/_xsin', 'samples/colors',
-		'samples/histclean', 'samples/sv'],
+		'samples/histclean', 'samples/sv', 'samples/README'],
 	install_dir: 'share/doc/xs/samples')
   install_data(['samples/_xsrc.d/aliases.xs', 'samples/_xsrc.d/commands.xs',
 		'samples/_xsrc.d/console.xs', 'samples/_xsrc.d/env.xs',
