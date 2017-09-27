@@ -1,2 +1,3 @@
 - Add job control (SIGTSTP, fg, bg, disown).
-- Add tests.
+- Fix crashes found by fuzzer.
+- Add unit tests.
