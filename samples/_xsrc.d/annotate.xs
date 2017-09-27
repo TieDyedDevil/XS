@@ -19,12 +19,14 @@ fn %advise {|name thunk|
 	}
 }
 
+fn .fec {}
 fn fec {|*|
 	.d 'Report entry counts of annotated xs functions'
 	.a '[-c]  # clear counts'
 	.c 'system'
 	.r 'annotate'
 	if {~ $*(1) -c} {%objreset $fco; echo Cleared}
+	if {!grep -q '{%enter .fec}' <{var fn-.fec}} {echo 'Not annotated'}
 	let (lines = `{echo $($fco)|tr ' ' \n|grep -vx obj|sort}) {
 		for l $lines {
 			let ((n c) = <={%split : $l}) {
