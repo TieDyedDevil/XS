@@ -548,7 +548,7 @@ globbing, such as:
 vi *^(mem wan)^.[ch]
 ```
 
-You can even concatenate multiple lists; `xs` will generate the cross
+You can even concatenate multiple lists using `^`; `xs` will generate the cross
 product of the lists. This:
 
 ```

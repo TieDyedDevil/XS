@@ -26,6 +26,9 @@ familiar to Lisp users. If that's you, here's what you need to know:
 
 - `xs` does not have macros.
 
+- All function arguments are explicitly evaluated (e.g. using `$`, ```,
+  ```` or `<=`.
+
 - `xs` control and assignment expressions are shell-like; not Lisp-like.
 
 - An `xs` expression must be on a single logical line. A line may be continued
