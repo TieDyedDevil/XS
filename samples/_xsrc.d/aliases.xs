@@ -4,6 +4,12 @@ fn ag {|*|
 	.c 'alias'
 	/usr/bin/ag --pager='less -RFX' $*
 }
+fn apropos {|*|
+	.d 'Find man pages by keyword'
+	.a '[apropos_OPTIONS] KEYWORD...'
+	.c 'alias'
+	/usr/bin/apropos -l $*|less -FXS
+}
 fn atop {|*|
 	.d 'Advanced system & process monitor'
 	.a '[atop_OPTIONS]'

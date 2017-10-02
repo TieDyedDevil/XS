@@ -40,6 +40,11 @@ fn boost-help {
 	.c 'help'
 	web http://boost.org/doc/libs/
 }
+fn git-help {
+	.d 'git documentation'
+	.c 'help'
+	web https://git-scm.com/doc
+}
 fn meson-help {
 	.d 'meson documentation'
 	.c 'help'

@@ -78,6 +78,12 @@ fn dl-clean {
 		!~ $#files 0 && rm -I -v $files
 	}
 }
+fn dt {|*|
+	.d 'List top directory usage'
+	.a '[DIR]'
+	.c 'system'
+	du -h -d1 $*|grep -vE '^[.0-9KMGTPEZY]+'\t'\.$'|sort -h -r -k1|head -15
+}
 fn doc {|*|
 	.d 'pushd to documentation directory of package'
 	.a 'PACKAGE_NAME_GLOB'
@@ -335,7 +341,7 @@ fn pp {|*|
 	if {~ $*(1) -c} {
 		%with-tempfile f {
 			pp $*(2) > $f
-			if {grep -qw 'not a function' $f} {
+			if {grep -qx 'not a function' $f} {
 				cat $f
 			} else {
 				list -s xs $f

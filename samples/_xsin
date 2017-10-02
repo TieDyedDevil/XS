@@ -9,7 +9,7 @@ if {~ `tty *tty1} {
 		~ `tty /dev/tty* && vtfbfit
 		.herald
 	}
-	if {!~ $history () && ~ `{wc -l $history} [4-9]???} {
+	if {{!~ $history ()} && {~ `{cat $history|wc -l} [5-9]??? *?????}} {
 		echo 'Consider histclean'
 	}
 	.xsin-rp

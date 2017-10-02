@@ -47,6 +47,7 @@ fn m {|*|
 	%with-tempfile mi {
 		mpc > $mi
 		if {!grep -o '^ERROR: .*$' $mi} {
+			~ `{cat $mi|wc -l} 3 && \
 			printf '%s|  '^`.as^'%s'^`.an^'  |%s %s'\n \
 				`` \n {cat $mi|head -1|cut -d\| -f1} \
 				`` \n {cat $mi|head -1|cut -d\| -f2|cut -c3-} \
@@ -55,6 +56,24 @@ fn m {|*|
 				`{grep -Eo '\[(playing|paused)\]' $mi}
 			printf %s%s%s\n `.ad <={%flatten '; ' \
 				`{cat $mi|tail -1|sed 's/: /:/g'}} `.an
+		}
+	}
+}
+fn midi {|*|
+	.d 'Play MIDI files'
+	.a 'FILE ...'
+	.c 'media'
+	let (s; p) {
+		unwind-protect {
+			fluidsynth -a pulseaudio -m alsa_seq -s -i -l \
+				/usr/share/soundfonts/FluidR3_*.sf2 \
+				>/dev/null >[2=1] &
+			s = $apid
+			sleep 1
+			p = `{aplaymidi -l|grep FLUID|cut -d' ' -f1}
+			for f $* {aplaymidi -p $p $f}
+		} {
+			kill $s
 		}
 	}
 }
@@ -76,7 +95,7 @@ fn mpv {|*|
 			video_driver = opengl-hq
 		}
 		/usr/bin/mpv --profile $video_driver $embed \
-			--no-stop-screensaver $*
+			--volume=50 --no-stop-screensaver $*
 	}
 }
 fn mpvl {|*|
