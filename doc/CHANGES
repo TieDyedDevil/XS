@@ -20,6 +20,12 @@ loaded before ~/.xsin.
 
 Added $&islogin and %is-login.
 
+Added $&len to count the number of characters in each word provided as
+an argument.
+
+Added $&wid to measure the number of display cells occupied by each word
+provided as an argument.
+
 Removed the ./xsdebug script, which was still es code and not usable
 with xs.
 

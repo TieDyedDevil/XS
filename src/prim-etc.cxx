@@ -522,6 +522,48 @@ PRIM(random) {
 	return mklist(mkstr(str("%d", random())), NULL);
 }
 
+PRIM(len) {
+	(void)binding;
+	(void)evalflags;
+	if (list == NULL)
+		fail("$&len", "usage: %%len [args ...]");
+	List *result = NULL;
+	List *tail = NULL;
+	while (list) {
+		size_t n = mbstowcs(NULL, getstr(list->term), 0);
+		if (n == (size_t)-1)
+			fail("$&len", "len: invalid character");
+		Term *elt = mkstr(str("%ld", n, 0));
+		if (!result) {result = mklist(elt, NULL); tail = result;}
+		else tail = tail->next = mklist(elt, NULL);
+		list = list->next;
+	}
+	return result;
+}
+
+PRIM(wid) {
+	(void)binding;
+	(void)evalflags;
+	if (list == NULL)
+		fail("$&wid", "usage: %%wid [args ...]");
+	List *result = NULL;
+	List *tail = NULL;
+	while (list) {
+		const size_t limwid = 512;
+		wchar_t d[limwid];
+		size_t n = mbstowcs(d, getstr(list->term), limwid);
+		if (n == (size_t)-1)
+			fail("$&wid", "wid: invalid character");
+		if (n == limwid)
+			fail("$&wid", "wid: word is too wide");
+		Term *elt = mkstr(str("%d", wcswidth(d, limwid)));
+		if (!result) {result = mklist(elt, NULL); tail = result;}
+		else tail = tail->next = mklist(elt, NULL);
+		list = list->next;
+	}
+	return result;
+}
+
 
 /*
  * initialization
@@ -553,6 +595,8 @@ extern void initprims_etc(Prim_dict& primdict) {
 	X(setmaxevaldepth);
 	initrandom();
 	X(random);
+	X(len);
+	X(wid);
 #if READLINE
 	X(resetterminal);
 #endif

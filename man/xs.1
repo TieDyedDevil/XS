@@ -2990,6 +2990,9 @@ The garbage collector in
 runs rather frequently;
 there should be no reason for a user to issue this command.
 .TP
+.Cr "$&len"
+Returns the number of characters in each word provided as an argument.
+.TP
 .Cr "$&primitives"
 Returns a list of the names of xs primitives.
 .TP
@@ -2999,6 +3002,10 @@ Returns a random integer.
 .Cr "$&version"
 Returns the version string of
 .IR xs .
+.TP
+.Cr "$&wid"
+Returns the number of display cells occupied by each word provided as
+an argument.
 .SH OPTIONS
 .TP
 .Cr \-c
