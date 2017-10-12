@@ -61,7 +61,7 @@ fn load {
 fn ls {|*|
 	.c 'alias'
 	.r 'la ll lt'
-	/usr/bin/ls --color=auto $*
+	/usr/bin/ls --group-directories-first -v --color=auto $*
 }
 fn lt {|*|
 	.c 'alias'
@@ -72,11 +72,6 @@ fn mutt {|*|
 	.c 'alias'
 	# mutt won't override st colors
 	env TERM=st /usr/bin/mutt $*
-}
-fn net {
-	.d 'Network status'
-	.c 'alias'
-	nmcli --fields name,type,device connection show --active
 }
 fn on {
 	.d 'List console logins'

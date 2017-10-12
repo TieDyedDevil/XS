@@ -42,8 +42,12 @@ fn image {|*|
 }
 fn m {|*|
 	.d 'Show currently playing track'
+	.a '[-w]'
 	.c 'media'
 	.r 'b mpc n played'
+	if {~ $* -w} {
+		%with-quit {
+			watch -x -p -t -n1 -c xs -c 'm >[2]/dev/null|head -1'}}
 	%with-tempfile mi {
 		mpc > $mi
 		if {!grep -o '^ERROR: .*$' $mi} {

@@ -111,7 +111,8 @@ fn import-abook {|*|
 	.d 'Import vcard to abook'
 	.a 'VCARD_FILE'
 	.c 'system'
-	mv ~/.abook/addressbook ~/.abook/addressbook-OLD
+	access -- ~/.abook/addressbook \
+		&& mv ~/.abook/addressbook ~/.abook/addressbook-OLD
 	abook --convert --infile $* --informat vcard --outformat abook \
 		--outfile ~/.abook/addressbook
 	chmod 600 ~/.abook/addressbook
@@ -136,7 +137,7 @@ fn list {|*|
 					dash bash posix bash bourne-again bash
 					patch diff md markdown fs forth
 					4th forth adb ada ads ada gpr ada
-					rs rust rst rest p pascal
+					rs rust rst rest p pascal py python
 					js javascript es rc
 					)}) {
 					result <={%objget $extm $ext $ext}
@@ -207,15 +208,18 @@ fn lpmd {|md|
 		| lpr -o page-top=60 -o page-bottom=60 \
 			-o page-left=60 -o lpi=8 -o cpi=12
 }
-fn luc {
+fn luc {|*|
 	.d 'List user commands'
+	.a '-l  # sort by length, then name'
 	.c 'system'
-	{
-	printf `.as^'@ ~/.xs*'^`.an^\n
-	vars -f | grep -o '^fn-[^ ]\+' | cut -d- -f2- | grep '^[a-z]' \
-		| column -c `{tput cols}
-	printf `.as^'@ ~/bin'^`.an^\n
-	ls ~/bin | column -c `{tput cols}
+	let (fn-sf) {
+		if {~ $* -l} {fn-sf = %asort} else {fn-sf = sort}
+		printf `.as^'@ ~/.xs*'^`.an^\n
+		vars -f | grep -o '^fn-[^ ]\+' | cut -d- -f2- | grep '^[a-z]' \
+			| sf | column -c `{tput cols}
+		printf `.as^'@ ~/bin'^`.an^\n
+		find -L ~/bin -mindepth 1 -maxdepth 1 -type f -executable \
+			| sf | xargs -n1 basename | column -c `{tput cols}
 	} | less -rFX
 }
 fn mamel {
@@ -246,8 +250,9 @@ fn mons {
 			^'$1, $3, ' \
 			^'gensub(/^([^x]+).*$/, "\\1", "g", $3) / 25.4, ' \
 			^'gensub(/^.*x([^x]+).*$/, "\\1", "g", $3) / 25.4, ' \
-			^'(gensub(/^([^x]+).*$/, "\\1", "g", $2) /' \
-			^' gensub(/^([^x]+).*$/, "\\1", "g", $3) * 25.4), $2)}'
+			^'$3 == "0x0" ? 0 : ' \
+			^'gensub(/^([^x]+).*$/, "\\1", "g", $2) /' \
+			^' gensub(/^([^x]+).*$/, "\\1", "g", $3) * 25.4, $2)}'
 }
 fn name {|*|
 	.d 'Set prompt text and terminal title.'
@@ -262,6 +267,15 @@ fn name {|*|
 		title $*
 	}
 }
+fn net {|*|
+	.d 'Network status'
+	.a '[-a]'
+	.c 'system'
+	let (flag) {
+		if {!~ $* -a} {flag = --active}
+		nmcli --fields name,type,device connection show $flag
+	}
+}
 fn noise {|*|
 	.d 'Audio noise generator'
 	.a '[white|pink|brown [LEVEL_DB]]'
@@ -273,8 +287,13 @@ fn noise {|*|
 		~ $pc white && {color = white; pad = -12}
 		if {~ $pl -* || ~ $pl 0} {level = $pl} else {level = -20}
 		volume = `($level + $pad)
-		play </dev/zero -q -t s32 -r 22050 -c 2 - synth $color^noise \
-			tremolo 0.05 30 vol $volume dB
+		unwind-protect {
+			play </dev/zero -q -t s32 -r 22050 -c 2 - \
+				synth $color^noise tremolo 0.05 30 \
+				vol $volume dB
+		} {
+			printf \n
+		}
 	}
 }
 fn o {
@@ -328,6 +347,15 @@ fn panel {|*|
 			}
 		}
 	} else {throw error panel 'no Intel backlight'}
+}
+fn parse {|*|
+	.d 'Parse an xs expression'
+	.a '[EXPRESSION]'
+	.c 'system'
+	if {~ $#* 0} {
+		let (c = <={~~ <={%parse 'xs: ' '  : '} \{*\}}) {
+			if {!~ $c ()} {xs -nxc $c}}} \
+	else {xs -nxc $^*}
 }
 fn pn {
 	.d 'Users with active processes'

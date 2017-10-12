@@ -311,3 +311,12 @@ fn %mkdict {|*|
 		result $d
 	}
 }
+
+fn %asort {
+	# Sort by length, then by name
+	%with-read-lines /dev/stdin {|line|
+		let (len = <={$&len $line}) {
+			printf %06d%s\n $len $line
+		}
+	} | sort | cut -c7-
+}
