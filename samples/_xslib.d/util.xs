@@ -107,14 +107,16 @@ fn %parse-args {|*|
 			}}}
 			cases = $l
 		}
-		let (l = <={%args $a}; words; extra) {
+		let (l = $a; words; extra) {
 			while {!~ $l ()} {
 				(optopt optval l) = $l
 				if {~ $extra(1) --} {extra = $extra $optval} \
-				else switch $optval (
+				else switch $optopt (
 					_ {words = $words $optval}
 					-- {extra = $optopt}
 					$cases
+					{throw error %parse-args \
+						'opt? '^$optopt}
 				)
 			}
 			result $words $extra
@@ -180,7 +182,7 @@ let (g = 0) {
 fn %with-read-lines {|file body|
 	# Run body with each line from file.
 	# Body must be a lambda; its argument is bound to the line content.
-	cat $file|let (__l = <=read) {
+	<$file let (__l = <=read) {
 		while {!~ $__l ()} {
 			$body $__l
 			__l = <=read

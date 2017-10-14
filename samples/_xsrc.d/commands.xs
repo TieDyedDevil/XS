@@ -160,7 +160,9 @@ fn list {|*|
 					syn = `{file -L $* | cut -d: -f2 \
 						| awk '
 /^ a .*\/env [^ ]+ script/ {print $3; next}
-/^ a .*\/[^ ]+ script/ {print gensub(/^ [^ ]+ .+\/([^ ]+) .*$/, "\\1", 1); next}
+/^ a .*\/[^ ]+ (-[^ ]+ )?script/ {
+	print gensub(/^ [^ ]+ .+\/([^ ]+) .*$/, "\\1", 1); next
+}
 // {print $1}
 ' \
 						| tr '[[:upper:]]' '[[:lower:]]'}
