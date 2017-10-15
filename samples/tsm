@@ -223,12 +223,12 @@ fn check_cmds {|*|
 }
 
 fn session_exists {
-	access -s $HOME/.abduco/$SESSION@`{hostname -s}
+	result <={access -s $HOME^/.abduco/^$SESSION^@^`{hostname -s}}
 }
 
 fn make_session {|*|
 	{~ $FLAG -c} && prevent_nesting
-	{result session_exists} && {fail $SESSION exists}
+	{result <=session_exists} && {fail $SESSION exists}
 	check_cmds $*
 	clean
 	defaults
@@ -263,7 +263,7 @@ EOF
 
 fn attach_session {
 	prevent_nesting
-	session_exists || fail $SESSION does not exist
+	{result <=session_exists} || fail $SESSION does not exist
 	clean
 	update_metadata
 	abduco -e $DET -a $SESSION
@@ -337,7 +337,7 @@ fn list_sessions {|*|
 }
 
 fn query {
-	if $session_exits {exit 0} else {exit 1}
+	if session_exists {exit 0} else {exit 1}
 }
 
 {access -d -- $HOME/.abduco} || {mkdir -m 700 $HOME/.abduco}

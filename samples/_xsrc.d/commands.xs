@@ -586,7 +586,7 @@ fn wallpaper {|*|
 		throw error wallpaper 'X only'
 	} else {
 		local (pageopt = $pageopt) {
-			let (geom; mon; monopt) {
+			let (geom; mon; monopt = '') {
 				if {~ $*(1) -m} {
 					mon = $*(2)
 					monopt = $*(1 2); monopt = $^monopt
