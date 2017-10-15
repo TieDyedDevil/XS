@@ -135,7 +135,8 @@ fn clean {
 	fork {
 		cd $HOME/.abduco
 		for f `{ls -A >[2]/dev/null} {
-			{~ `{substring $f 0 1} .} && {!access -s `{substring $f 1}} && {
+			{~ `{substring $f 0 1} .} \
+					&& {!access -s `{substring $f 1}} && {
 				. ./$f
 				kill $_W >[2]/dev/null
 				rm -f $_X $_Y $_Z
@@ -312,12 +313,13 @@ fn list_sessions {|*|
 	}
 	if {$w1 :gt 0} {
 		{$w1 :lt 4} && {w1 = 4}
-		printf 'Created at   F Name%'^`($w1-2)^'sMod Det Scroll Initial wdir'\n ' '
+		printf 'Created at   F Name%'^`($w1-2)^'s' \
+			^'Mod Det Scroll Initial wdir'\n ' '
 		%with-read-lines <{ls -lt $HOME/.abduco|tail -n+2 \
 			|cut -d' ' -f6-|$*} {|SESS|
 			(d1 d2 d3 s _) = <={~~ $SESS *\ *\ *\ *@*}
 			p = $d1 $d2 $d3 $s
-			flag = <={%argify `{session_flag $p|cut -d' ' -f4}}
+			flag = <={%argify `{session_flag $s|cut -d' ' -f4}}
 			~ $flag '' && flag = ' '
 			printf '%3s %2s %5s '^$flag^' '^`.as^'%s'^`.an $p
 			(_ _ _ s h) = <={~~ $SESS *\ *\ *\ *@*}
