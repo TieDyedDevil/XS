@@ -64,7 +64,7 @@ EOF
 	exit 0
 }
 
-!~ $#* 0 || usage
+!~ $#ARGS 0 || usage
 
 fn one_op {
 	~ $FLAG () || {usage 'only one of -c -n -a -l -L -i -q'}
@@ -97,7 +97,6 @@ ARGS = <={%parse-args <={%args $ARGS} \& (
 	-h {usage help|less -FX}
 )}
 }
-* = $ARGS
 
 fn substring {|*|
 	let (s = $*(1); b = $*(2); e = $*(3)) {
@@ -111,7 +110,7 @@ fn substring {|*|
 	}
 }
 
-{!~ $FLAG -c} && {!~ $FLAG -n} && {!~ $#* 0} && {usage extra parameter}
+{!~ $FLAG -c} && {!~ $FLAG -n} && {!~ $#ARGS 0} && {usage extra parameter}
 {~ $FLAG -l} || {~ $FLAG -L} || {~ $FLAG -i} || {~ $FLAG -q} && \
 	{!~ $DET$MOD$WDIR$SCROLL ()} && {usage disallowed option}
 {~ $FLAG -a} && {!~ $MOD$WDIR$SCROLL ()} && {usage disallowed option}
@@ -156,7 +155,7 @@ fn prevent_nesting {
 	}
 }
 
-fn badenv {
+fn badenv {|*|
 	let (s = `{printf 'Invalid environment: %s' `` \n {var $*}}) {
 		fail $s
 	}
@@ -345,8 +344,8 @@ fn query {
 {access -d -- $HOME/.abduco} || {mkdir -m 700 $HOME/.abduco}
 
 switch $FLAG (
-	-c {make_session $*}
-	-n {make_session $*}
+	-c {make_session $ARGS}
+	-n {make_session $ARGS}
 	-a {attach_session}
 	-l {list_sessions cat}
 	-L {list_sessions sort -k4}
