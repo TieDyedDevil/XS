@@ -136,13 +136,16 @@ fn clean {
 		for f `{ls -A >[2]/dev/null} {
 			{~ `{substring $f 0 1} .} \
 					&& {!access -s `{substring $f 1}} && {
-				. ./$f
-				kill $_W >[2]/dev/null
-				rm -f $_X $_Y $_Z
-				rm $f
+				unwind-protect {
+					. ./$f
+					kill $_W >[2]/dev/null
+					rm -f $_X $_Y $_Z
+				} {
+					rm $f
+				}
 			}
 		}
-	}
+	} >[2]/dev/null
 }
 
 fn prevent_nesting {
@@ -212,7 +215,7 @@ EOF
 			. $f
 			DET = $_4
 			true
-		} else {DET = \\}
+		} else {DET = \^\\}
 	}
 }
 
@@ -224,6 +227,10 @@ fn check_cmds {|*|
 
 fn session_exists {
 	result <={access -s $HOME^/.abduco/^$SESSION^@^`{hostname -s}}
+}
+
+fn rewrite_abduco_message {|*|
+	sed 's/^abduco/tsm/'
 }
 
 fn make_session {|*|
@@ -245,19 +252,21 @@ fn make_session {|*|
 	ABDUCO_CMD =
 	DVTM_STATUS_UPDATER = `mktemp
 	cat >$DVTM_STATUS_UPDATER <<EOF
-#!/bin/sh
+#! /usr/bin/env xs
 
-while true; do
-	stamp=$$(date +%a\ %F\ %R:%S)
-	echo $$stamp $USER `{hostname -s} $DISPLAY_TSMWD $SESSION >> $S_FIFO
+while true {
+	stamp = `{date +%a\ %F\ %R:%S}
+	host = `{hostname -s}
+	echo $$stamp $USER $$host $DISPLAY_TSMWD $SESSION >> $S_FIFO
 	sleep 1
-done
+}
 EOF
-	nohup >/dev/null >[2=1] sh $DVTM_STATUS_UPDATER &
+	setsid >/dev/null >[2=1] xs $DVTM_STATUS_UPDATER &
 	STATUS_UPDATER_PID = $apid
 	write_metadata
 	abduco -e $DET $FLAG $SESSION \
-		dvtm -M -c $C_FIFO -s $S_FIFO -m $MOD -h $SCROLL $*
+		dvtm -M -c $C_FIFO -s $S_FIFO -m $MOD -h $SCROLL $* \
+		|[2] rewrite_abduco_message
 	tput cnorm
 }
 
@@ -266,7 +275,7 @@ fn attach_session {
 	{result <=session_exists} || fail $SESSION does not exist
 	clean
 	update_metadata
-	abduco -e $DET -a $SESSION
+	abduco -e $DET -a $SESSION |[2] rewrite_abduco_message
 	tput cnorm
 }
 

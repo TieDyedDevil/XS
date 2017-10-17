@@ -1,17 +1,30 @@
 ## Terminal presentation
 fn .ab {tput bold}
+fn .%ab {result <={%argify `.ab}}
 fn .ad {tput dim}
+fn .%ad {result <={%argify `.ad}}
 fn .ah {tput setab 8}
+fn .%ah {result <={%argify `.ah}}
 fn .ahe {tput setab 0}
+fn .%ahe {result <={%argify `.ahe}}
 fn .ai {tput sitm}
+fn .%ai {result <={%argify `.ai}}
 fn .af {|n| tput setaf $n}
+fn .%af {result <={%argify `.af}}
 fn .an {tput sgr0}
+fn .%an {result <={%argify `.an}}
 fn .as {if {~ $TERM linux} .ad else .ai}
+fn .%as {result <={%argify `.as}}
 fn .au {tput smul}
+fn .%au {result <={%argify `.au}}
 fn .aue {tput rmul}
+fn .%aue {result <={%argify `.aue}}
 fn .ci {tput civis}
+fn .%ci {result <={%argify `.ci}}
 fn .cn {tput cnorm}
+fn .%cn {result <={%argify `.cn}}
 fn .ed {tput ed}
+fn .%ed {result <={%argify `.ed}}
 fn .palette {
 	if {~ $TERM linux} {
 		printf %s \e]R
@@ -58,3 +71,4 @@ fn .tattr {|*|
 		~ $cs () || printf %s $cs
 	}
 }
+fn .%tattr {|*| result <={%argify `{.tattr $*}}}

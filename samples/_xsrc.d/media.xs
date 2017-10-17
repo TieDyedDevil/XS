@@ -58,8 +58,8 @@ fn m {|*|
 				`` \n {cat $mi|tail -n+2|head -1|xargs echo \
 					|cut -d' ' -f3-} \
 				`{grep -Eo '\[(playing|paused)\]' $mi}
-			printf %s%s%s\n `.ad <={%flatten '; ' \
-				`{cat $mi|tail -1|sed 's/: /:/g'}} `.an
+			printf %s%s%s\n <=.%ad <={%flatten '; ' \
+				`{cat $mi|tail -1|sed 's/: /:/g'}} <=.%an
 		}
 	}
 }

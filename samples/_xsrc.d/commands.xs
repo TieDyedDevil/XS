@@ -1,3 +1,10 @@
+fn astat {
+	.d 'Display a status screen'
+	.c 'system'
+	%with-quit {
+		watch -t -p -c -n1 'xs -c ''d;load;thermal;played;m'''
+	}
+}
 fn battery {
 	.d 'Show battery status'
 	.c 'system'
