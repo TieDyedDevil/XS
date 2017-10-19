@@ -15,3 +15,8 @@ history = $home/.xshistory
 
 access -d ~/.xslib.d && {for f ~/.xslib.d/*.xs {. $f}}
 access -d ~/.xsrc.d && {for f ~/.xsrc.d/*.xs {. $f}}
+catch {|e|
+	if {!~ $e *'.xsuser.d/*.xs: No such file or directory'} {throw $e}
+} {
+	access -d ~/.xsuser.d && {for f ~/.xsuser.d/*.xs {. $f}}
+}

@@ -246,7 +246,7 @@ fn make_session {|*|
 	let ((d _) = ($WDIR $PWD)) {
 		TSMWD = `{cd $d; pwd}
 	}
-	DISPLAY_TSMWD = `{echo $TSMWD|sed 's|'$HOME'|~|'}
+	DISPLAY_TSMWD = `{echo $TSMWD|sed 's|'$HOME'|\\~|'}
 	DISPLAY_TSMWD = `{echo $DISPLAY_TSMWD|sed 's| |\\\\ |'}
 	cd $TSMWD
 	ABDUCO_CMD =
