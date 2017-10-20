@@ -322,3 +322,77 @@ fn %asort {
 		}
 	} | sort | cut -c7-
 }
+
+fn %read-char {
+	# Read one character from stdin
+	let (c) {
+		unwind-protect {
+			stty -icanon
+			c = `{dd bs=1 count=1 >[2]/dev/null}
+		} {
+			stty icanon
+		}
+		result $c
+	}
+}
+
+fn %menu {|*|
+	# Present a menu. The argument list is a header followed by
+	# a list of <key, title, action> tuples. Keystrokes are
+	# processed immediately. The menu remains active until an
+	# action invokes `break`.
+	let (hdr; l; mt; ma; key; title; action; c; a; none = <=%gensym) {
+		hdr = $*(1); * = $*(2 ...)
+		ma = <=%mkobj
+		while {!~ $* ()} {
+			(key title action) = $*(1 2 3); * = $*(4 ...)
+			mt = $mt $key $title
+			%objset $ma $key $action
+		}
+		escape {|fn-break|
+			while true {
+				{!~ <={$&len $hdr} 0} && printf %s\n $hdr
+				l = $mt
+				while {!~ $mt ()} {
+					(key title) = $mt(1 2); mt = $mt(3 ...)
+					printf %c\ %s\n $key $title
+				}
+				printf \?\ 
+				c = <=%read-char
+				{~ $c \x04} && {printf \n; break}
+				a = <={%objget $ma $c $none}
+				printf \n
+				if {!~ $a $none} {
+					$a
+				} else {
+					printf What\?\n
+				}
+			}
+		}
+	}
+}
+
+fn %list-menu {|*|
+	# Present a menu. The argument list is a header, a lambda,
+	# and a list of items. The lambda is applied to the selected
+	# item.
+	let ((hdr action) = $(1 2); l = $*(3 ...); i; n) {
+		i = 0
+		for n $l {
+			i = `($i+1)
+			echo $i $n
+			%aset s $i $n
+		}
+		escape {|fn-break|
+			while true {
+				printf '#? '
+				n = <=read
+				~ $n () && {printf \n; break}
+				if {echo $n|grep -q '^[[:digit:]]\+$'} {
+					i = <={%aref s $n}
+					{!~ $i ()} && {$action $i; break}
+				}
+			}
+		}
+	}
+}

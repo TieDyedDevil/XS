@@ -39,7 +39,7 @@ fn cs {|*|
 	.a '[-a]  # show all variations'
 	.c 'system'
 	.r 'u2o ulu'
-	%with-read-lines <{grep '^<Multi_key>' \
+	%with-read-lines <{grep -h '^<Multi_key>' ~/.XCompose \
 				/usr/share/X11/locale/en_US.UTF-8/Compose | \
 		grep -v -e '<dead' -e '<kana_' -e '<hebrew_' -e '<Arabic_' \
 			-e '<Cyrillic_' -e '<Greek_' -e '<Ukrainian_' \

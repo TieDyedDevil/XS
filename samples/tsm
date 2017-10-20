@@ -280,26 +280,14 @@ fn attach_session {
 }
 
 fn interactive {
-	ls $HOME/.abduco/* >/dev/null >[2=1] || {echo No sessions; return}
-	i = 0
-	for f $HOME/.abduco/* {
-		(f _) = <={~~ $f *@*}
-		f = `{basename $f}
-		i = `($i+1)
-		echo $i $f
-		%aset s $i $f
-	}
-	escape {|fn-break|
-		while true {
-			printf '#? '
-			n = <=read
-			~ $n () && {printf \n; break}
-			if {echo $n|grep -q $DIGITS} {
-				SESSION = <={%aref s $n}
-				!~ $SESSION () && {
-					attach_session
-					break
-				}
+	if {!ls $HOME/.abduco/* >/dev/null >[2=1]} {
+		echo No sessions
+	} else {
+		%list-menu '' {|*| SESSION = $*; attach_session} `{
+			for f $HOME/.abduco/* {
+				(f _) = <={~~ $f *@*}
+				f = `{basename $f}
+				echo $f
 			}
 		}
 	}
