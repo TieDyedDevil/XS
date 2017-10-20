@@ -24,8 +24,8 @@ defined in `src/initial.xs`.
 
 It seems reasonable to, over time, create a collection of "standard" library
 functions, maintaining a separation between the core language and the runtime
-library. I believe it's too early to worry about this. The `samples` directory
-is meant to be suggestive; not prescriptive.
+library. I believe it's too early to worry about standardization. The `samples`
+directory is meant to be suggestive; not prescriptive.
 
 Finally, I intend to maintain `xs` as a Linux-only project despite attempts by
 prior maintainers to cater to other flavors of Unix. The reason for this is
