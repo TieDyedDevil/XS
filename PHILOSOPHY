@@ -1,0 +1,33 @@
+`xs` has been around for a while, even discounting its ancestral incarnations
+(`es` and `rc`). Now that `xs` is finally holding up as a usable and useful
+shell, user's thoughts inevitably turn to thoughts of "making it better" via
+"my favorite feature from <insert other language here>" or "providing a more
+convenient syntax for <insert idiom here>." This document explains the
+philosophy by which I'll evaluate requests to change the language.
+
+In short: I intend to keep the language definition as stable as possible. That
+means: Unless the language is demonstrably "broken" (i.e.: there's an `xs`
+program that crashes the shell or behaves in a manner that's inconsistent with
+what the manual says `xs` should do), there will be no changes. In other words:
+the `xs` language is "frozen".
+
+On the plus side, this means that you should never have to worry about writing
+an `xs` program to work with a particular release of the shell (taking into
+consideration, of course, that `xs` version 1.1 is a radical departure from
+1.0 - which self-advertises as 0.1 - in that version 1.1 actually behaves as
+intended.)
+
+I extend `xs` via "libraries". In particular, the `samples/_xslib.d` directory
+contains a number of scripts to define useful functions. It's even possible to
+define new language constructs in `xs`; many of the `xs` control structures are
+defined in `src/initial.xs`.
+
+Over time, it seems like a reasonable idea to create a collection of "standard"
+library functions, maintaining a separation between the core language and the
+runtime library. I believe it's too early to worry about this. The `samples`
+directory is meant to be suggestive; not prescriptive.
+
+Finally, I intend to maintain `xs` as a Linux-only project despite attempts by
+prior maintainers to cater to other flavors of Unix. The reason for this is
+simple: I use Linux, and not other Unices. If you really want to use `xs` on a
+different platform, please create a platform-specific fork.
