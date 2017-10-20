@@ -1,9 +1,9 @@
 `xs` has been around for a while, even discounting its ancestral incarnations
 (`es` and `rc`). Now that `xs` is finally holding up as a usable and useful
-shell, user's thoughts inevitably turn to thoughts of "making it better" via
-"my favorite feature from <insert other language here>" or "providing a more
-convenient syntax for <insert idiom here>." This document explains the
-philosophy by which I'll evaluate requests to change the language.
+shell, it's time to consider "what's next?" Users' thoughts inevitably turn to
+"making it better" via "my favorite feature from <insert other language here>"
+or "providing a more convenient syntax for <insert idiom here>." This document
+explains the philosophy by which I'll evaluate requests to change the language.
 
 In short: I intend to keep the language definition as stable as possible. That
 means: Unless the language is demonstrably "broken" (i.e.: there's an `xs`
@@ -22,10 +22,10 @@ contains a number of scripts to define useful functions. It's even possible to
 define new language constructs in `xs`; many of the `xs` control structures are
 defined in `src/initial.xs`.
 
-Over time, it seems like a reasonable idea to create a collection of "standard"
-library functions, maintaining a separation between the core language and the
-runtime library. I believe it's too early to worry about this. The `samples`
-directory is meant to be suggestive; not prescriptive.
+It seems reasonable to, over time, create a collection of "standard" library
+functions, maintaining a separation between the core language and the runtime
+library. I believe it's too early to worry about this. The `samples` directory
+is meant to be suggestive; not prescriptive.
 
 Finally, I intend to maintain `xs` as a Linux-only project despite attempts by
 prior maintainers to cater to other flavors of Unix. The reason for this is
