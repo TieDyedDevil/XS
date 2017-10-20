@@ -14,7 +14,7 @@ fi
 touch .build
 [ -d build ] || meson build
 ninja -C build "$@"
-if [ $? -ne 0 ] && [ ${#@} -eq 0 ] && [ .build -nt build ]; then
+if [ $? -ne 0 ] && [ .build -nt build ]; then
 	rm -rf build
 	meson build
 	ninja -C build "$@"
