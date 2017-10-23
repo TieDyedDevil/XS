@@ -193,14 +193,19 @@ static int yylex_arithmetic() {
 
 	if (isdigit(c) || c == '.') {
 		bool floating = false;
+		bool radix = false;
+		bool digits = false;
 		size_t i = 0;
 		do {
-		    	if (c == '.') floating = true;
+			if (c == '.') radix = true;
+			if (isdigit(c)) digits = true;
                         // TODO: Does this work with other localities?
 		    	bufput(i++, c);
 		} while (c = GETC(), isdigit(c) || c =='.');
 		UNGETC(c);
 		bufput(i, '\0');
+		if (radix && digits) floating = true;
+		if (!floating && !digits) goto error;
 
 		yylval.str = gcdup(buf);
 		return floating ? FLOAT : INT;
@@ -234,6 +239,7 @@ static int yylex_arithmetic() {
 		return ARITH_VAR;
 	}
 	default: 
+error:
 		scanerror("Invalid token in arithmetic expression");
 		return ERROR;
 	}
