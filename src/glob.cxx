@@ -93,7 +93,7 @@ List* dirmatch(const char* prefix,
 /* listglob -- glob a directory plus a filename pattern into a list of names */
 static List* listglob(List* list, const char *pattern, const char *quote,
                       size_t slashcount) {
-	List* result; 
+	List* result = NULL;
 	List **prevp;
 
 	for (prevp = &result; 
