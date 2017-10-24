@@ -349,7 +349,12 @@ static int toint(List *x) {
 	}
 }
 static double todouble(List *x) {
-	return lexical_cast<double>(getstr(x->term));
+	try {
+		return lexical_cast<double>(getstr(x->term));
+	} catch (boost::bad_lexical_cast) {
+		fail("glom:arith:todouble",
+		     "Could not handle floating point input");
+	}
 }
 
 #define OP(f, x, y) op(f<int>(), f<double>(), x, y)
