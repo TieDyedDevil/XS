@@ -14,11 +14,10 @@ fi
 touch .build
 [ -d build ] || meson build
 ninja -C build "$@"
-if [ "$@" != 'fuzz' ] && [ "$@" != 'check' ]; then
-	if [ $? -ne 0 ] && [ .build -nt build ]; then
-		rm -rf build
-		meson build
-		ninja -C build "$@"
-	fi
+if [ $? -ne 0 ] && [ .build -nt build ] \
+		&& [ "$*" != 'fuzz' ] && [ "$*" != 'check' ]; then
+	rm -rf build
+	meson build
+	ninja -C build "$@"
 fi
 rm -f .build
