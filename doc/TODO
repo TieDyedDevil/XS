@@ -1,9 +1,3 @@
 - Add job control (SIGTSTP, fg, bg, disown).
 - Fix crashes found by fuzzer.
 - Add unit tests.
-- Take another run at integrating libedit (editline).
-  - Use the native API; not the readline-compatible API.
-    - http://www.cs.utah.edu/~bigler/code/libedit.html suggests that
-      the compatible API disappears in newer libedit implementations.
-  - packages: libedit-devel; ncurses-devel
-  - licenses: BSD, MIT
