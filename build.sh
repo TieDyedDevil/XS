@@ -10,6 +10,16 @@ elif [ "$1" = '--gcc' ]; then
 	export CXX=g++
 	shift
 	rm -rf build
+elif [ "$1" = '--afl-clang' ]; then
+	export CC=afl-clang
+	export CXX=afl-clang++
+	shift
+	rm -rf build
+elif [ "$1" = '--afl-gcc' ]; then
+	export CC=afl-gcc
+	export CXX=afl-g++
+	shift
+	rm -rf build
 fi
 touch .build
 [ -d build ] || meson build
