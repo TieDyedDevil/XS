@@ -10,7 +10,7 @@ ARGS = $*
 VALID = '[]\\[^_[:alpha:]]'
 DIGITS = '^[[:digit:]]\+$'
 
-fn usage {|*|
+fn @usage {|*|
 	if {{!~ $#* 0} && {!~ $* help}} {
 		echo $PGM: $*
 		echo
@@ -64,14 +64,14 @@ EOF
 	exit 0
 }
 
-!~ $#ARGS 0 || usage
+!~ $#ARGS 0 || @usage
 
-fn one_op {
-	~ $FLAG () || {usage 'only one of -c -n -a -l -L -i -q'}
+fn @one_op {
+	~ $FLAG () || {@usage 'only one of -c -n -a -l -L -i -q'}
 }
 
-fn optreq {|opt val|
-	~ $val _ && {usage 'option '^$opt^' needs a value'}
+fn @optreq {|opt val|
+	~ $val _ && {@usage 'option '^$opt^' needs a value'}
 }
 
 WDIR =
@@ -83,22 +83,22 @@ SESSION =
 DET_OVERRIDE = false
 catch {|e| echo $e(3 ...); usage} {
 ARGS = <={%parse-args <={%args $ARGS} \& (
-	-D {optreq $optopt $optval; WDIR = $optval}
-	-e {optreq $optopt $optval; DET = \^^$optval; DET_OVERRIDE = true}
-	-m {optreq $optopt $optval; MOD = \^^$optval}
-	-s {optreq $optopt $optval; SCROLL = $optval}
-	-c {optreq $optopt $optval; one_op; FLAG = $optopt; SESSION = $optval}
-	-n {optreq $optopt $optval; one_op; FLAG = $optopt; SESSION = $optval}
-	-a {optreq $optopt $optval; one_op; FLAG = $optopt; SESSION = $optval}
-	-q {optreq $optopt $optval; one_op; FLAG = $optopt; SESSION = $optval}
-	-l {one_op; FLAG = $optopt}
-	-L {one_op; FLAG = $optopt}
-	-i {one_op; FLAG = $optopt}
-	-h {usage help|less -FX}
+	-D {@optreq $optopt $optval; WDIR = $optval}
+	-e {@optreq $optopt $optval; DET = \^^$optval; DET_OVERRIDE = true}
+	-m {@optreq $optopt $optval; MOD = \^^$optval}
+	-s {@optreq $optopt $optval; SCROLL = $optval}
+	-c {@optreq $optopt $optval; @one_op; FLAG = $optopt; SESSION = $optval}
+	-n {@optreq $optopt $optval; @one_op; FLAG = $optopt; SESSION = $optval}
+	-a {@optreq $optopt $optval; @one_op; FLAG = $optopt; SESSION = $optval}
+	-q {@optreq $optopt $optval; @one_op; FLAG = $optopt; SESSION = $optval}
+	-l {@one_op; FLAG = $optopt}
+	-L {@one_op; FLAG = $optopt}
+	-i {@one_op; FLAG = $optopt}
+	-h {@usage help|less -FX}
 )}
 }
 
-fn substring {|*|
+fn @substring {|*|
 	let (s = $*(1); b = $*(2); e = $*(3)) {
 		if {!~ $e ()} {
 			echo $s|awk '{ print substr($0, ' \
@@ -110,19 +110,19 @@ fn substring {|*|
 	}
 }
 
-{!~ $FLAG -c} && {!~ $FLAG -n} && {!~ $#ARGS 0} && {usage extra parameter}
+{!~ $FLAG -c} && {!~ $FLAG -n} && {!~ $#ARGS 0} && {@usage extra parameter}
 {~ $FLAG -l} || {~ $FLAG -L} || {~ $FLAG -i} || {~ $FLAG -q} && \
-	{!~ $DET$MOD$WDIR$SCROLL ()} && {usage disallowed option}
-{~ $FLAG -a} && {!~ $MOD$WDIR$SCROLL ()} && {usage disallowed option}
+	{!~ $DET$MOD$WDIR$SCROLL ()} && {@usage disallowed option}
+{~ $FLAG -a} && {!~ $MOD$WDIR$SCROLL ()} && {@usage disallowed option}
 {!~ $SESSION ()} && {echo $SESSION|grep -qv '^[a-zA-Z0-9][a-zA-Z0-9._-]*$'} && \
-	{usage invalid session name}
+	{@usage invalid session name}
 
-fn fail {|*|
+fn @fail {|*|
 	echo $PGM: $*
 	exit 1
 }
 
-fn clean {
+fn @clean {
 	for f `{ls $HOME/.abduco/* >[2]/dev/null} {
 		unmatched = true
 		escape {|fn-break| for s `{lsof -a -c abduco -u $USER -U -Fn \
@@ -134,8 +134,8 @@ fn clean {
 	fork {
 		cd $HOME/.abduco
 		for f `{ls -A >[2]/dev/null} {
-			{~ `{substring $f 0 1} .} \
-					&& {!access -s `{substring $f 1}} && {
+			{~ `{@substring $f 0 1} .} \
+					&& {!access -s `{@substring $f 1}} && {
 				unwind-protect {
 					. ./$f
 					kill $_W >[2]/dev/null
@@ -148,48 +148,48 @@ fn clean {
 	} >[2]/dev/null
 }
 
-fn prevent_nesting {
+fn @prevent_nesting {
 	THIS = $pid
 	while {!~ $THIS 1} {
 		PARENT = `{ps -ho ppid -p $THIS}
 		COMMAND = `{ps -ho comm -p $PARENT}
-		{~ $COMMAND abduco} && {fail no session nesting}
+		{~ $COMMAND abduco} && {@fail no session nesting}
 		THIS = $PARENT
 	}
 }
 
-fn badenv {|*|
+fn @badenv {|*|
 	let (s = `{printf 'Invalid environment: %s' `` \n {var $*}}) {
-		fail $s
+		@fail $s
 	}
 }
 
-fn defaults {
+fn @defaults {
 	if {!~ $TSM_DET ()} {
-		~ $TSM_DET $VALID || badenv TSM_DET
+		~ $TSM_DET $VALID || @badenv TSM_DET
 		TSM_DET = \^^$TSM_DET
 	}
 	(DET _) = ($DET $TSM_DET \^\\)
-	echo `{substring $DET 1}|grep -q $VALID || usage CHAR not in allowed set
+	echo `{@substring $DET 1}|grep -q $VALID || @usage CHAR not in allowed set
 	if {!~ $TSM_MOD ()} {
-		~ $TSM_MOD $VALID || badenv TSM_MOD
+		~ $TSM_MOD $VALID || @badenv TSM_MOD
 		TSM_MOD = \^^$TSM_MOD
 	}
 	(MOD _) = ($MOD $TSM_MOD \^s)
-	echo `{substring $MOD 1}|grep -q $VALID || usage CHAR not in allowed set
+	echo `{@substring $MOD 1}|grep -q $VALID || @usage CHAR not in allowed set
 	if {!~ $TSM_SCROLL ()} {
-		{echo $TSM_SCROLL|grep -q $DIGITS} || badenv TSM_SCROLL
+		{echo $TSM_SCROLL|grep -q $DIGITS} || @badenv TSM_SCROLL
 	}
 	(SCROLL _) = ($SCROLL $TSM_SCROLL 1000)
-	{echo $SCROLL|grep -q $DIGITS} || usage NUM not valid
-	{$SCROLL :ge 500} && {$SCROLL :lt 100000} || usage SCROLL out of range
-	!~ $SESSION () || usage SESSION name required
+	{echo $SCROLL|grep -q $DIGITS} || @usage NUM not valid
+	{$SCROLL :ge 500} && {$SCROLL :lt 100000} || @usage SCROLL out of range
+	!~ $SESSION () || @usage SESSION name required
 	{!~ $WDIR ()} && {
-		access -d $WDIR || fail $WDIR not a directory
+		access -d $WDIR || @fail $WDIR not a directory
 	}
 }
 
-fn write_metadata {
+fn @write_metadata {
 	{
 	echo '_1 = '$DISPLAY_TSMWD
 	echo '_2 = '`{echo $MOD|sed 's/\\/\\\\/'|sed 's/\^/\\^/'}
@@ -202,7 +202,7 @@ fn write_metadata {
 	} > $HOME/.abduco/.^$SESSION^@`{hostname -s}
 }
 
-fn update_metadata {
+fn @update_metadata {
 	f = $HOME/.abduco/.$SESSION@`{hostname -s}
 	{access -- $f} && {
 		if {result $DET_OVERRIDE} {ed -s $f << EOF
@@ -219,26 +219,26 @@ EOF
 	}
 }
 
-fn check_cmds {|*|
+fn @check_cmds {|*|
 	for c $* {
-		{access -d $c} && {fail $c is a directory}
+		{access -d $c} && {@fail $c is a directory}
 	}
 }
 
-fn session_exists {
+fn @session_exists {
 	result <={access -s $HOME^/.abduco/^$SESSION^@^`{hostname -s}}
 }
 
-fn rewrite_abduco_message {|*|
+fn @rewrite_abduco_message {|*|
 	sed 's/^abduco/tsm/'
 }
 
-fn make_session {|*|
-	{~ $FLAG -c} && prevent_nesting
-	{result <=session_exists} && {fail $SESSION exists}
-	check_cmds $*
-	clean
-	defaults
+fn @make_session {|*|
+	{~ $FLAG -c} && @prevent_nesting
+	{result <=@session_exists} && {@fail $SESSION exists}
+	@check_cmds $*
+	@clean
+	@defaults
 	S_FIFO = /tmp/^$PGM^-s.^$pid
 	C_FIFO = /tmp/^$PGM^-c.^$pid
 	mkfifo -m 600 $S_FIFO
@@ -263,27 +263,27 @@ while true {
 EOF
 	setsid >/dev/null >[2=1] xs $DVTM_STATUS_UPDATER &
 	STATUS_UPDATER_PID = $apid
-	write_metadata
+	@write_metadata
 	abduco -e $DET $FLAG $SESSION \
 		dvtm -M -c $C_FIFO -s $S_FIFO -m $MOD -h $SCROLL $* \
-		|[2] rewrite_abduco_message
+		|[2] @rewrite_abduco_message
 	tput cnorm
 }
 
-fn attach_session {
-	prevent_nesting
-	{result <=session_exists} || fail $SESSION does not exist
-	clean
-	update_metadata
-	abduco -e $DET -a $SESSION |[2] rewrite_abduco_message
+fn @attach_session {
+	@prevent_nesting
+	{result <=@session_exists} || @fail $SESSION does not exist
+	@clean
+	@update_metadata
+	abduco -e $DET -a $SESSION |[2] @rewrite_abduco_message
 	tput cnorm
 }
 
-fn interactive {
+fn @interactive {
 	if {!ls $HOME/.abduco/* >/dev/null >[2=1]} {
 		echo No sessions
 	} else {
-		%list-menu '' {|*| SESSION = $*; attach_session} `{
+		%list-menu '' {|*| SESSION = $*; @attach_session} `{
 			for f $HOME/.abduco/* {
 				(f _) = <={~~ $f *@*}
 				f = `{basename $f}
@@ -293,12 +293,12 @@ fn interactive {
 	}
 }
 
-fn session_flag {|*|
+fn @session_flag {|*|
 	abduco|tail -n+2|cut -f1,3|cut -c1,7-|grep -w $^*|cut -c1
 }
 
-fn list_sessions {|*|
-	clean
+fn @list_sessions {|*|
+	@clean
 	w1 = 0
 	%with-read-lines <{ls -ltu $HOME/.abduco|tail -n+2 \
 			|cut -d' ' -f6-} {|SESS|
@@ -315,7 +315,7 @@ fn list_sessions {|*|
 			|cut -d' ' -f6-|$*} {|SESS|
 			(d1 d2 d3 s _) = <={~~ $SESS *\ *\ *\ *@*}
 			p = $d1 $d2 $d3 $s
-			flag = <={%argify `{session_flag $s|cut -d' ' -f4}}
+			flag = <={%argify `{@session_flag $s|cut -d' ' -f4}}
 			~ $flag '' && flag = ' '
 			printf '%3s %2s %5s '^$flag^' '^`.as^'%s'^`.an $p
 			(_ _ _ s h) = <={~~ $SESS *\ *\ *\ *@*}
@@ -334,19 +334,19 @@ fn list_sessions {|*|
 	}
 }
 
-fn query {
-	if session_exists {exit 0} else {exit 1}
+fn @query {
+	if @session_exists {exit 0} else {exit 1}
 }
 
 {access -d -- $HOME/.abduco} || {mkdir -m 700 $HOME/.abduco}
 
 switch $FLAG (
-	-c {make_session $ARGS}
-	-n {make_session $ARGS}
-	-a {attach_session}
-	-l {list_sessions cat}
-	-L {list_sessions sort -k4}
-	-i {interactive}
-	-q {query}
-	{usage}
+	-c {@make_session $ARGS}
+	-n {@make_session $ARGS}
+	-a {@attach_session}
+	-l {@list_sessions cat}
+	-L {@list_sessions sort -k4}
+	-i {@interactive}
+	-q {@query}
+	{@usage}
 )

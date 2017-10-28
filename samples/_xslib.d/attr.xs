@@ -46,10 +46,12 @@ fn .palette {
 			tput initc 5 205 0 205 # magenta = Magenta3
 			tput initc 6 0 205 205 # cyan = Cyan3
 			tput initc 7 229 229 229 # white = Gray90
+			tput initc 8 77 77 77 # bright black - Gray30
+			tput initc 12 99 184 255 # bright blue = SteelBlue1
 		}
 		if {~ $TERM yaft-256color} {
 			tput initc 7 208 208 208 # normal white
-			tput initc 12 99 185 255 # bright blue
+			tput initc 12 99 184 255 # bright blue
 			tput initc 15 255 255 255 # bright white
 		}
 	}
