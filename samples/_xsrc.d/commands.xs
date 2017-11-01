@@ -75,7 +75,7 @@ fn cs {|*|
 	} | expand | awk -F: '{printf "%-48.48s:%s\n", ' \
 				^'gensub(/^(.*) +$/, "\\1", "g", $1), ' \
 				^'gensub(/ +/, " ", "g", $2)}' \
-		| env LESSUTFBINFMT='*s?' less -SFX
+		| env LESSUTFBINFMT='*s?' less -iSFX
 }
 fn dl-clean {
 	.d 'Remove advertising asset files left behind by WebKit browser'
@@ -132,7 +132,7 @@ fn list {|*|
 	if {~ $* -l} {
 		ls /usr/local/share/vis/lexers/*.lua | grep -v lexer\\\.lua \
 			| xargs -I\{\} basename \{\} | sed s/\.lua\$// \
-			| column -c `{tput cols} | less -FX
+			| column -c `{tput cols} | less -iFX
 	} else if {!~ $#* 0} {
 		let (syn; \
 			lpath = /usr/local/share/vis/lexers; \
@@ -187,7 +187,7 @@ fn list {|*|
 				vis-highlight $syn <{cat $*|tr \r \n}
 			} else {
 				vis-highlight $syn $*
-			} | nl >[2]/dev/null | less -RFXS
+			} | nl >[2]/dev/null | less -iRFXS
 		}
 	}
 }
@@ -229,7 +229,7 @@ fn luc {|*|
 		printf `.as^'@ ~/bin'^`.an^\n
 		find -L ~/bin -mindepth 1 -maxdepth 1 -type f -executable \
 			| sf | xargs -n1 basename | column -c `{tput cols}
-	} | less -rFX
+	} | less -irFX
 }
 fn mamel {
 	.d 'List installed MAME games'
@@ -324,7 +324,7 @@ fn o {
 				}
 			}
 		}
-	} | less -FX
+	} | less -iFX
 }
 fn oc {
 	.d 'Onscreen clock'
@@ -388,7 +388,7 @@ fn pp {|*|
 		echo 'not a function'
 	} {
 		%pprint $*
-	} | less -RFXS
+	} | less -iRFXS
 }
 fn prs {|*|
 	.d 'Display process info'
@@ -405,7 +405,7 @@ fn prs {|*|
 					for pid $pids {
 						!~ $#pids 1 && echo '========'
 						prtstat $pid
-					} | less -FX
+					} | less -iFX
 				} else {
 					echo 'not found'
 				}
@@ -418,14 +418,14 @@ fn pt {|*|
 	.a '[[-fFcyM] USERNAME]'
 	.c 'system'
 	.r 'pu'
-	.pu $*|awk '{if ($14 != "?") print}'|less -FX
+	.pu $*|awk '{if ($14 != "?") print}'|less -iFX
 }
 fn pu {|*|
 	.d 'ps for user'
 	.a '[[-fFCyM] USERNAME]'
 	.c 'system'
 	.r 'pt'
-	.pu $*|less -FX
+	.pu $*|less -iFX
 }
 fn screensaver {|*|
 	.d 'Query/set display screensaver enable'
@@ -568,7 +568,7 @@ fn ulu {|*|
 				!~ $desc \<control\> && \
 					printf %s\tU+%s\t%s\n $uni $hex $desc
 			}
-		} | env LESSUTFBINFMT=*n!PRINT less -FXS
+		} | env LESSUTFBINFMT=*n!PRINT less -iFXS
 	}
 }
 fn vman {|*|

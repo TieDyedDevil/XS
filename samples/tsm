@@ -203,7 +203,7 @@ fn @write_metadata {
 }
 
 fn @update_metadata {
-	f = $HOME/.abduco/.$SESSION@`{hostname -s}
+	f = $HOME/.abduco/.^$SESSION^@`{hostname -s}
 	{access -- $f} && {
 		if {result $DET_OVERRIDE} {ed -s $f << EOF
 4d
@@ -226,7 +226,7 @@ fn @check_cmds {|*|
 }
 
 fn @session_exists {
-	result <={access -s $HOME^/.abduco/^$SESSION^@^`{hostname -s}}
+	result <={access -s $HOME/.abduco/^$SESSION^@^`{hostname -s}}
 }
 
 fn @rewrite_abduco_message {|*|
@@ -300,8 +300,9 @@ fn @session_flag {|*|
 fn @list_sessions {|*|
 	@clean
 	w1 = 0
-	%with-read-lines <{ls -ltu $HOME/.abduco|tail -n+2 \
-			|cut -d' ' -f6-} {|SESS|
+	%with-read-lines <{ls -ltu --time-style='+%b %d %H:%M' $HOME/.abduco \
+			|tail -n+2 |cut -d' ' -f6-} \
+	{|SESS|
 		(_ _ _ s h) = <={~~ $SESS *\ *\ *\ *@*}
 		p = $s^@^$h
 		w = <={$&len $s}
@@ -311,8 +312,9 @@ fn @list_sessions {|*|
 		{$w1 :lt 4} && {w1 = 4}
 		printf 'Created at   F Name%'^`($w1-2)^'s' \
 			^'Mod Det Scroll Initial wdir'\n ' '
-		%with-read-lines <{ls -lt $HOME/.abduco|tail -n+2 \
-			|cut -d' ' -f6-|$*} {|SESS|
+		%with-read-lines <{ls -lt --time-style='+%b %d %H:%M' \
+				$HOME/.abduco|tail -n+2 |cut -d' ' -f6-|$*} \
+		{|SESS|
 			(d1 d2 d3 s _) = <={~~ $SESS *\ *\ *\ *@*}
 			p = $d1 $d2 $d3 $s
 			flag = <={%argify `{@session_flag $s|cut -d' ' -f4}}

@@ -30,7 +30,7 @@ fn help {|*|
 							whats $nm}
 				~ $^st '0 1 0 1 0' && echo 'no function' $nm
 			}
-		} | less -rFX
+		} | less -irFX
 	}
 }
 

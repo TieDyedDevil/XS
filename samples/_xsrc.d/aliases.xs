@@ -2,13 +2,13 @@ fn ag {|*|
 	.d 'Search tree for pattern in files'
 	.a '[ag_OPTIONS] PATTERN [DIRECTORY]'
 	.c 'alias'
-	/usr/bin/ag --pager='less -RFX' $*
+	/usr/bin/ag --pager='less -iRFX' $*
 }
 fn apropos {|*|
 	.d 'Find man pages by keyword'
 	.a '[apropos_OPTIONS] KEYWORD...'
 	.c 'alias'
-	/usr/bin/apropos -l $*|less -FXS
+	/usr/bin/apropos -l $*|less -iFXS
 }
 fn atop {|*|
 	.d 'Advanced system & process monitor'
@@ -46,7 +46,7 @@ fn la {|*|
 fn latest {
 	.d 'List latest START processes for current user'
 	.c 'alias'
-	ps auk-start_time -U $USER|less -FX
+	ps auk-start_time -U $USER|less -iFX
 }
 fn ll {|*|
 	.c 'alias'
@@ -138,7 +138,7 @@ fn treec {|*|
 	.d 'Display filesystem tree'
 	.a 'DIRECTORY'
 	.c 'alias'
-	tree --du -hpugDFC $* | less -RFX
+	tree --du -hpugDFC $* | less -iRFX
 }
 fn upgrade {
 	.d 'Upgrade Fedora packages'

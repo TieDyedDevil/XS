@@ -32,7 +32,7 @@ fn fec {|*|
 			let ((n c) = <={%split : $l}) {
 				printf '%-38s  %12d'\n $n $c
 			}
-		} | local (LC_ALL = C) sort | less -FX
+		} | local (LC_ALL = C) sort | less -iFX
 	}
 }
 

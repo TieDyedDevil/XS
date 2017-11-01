@@ -1,7 +1,7 @@
 fn b {
 	.d 'Stop playing track'
 	.c 'media'
-	.r 'm mpc n played'
+	.r 'm mpc n played s'
 	mpc -q pause
 	m
 }
@@ -44,7 +44,7 @@ fn m {|*|
 	.d 'Show currently playing track'
 	.a '[-w]'
 	.c 'media'
-	.r 'b mpc n played'
+	.r 'b mpc n played s'
 	if {~ $* -w} {
 		%with-quit {
 			watch -x -p -t -n1 -c xs -c 'm >[2]/dev/null|head -1'}}
@@ -84,7 +84,7 @@ fn midi {|*|
 fn mpc {|*|
 	.d 'Music player'
 	.c 'media'
-	.r 'b m n played'
+	.r 'b m n played s'
 	/usr/bin/mpc -f '%artist% - %album% - %track%#|  %title%' $*
 }
 fn mpv {|*|
@@ -114,15 +114,25 @@ fn mpvl {|*|
 fn n {
 	.d 'Play next track'
 	.c 'media'
-	.r 'b mpc n played'
+	.r 'b mpc n played s'
 	if {~ `mpc \[playing\]} {mpc -q next} else {mpc -q play}
 	m
 }
 fn played {
 	.d 'List recently-played tracks'
 	.c 'media'
-	.r 'b m mpc n'
+	.r 'b m mpc n s'
 	cat ~/.mpd/mpd.log|cut -c24-|grep '^played'|tail -n 15|tac|nl|tac
+}
+fn s {|*|
+	.d 'Seek within current track'
+	.a '+[MM:]SS  # forward relative'
+	.a '-[MM:]SS  # backward relative'
+	.a '[MM:]SS  # absolute time'
+	.a 'N%  # absolute percent'
+	.c 'media'
+	.r 'b m mpc n played'
+	mpc seek $*
 }
 fn vidshuffle {|*|
 	.d 'Shuffle videos under directory'
