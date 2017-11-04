@@ -55,7 +55,8 @@ There are a few things to note in the preceding example:
       I'll remind you: words in `xs` are quoted *only* using `'`.
     * As in other shells, you use `$` to dereference a variable. This
       example also needs to enclose the variable name in `(` and `)`.
-      I'll talk more about this later.
+      We could also have written `echo $'*+,-./:=?@[]_~?'`. See `xs(1)`
+      for more information on constructing variable names.
 
 In addition to quoting with `'`, you can use `\` to escape certain
 characters. Here again, `xs`'s treatment differs somewhat from the
