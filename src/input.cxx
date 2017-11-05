@@ -459,6 +459,8 @@ extern Tree *parse(const char *pr1, const char *pr2) {
 
 	inityy();
 	emptyherequeue();
+	yylloc.first_column = yylloc.last_column = 0;
+	yylloc.first_line = yylloc.last_line = 1;
 
 	if (ISEOF(input))
 		throw mklist(mkstr("eof"), NULL);
