@@ -96,7 +96,9 @@ fn doc {|*|
 	.a 'PACKAGE_NAME_GLOB'
 	.a '-n PACKAGE_NAME'
 	.c 'system'
-	if {~ $*(1) -n} {
+	if {~ $#* 0} {
+		.usage doc
+	} else if {~ $*(1) -n} {
 		doc /$*(2)^\$
 	} else if {!~ $* ()} {
 		let (pl) {
@@ -118,22 +120,28 @@ fn import-abook {|*|
 	.d 'Import vcard to abook'
 	.a 'VCARD_FILE'
 	.c 'system'
-	access -- ~/.abook/addressbook \
-		&& mv ~/.abook/addressbook ~/.abook/addressbook-OLD
-	abook --convert --infile $* --informat vcard --outformat abook \
-		--outfile ~/.abook/addressbook
-	chmod 600 ~/.abook/addressbook
+	if {~ $#* 0} {
+		.usage import-abook
+	} else {
+		access -- ~/.abook/addressbook \
+			&& mv ~/.abook/addressbook ~/.abook/addressbook-OLD
+		abook --convert --infile $* --informat vcard \
+			--outformat abook --outfile ~/.abook/addressbook
+		chmod 600 ~/.abook/addressbook
+	}
 }
 fn list {|*|
 	.d 'List file with syntax highlighting'
 	.a '[-s SYNTAX|-f] FILE'
 	.a '-l  # list SYNTAX names'
 	.c 'system'
-	if {~ $* -l} {
+	if {~ $#* 0} {
+		.usage list
+	} else if {~ $* -l} {
 		ls /usr/local/share/vis/lexers/*.lua | grep -v lexer\\\.lua \
 			| xargs -I\{\} basename \{\} | sed s/\.lua\$// \
 			| column -c `{tput cols} | less -iFX
-	} else if {!~ $#* 0} {
+	} else {
 		let (syn; \
 			lpath = /usr/local/share/vis/lexers; \
 			fallback = false; \
@@ -205,17 +213,25 @@ fn lpman {|man|
 	.d 'Print a man page'
 	.a 'PAGE'
 	.c 'system'
-	env MANWIDTH=80 man $man | sed 's/^.*/    &/' \
-		| lpr -o page-top=60 -o page-bottom=60 \
-			-o page-left=60 -o lpi=8 -o cpi=12
+	if {~ $#man 0} {
+		.usage lpman
+	} else {
+		env MANWIDTH=80 man $man | sed 's/^.*/    &/' \
+			| lpr -o page-top=60 -o page-bottom=60 \
+				-o page-left=60 -o lpi=8 -o cpi=12
+	}
 }
 fn lpmd {|md|
 	.d 'Print a markdown file'
 	.a 'FILE'
 	.c 'system'
-	markdown $md | w3m -T text/html -cols 80 | sed 's/^.*/    &/' \
-		| lpr -o page-top=60 -o page-bottom=60 \
-			-o page-left=60 -o lpi=8 -o cpi=12
+	if {~ $#md 0} {
+		.usage lpmd
+	} else {
+		markdown $md | w3m -T text/html -cols 80 | sed 's/^.*/    &/' \
+			| lpr -o page-top=60 -o page-bottom=60 \
+				-o page-left=60 -o lpi=8 -o cpi=12
+	}
 }
 fn luc {|*|
 	.d 'List user commands'
@@ -240,8 +256,10 @@ fn mdv {|*|
 	.d 'Markdown file viewer'
 	.a 'MARKDOWN_FILE'
 	.c 'system'
-	if {!~ $#* 1 || !access -f $*} {
-		throw error mdv 'usage: mdv MARKDOWN_FILE'
+	if {!~ $#* 1} {
+		.usage mdv
+	} else if {!access -f $*} {
+		echo 'file?'
 	} else {
 		markdown -f fencedcode $* | w3m -X -T text/html -no-mouse \
 			-no-proxy -o confirm_qq=0 -o document_root=`pwd
@@ -375,7 +393,9 @@ fn pp {|*|
 	.d 'Prettyprint xs function'
 	.a '[-c] NAME'
 	.c 'system'
-	if {~ $*(1) -c} {
+	if {~ $#* 0} {
+		.usage pp
+	} else if {~ $*(1) -c} {
 		%with-tempfile f {
 			pp $*(2) > $f
 			if {grep -qx 'not a function' $f} {
@@ -394,7 +414,9 @@ fn prs {|*|
 	.d 'Display process info'
 	.a '[-f] [prtstat_OPTIONS] NAME'
 	.c 'system'
-	!~ $* () && {
+	if {~ $#* 0} {
+		.usage prs
+	} else {
 		let (pgrep_option = -x) {
 			{~ $*(1) -f} && {
 				pgrep_option = $*(1)
@@ -541,7 +563,11 @@ fn u2o {|*|
 	.a 'TEXT'
 	.c 'system'
 	.r 'cs ulu'
-	{echo -n $*|hexdump -b|grep -Eo '( [0-7]+)+'|tr ' ' \\\\}
+	if {~ $#* 0} {
+		.usage u2o
+	} else {
+		echo -n $*|hexdump -b|grep -Eo '( [0-7]+)+'|tr ' ' \\\\
+	}
 }
 fn uh {
 	.d 'Undo history'
@@ -558,7 +584,9 @@ fn ulu {|*|
 	.a 'PATTERN'
 	.c 'system'
 	.r 'cs u2o'
-	let (ud = /usr/share/unicode/ucd/UnicodeData.txt) {
+	if {~ $#* 0} {
+		.usage ulu
+	} else {let (ud = /usr/share/unicode/ucd/UnicodeData.txt) {
 		%with-read-lines <{egrep -i -o '^[0-9a-f]{4,};[^;]*' \
 						^$*^'[^;]*;' $ud} {|l|
 			let ((hex desc) = <={~~ $l *\;*\;}) {
@@ -569,14 +597,16 @@ fn ulu {|*|
 					printf %s\tU+%s\t%s\n $uni $hex $desc
 			}
 		} | env LESSUTFBINFMT=*n!PRINT less -iFXS
-	}
+	}}
 }
 fn vman {|*|
 	.d 'View man page'
-	.a 'man_OPTS'
+	.a '[man_OPTS] PAGE'
 	.c 'system'
 	if {~ $DISPLAY ()} {
 		throw error vman 'X only'
+	} else if {~ $#* 0} {
+		.usage vman
 	} else {
 		%with-tempfile f {
 			{man -Tpdf $* >$f} && {zathura $f}

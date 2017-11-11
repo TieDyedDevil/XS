@@ -2,7 +2,9 @@ fn web {|*|
 	.d 'Open web URL'
 	.a '[-t] URL'
 	.c 'web'
-	if {{!~ $DISPLAY ()} && {~ $*(1) -t}} {
+	if {~ $#* 0} {
+		.usage web
+	} else if {{!~ $DISPLAY ()} && {~ $*(1) -t}} {
 		local (DISPLAY) {web $*(2 ...)}
 	} else {
 		let (error = false) {

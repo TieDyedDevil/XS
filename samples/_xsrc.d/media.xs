@@ -9,7 +9,9 @@ fn gallery {|*|
 	.d 'Random slideshow'
 	.a 'PATH [DELAY]'
 	.c 'media'
-	let (dir = $(1); time = $(2)) {
+	if {~ $#* 0} {
+		.usage gallery
+	} else {let (dir = $(1); time = $(2)) {
 		~ $time () && time = 5
 		if {~ $TERM linux} {
 			fbi -l <{find -L $dir -type f|shuf} \
@@ -26,13 +28,15 @@ fn gallery {|*|
 			find -L $dir -type f|shuf|sxiv -qifb -sd -S$time \
 				>[2]/dev/null
 		}
-	}
+	}}
 }
 fn image {|*|
 	.d 'Display image'
 	.a 'FILE ...'
 	.c 'media'
-	if {~ $TERM linux} {
+	if {~ $#* 0} {
+		.usage image
+	} else if {~ $TERM linux} {
 		fbi --noverbose $*
 	} else if {~ $DISPLAY () && ~ `consoletype pty} {
 		mpv --image-display-duration inf --really-quiet $*
@@ -67,8 +71,9 @@ fn midi {|*|
 	.d 'Play MIDI files'
 	.a 'FILE ...'
 	.c 'media'
-	let (s; p) {
-		unwind-protect {
+	if {~ $#* 0} {
+		.usage midi
+	} else {let (s; p) { unwind-protect {
 			fluidsynth -a pulseaudio -m alsa_seq -s -i -l \
 				/usr/share/soundfonts/FluidR3_*.sf2 \
 				>/dev/null >[2=1] &
@@ -79,7 +84,7 @@ fn midi {|*|
 		} {
 			kill $s
 		}
-	}
+	}}
 }
 fn mpc {|*|
 	.d 'Music player'
@@ -91,7 +96,9 @@ fn mpv {|*|
 	.d 'Movie player'
 	.a '[mpv_OPTIONS] FILE ...'
 	.c 'media'
-	let (embed; video_driver) {
+	if {~ $#* 0} {
+		.usage mpv
+	} else {let (embed; video_driver) {
 		if {~ $DISPLAY ()} {
 			video_driver = drm
 		} else {
@@ -100,16 +107,18 @@ fn mpv {|*|
 		}
 		/usr/bin/mpv --profile $video_driver $embed \
 			--volume=50 --no-stop-screensaver $*
-	}
+	}}
 }
 fn mpvl {|*|
 	.d 'Movie player w/ volume leveler'
 	.a '[mpv_OPTIONS] FILE ...'
 	.c 'media'
-	let (afconf = 'lavfi=[highpass=f=100,dynaudnorm=f=100:r=0.7:c=1' \
+	if {~ $#* 0} {
+		.usage mpvl
+	} else {let (afconf = 'lavfi=[highpass=f=100,dynaudnorm=f=100:r=0.7:c=1' \
 		^':m=20.0:b=1]') {
 		mpv --af=$afconf $*
-	}
+	}}
 }
 fn n {
 	.d 'Play next track'
@@ -132,18 +141,24 @@ fn s {|*|
 	.a 'N%  # absolute percent'
 	.c 'media'
 	.r 'b m mpc n played'
-	mpc seek $*
+	if {~ $#* 0} {
+		.usage s
+	} else {
+		mpc seek $*
+	}
 }
 fn vidshuffle {|*|
 	.d 'Shuffle videos under directory'
 	.a 'DIRECTORY'
 	.c 'media'
-	let (dir = $(1); filt = $(2); scale) {
+	if {~ $#* 0} {
+		.usage vidshuffle
+	} else {let (dir = $(1); filt = $(2); scale) {
 		~ $filt () && filt = '*'
 		~ `consoletype vt && scale = --vf scale=`{fbset \
 			|grep -o '[0-9]\+[0-9]\+'|tr x :}
 		mpvl --really-quiet $scale --fs --playlist <{find -L $dir \
 			-type f -iname $filt|shuf \
 			|awk '/^[^/]/ {print "'`pwd'/"$0} /^\// {print}'}
-	}
+	}}
 }

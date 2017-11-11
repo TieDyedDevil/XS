@@ -4,6 +4,7 @@ fn help {|*|
 	.a 'NAME'
 	.a '-c [CATEGORY]'
 	.c 'help'
+	if {~ $#* 0} {.usage help}
 	let ( \
 		fn-ext = {
 			sed 's/{\.\(a\|c\|d\|r\) [^}]*}/\n&\n/g'
@@ -32,6 +33,10 @@ fn help {|*|
 			}
 		} | less -irFX
 	}
+}
+
+fn .usage {|*|
+	if {{~ $#* 1} && {!~ $* -*}} {help $* | grep '^a:'}
 }
 
 ## Online documentation
