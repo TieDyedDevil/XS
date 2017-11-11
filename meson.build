@@ -59,10 +59,11 @@ project('xs', ['cpp'])
 		'samples/histclean', 'samples/sv', 'samples/tsm',
 		'samples/README'],
 	install_dir: 'share/doc/xs/samples')
-  install_data(['samples/_xsrc.d/aliases.xs', 'samples/_xsrc.d/commands.xs',
-		'samples/_xsrc.d/console.xs', 'samples/_xsrc.d/env.xs',
-		'samples/_xsrc.d/help.xs', 'samples/_xsrc.d/mame-games.xs',
-		'samples/_xsrc.d/media.xs', 'samples/_xsrc.d/prompt-config.xs',
+  install_data(['samples/_xsrc.d/aliases.xs', 'samples/_xsrc.d/annotate.xs',
+		'samples/_xsrc.d/commands.xs', 'samples/_xsrc.d/console.xs',
+		'samples/_xsrc.d/env.xs', 'samples/_xsrc.d/help.xs',
+		'samples/_xsrc.d/mame-games.xs', 'samples/_xsrc.d/media.xs',
+		'samples/_xsrc.d/prompt-config.xs',
 		'samples/_xsrc.d/prompt.xs', 'samples/_xsrc.d/web.xs'],
 	install_dir: 'share/doc/xs/samples/_xsrc.d')
   install_data(['samples/_xslib.d/attr.xs', 'samples/_xslib.d/subs.xs',
