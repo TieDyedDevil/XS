@@ -77,14 +77,6 @@ fn cs {|*|
 				^'gensub(/ +/, " ", "g", $2)}' \
 		| env LESSUTFBINFMT='*s?' less -iSFX
 }
-fn dl-clean {
-	.d 'Remove advertising asset files left behind by WebKit browser'
-	.c 'system'
-	let (pat = *^(\; \? \% \=)^* zrt_lookup.html*; files) {
-		files = `{ls $pat >[2]/dev/null|sort|uniq}
-		!~ $#files 0 && rm -I -v $files
-	}
-}
 fn dt {|*|
 	.d 'List top directory usage'
 	.a '[DIR]'
@@ -326,10 +318,14 @@ fn noise {|*|
 fn o {
 	.d 'List open windows per desktop'
 	.c 'system'
-	for d `{bspc query -D --names} {
-		let (wl = `{bspc query -N -n .window -d $d}; vf; ti) {
+	for d `{bspc query -D} {
+		let (wl = `{bspc query -N -n .window -d $d}; vf; ti; \
+				ff = `{bspc query -N -n focused}; mw; \
+				fd = `{bspc query -D -d focused}; md) {
 			if {!~ $wl ()} {
-				echo Desktop $d
+				if {~ $d $fd} {md = ' .'} else {md = '  '}
+				printf 'Desktop %s%s'\n \
+					`{bspc query -D -d $d --names} $md
 				for w $wl {
 					if {~ `{bspc query -N -n $w^.hidden} \
 						()} {
@@ -337,8 +333,10 @@ fn o {
 						} else {
 							vf = hidden\ 
 						}
+					if {~ $w $ff} {mw = .} else {mw = \ }
 					ti = <={%argify `{xtitle $w}}
-					printf '  [%s %s]'\t'%s'\n $vf $w $ti
+					printf '%c  [%s %s]'\t'%s'\n \
+						$mw $vf $w $ti
 				}
 			}
 		}
