@@ -24,7 +24,7 @@ fi
 touch .build
 [ -d build ] || meson build
 ninja -C build "$@"
-if [ $? -ne 0 ] && [ .build -nt build ] \
+if [ $? -ne 0 ] && [ .build -nt build/.stamp ] \
 		&& [ "$*" != 'fuzz' ] && [ "$*" != 'check' ]; then
 	rm -rf build
 	meson build

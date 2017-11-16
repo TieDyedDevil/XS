@@ -6,6 +6,10 @@ project('xs', ['cpp'])
   ffi_lib = compiler.find_library('ffi')
   gc_lib = compiler.find_library('gc')
   readline_lib = compiler.find_library('readline')
+  custom_target('.stamp',
+	build_always: true,
+	output: '.stamp',
+	command: ['touch', '@OUTPUT@'])
   custom_target('git_date.hxx',
 	build_always: true,
 	output: 'git_date.hxx',
