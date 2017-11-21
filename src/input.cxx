@@ -286,6 +286,10 @@ static inline const char * simple_basename(const char *str) {
 static char ** get_completions(const char *text, int start, int end) {
 	char **results = NULL;
 
+	/* Don't try to complete nothing; it's not useful. Instead,
+	   let readline fall back to displaying the files on pwd. */
+	if (start == end) return NULL;
+
 	/* Leave room for \0, and special first element */
 	int result_p = 1;
 	int results_size = 2;
