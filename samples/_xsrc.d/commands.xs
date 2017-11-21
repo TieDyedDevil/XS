@@ -79,9 +79,13 @@ fn cs {|*|
 }
 fn dt {|*|
 	.d 'List top directory usage'
-	.a '[DIR]'
+	.a '[-a] [DIR]'
 	.c 'system'
-	du -h -d1 $*|grep -vE '^[.0-9KMGTPEZY]+'\t'\.$'|sort -h -r -k1|head -15
+	let (eo = --exclude './.*') {
+		if {~ $*(1) -a} {eo = ; * = $*(2 ...)}
+		du $eo -t1 -h -d1 $*|grep -vE '^[.0-9KMGTPEZY]+'\t'\.$' \
+			|sort -h -r -k1|head -15
+	}
 }
 fn doc {|*|
 	.d 'pushd to documentation directory of package'
