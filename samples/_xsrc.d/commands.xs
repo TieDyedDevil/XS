@@ -140,6 +140,14 @@ fn lib {
 		| column -c `{tput cols} | less -iFX
 	# Ideally we'd hide all of the xs hook functions; not only %prompt.
 }
+fn libi {|*|
+	.d 'Show information about a library function.'
+	.a 'FUNCTION-NAME'
+	.c 'system'
+	%header-doc $*
+	printf \n'arglist:  %s'\n'location: %s'\n \
+		<={%argify `` \n {%arglist $*}} <={%objget $libloc $*}
+}
 fn list {|*|
 	.d 'List file with syntax highlighting'
 	.a '[-s SYNTAX|-f] FILE'
