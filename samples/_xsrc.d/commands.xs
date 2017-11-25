@@ -144,9 +144,13 @@ fn libi {|*|
 	.d 'Show information about a library function.'
 	.a 'FUNCTION-NAME'
 	.c 'system'
-	%header-doc $*
-	printf \n'arglist:  %s'\n'location: %s'\n \
-		<={%argify `` \n {%arglist $*}} <={%objget $libloc $*}
+	if {~ $#* 0} {
+		.usage libi
+	} else {
+		%header-doc $*
+		printf \n'arglist:  %s'\n'location: %s'\n \
+			<={%argify `` \n {%arglist $*}} <={%objget $libloc $*}
+	}
 }
 fn list {|*|
 	.d 'List file with syntax highlighting'
