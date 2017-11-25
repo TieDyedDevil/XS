@@ -35,16 +35,6 @@ fn lwn {
 }
 
 ## Web lookups
-fn .web-query {|site path query|
-	if {~ $#query 0} {
-		web-browser $site
-	} else {
-		let (q) {
-			q = `{echo $^query|sed 's/\+/%2B/g'|tr ' ' +}
-			web-browser $site^$path^$q
-		}
-	}
-}
 fn amazon {|*|
 	.d 'Search Amazon'
 	.a '[QUERY]'
