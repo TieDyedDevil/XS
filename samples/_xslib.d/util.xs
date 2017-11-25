@@ -466,3 +466,11 @@ fn %arglist {|fn-name|
 		echo $args
 	}
 }
+
+fn %safe-wild {|path thunk|
+	# Given a quoted wildcard path, evaluate thunk with a handler to ignore
+	# a 'no such ...' error and the expanded path passed as an argument.
+	let (expanded = `{eval ls $path >[2]/dev/null}) {
+		$thunk $expanded
+	}
+}

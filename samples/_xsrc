@@ -14,15 +14,22 @@ path = /usr/local/bin /usr/bin /usr/sbin $home/.local/bin $home/bin
 history = $home/.xshistory
 
 access -d ~/.xslib.d && {for f ~/.xslib.d/*.xs {. $f}}
-libloc = <=%mkobj
-for f ~/.xslib.d/*.xs {
-	for lf `{cat $f|grep -o 'fn [^ ]\+'|cut -d ' ' -f2} {
-		%objset $libloc $lf $f
+if {~ $fn-%safe-wild ()} {
+	throw error \~/.xsrc \
+		'No ~/.xslib.d/; ~/.xsrc.d/* and ~/.xsuser.d/* are not loaded.'
+} else {
+	libloc = <=%mkobj
+	%safe-wild '~/.xslib.d/*.xs' {|exp|
+		for f $exp {
+			for lf `{cat $f|grep -o 'fn [^ ]\+'|cut -d ' ' -f2} {
+				%objset $libloc $lf $f
+			}
+		}
 	}
-}
-access -d ~/.xsrc.d && {for f ~/.xsrc.d/*.xs {. $f}}
-catch {|e|
-	if {!~ $e *'.xsuser.d/*.xs: No such file or directory'} {throw $e}
-} {
-	access -d ~/.xsuser.d && {for f ~/.xsuser.d/*.xs {. $f}}
+	%safe-wild '~/.xsrc.d/*.xs' {|exp|
+		for f $exp {. $f}
+	}
+	%safe-wild '~/.xsuser.d/*.xs' {|exp|
+		for f $exp {. $f}
+	}
 }
