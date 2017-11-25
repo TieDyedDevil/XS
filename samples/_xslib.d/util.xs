@@ -1,3 +1,24 @@
+fn %advise {|name thunk|
+	# Insert a thunk at the beginning of a function
+	let (f = `` \n {var fn-$name}; c) {
+		if {{echo $f|grep -wqv $thunk} && {echo $f|grep -q '{.*}'}} {
+			c = `` \n {echo -- $f|sed 's/= ''\({\(|[^|]\+|\)\?' \
+				^'%seq \)\(.*}\)/= ''\1'^$thunk^' \3/'}
+			if {$c :eq $f} {
+				c = `` \n {echo -- $f|sed 's/= ''\({\(|[^|]' \
+					^'\+|\)\?\)\(.*}\)/= ''\1 %seq ' \
+					^$thunk^' {\3}/'}
+			}
+			if {$c :eq $f} {
+				c = `` \n {echo -- $f|sed 's/= ''\(.*\)''$' \
+					^'/= ''{%seq '^$thunk^' {\1}}''/'}
+			}
+			fn-$name = `` \n {echo -- $c|sed 's/fn-[^ ]\+ = ' \
+				^'''\(.\+\)''/\1/'|sed 's/''''/''/g'}
+		}
+	}
+}
+
 fn %max {|*|
 	# Return the largest of a list.
 	let (f; (m r) = $*) {
@@ -93,7 +114,7 @@ fn %args {|*|
 }
 
 fn %parse-args {|*|
-	# Given the output of $args followed by \& and a list of option/
+	# Given the output of %args followed by \& and a list of option/
 	# thunk pairs to be used for processing options, process the
 	# options and a return a list of the non-option words optionally
 	# followed by -- and following words. Within the option thunks,
@@ -125,12 +146,12 @@ fn %parse-args {|*|
 }
 
 fn %argify {|*|
-	# Always return a one-element list
+	# Always return a one-element list.
 	if {~ $* ()} {result ''} else {result `` '' {echo -n $*}}
 }
 
 fn %with-quit {|*|
-	# Run command with q key bound to send SIGINTR.
+	# Run command with q key bound to send SIGINT.
 	stty intr q
 	unwind-protect {
 		$*
@@ -150,6 +171,7 @@ fn %without-cursor {|*|
 }
 
 fn %with-tempfile {|name body|
+	# Bind a temporary file to name while evaluating body.
 	local ($name = `mktemp) {
 		unwind-protect {
 			$body
@@ -211,12 +233,13 @@ fn %with-read-chars {|line body|
 }
 
 fn %pprint {|fn-name|
-	# Pretty print named function
+	# Prettyprint named function.
 	~ $(fn-$fn-name) () && {throw error %pprint 'not a function'}
 	printf fn\ %s $fn-name
-	let (depth = 1; q = 0) {
+	let (depth = 1; q = 0; i = 0; lc) {
 		let ( \
 			fn-wrap = {
+				!~ $lc ' ' && printf ' '
 				printf %c\n '\'
 				for i `{seq `($depth*4)} {printf ' '}
 			} \
@@ -224,11 +247,14 @@ fn %pprint {|fn-name|
 			%with-read-chars $(fn-$fn-name) {|c|
 				~ $c '''' && {q = `(($q+1)%2)}
 				~ $q 0 && switch $c (
+				'%'	{~ $i 0 && {wrap; depth = `($depth+1)}}
 				'{'	{wrap; depth = `($depth+1)}
 				'}'	{depth = `($depth-1)}
 				'^'	{wrap}
 				)
+				i = 1
 				printf %c $c
+				lc = $c
 			}
 		}
 	}
@@ -249,7 +275,7 @@ fn %id {|*|
 }
 
 fn %mkobj {
-	# Create an object; return its name
+	# Create an object; return its name.
 	let (nm = go; go = go) {
 		while {!~ $($nm) ()} {nm = \xff^objid:^<=$&random}
 		$nm = obj
@@ -258,21 +284,21 @@ fn %mkobj {
 }
 
 fn .objcheck {|objname|
-	# Throw an error if objname does not name an object
+	# Throw an error if objname does not name an object.
 	if {{~ $objname ()} || {!~ $($objname) obj *\ obj}} {
 		throw error object 'Not an object: '^$objname
 	}
 }
 
 fn %objset {|objname key value|
-	# Set an object field
+	# Set an object field.
 	.objcheck $objname
 	%objunset $objname $key
 	$objname = $key:$value $($objname)
 }
 
 fn %objunset {|objname key|
-	# Remove an object field
+	# Remove an object field.
 	.objcheck $objname
 	let (ov = $($objname); rv) {
 		for kv $ov {
@@ -283,7 +309,7 @@ fn %objunset {|objname key|
 }
 
 fn %objget {|objname key default|
-	# Get an object field
+	# Get an object field.
 	.objcheck $objname
 	let (v = <={~~ $($objname) $key:*}) {
 		if {!~ $v ()} {result $v} else {result $default}
@@ -291,19 +317,19 @@ fn %objget {|objname key default|
 }
 
 fn %obj-isempty {|objname|
-	# True if object has no fields
+	# True if object has no fields.
 	.objcheck $objname
 	result <={!~ $($objname) *:*}
 }
 
 fn %objreset {|objname|
-	# Remove all fields from an object
+	# Remove all fields from an object.
 	.objcheck $objname
 	$objname = obj
 }
 
 fn %mkdict {|*|
-	# Make a dictionary from a list of key/value pairs
+	# Make a dictionary from a list of key/value pairs.
 	let (d = <=%mkobj) {
 		while {!~ $* ()} {
 			(k v) = $*(1 2)
@@ -315,7 +341,7 @@ fn %mkdict {|*|
 }
 
 fn %asort {
-	# Sort by length, then by name
+	# Sort by length, then by name.
 	%with-read-lines /dev/stdin {|line|
 		let (len = <={$&len $line}) {
 			printf %06d%s\n $len $line
@@ -324,7 +350,7 @@ fn %asort {
 }
 
 fn %read-char {
-	# Read one character from stdin
+	# Read one character from stdin.
 	let (c) {
 		unwind-protect {
 			stty -icanon
@@ -376,7 +402,7 @@ fn %list-menu {|*|
 	# Present a menu. The argument list is a header, a lambda,
 	# and a list of items. The lambda is applied to the selected
 	# item.
-	let ((hdr action) = $(1 2); l = $*(3 ...); i; n) {
+	let ((hdr action) = $*(1 2); l = $*(3 ...); i; n) {
 		i = 0
 		for n $l {
 			i = `($i+1)
@@ -394,5 +420,49 @@ fn %list-menu {|*|
 				}
 			}
 		}
+	}
+}
+
+fn %without-echo {|cmd|
+	# Disable terminal echo while evaluating cmd.
+	unwind-protect {
+		stty -echo
+		$cmd
+	} {
+		stty echo
+	}
+}
+
+fn %with-bracketed-paste-mode {|cmd|
+	# Enable terminal bracketed-paste mode while evaluating cmd.
+	unwind-protect {
+		printf \e'[?2004h'
+		$cmd
+	} {
+		printf \e'[?2004l'
+	}
+}
+
+fn %header-doc {|fn-name|
+	# Print a functions's header documentation.
+	escape {|fn-quit| let (pass = 0; file = <={%objget $libloc $fn-name}) {
+		~ $file () && throw error %header-doc 'not in library'
+		%with-read-lines $file {|l|
+			if {~ $pass 1} {
+				if {~ $l \t\#*} {
+					printf %s `` '' {echo $l|cut -c4-}
+				} else {
+					quit
+				}
+			}
+			{~ $l *fn\ $fn-name^*} && {pass = 1}
+		}
+	}}
+}
+
+fn %arglist {|fn-name|
+	# Print a function's argument list.
+	let ((_ args _) = <={~~ $(fn-$fn-name) *\|*\|*}) {
+		echo $args
 	}
 }

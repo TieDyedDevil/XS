@@ -35,10 +35,6 @@ fn help {|*|
 	}
 }
 
-fn .usage {|*|
-	if {{~ $#* 1} && {!~ $* -*}} {help $* | grep '^a:'}
-}
-
 ## Online documentation
 fn boost-help {
 	.d 'Boost documentation'

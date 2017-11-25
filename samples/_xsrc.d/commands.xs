@@ -1,3 +1,9 @@
+fn arrs {
+	.d 'List all array variables'
+	.c 'system'
+	vars | grep -a \377^'[^[]\+\[' | tr -d \377 | sort -V \
+		| column -c `{tput cols} | less -iFX
+}
 fn astat {
 	.d 'Display a status screen'
 	.c 'system'
@@ -125,6 +131,14 @@ fn import-abook {|*|
 			--outformat abook --outfile ~/.abook/addressbook
 		chmod 600 ~/.abook/addressbook
 	}
+}
+fn lib {
+	.d 'List names of library functions'
+	.c 'system'
+	vars -f | cut -c4- | cut -d' ' -f1 | grep -E '^(%|\.)' \
+		| grep -v -e %prompt \
+		| column -c `{tput cols} | less -iFX
+	# Ideally we'd hide all of the xs hook functions; not only %prompt.
 }
 fn list {|*|
 	.d 'List file with syntax highlighting'
@@ -345,6 +359,21 @@ fn o {
 			}
 		}
 	} | less -iFX
+}
+fn objs {
+	.d 'List all object variables'
+	.c 'system'
+	let (tf = `mktemp) {
+		vars | grep -a \377^objid: | tr -d \377 > $tf^02 # objs & names
+		cat $tf^02 | grep -v '^objid:' | cut -d' ' -f3 > $tf^03 # keys
+		grep -F -f $tf^03 $tf^02 > $tf^04 # objs and their names
+		cat $tf^04 | sort -t: -k2 | split -d -n r/2 - $tf
+			# 00: names; 01: objects
+		cat $tf^01 | sed 's/^objid:[^ ]\+ = /{/' | sed 's/ \?obj$/}/' \
+			> $tf^05 # objects rewritten as {key:value ...}
+		paste $tf^00 $tf^05 | column -c `{tput cols} | less -iFXS
+		rm -f $tf^??
+	}
 }
 fn oc {
 	.d 'Onscreen clock'

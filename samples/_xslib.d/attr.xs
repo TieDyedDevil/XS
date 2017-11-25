@@ -1,31 +1,110 @@
 ## Terminal presentation
-fn .ab {tput bold}
-fn .%ab {result <={%argify `.ab}}
-fn .ad {tput dim}
-fn .%ad {result <={%argify `.ad}}
-fn .ah {tput setab 8}
-fn .%ah {result <={%argify `.ah}}
-fn .ahe {tput setab 0}
-fn .%ahe {result <={%argify `.ahe}}
-fn .ai {tput sitm}
-fn .%ai {result <={%argify `.ai}}
-fn .af {|n| tput setaf $n}
-fn .%af {result <={%argify `.af}}
-fn .an {tput sgr0}
-fn .%an {result <={%argify `.an}}
-fn .as {if {~ $TERM linux} .ad else .ai}
-fn .%as {result <={%argify `.as}}
-fn .au {tput smul}
-fn .%au {result <={%argify `.au}}
-fn .aue {tput rmul}
-fn .%aue {result <={%argify `.aue}}
-fn .ci {tput civis}
-fn .%ci {result <={%argify `.ci}}
-fn .cn {tput cnorm}
-fn .%cn {result <={%argify `.cn}}
-fn .ed {tput ed}
-fn .%ed {result <={%argify `.ed}}
+fn .ab {
+	# Set terminal attribute bold.
+	tput bold
+}
+fn .%ab {
+	# Return terminal attribute bold string.
+	result <={%argify `.ab}
+}
+fn .ad {
+	# Set terminal attribute dim.
+	tput dim}
+fn .%ad {
+	# Return terminal attribute dim string.
+	result <={%argify `.ad}
+}
+fn .ah {
+	# Set terminal attribute background highlight begin.
+	tput setab 8
+}
+fn .%ah {
+	# Return terminal attribute background highlight begin.
+	result <={%argify `.ah}
+}
+fn .ahe {
+	# Set terminal attribute background highlight end.
+	tput setab 0}
+fn .%ahe {
+	# Return terminal attribute background highlight end.
+	result <={%argify `.ahe}
+}
+fn .ai {
+	# Set terminal attribute italic.
+	tput sitm
+}
+fn .%ai {
+	# Return terminal attribute italic.
+	result <={%argify `.ai}
+}
+fn .af {|n|
+	# Set terminal attribute foreground.
+	# 0=black; 1=red; 2=green; 3=yellow; 4=blue; 5=magenta; 6=cyan; 7=white
+	tput setaf $n
+}
+fn .%af {
+	# Return terminal attribute foreground.
+	# 0=black; 1=red; 2=green; 3=yellow; 4=blue; 5=magenta; 6=cyan; 7=white
+	result <={%argify `.af}
+}
+fn .an {
+	# Set terminal attribute normal.
+	tput sgr0
+}
+fn .%an {
+	# Return terminal attribute normal.
+	result <={%argify `.an}
+}
+fn .as {
+	# Set terminal attribute "special": dim if console; else italic.
+	if {~ $TERM linux} .ad else .ai
+}
+fn .%as {
+	# Return terminal attribute "special": dim if console; else italic.
+	result <={%argify `.as}
+}
+fn .au {
+	# Set terminal attribute underline begin.
+	tput smul
+}
+fn .%au {
+	# Return terminal attribute underline begin.
+	result <={%argify `.au}
+}
+fn .aue {
+	# Set terminal attribute underline end.
+	tput rmul
+}
+fn .%aue {
+	# Return terminal attribute underline end.
+	result <={%argify `.aue}
+}
+fn .ci {
+	# Set terminal attribute cursor invisible.
+	tput civis
+}
+fn .%ci {
+	# Return terminal attribute cursor invisible.
+	result <={%argify `.ci}
+}
+fn .cn {
+	# Set terminal attribute cursor visible.
+	tput cnorm
+}
+fn .%cn {
+	# Return terminal attribute cursor visible.
+	result <={%argify `.cn}
+}
+fn .ed {
+	# Put terminal erase to end of display.
+	tput ed
+}
+fn .%ed {
+	# Return terminal erase to end of display.
+	result <={%argify `.ed}
+}
 fn .palette {
+	# Adjust terminal color palette.
 	if {~ $TERM linux} {
 		printf %s \e]R
 		printf %s \e]P0000000 # black = Black
@@ -57,6 +136,8 @@ fn .palette {
 	}
 }
 fn .tattr {|*|
+	# Set terminal foreground attribute: bold, normal, dim, italic,
+	# red, green, yellow, blue, magenta or cyan.
 	let (cs) {
 		switch $* (
 		bold {cs = `.ab}
@@ -73,4 +154,8 @@ fn .tattr {|*|
 		~ $cs () || printf %s $cs
 	}
 }
-fn .%tattr {|*| result <={%argify `{.tattr $*}}}
+fn .%tattr {|*|
+	# Return terminal foreground attribute: bold, normal, dim, italic,
+	# red, green, yellow, blue, magenta or cyan.
+	result <={%argify `{.tattr $*}}
+}
