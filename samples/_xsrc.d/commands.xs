@@ -147,8 +147,8 @@ fn libi {|*|
 	if {~ $#* 0} {
 		.usage libi
 	} else {
-		%header-doc $*
-		printf \n'arglist:  %s'\n'location: %s'\n \
+		%header-doc $* | nl -w2 -s': '
+		printf \n'arglist : %s'\n'location: %s'\n \
 			<={%argify `` \n {%arglist $*}} <={%objget $libloc $*}
 	}
 }
