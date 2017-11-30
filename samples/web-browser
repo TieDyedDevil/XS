@@ -1,0 +1,25 @@
+#! /usr/local/bin/xs --
+
+#: web browser for command-line usage
+
+npf = ~/.local/noproxy
+
+{!~ $#* 0} && {access $npf} && {
+	echo $* | grep -q -f $npf && {
+		{!~ $DISPLAY ()} && {
+			prx = --no-proxy-server
+		} else {
+			prx=-no-proxy
+		}
+	}
+}
+
+if {!~ $DISPLAY ()} {
+	setsid chromium-browser $prx $* >/dev/null >[2=1] &
+} else {
+	if {~ $#* 0} {
+		w3m -X $prx -v
+	} else {
+		w3m -X $prx $*
+	}
+}

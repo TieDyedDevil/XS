@@ -8,7 +8,7 @@ fn astat {
 	.d 'Display a status screen'
 	.c 'system'
 	%with-quit {
-		watch -t -p -c -n1 'xs -c ''d;load;thermal;played;m'''
+		watch -t -p -c -n1 'xs -c ''d;load;thermal;vol;played;m'''
 	}
 }
 fn battery {
@@ -147,6 +147,12 @@ fn libi {|*|
 	if {~ $#* 0} {
 		.usage libi
 	} else {
+		{~ <={result $#(fn-$*)} 0} && {
+			throw error libi 'not a function'
+		}
+		{~ <={%objget $libloc $*} ()} && {
+			throw error libi 'not in library'
+		}
 		%header-doc $* | nl -w2 -s': '
 		printf \n'arglist : %s'\n'location: %s'\n \
 			<={%argify `` \n {%arglist $*}} <={%objget $libloc $*}

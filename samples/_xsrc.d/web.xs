@@ -1,19 +1,11 @@
 fn web {|*|
 	.d 'Open web URL'
-	.a '[-t] URL'
+	.a '[-t] [URL]'
 	.c 'web'
-	if {~ $#* 0} {
-		.usage web
-	} else if {{!~ $DISPLAY ()} && {~ $*(1) -t}} {
+	if {{!~ $DISPLAY ()} && {~ $*(1) -t}} {
 		local (DISPLAY) {web $*(2 ...)}
 	} else {
-		let (error = false) {
-			switch $#* (
-			0 web-browser
-			1 {web-browser $*}
-			{throw error web 'spaces not allowed in URL'}
-			)
-		}
+		web-browser $*
 	}
 }
 

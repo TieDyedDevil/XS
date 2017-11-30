@@ -25,7 +25,7 @@ fn gallery {|*|
 				>[2]/dev/null
 
 		} else {
-			find -L $dir -type f|shuf|sxiv -qifb -sd -S$time \
+			find -L $dir -type f|shuf|sxiv -qifb -sf -S$time \
 				>[2]/dev/null
 		}
 	}}
@@ -161,4 +161,10 @@ fn vidshuffle {|*|
 			-type f -iname $filt|shuf \
 			|awk '/^[^/]/ {print "'`pwd'/"$0} /^\// {print}'}
 	}}
+}
+fn vol {
+	.d 'Show volume of default PulseAudio output'
+	.c 'media'
+	if {~ `{pamixer --get-mute} 1} {printf Volume:\ muted\n} \
+	else {printf Volume:\ %d%%\n `{pamixer --get-volume|cut -d\  -f1}}
 }
