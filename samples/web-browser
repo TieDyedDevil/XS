@@ -16,6 +16,7 @@ npf = ~/.local/noproxy
 
 if {!~ $DISPLAY ()} {
 	setsid chromium-browser $prx $* >/dev/null >[2=1] &
+	exit
 } else {
 	if {~ $#* 0} {
 		w3m -X $prx -v
