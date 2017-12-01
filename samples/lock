@@ -1,0 +1,28 @@
+#! /usr/bin/env xs
+
+XL_UNAESTHETIC = -solitaire,-eyes,-world,-image,-nose,-dclock,-xjack,-daisy,\
+^-lightning,-tube,-decay,-life1d,-star,-tetris,-puzzle,-marquee
+XL_BROKEN = -pacman
+XL_MODELIST = allnice,$XL_UNAESTHETIC,$XL_BROKEN
+AC_LOCKOPTS = -modelist $XL_MODELIST -erasemode squaretate -duration 150
+DC_LOCKOPTS = -mode blank -dpmsoff 5 -delay 2000000
+
+fn locker {|*|
+	pkill -USR1 dunst
+	xlock -nice 25 \
+	-font '-*-liberation mono-bold-i-*-*-*-180-*-*-*-*-iso10646-1' \
+	-planfont '-*-liberation mono-bold-i-*-*-*-160-*-*-*-*-iso10646-1' \
+	-echokeys -echokey _ -icongeometry 256x256 +description -timeelapsed \
+	-saturation 0.5 -bg 'cadet blue' -fg white -timeout 15 +resetsaver \
+	-fullrandom -username 'Username: ' -password 'Password:' \
+	-info 'Enter password to unlock.' $*
+	pkill -USR2 dunst
+}
+
+AC = /sys/class/power_supply/AC
+
+if {{! access -d $AC} || {~ `{cat $AC/online} 1}} {
+	locker $AC_LOCKOPTS
+} else {
+	locker $DC_LOCKOPTS
+}
