@@ -9,7 +9,7 @@ npf = ~/.local/noproxy
 		{!~ $DISPLAY ()} && {
 			prx = --no-proxy-server
 		} else {
-			prx=-no-proxy
+			prx = -no-proxy
 		}
 	}
 }
