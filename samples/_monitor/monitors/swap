@@ -8,7 +8,7 @@ THRPCT = 5
 while true {
 	sleep $INTVL
 	swapping = `{
-less -n +2 /proc/swaps | awk '
+tail -n +2 /proc/swaps | awk '
 BEGIN { tot = 0; use = 0 }
 { tot += $3; use += $4; }
 END { print ((use * 100 / tot) > '^$THRPCT^') }
