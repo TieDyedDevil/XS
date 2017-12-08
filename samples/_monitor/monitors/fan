@@ -1,0 +1,29 @@
+#! /usr/bin/env xs
+
+. $HERE/common
+
+HIGH = `{sensors|grep Package\\\|Physical|cut -d= -f2|cut -d\. -f1}
+CHASSIS = `{cat /sys/devices/virtual/dmi/id/chassis_type}
+if {~ $CHASSIS ()} {
+	THRESHOLD = `($HIGH - 50)
+} else if {{$CHASSIS :lt 8} || {$CHASSIS" :gt 16}} {
+	# Notionally "desktop"
+	THRESHOLD = `($HIGH - 50)
+} else {
+	# Notionally "mobile" or otherwise compact
+	THRESHOLD = `($HIGH - 40)
+}
+
+cycles = 0
+while true {
+	sleep 30
+	temp = `{sensors|grep Package\\\|Physical|cut -d: -f2|cut -d\. -f1}
+	speeds = `{sensors|grep fan|cut -d: -f2|awk '{print $1}'}
+	speed = 0; for s $speeds {speed = `($speed+$s)}
+	if {{$temp :gt $THRESHOLD} && {~ $speed 0}} {
+		cycles = `($cycles+1)
+		{$cycles :gt 1} && announce Fan!
+	} else {
+		cycles = 0
+	}
+}

@@ -264,15 +264,25 @@ fn lpmd {|md|
 fn luc {|*|
 	.d 'List user commands'
 	.a '-l  # sort by length, then name'
+	.a '-s  # list commands on system paths'
 	.c 'system'
-	let (fn-sf) {
-		if {~ $* -l} {fn-sf = %asort} else {fn-sf = sort}
+	let (al = <={%args $*}; fn-sf) {
+		if {~ $al -l} {fn-sf = %asort} else {fn-sf = sort}
 		printf `.as^'@ ~/.xs*'^`.an^\n
 		vars -f | grep -o '^fn-[^ ]\+' | cut -d- -f2- | grep '^[a-z]' \
 			| sf | column -c `{tput cols}
 		printf `.as^'@ ~/bin'^`.an^\n
 		find -L ~/bin -mindepth 1 -maxdepth 1 -type f -executable \
 			| sf | xargs -n1 basename | column -c `{tput cols}
+		if {~ $al -s} {
+			printf `.as^'@ /usr/local/bin'^`.an^\n
+			ls /usr/local/bin | sf | column -c `{tput cols}
+			optbins = `{find /opt -type d -name bin}
+			for d $optbins {
+				printf `.as^'@ '^$d^`.an^\n
+				ls $d | sf | column -c `{tput cols}
+			}
+		}
 	} | less -irFX
 }
 fn mamel {

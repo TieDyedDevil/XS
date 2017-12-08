@@ -7,10 +7,15 @@ if {~ `tty *tty1} {
 	stty start undef stop undef
 	%is-login && {
 		~ `tty /dev/tty* && vtfbfit
-		.herald
+		.as; cookie; .an; echo
+		if {~ `tty /dev/tty*} {
+			on; echo; net; echo; thermal; battery; load; echo
+		}
+		.ab; where; .an
 	}
 	if {{!~ $history ()} && {~ `{cat $history|wc -l} [5-9]??? *?????}} {
 		echo 'Consider histclean'
 	}
-	.xsin-rp
+	# `rp` needs an extra bit of support when run this early in setup.
+	%prompt; rp; _n@$pid = 0
 }

@@ -181,14 +181,30 @@ fn %with-tempfile {|name body|
 	}
 }
 
-fn %aset {|n i v|
+fn %aset {|name index value|
 	# Emulate indexed assignment.
-	\xff^$n[$i] = $v
+	\xff^$name[$index] = $value
 }
 
-fn %aref {|n i|
+fn %asetm {|name value indices|
+	# Emulate multidimensional indexed assignment.
+	let (n_ = \xff^$name; i_) {
+		for i_ $indices {n_ = $n_^[$i_]}
+		eval \{ $n_ \= $value \}
+	}
+}
+
+fn %aref {|name index|
 	# Emulate indexed retrieval.
-	result $(\xff^$n[$i])
+	result $(\xff^$name[$index])
+}
+
+fn %arefm {|name indices|
+	# Emulate multidimensional indexed retrieval.
+	let (n_ = \xff^$name; i_) {
+		for i_ $indices {n_ = $n_^[$i_]}
+		result $($n_)
+	}
 }
 
 let (g = 0) {
@@ -379,22 +395,27 @@ fn %menu {|*|
 			while true {
 				{!~ <={$&len $hdr} 0} && printf %s\n $hdr
 				l = $mt
-				while {!~ $mt ()} {
-					(key title) = $mt(1 2); mt = $mt(3 ...)
+				while {!~ $l ()} {
+					(key title) = $l(1 2); l = $l(3 ...)
 					printf %c\ %s\n $key $title
 				}
-				printf \?\ 
-				c = <=%read-char
-				{~ $c \x04} && {printf \n; break}
-				a = <={%objget $ma $c $none}
+				escape {|fn-redisplay| while true {
+					printf \?\ 
+					c = <=%read-char
+					{~ $c ()} && redisplay
+					{~ $c \x04} && break
+					a = <={%objget $ma $c $none}
+					printf \n
+					if {!~ $a $none} {
+						$a
+					} else {
+						printf What\?\n
+					}
+				}}
 				printf \n
-				if {!~ $a $none} {
-					$a
-				} else {
-					printf What\?\n
-				}
 			}
 		}
+		printf \n
 	}
 }
 

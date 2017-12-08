@@ -1,0 +1,18 @@
+#! /usr/bin/env xs
+
+INTVL = 60
+THRPCT = 5
+
+. $HERE/common
+
+while true {
+	sleep $INTVL
+	swapping = `{
+less -n +2 /proc/swaps | awk '
+BEGIN { tot = 0; use = 0 }
+{ tot += $3; use += $4; }
+END { print ((use * 100 / tot) > '^$THRPCT^') }
+'
+}
+	{~ $swapping 1} && announce Swapping!
+}

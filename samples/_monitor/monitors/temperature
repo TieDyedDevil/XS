@@ -1,0 +1,21 @@
+#! /usr/bin/env xs
+
+. $HERE/common
+
+HIGH = `{sensors|grep Physical|cut -d= -f2|cut -d\. -f1}
+CHASSIS = `{cat /sys/devices/virtual/dmi/id/chassis_type}
+if {~ $CHASSIS ()} {
+	HOT = `($HIGH - 25)
+} else if {{$CHASSIS :lt 8} || {$CHASSIS :gt 16}} {
+	# Notionally "desktop"
+	HOT = `($HIGH - 25)
+} else {
+	# Notionally "mobile" or otherwise compact
+	HOT = `($HIGH - 15)
+}
+
+while true {
+	sleep 10
+	temp = `{sensors|grep Physical|cut -d: -f2|cut -d\. -f1}
+	{$temp :gt $HOT} && announce Hot!
+}

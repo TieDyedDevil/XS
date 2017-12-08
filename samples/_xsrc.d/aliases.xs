@@ -93,6 +93,12 @@ fn remake {
 	.r 'upgrade'
 	sudo -E /usr/local/bin/xs -c 'cd /usr/local/src; ./remake'
 }
+fn rg {|*|
+	.d 'Search tree for pattern in files'
+	.a '[rg_OPTIONS] PATTERN [PATH]'
+	.c 'alias'
+	/usr/local/bin/rg --heading --line-number --color=always $* | less -iRFX
+}
 fn svis {|*|
 	.d 'Edit file under sudo'
 	.a '[vis_OPTIONS|FILE] ...'
