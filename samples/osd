@@ -1,0 +1,11 @@
+#! /usr/bin/env xs
+
+#: pop up a transient message via osd
+
+ARG0 = $0
+FROM = `{basename $ARG0}
+
+. $HOME/.monitor/osd_pipe
+. $HOME/.monitor/common
+
+osd $*
