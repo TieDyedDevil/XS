@@ -8,3 +8,19 @@ with a `.`, and placed in your home directory.
 
 The other files (those not having a leading `_`) can go into any directory on
 $PATH.
+
+Overview
+--------
+	announce	Write to all $USER's ttys and ptys and OSD popup
+	colors		Display ANSI color pallette on terminal
+	histclean	Prune older entries from ~/.xshistory
+	lock		A smart wrapper around xlock
+	osd		Pop up a transient message via OSD
+	sv		Pre-validate sudo for long-running commands
+	tsm		Integrate dvtm and abduco
+	web-browser	Launch a web browser
+	_monitor	Daemon notifies user of system resouce issues
+	_xslib.d	Library of shared xs functions
+	_xsrc.d		Utility commands and definitions
+	_xsin		Startup file for interactive xs session
+	_xsrc		Startup file for login xs session
