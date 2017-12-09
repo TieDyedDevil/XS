@@ -46,7 +46,7 @@ fn la {|*|
 fn latest {
 	.d 'List latest START processes for current user'
 	.c 'alias'
-	ps auk-start_time -U $USER|less -iFX
+	%view-with-header 1 <{ps auk-start_time -U $USER} latest
 }
 fn ll {|*|
 	.c 'alias'

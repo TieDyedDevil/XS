@@ -495,3 +495,22 @@ fn %safe-wild {|path thunk|
 		$thunk $expanded
 	}
 }
+
+fn %view-with-header {|count file title|
+	# Preserve the first count lines while viewing file.
+	# Display title in the pager's prompt.
+	unwind-protect {
+		tput cup 0 0
+		tput ed
+		tput csr $count `{tput lines}
+		let (ts = '') {
+			!~ $title () && ts = `` '' {printf '[%s] ' $title}
+			env TERM=dumb less -dfiSXF \
+				-P$ts^'%lt-%lb?L/%L ?e(END)' $file
+		}
+	} {
+		tput sc
+		tput csr 0 `{tput lines}
+		tput rc
+	}
+}

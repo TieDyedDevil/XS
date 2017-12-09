@@ -499,14 +499,14 @@ fn pt {|*|
 	.a '[[-fFcyM] USERNAME]'
 	.c 'system'
 	.r 'pu'
-	.pu $*|awk '{if ($14 != "?") print}'|less -iFX
+	%view-with-header 1 <{.pu $*|awk '{if ($14 != "?") print}'} pt
 }
 fn pu {|*|
 	.d 'ps for user'
 	.a '[[-fFCyM] USERNAME]'
 	.c 'system'
 	.r 'pt'
-	.pu $*|less -iFX
+	%view-with-header 1 <{.pu $*} pu
 }
 fn screensaver {|*|
 	.d 'Query/set display screensaver enable'
