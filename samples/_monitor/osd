@@ -23,4 +23,4 @@ fn wait_and_whinge {
 	}
 }
 
-fork {while true {wait_and_whinge; sleep 1} &}
+while true {wait_and_whinge; sleep 1}
