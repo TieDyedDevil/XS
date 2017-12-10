@@ -344,6 +344,20 @@ fn %objreset {|objname|
 	$objname = obj
 }
 
+fn %objpersist {|objname path|
+	# Persist named object to path.
+	.objcheck $objname
+	echo $objname $($objname) >$path
+}
+
+fn %objrestore {|path|
+	# Restore object from path and return object's ID.
+	let (t = `` ' ' {cat $path}) {
+		eval $t(1) \= $t(2 ...)
+		result $t(1)
+	}
+}
+
 fn %mkdict {|*|
 	# Make a dictionary from a list of key/value pairs.
 	let (d = <=%mkobj) {
