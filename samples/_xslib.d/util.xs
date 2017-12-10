@@ -503,10 +503,13 @@ fn %view-with-header {|count file title|
 		tput cup 0 0
 		tput ed
 		tput csr $count `{tput lines}
-		let (ts = '') {
+		tput cup 0 0
+		let (ts = ''; tl = `($count+1)) {
 			!~ $title () && ts = `` '' {printf '[%s] ' $title}
-			env TERM=dumb less -dfiSXF \
-				-P$ts^'%lt-%lb?L/%L ?e(END)' $file
+			env TERM=dumb less -dfiSXF -j$tl \
+				-P$ts^'%lt-%lb?L/%L ?e(END)' \
+				<{cat $file|tee >{head -$count >/dev/tty} \
+					|tail -n +$tl}
 		}
 	} {
 		tput sc
