@@ -30,6 +30,22 @@ fn gallery {|*|
 		}
 	}}
 }
+fn grayview {|*|
+	.d 'View image in grayscale'
+	.a 'FILE ...'
+	let (tf; _; ext) {
+		for f $* {
+			unwind-protect {
+				(_ ext) = <={~~ $f *.*}
+				tf = `mktemp^.$ext
+				convert $f -type grayscale $tf
+				image $tf
+			} {
+				rm -f $tf
+			}
+		}
+	}
+}
 fn image {|*|
 	.d 'Display image'
 	.a 'FILE ...'

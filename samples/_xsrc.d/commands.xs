@@ -738,3 +738,20 @@ fn xaos {|*|
 		/usr/bin/xaos -driver $dr $*
 	}
 }
+fn xcolors {|*|
+	.d 'Display X11 colors with RGB values and names'
+	.a '[xs_filter_thunk]  # on $r, $g and $b'
+	%with-read-lines <{showrgb} {|l|
+		(r g b d) = `{echo $l}
+		let (fn-render = {|f r g b d|
+				printf `{.af $f}
+				printf \e'[48;2;%d;%d;%dm %03d %03d %03d ' \
+					^'%30s '^`.an^\n $r $g $b $r $g $b \
+					<={%argify $d}}) {
+			if {{~ $* ()} || {eval $*}} {
+				render 0 $r $g $b $d
+				render 7 $r $g $b $d
+			}
+		}
+	} | less -iFXR
+}
