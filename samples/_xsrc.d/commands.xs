@@ -740,7 +740,7 @@ fn xaos {|*|
 }
 fn xcolors {|*|
 	.d 'Display X11 colors with RGB values and names'
-	.a '[xs_filter_thunk]  # on $r, $g and $b'
+	.a '[xs_filter_thunk]  # on $r, $g, $b and $d'
 	%with-read-lines <{showrgb} {|l|
 		(r g b d) = `{echo $l}
 		let (fn-render = {|f r g b d|
