@@ -1,19 +1,22 @@
 # Prompt control for xs
 
-let (prompt_init; pi_p; pi_a; pi_s) {
-	if {~ `consoletype vt} {
-		prompt_init = <={%aref pr cinit}
-	} else {
-		prompt_init = <={%aref pr pinit}
+fn _prompt_init {
+	let (prompt_init; pi_p; pi_a; pi_s) {
+		if {~ `consoletype vt} {
+			prompt_init = <={%aref pr cinit}
+		} else {
+			prompt_init = <={%aref pr pinit}
+		}
+		pi_p = $prompt_init(1); pi_a = $prompt_init(2); pi_s = $prompt_init(3)
+		if {!~ <={%aref pr $pi_p} ()} {_op = <={%aref pr $pi_p} ''} \
+		else {_op = \> \| xs}
+		if {!~ $pi_a ()} {_oa = `{.tattr $pi_a}} \
+		else {_oa = `{.tattr bold}}
+		if {!~ $pi_s ()} {_ob = $pi_s} \
+		else {_ob = underline}
 	}
-	pi_p = $prompt_init(1); pi_a = $prompt_init(2); pi_s = $prompt_init(3)
-	if {!~ <={%aref pr $pi_p} ()} {_op = <={%aref pr $pi_p} ''} \
-	else {_op = \> \| xs}
-	if {!~ $pi_a ()} {_oa = `{.tattr $pi_a}} \
-	else {_oa = `{.tattr bold}}
-	if {!~ $pi_s ()} {_ob = $pi_s} \
-	else {_ob = underline}
 }
+_prompt_init
 local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 	fn prompt {|x|
 		.d 'Alter prompt'
@@ -101,6 +104,7 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 	fn %prompt {
 		.palette; .an; .ed; .cn
 		~ $(_pr@$pid) () && {
+			_prompt_init; rp
 			_pa@$pid = $_oa; prompt; _n@$pid = 0; _s@$pid = -1
 			_pb@$pid = $_ob
 		}
