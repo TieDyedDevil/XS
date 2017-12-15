@@ -1,6 +1,12 @@
 # Prompt control for xs
 
-let (pi_p = $prompt_init(1); pi_a = $prompt_init(2); pi_s = $prompt_init(3)) {
+let (prompt_init; pi_p; pi_a; pi_s) {
+	if {~ `consoletype vt} {
+		prompt_init = <={%aref pr cinit}
+	} else {
+		prompt_init = <={%aref pr pinit}
+	}
+	pi_p = $prompt_init(1); pi_a = $prompt_init(2); pi_s = $prompt_init(3)
 	if {!~ <={%aref pr $pi_p} ()} {_op = <={%aref pr $pi_p} ''} \
 	else {_op = \> \| xs}
 	if {!~ $pi_a ()} {_oa = `{.tattr $pi_a}} \
@@ -29,16 +35,30 @@ local (_pr@$pid; _n@$pid; _s@$pid; _p1@$pid; _p2@$pid; _pt@$pid; _pa@$pid) {
 			else {throw error prompt 'P1 P2 PT'}
 		}
 		if {~ $x(1) -l} {
-			let (n = 1) {
-				while {!~ <={%aref pr $n} ()} {
+			let (pm; n = 1) {
+				if {~ `consoletype vt} {
+					pm = <={%aref pr cmax}
+				} else {
+					pm = <={%aref pr pmax}
+				}
+				while {$n :le $pm} {
 					printf '%d %s %s'\n $n <={%aref pr $n}
 					n = `($n + 1)
 				} | pr -8 -t
 			}
 		}
 		if {~ $x(1) -n} {
-			let (n = $x(2)) {
-				!~ <={%aref pr $n} () && prompt <={%aref pr $n}
+			let (pm; n = $x(2)) {
+				if {~ `consoletype vt} {
+					pm = <={%aref pr cmax}
+				} else {
+					pm = <={%aref pr pmax}
+				}
+				if {{$n :le $pm} && {!~ <={%aref pr $n} ()}} {
+					prompt <={%aref pr $n}
+				} else {
+					throw error prompt 'range?'
+				}
 			}
 		}
 		if {~ $x(1) -s} {
@@ -132,8 +152,11 @@ fn rp {
 				magenta yellow cyan); \
 			bkg = (normal highlight underline); \
 			r; i; a; s) {
-		while {!~ <={%aref pr $np} ()} {np = `($np + 1)}
-		np = `($np - 1)
+		if {~ `consoletype vt} {
+			np = <={%aref pr cmax}
+		} else {
+			np = <={%aref pr pmax}
+		}
 		r = <=$&random
 		i = `($r % $np + 1)
 		prompt <={%aref pr $i} $(_pt@$pid)

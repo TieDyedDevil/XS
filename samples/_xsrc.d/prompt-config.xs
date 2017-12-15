@@ -1,5 +1,7 @@
 # index of prompt, prompt attribute, sequence attribute
-prompt_init = 16 bold underline
+
+%aset pr cinit 16 bold underline # vt  default
+%aset pr pinit 27 bold underline # pty default
 
 %aset pr 1 \u252c \u251c
 #    1┬
@@ -97,3 +99,28 @@ prompt_init = 16 bold underline
 #    1Ŀ
 #    1Ł
 #    2Ŀ
+
+# Mark the largest index that'll work in the console.
+%aset pr cmax 24
+
+## The following won't render in the console.
+
+%aset pr 25 \u2b95 \u2b8a
+#    1⮕
+#    2⮊
+#    1⮕
+%aset pr 26 \u2b72 \u2b71
+#    1⭲
+#    2⭱
+#    1⭲
+%aset pr 27 \u2b62 \u2b77
+#    1⭢
+#    2⭷
+#    1⭢
+%aset pr 28 \u2bee \u2bed
+#    1⯮
+#    2⯭
+#    1⯮
+
+# Mark the largest index that'll work in a pty.
+%aset pr pmax 28
