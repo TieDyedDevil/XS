@@ -121,6 +121,26 @@
 #    1⯮
 #    2⯭
 #    1⯮
+%aset pr 29 \U00012460 \U00012462
+#    1𒑠
+#    2𒑢
+#    1𒑠
+%aset pr 30 \u27e3 \u27e1
+#    1⟣
+#    2⟡
+#    1⟣
+%aset pr 31 \U0001f7c1 \U0001f7c3
+#    1🟁
+#    2🟃
+#    1🟁
+%aset pr 31 \U0001f7c5 \U0001f7c7
+#    1🟅
+#    2🟇
+#    1🟅
+%aset pr 32 \U0001d032 \U0001d04c
+#    1𝀲
+#    2𝁌
+#    1𝀲
 
 # Mark the largest index that'll work in a pty.
-%aset pr pmax 28
+%aset pr pmax 32
