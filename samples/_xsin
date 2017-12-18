@@ -1,5 +1,14 @@
 #! /usr/bin/env xs
 
+if {~ $fn-%safe-wild ()} {
+	throw error \~/.xsrc \
+		'No %safe-wild (see ~/.xslib.d/*); ~/.xsrc.d/* is not loaded.'
+} else {
+	%safe-wild '~/.xsuser.d/*.xs' {|exp|
+		for f $exp {. $f}
+	}
+}
+
 if {~ `tty *tty1} {
 	screensaver on
 	startwm

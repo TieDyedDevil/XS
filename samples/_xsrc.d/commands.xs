@@ -1,8 +1,10 @@
-fn arrs {
-	.d 'List all array variables'
+fn arrs {|*|
+	.d 'List array variables'
+	.a '[FILTER]'
 	.c 'system'
 	vars | grep -a \377^'[^[]\+\[' | tr -d \377 | sort -V \
-		| column -c `{tput cols} | less -iFX
+		| grep \^^<={%argify $*}^.\* | column -c `{tput cols} \
+		| less -iFX
 }
 fn astat {
 	.d 'Display a status screen'
@@ -388,8 +390,9 @@ fn o {
 		}
 	} | less -iFX
 }
-fn objs {
-	.d 'List all object variables'
+fn objs {|*|
+	.d 'List object variables'
+	.a '[FILTER]'
 	.c 'system'
 	let (tf = `mktemp) {
 		vars | grep -a \377^objid: | tr -d \377 > $tf^02 # objs & names
@@ -399,7 +402,8 @@ fn objs {
 			# 00: names; 01: objects
 		cat $tf^01 | sed 's/^objid:[^ ]\+ = /{/' | sed 's/ \?obj$/}/' \
 			> $tf^05 # objects rewritten as {key:value ...}
-		paste $tf^00 $tf^05 | column -c `{tput cols} | less -iFXS
+		paste $tf^00 $tf^05 | grep \^^<={%argify $*}^.\* \
+			| column -c `{tput cols} | less -iFXS
 		rm -f $tf^??
 	}
 }

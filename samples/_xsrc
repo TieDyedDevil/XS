@@ -16,7 +16,7 @@ history = $home/.xshistory
 access -d ~/.xslib.d && {for f ~/.xslib.d/*.xs {. $f}}
 if {~ $fn-%safe-wild ()} {
 	throw error \~/.xsrc \
-		'No ~/.xslib.d/; ~/.xsrc.d/* and ~/.xsuser.d/* are not loaded.'
+		'No %safe-wild (see ~/.xslib.d/*); ~/.xsuser.d/* is not loaded.'
 } else {
 	libloc = <=%mkobj
 	%safe-wild '~/.xslib.d/*.xs' {|exp|
@@ -27,9 +27,6 @@ if {~ $fn-%safe-wild ()} {
 		}
 	}
 	%safe-wild '~/.xsrc.d/*.xs' {|exp|
-		for f $exp {. $f}
-	}
-	%safe-wild '~/.xsuser.d/*.xs' {|exp|
 		for f $exp {. $f}
 	}
 }

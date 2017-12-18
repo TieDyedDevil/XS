@@ -68,6 +68,10 @@ fn lt {|*|
 	.r 'la ll ls'
 	ls -lhtr $*
 }
+fn mb2 {|*|
+	.c 'alias'
+	mandelbulber2 $*
+}
 fn mutt {|*|
 	.c 'alias'
 	# mutt won't override st colors
