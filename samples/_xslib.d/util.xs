@@ -23,6 +23,15 @@ fn %advise {|name thunk|
 	}
 }
 
+fn %unadvise {|name thunk|
+	# Remove a thunk from a function.
+	let (f = $(fn-$name)) {
+		if {{echo $f|grep -wq $thunk} && {echo $f|grep -q '{.*}'}} {
+			fn $name `` \n {echo $f|sed 's/'^$thunk^'//'}
+		}
+	}
+}
+
 fn %max {|*|
 	# Return the largest of a list.
 	let (f; (m r) = $*) {

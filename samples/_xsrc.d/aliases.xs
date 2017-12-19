@@ -156,6 +156,13 @@ fn upgrade {
 	.r 'remake'
 	sudo dnf upgrade -y --refresh
 }
+fn worms {
+	.d 'Display worms'
+	.c 'alias'
+	%with-quit {
+		/usr/bin/worms -n 7 -d 50
+	}
+}
 fn zathura {|*|
 	.d 'Document viewer'
 	.c 'alias'
