@@ -60,8 +60,15 @@ fn load {
 }
 fn ls {|*|
 	.c 'alias'
+	.a '[ls_ARGS|-P]'
 	.r 'la ll lt'
-	/usr/bin/ls --group-directories-first -v --color=auto $*
+	if {~ $* -P} {
+		* = `{echo $*|sed 's/-P//'}
+		/usr/bin/ls --group-directories-first -v --color=yes $* \
+			| less -RFXi
+	} else {
+		/usr/bin/ls --group-directories-first -v --color=auto $*
+	}
 }
 fn lt {|*|
 	.c 'alias'
