@@ -75,7 +75,11 @@ fn lt {|*|
 	.r 'la ll ls'
 	ls -lhtr $*
 }
-fn mb2 {|*|
+%cfn {%have mandelbulber} mb {|*|
+	.c 'alias'
+	mandelbulber $*
+}
+%cfn {%have mandelbulber2} mb2 {|*|
 	.c 'alias'
 	mandelbulber2 $*
 }
@@ -163,11 +167,18 @@ fn upgrade {
 	.r 'remake'
 	sudo dnf upgrade -y --refresh
 }
-fn worms {
+%prewrap vars
+fn vars {|*|
+	.d 'List environment'
+	.c 'alias'
+	%_vars $* | less -RFXi
+}
+fn worms {|*|
 	.d 'Display worms'
+	.a '[worms_OPTIONS]'
 	.c 'alias'
 	%with-quit {
-		/usr/bin/worms -n 7 -d 50
+		/usr/bin/worms -n 7 -d 50 $*
 	}
 }
 fn zathura {|*|

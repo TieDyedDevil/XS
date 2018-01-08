@@ -39,14 +39,13 @@ fn vtfbfit {
 	.d 'Fit framebuffer to largest display'
 	.c 'framebuffer'
 	.r 'vtfhd vtqfhd vtqhd vtuwqhd vtuw-uxga vtwxga'
-	if {~ $TERM linux} {
-		let (best; hv) {
-			best = `{cat /sys/class/drm/*/modes \
-				|grep -Eo '[[:digit:]]+x[[:digit:]]+' \
-				|sort -gr|uniq|head -1}
-			echo Using $best
-			hv = `` x {echo -n $best}
-			.fbset $hv
-		}
-	} else {echo 'not a vt'}
+	%only-vt
+	let (best; hv) {
+		best = `{cat /sys/class/drm/*/modes \
+			|grep -Eo '[[:digit:]]+x[[:digit:]]+' \
+			|sort -gr|uniq|head -1}
+		echo Using $best
+		hv = `` x {echo -n $best}
+		.fbset $hv
+	}
 }

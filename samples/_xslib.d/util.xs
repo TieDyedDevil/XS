@@ -32,6 +32,12 @@ fn %unadvise {|name thunk|
 	}
 }
 
+fn %prewrap {|name|
+	# Capture the original function as %_NAME.
+	# Use this to wrap a function.
+	~ $(fn-%_^$name) () && fn-%_^$name = $(fn-$name)
+}
+
 fn %max {|*|
 	# Return the largest of a list.
 	let (f; (m r) = $*) {
@@ -542,5 +548,46 @@ fn %view-with-header {|count file title|
 		tput sc
 		tput csr 0 `{tput lines}
 		tput rc
+	}
+}
+
+fn %cfn {|test name thunk|
+	# When test is true, define function.
+	if $test {fn $name $thunk}
+}
+
+fn %have {|pgm|
+	# Return true when pgm is on $PATH.
+	which $pgm > /dev/null >[2=1]
+}
+
+fn %running {|*|
+	# Return true when process is running.
+	# Accepts pgrep options.
+	pgrep -c $* >/dev/null
+}
+
+fn %only-X {
+	# Throw an error if not running under X.
+	~ $DISPLAY () && throw error %only-X 'Only under X'
+}
+
+fn %only-vt {
+	# Throw an error if not running on a virtual terminal.
+	~ `consoletype vt || throw error %only-vt 'Only in vt'
+}
+
+fn %strip-csi {
+	# Filter strips ANSI CSI sequences.
+	sed 's/\x1B\[[0-9;]*[a-zA-Z]//g'
+}
+
+fn %ext {|*|
+	# Extract extension from path.
+	let (x = $*) {
+		while {~ $x *.*} {
+			(_ x) = <= {~~ $x *.*}
+		}
+		result $x
 	}
 }

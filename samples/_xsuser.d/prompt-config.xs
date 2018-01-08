@@ -149,6 +149,10 @@
 #    1⁘
 #    2⁙
 #    1⁘
+%aset pr 36 \u2a15 \u2a16
+#    1⨕
+#    2⨖
+#    1⨕
 
 # Mark the largest index that'll work in a pty.
-%aset pr pmax 35
+%aset pr pmax 36

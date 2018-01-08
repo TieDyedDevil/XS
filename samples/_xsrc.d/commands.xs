@@ -666,9 +666,8 @@ fn vman {|*|
 	.d 'View man page'
 	.a '[man_OPTS] PAGE'
 	.c 'system'
-	if {~ $DISPLAY ()} {
-		throw error vman 'X only'
-	} else if {~ $#* 0} {
+	%only-X
+	if {~ $#* 0} {
 		.usage vman
 	} else {
 		%with-tempfile f {
@@ -682,49 +681,46 @@ fn wallpaper {|*|
 	.a '[-m MONITOR] DELAY_MINUTES DIRECTORY'
 	.a '(none)  # restore root window'
 	.c 'system'
-	if {~ $DISPLAY ()} {
-		throw error wallpaper 'X only'
-	} else {
-		local (pageopt = $pageopt) {
-			let (geom; mon; monopt = '') {
-				if {~ $*(1) -m} {
-					mon = $*(2)
-					monopt = $*(1 2); monopt = $^monopt
-					* = $*(3 ...)
-					geom = `{grep \^$mon <{xrandr}| \
-						cut -d' ' -f3}
-				}
-				!~ $geom () && pageopt = -page $geom
-				switch $#* (
-				1 {	let (f) {
-						access -f $* && f = $*
-						access -d $* && wallpaper \
-							`{find -L $* \
-							\( -name '*.jpg' \
-							-o -name '*.png' \) \
-							|shuf|head -1}
-						!~ $f () && {
-							display -window root \
-								$pageopt $f
-						}
-					}
-				}
-				2 {	let (m = $*(1); d = $*(2); \
-						p = 'while true {wallpaper '; \
-						f = 'while true \{wallpaper') {
-						access -d $d && {
-							pkill -f $f
-							setsid xs -c \
-							$p^$monopt^' ' \
-							^$d^'; sleep ' \
-							^`($m*60)^'}' &
-						}
-					}
-				}
-				{	pkill -f 'while true \{wallpaper'
-					xsetroot -solid 'Slate Gray'
-				})
+	%only-X
+	local (pageopt = $pageopt) {
+		let (geom; mon; monopt = '') {
+			if {~ $*(1) -m} {
+				mon = $*(2)
+				monopt = $*(1 2); monopt = $^monopt
+				* = $*(3 ...)
+				geom = `{grep \^$mon <{xrandr}| \
+					cut -d' ' -f3}
 			}
+			!~ $geom () && pageopt = -page $geom
+			switch $#* (
+			1 {	let (f) {
+					access -f $* && f = $*
+					access -d $* && wallpaper \
+						`{find -L $* \
+						\( -name '*.jpg' \
+						-o -name '*.png' \) \
+						|shuf|head -1}
+					!~ $f () && {
+						display -window root \
+							$pageopt $f
+					}
+				}
+			}
+			2 {	let (m = $*(1); d = $*(2); \
+					p = 'while true {wallpaper '; \
+					f = 'while true \{wallpaper') {
+					access -d $d && {
+						pkill -f $f
+						setsid xs -c \
+						$p^$monopt^' ' \
+						^$d^'; sleep ' \
+						^`($m*60)^'}' &
+					}
+				}
+			}
+			{	pkill -f 'while true \{wallpaper'
+				xsetroot -solid 'Slate Gray'
+			})
 		}
 	}
 }
@@ -733,14 +729,6 @@ fn where {
 	.c 'system'
 	printf '%s@%s[%s;%d]:%s'\n \
 		$USER `{hostname -s} <={~~ `tty /dev/*} $pid `pwd
-}
-fn xaos {|*|
-	.d 'Fractal explorer'
-	.c 'system'
-	let (dr) {
-		if {~ $DISPLAY ()} {dr = aa} else {dr = 'GTK+ Driver'}
-		/usr/bin/xaos -driver $dr $*
-	}
 }
 fn xcolors {|*|
 	.d 'Display X11 colors with RGB values and names'
