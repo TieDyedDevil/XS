@@ -38,6 +38,14 @@ fn d {
 	.c 'alias'
 	date; date -u
 }
+fn iotop {|*|
+	.c 'alias'
+	sudo /usr/sbin/iotop $*
+}
+fn iptraf-ng {|*|
+	.c 'alias'
+	sudo /usr/sbin/iptraf-ng $*
+}
 fn la {|*|
 	.c 'alias'
 	.r 'll ls lt'
@@ -88,6 +96,10 @@ fn mutt {|*|
 	# mutt won't override st colors
 	env TERM=st /usr/bin/mutt $*
 }
+fn nethogs {|*|
+	.c 'alias'
+	sudo /usr/sbin/nethogs $*
+}
 fn on {
 	.d 'List console logins'
 	.c 'alias'
@@ -101,6 +113,10 @@ fn p {
 	.d 'Pulse Audio mixer'
 	.c 'alias'
 	pamixer
+}
+fn powertop {|*|
+	.c 'alias'
+	sudo /usr/sbin/powertop $*
 }
 fn remake {
 	.d 'Remake K source projects as needed'
@@ -124,6 +140,10 @@ fn sysmon {
 	.d 'View Monitorix stats'
 	.c 'alias'
 	web http://localhost:8080/monitorix
+}
+fn tiptop {|*|
+	.c 'alias'
+	sudo /usr/bin/tiptop $*
 }
 fn topc {
 	.d 'List top %CPU processes'
@@ -172,6 +192,10 @@ fn vars {|*|
 	.d 'List environment'
 	.c 'alias'
 	%_vars $* | less -RFXi
+}
+fn wavemon {|*|
+	.c 'alias'
+	sudo /usr/bin/wavemon $*
 }
 fn worms {|*|
 	.d 'Display worms'
