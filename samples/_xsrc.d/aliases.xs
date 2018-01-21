@@ -38,6 +38,10 @@ fn d {
 	.c 'alias'
 	date; date -u
 }
+fn hc {|*|
+	.c 'alias'
+	herbstclient $*
+}
 fn iotop {|*|
 	.c 'alias'
 	sudo /usr/sbin/iotop $*
@@ -90,6 +94,10 @@ fn lt {|*|
 %cfn {%have mandelbulber2} mb2 {|*|
 	.c 'alias'
 	mandelbulber2 $*
+}
+fn mons {
+	.c 'alias'
+	herbstclient list_monitors
 }
 fn mutt {|*|
 	.c 'alias'
@@ -196,6 +204,11 @@ fn vars {|*|
 fn wavemon {|*|
 	.c 'alias'
 	sudo /usr/bin/wavemon $*
+}
+fn wmb {
+	.d 'List WM bindings'
+	.c 'alias'
+	herbstclient list_keybinds|column -t|less -FXSi
 }
 fn worms {|*|
 	.d 'Display worms'

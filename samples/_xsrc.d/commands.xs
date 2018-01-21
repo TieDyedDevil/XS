@@ -305,22 +305,6 @@ fn mdv {|*|
 			-no-proxy -o confirm_qq=0 -o document_root=`pwd
 	}
 }
-fn mons {
-	.d 'List attached monitors recognized by bspwm'
-	.c 'system'
-	printf Name\t\t\ \ \ \ Size\t\tResolution\tGeometry\n
-	printf ----\t----------------------------\t----------\t--------\n
-	grep -f <{map {|*| echo \^$*} `{bspc query -M --names}} <{xrandr} \
-		|sed 's/ \(dis\)\?connected / /'|sed 's/ (.*) / /' \
-		|sed 's/\([0-9]\+\)mm x \([0-9]\+\)mm/\1x\2/' \
-		|awk '{printf("%s\t%8s mm\t%4.1fx%4.1f in\t%5.0f PPI\t%s\n", ' \
-			^'$1, $3, ' \
-			^'gensub(/^([^x]+).*$/, "\\1", "g", $3) / 25.4, ' \
-			^'gensub(/^.*x([^x]+).*$/, "\\1", "g", $3) / 25.4, ' \
-			^'$3 == "0x0" ? 0 : ' \
-			^'gensub(/^([^x]+).*$/, "\\1", "g", $2) /' \
-			^' gensub(/^([^x]+).*$/, "\\1", "g", $3) * 25.4, $2)}'
-}
 fn name {|*|
 	.d 'Set prompt text and terminal title.'
 	.a '[NAME]'
@@ -362,33 +346,6 @@ fn noise {|*|
 			printf \n
 		}
 	}
-}
-fn o {
-	.d 'List open windows per desktop'
-	.c 'system'
-	for d `{bspc query -D} {
-		let (wl = `{bspc query -N -n .window -d $d}; vf; ti; \
-				ff = `{bspc query -N -n focused}; mw; \
-				fd = `{bspc query -D -d focused}; md) {
-			if {!~ $wl ()} {
-				if {~ $d $fd} {md = ' .'} else {md = '  '}
-				printf 'Desktop %s%s'\n \
-					`{bspc query -D -d $d --names} $md
-				for w $wl {
-					if {~ `{bspc query -N -n $w^.hidden} \
-						()} {
-							vf = visible
-						} else {
-							vf = hidden\ 
-						}
-					if {~ $w $ff} {mw = .} else {mw = \ }
-					ti = <={%argify `{xtitle $w}}
-					printf '%c  [%s %s]'\t'%s'\n \
-						$mw $vf $w $ti
-				}
-			}
-		}
-	} | less -iFX
 }
 fn objs {|*|
 	.d 'List object variables'
@@ -572,21 +529,6 @@ fn startwm {
 		throw error startwm 'run from console'
 	} else {
 		cd; exec startx -- -logverbose 0 >~/.startx.log >[2=1]
-	}
-}
-fn swapm {
-	.d 'Exchange positions of monitors'
-	.c 'system'
-	let ((m1 m2) = `{
-		grep -f <{map {|*| echo \^$*} `{bspc query -M --names}} \
-			<{xrandr} \
-			|sed 's/ \(dis\)\?connected / /'|sed 's/ (.*) / /' \
-			|awk '{printf("%s\t%s\n", $1, $2)}' \
-			|sort -n -t+ -k2|cut -f1}) {
-			!~ $m2 () && {
-				xrandr --output $m2 --left-of $m1
-				echo $m2 $m1
-			}
 	}
 }
 fn thermal {
