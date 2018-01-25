@@ -369,7 +369,8 @@ fn oc {
 	.c 'system'
 	%with-quit {
 		%without-cursor {
-			watch -t -n 1 -p banner \`date +%A%n%T%n%x\`
+			watch -t -n 1 -p -c banner \\' '^\`date +%T\`\; \
+							cal -n 3 --color=always
 		}
 	}
 }

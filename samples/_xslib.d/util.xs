@@ -591,3 +591,16 @@ fn %ext {|*|
 		result $x
 	}
 }
+
+fn %prefixes {|word min|
+	# Return all prefixes of word.
+	# If specified, min is length of shortest prefix.
+	let (r; i = $min; l = <={$&len $word}) {
+		~ $i () && i = 1
+		while {$i :le $l} {
+			r = $r `{echo $word|cut -c 1-$i}
+			i = `($i+1)
+		}
+		result $r
+	}
+}
