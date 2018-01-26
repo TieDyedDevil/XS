@@ -52,11 +52,6 @@ fn meson-help {
 	.r 'ninja-help'
 	web http://mesonbuild.com/
 }
-fn newlisp-help {
-	.d 'newLISP documentation'
-	.c 'help'
-	web /usr/share/doc/newlisp/newlisp_manual.html
-}
 fn ninja-help {
 	.d 'ninja documentation'
 	.c 'help'

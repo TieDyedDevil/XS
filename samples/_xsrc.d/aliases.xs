@@ -95,10 +95,6 @@ fn lt {|*|
 	.c 'alias'
 	mandelbulber2 $*
 }
-fn mons {
-	.c 'alias'
-	herbstclient list_monitors
-}
 fn mutt {|*|
 	.c 'alias'
 	# mutt won't override st colors

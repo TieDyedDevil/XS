@@ -120,6 +120,39 @@ fn doc {|*|
 		}
 	}
 }
+fn em {|*|
+	.d 'Enable one monitor'
+	.a '[external|internal]  # first and second in xrandr list'
+	.a '(none) # first in xrandr list'
+	.c 'system'
+	%only-X
+	let (i; hc = herbstclient; \
+		mnl = `{xrandr|grep '^[^ ]\+ connected' \
+			|cut -d' ' -f1}) {
+		i = 0
+		for m $mnl {
+			if {xrandr|grep -q '^'^$m^' .*[^ ]\+ x [^ ]\+$'} {
+				hc rename_monitor $i '' >[2]/dev/null
+			}
+			i = `($i+1)
+		}
+		hc lock
+		if {~ $* <={%prefixes external}} {
+			xrandr --output $mnl(1) --off \
+				--output $mnl(2) --auto --primary
+			hc rename_monitor 0 $mnl(2)
+		} else {
+			xrandr --output $mnl(1) --auto --primary \
+				--output $mnl(2) --off
+			hc rename_monitor 0 $mnl(1)
+		}
+		hc reload
+		hc unlock
+	}
+	# Since we've changed monitor size, remove wallpaper.
+	pkill -f 'while true \{wallpaper'
+	xsetroot -solid 'Slate Gray'
+}
 fn import-abook {|*|
 	.d 'Import vcard to abook'
 	.a 'VCARD_FILE'
@@ -303,6 +336,29 @@ fn mdv {|*|
 	} else {
 		markdown -f fencedcode $* | w3m -X -T text/html -no-mouse \
 			-no-proxy -o confirm_qq=0 -o document_root=`pwd
+	}
+}
+fn mons {
+	.d 'List active monitors'
+	.c 'system'
+	%only-X
+	let (i; hc = herbstclient; \
+		mnl = `{xrandr|grep '^[^ ]\+ connected .* [^ ]\+ x [^ ]\+$' \
+			|cut -d' ' -f1}) {
+		i = 0
+		for m $mnl {
+			hc rename_monitor $i ''
+			hc rename_monitor $i $m
+			i = `($i+1)
+		}
+		for m $mnl {
+			join -1 7 -o1.1,1.2,2.2,1.3,1.4,1.5,1.6,1.7,1.8 \
+				<{hc list_monitors|grep "$m"} \
+				<{printf "%s"\ %s\n $m <={%argify \
+					`{xrandr|grep \^^$m^' ' \
+						|grep -o '[^ ]\+ x [^ ]\+$' \
+						|tr -d ' '}}}
+		}
 	}
 }
 fn name {|*|
