@@ -342,7 +342,7 @@ fn mons {
 	.d 'List active monitors'
 	.c 'system'
 	%only-X
-	let (i; hc = herbstclient; \
+	let (i; hc = herbstclient; size; w; h; diag; _; \
 		mnl = `{xrandr|grep '^[^ ]\+ connected .* [^ ]\+ x [^ ]\+$' \
 			|cut -d' ' -f1}) {
 		i = 0
@@ -352,12 +352,15 @@ fn mons {
 			i = `($i+1)
 		}
 		for m $mnl {
-			join -1 7 -o1.1,1.2,2.2,1.3,1.4,1.5,1.6,1.7,1.8 \
-				<{hc list_monitors|grep "$m"} \
-				<{printf "%s"\ %s\n $m <={%argify \
-					`{xrandr|grep \^^$m^' ' \
+			size = <={%argify `{xrandr|grep \^^$m^' ' \
 						|grep -o '[^ ]\+ x [^ ]\+$' \
-						|tr -d ' '}}}
+						|tr -d ' '}}
+			(w h) = <={~~ $size *mmx*mm}
+			diag = `{nickle -e 'sqrt('^$w^'**2+'^$h^'**2)/25.4'}
+			(diag _) = <={~~ $diag *.*}
+			join -1 7 -o1.1,1.2,2.2,2.3,1.3,1.4,1.5,1.6,1.7,1.8 \
+				<{hc list_monitors|grep "$m"} \
+				<{printf "%s"\ %s\ \(%s"\)\n $m $size $diag}
 		}
 	}
 }
