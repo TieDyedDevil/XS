@@ -361,7 +361,7 @@ fn mons {
 			join -1 7 -o1.1,1.2,2.2,2.3,1.3,1.4,1.5,1.6,1.7,1.8 \
 				<{hc list_monitors|grep "$m"} \
 				<{printf "%s"\ %s\ \(%s"\)\n $m $size $diag}
-		}
+		} | column -t
 	}
 }
 fn name {|*|
