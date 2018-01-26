@@ -138,7 +138,6 @@ fn @clean {
 					&& {!access -s `{@substring $f 1}} && {
 				unwind-protect {
 					. ./$f
-					kill $_W >[2]/dev/null
 					rm -f $_X $_Y $_Z
 				} {
 					rm $f
@@ -195,7 +194,6 @@ fn @write_metadata {
 	echo '_2 = '`{echo $MOD|sed 's/\\/\\\\/'|sed 's/\^/\\^/'}
 	echo '_3 = '$SCROLL
 	echo '_4 = '`{echo $DET|sed 's/\\/\\\\/'|sed 's/\^/\\^/'}
-	echo '_W = '$STATUS_UPDATER_PID
 	echo '_X = '$DVTM_STATUS_UPDATER
 	echo '_Y = '$S_FIFO
 	echo '_Z = '$C_FIFO
@@ -233,6 +231,17 @@ fn @rewrite_abduco_message {|*|
 	sed 's/^abduco/tsm/'
 }
 
+fn @stop_status_updater {
+	pkill -f '.*xs '^$DVTM_STATUS_UPDATER
+}
+
+fn @restart_status_updater {
+	. $HOME/.abduco/.^$SESSION^@`{hostname -s}
+	DVTM_STATUS_UPDATER = $_X
+	(_1 _2 _3 _4 _X _Y _Z) =
+	setsid >/dev/null >[2=1] xs $DVTM_STATUS_UPDATER &
+}
+
 fn @make_session {|*|
 	{~ $FLAG -c} && @prevent_nesting
 	{result <=@session_exists} && {@fail $SESSION exists}
@@ -262,11 +271,11 @@ while true {
 }
 EOF
 	setsid >/dev/null >[2=1] xs $DVTM_STATUS_UPDATER &
-	STATUS_UPDATER_PID = $apid
 	@write_metadata
 	abduco -e $DET $FLAG $SESSION \
 		dvtm -M -c $C_FIFO -s $S_FIFO -m $MOD -h $SCROLL $* \
 		|[2] @rewrite_abduco_message
+	@stop_status_updater
 	tput cnorm
 }
 
@@ -275,7 +284,9 @@ fn @attach_session {
 	{result <=@session_exists} || @fail $SESSION does not exist
 	@clean
 	@update_metadata
-	abduco -e $DET -a $SESSION |[2] @rewrite_abduco_message
+	@restart_status_updater
+	abduco -e $DET -a $SESSION |[3] @rewrite_abduco_message
+	@stop_status_updater
 	tput cnorm
 }
 
