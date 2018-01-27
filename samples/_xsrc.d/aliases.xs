@@ -38,10 +38,6 @@ fn d {
 	.c 'alias'
 	date; date -u
 }
-fn hc {|*|
-	.c 'alias'
-	herbstclient $*
-}
 fn iotop {|*|
 	.c 'alias'
 	sudo /usr/sbin/iotop $*
@@ -194,11 +190,6 @@ fn vars {|*|
 fn wavemon {|*|
 	.c 'alias'
 	sudo /usr/bin/wavemon $*
-}
-fn wmb {
-	.d 'List WM bindings'
-	.c 'alias'
-	herbstclient list_keybinds|column -t|less -FXSi
 }
 fn worms {|*|
 	.d 'Display worms'
