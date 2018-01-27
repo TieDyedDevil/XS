@@ -40,7 +40,7 @@ fn mons {
 	.d 'List active monitors'
 	.c 'system'
 	%only-X
-	let (i; hc = herbstclient; xrinfo; size; w; h; diag; _; xres; dpi; \
+	let (i; hc = herbstclient; xrinfo; size; w; h; diag; f; _; xres; dpi; \
 		mnl = `{xrandr|grep '^[^ ]\+ connected .* [^ ]\+ x [^ ]\+$' \
 			|cut -d' ' -f1}) {
 		i = 0
@@ -55,8 +55,11 @@ fn mons {
 						|grep -o '[^ ]\+ x [^ ]\+$' \
 						|tr -d ' '}}
 			(w h) = <={~~ $size *mmx*mm}
-			diag = `{nickle -e 'sqrt('^$w^'**2+'^$h^'**2)/25.4'}
-			(diag _) = <={~~ $diag *.*}
+			# 0 .. 0.3999... truncates
+			# 0.4?... .. 0.9?... is ½
+			diag = `{nickle -e 'sqrt('^$w^'**2+'^$h^'**2)/25.4+.1'}
+			(diag f) = <={~~ $diag *.*}
+			{~ $f 5* 6* 7* 8*} && diag = `{printf %s%s $diag ½}
 			xres = `{echo $xrinfo|grep -o '^[^ ]\+ .* [0-9]\+x'}
 			xres = <={~~ $xres *x}
 			dpi = `(25.4*$xres/$w)
