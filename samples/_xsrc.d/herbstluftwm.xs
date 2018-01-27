@@ -64,11 +64,12 @@ fn mons {
 			xres = <={~~ $xres *x}
 			dpi = `(25.4*$xres/$w)
 			(dpi _) = <={~~ $dpi *.*}
-			join -1 7 -o1.1,1.2,2.2,2.3,1.4,1.5,1.6,1.7,1.8 \
+			join -1 7 -o1.1,1.7,1.2,2.2,2.3,1.4,1.5,1.8 \
 				<{hc list_monitors|grep "$m"} \
 				<{printf "%s"\ %s\ \(%s"\;%dppi\)\n \
 					$m $size $diag $dpi}
-		} | column -t
+		} | sed 's/"\([^"]\+\)"/\1/' | sed 's/",/"/' \
+			| sed 's/tag\s/tag:/' | column -t
 	}
 }
 fn wmb {
