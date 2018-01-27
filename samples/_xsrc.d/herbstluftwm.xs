@@ -68,8 +68,11 @@ fn mons {
 				<{hc list_monitors|grep "$m"} \
 				<{printf "%s"\ %s\ \(%s"\;%dppi\)\n \
 					$m $size $diag $dpi}
-		} | sed 's/"\([^"]\+\)"/\1/' | sed 's/",/"/' \
-			| sed 's/tag\s/tag:/' | column -t
+		} | sed 's/"\([^"]\+\)"/\1/' \
+			| sed 's/",/"/' \
+			| sed 's/tag\s/tag:/' \
+			| sed 's/\[FOCUS\]/🖵/' \
+			| column -t
 	}
 }
 fn wmb {
