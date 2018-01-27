@@ -604,3 +604,14 @@ fn %prefixes {|word min|
 		result $r
 	}
 }
+
+fn %trunc {|float|
+	# Truncate a floating point number.
+	let ((i f) = <={~~ $float *.*}) {result $i}
+}
+
+fn %round {|float|
+	# Round a floating point number.
+	# ½ rounds up.
+	result <={%trunc `($float+.5)}
+}
