@@ -66,10 +66,12 @@ fn mons {
 			(dpi _) = <={~~ $dpi *.*}
 			join -1 7 -o1.1,1.7,1.2,2.2,2.3,1.4,1.5,1.8 \
 				<{hc list_monitors|grep "$m"} \
-				<{printf "%s"\ %s\ \(%s"\;%dppi\)\n \
+				<{printf "%s"\ %s\ %s"\;%dppi\n \
 					$m $size $diag $dpi}
-		} | sed 's/"\([^"]\+\)"/\1/' \
+		} \
+			| awk '{sub(/^.:/, sprintf("%c", 0x2460+$1)); print}' \
 			| sed 's/",/"/' \
+			| sed 's/"\([^" ]\+\)"/\1/g' \
 			| sed 's/tag\s/tag:/' \
 			| sed 's/\[FOCUS\]/🖵/' \
 			| column -t
