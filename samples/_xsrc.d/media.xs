@@ -36,7 +36,7 @@ fn grayview {|*|
 	let (tf; _; ext) {
 		for f $* {
 			unwind-protect {
-				ext = <={%ext $f}
+				(_ ext) = <={~~ $f *.*}
 				tf = `mktemp^.$ext
 				convert $f -type grayscale $tf
 				image $tf

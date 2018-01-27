@@ -129,6 +129,7 @@ fn em {|*|
 	let (i; hc = herbstclient; \
 		mnl = `{xrandr|grep '^[^ ]\+ connected' \
 			|cut -d' ' -f1}) {
+		if {~ $#mnl 1} {throw error em 'One monitor'}
 		i = 0
 		for m $mnl {
 			if {xrandr|grep -q '^'^$m^' .*[^ ]\+ x [^ ]\+$'} {
@@ -342,7 +343,7 @@ fn mons {
 	.d 'List active monitors'
 	.c 'system'
 	%only-X
-	let (i; hc = herbstclient; size; w; h; diag; _; \
+	let (i; hc = herbstclient; xrinfo; size; w; h; diag; _; xres; dpi; \
 		mnl = `{xrandr|grep '^[^ ]\+ connected .* [^ ]\+ x [^ ]\+$' \
 			|cut -d' ' -f1}) {
 		i = 0
@@ -352,15 +353,21 @@ fn mons {
 			i = `($i+1)
 		}
 		for m $mnl {
-			size = <={%argify `{xrandr|grep \^^$m^' ' \
+			xrinfo = `{xrandr|grep \^^$m^' '}
+			size = <={%argify `{echo $xrinfo \
 						|grep -o '[^ ]\+ x [^ ]\+$' \
 						|tr -d ' '}}
 			(w h) = <={~~ $size *mmx*mm}
 			diag = `{nickle -e 'sqrt('^$w^'**2+'^$h^'**2)/25.4'}
 			(diag _) = <={~~ $diag *.*}
+			xres = `{echo $xrinfo|grep -o '^[^ ]\+ .* [0-9]\+x'}
+			xres = <={~~ $xres *x}
+			dpi = `(25.4*$xres/$w)
+			(dpi _) = <={~~ $dpi *.*}
 			join -1 7 -o1.1,1.2,2.2,2.3,1.3,1.4,1.5,1.6,1.7,1.8 \
 				<{hc list_monitors|grep "$m"} \
-				<{printf "%s"\ %s\ \(%s"\)\n $m $size $diag}
+				<{printf "%s"\ %s\ \(%s"\;%ddpi\)\n \
+					$m $size $diag $dpi}
 		} | column -t
 	}
 }
