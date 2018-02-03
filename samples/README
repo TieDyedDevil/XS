@@ -1,7 +1,8 @@
 This directory contains a collection of `xs` scripts. Feel free to adopt or
 adapt these as needed, but be aware that not all of these scripts will be
 useful in all environments. In particular, the `daemons.xs` script is specific
-to the author's system and should be reworked or removed as needed.
+to the author's system and should be reworked or removed as needed. The
+herbstluftwm scripts assume the presence of that window manager.
 
 The _* files and directories should all be renamed, replacing the leading `_`
 with a `.`, and placed in your home directory.
@@ -11,16 +12,15 @@ $PATH.
 
 Overview
 --------
-	announce	Write to all $USER's ttys and ptys and OSD popup
-	colors		Display ANSI color pallette on terminal
-	histclean	Prune older entries from ~/.xshistory
-	lock		A smart wrapper around xlock
-	osd		Pop up a transient message via OSD
-	sv		Pre-validate sudo for long-running commands
-	tsm		Integrate dvtm and abduco
-	web-browser	Launch a web browser
-	_monitor	Daemon notifies user of system resouce issues
-	_xslib.d	Library of shared xs functions
-	_xsrc.d		Utility commands and definitions
-	_xsin		Startup file for interactive xs session
-	_xsrc		Startup file for login xs session
+	_config/herbstluftwm/	Configuration for the window manager
+	_xslib.d/		Library of shared xs functions
+	_xsrc.d/		Utility commands and definitions
+	_xsuser.d/		Scripts loaded for interactive shell
+	_xsin			Startup file for interactive xs session
+	_xsrc			Startup file for login xs session
+	colors			Display ANSI color pallette on terminal
+	histclean		Prune older entries from ~/.xshistory
+	lock			A smart wrapper around xlock
+	sv			Pre-validate sudo for long-running commands
+	tsm			Integrate dvtm and abduco
+	web-browser		Launch a web browser

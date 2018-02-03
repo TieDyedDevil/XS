@@ -8,5 +8,4 @@ if {~ $SSH_TTY ()} {
 		rm -f ~/.mpd/mpd.log
 		mpd
 	}
-	~/.monitor/monitor
 }

@@ -1,2 +1,0 @@
-OSD_PIPE = /tmp/^$USER^-osd
-access -p $OSD_PIPE || mkfifo -m 600 $OSD_PIPE

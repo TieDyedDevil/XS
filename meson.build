@@ -55,35 +55,28 @@ project('xs', ['cpp'])
 	install: true)
   install_man(['man/xs.1'])
   install_data(['doc/AUTHORS', 'doc/CHANGES', 'doc/COPYING', 'doc/GOTCHAS',
-		'INSTALL', 'doc/NOTES', 'doc/PHILOSOPHY', 'README',
-		'doc/SYSTEMD_LOCALE', 'doc/TODO', 'doc/TUTORIAL.md',
+		'INSTALL', 'doc/NOTES', 'doc/PHILOSOPHY', 'doc/PROJECTS',
+		'README', 'doc/SYSTEMD_LOCALE', 'doc/TODO', 'doc/TUTORIAL.md',
 		'doc/XS-FOR-LISPERS'],
 	install_dir: 'share/doc/xs')
-  install_data(['samples/_xsrc', 'samples/_xsin', 'samples/announce',
-		'samples/colors', 'samples/histclean', 'samples/lock',
-		'samples/osd', 'samples/sv', 'samples/tsm',
-		'samples/web-browser', 'samples/README'],
-	install_dir: 'share/doc/xs/samples')
-  install_data(['samples/_xsrc.d/aliases.xs', 'samples/_xsrc.d/annotate.xs',
-		'samples/_xsrc.d/commands.xs', 'samples/_xsrc.d/console.xs',
-		'samples/_xsrc.d/env.xs', 'samples/_xsrc.d/help.xs',
-		'samples/_xsrc.d/media.xs',
-		'samples/_xsrc.d/prompt.xs', 'samples/_xsrc.d/web.xs'],
-	install_dir: 'share/doc/xs/samples/_xsrc.d')
+  install_data(['samples/_config/herbstluftwm/autostart',
+		'samples/_config/herbstluftwm/panel.xs'],
+	install_dir: 'share/doc/xs/samples/_config/herbstluftwm')
   install_data(['samples/_xslib.d/attr.xs', 'samples/_xslib.d/subs.xs',
 		'samples/_xslib.d/util.xs'],
 	install_dir: 'share/doc/xs/samples/_xslib.d')
+  install_data(['samples/_xsrc.d/aliases.xs', 'samples/_xsrc.d/annotate.xs',
+		'samples/_xsrc.d/commands.xs', 'samples/_xsrc.d/console.xs',
+		'samples/_xsrc.d/env.xs', 'samples/_xsrc.d/help.xs',
+		'samples/_xsrc.d/herbstluftwm.xs', 'samples/_xsrc.d/media.xs',
+		'samples/_xsrc.d/prompt.xs', 'samples/_xsrc.d/web.xs'],
+	install_dir: 'share/doc/xs/samples/_xsrc.d')
   install_data(['samples/_xsuser.d/prompt-config.xs'],
 	install_dir: 'share/doc/xs/samples/_xsuser.d')
-  install_data(['samples/_monitor/common', 'samples/_monitor/monitor',
-		'samples/_monitor/osd', 'samples/_monitor/osd_pipe'],
-	install_dir: 'share/doc/xs/samples/_monitor')
-  install_data(['samples/_monitor/monitors/battery',
-		'samples/_monitor/monitors/disk',
-		'samples/_monitor/monitors/fan',
-		'samples/_monitor/monitors/swap',
-		'samples/_monitor/monitors/temperature'],
-	install_dir: 'share/doc/xs/samples/_monitor/monitors')
+  install_data(['samples/_xsin', 'samples/_xsrc', 'samples/colors',
+		'samples/histclean', 'samples/lock', 'samples/sv',
+		'samples/tsm', 'samples/web-browser', 'samples/README'],
+	install_dir: 'share/doc/xs/samples')
 
 run_target('check',
 	command: ['./build/xs', '-c', './tests/xs_tests.xs'],
