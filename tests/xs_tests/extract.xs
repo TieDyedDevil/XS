@@ -1,17 +1,17 @@
 run 'extract null subject and pattern' {
-    v = <={~~ () ()}
+    echo -n <={%count <={~~ () ()}}
 }
-conds { ~ $#v 0 }
+conds { match-abs 0 }
 
 run 'extract null pattern' {
-    v = <={~~ word ()}
+    echo -n <={%count <={~~ word ()}}
 }
-conds { ~ $#v 0 }
+conds { match-abs 0 }
 
 run 'extract ? mismatch' {
-    v = <={~~ word ?}
+    echo -n <={%count <={~~ word ?}}
 }
-conds { ~ $#v 0 }
+conds { match-abs 0 }
 
 run 'extract ? match' {
     echo -n <={~~ a ?}
@@ -29,14 +29,14 @@ run 'extract [] match' {
 conds { match-abs a }
 
 run 'extract [] mismatch' {
-    echo -n <={~~ b [ac]}
+    echo -n <={%count <={~~ b [ac]}}
 }
-conds { ~ $#v 0 }
+conds { match-abs 0 }
 
 run 'extract multiple ? patterns, no match' {
-    v = <={~~ f ?? ???}
+    echo -n <={%count <={~~ f ?? ???}}
 }
-conds { ~ $#v 0 }
+conds { match-abs 0 }
 
 run 'extract multiple ? patterns, match' {
     echo -n <={~~ f ?? ? ???}
@@ -44,9 +44,9 @@ run 'extract multiple ? patterns, match' {
 conds { match-abs f }
 
 run 'extract multiple * patterns, no match' {
-    v = <={~~ abcd *x x* *x*}
+    echo -n <={%count <={~~ abcd *x x* *x*}}
 }
-conds { ~ $#v 0 }
+conds { match-abs 0 }
 
 run 'extract multiple * patterns, one match, one result' {
     echo -n <={~~ abcd *x x* a* *x*}
@@ -59,9 +59,9 @@ run 'extract multiple * patterns, one match, mult results' {
 conds { match-abs ab d }
 
 run 'extract multiple [] patterns, no match' {
-    v = <={~~ abcd abc[xy] ab[xy]d}
+    echo -n <={%count <={~~ abcd abc[xy] ab[xy]d}}
 }
-conds { ~ $#v 0 }
+conds { match-abs 0 }
 
 run 'extract multiple [] patterns, one match, one result' {
     echo -n <={~~ abyd abc[xy] ab[xy]d}
@@ -74,9 +74,9 @@ run 'extract multiple [] patterns, one match, mult results' {
 conds { match-abs b y }
 
 run 'extract multiple subjects, no match' {
-    v = <={~~ (foo8 bar9 bazzle) *x*}
+    echo -n <={%count <={~~ (foo8 bar9 bazzle) *x*}}
 }
-conds { ~ $#v 0 }
+conds { match-abs 0 }
 
 run 'extract multiple subjects, one match' {
     echo -n <={~~ (foo8 bar9 bazzle) baz*}
