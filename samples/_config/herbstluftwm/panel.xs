@@ -284,7 +284,8 @@ TEMPERATURE_THRESHOLD = <={get_setpoint \
 FAN_THRESHOLD = <={get_setpoint $fan_margin_desktop_C $fan_margin_mobile_C}
 
 fn get_curtemp {
-	result `{sensors|grep Package\\\|Physical|cut -d: -f2|cut -d\. -f1}
+	result `{sensors|grep Package\\\|Physical \
+			|cut -d: -f2|cut -d\. -f1|tr -d ' +'}
 }
 
 fn fan () {
