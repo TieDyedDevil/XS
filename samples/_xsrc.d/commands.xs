@@ -33,6 +33,12 @@ fn battery {
 		!~ $curr 0 && printf '%.1f%%'\n `(100.0*$curr/$full)
 	}
 }
+fn boc {|*|
+	.d 'Bell on completion'
+	.a 'COMMAND'
+	.c 'system'
+	unwind-protect {$*} {printf %c \a}
+}
 fn cookie {
 	.d 'Fortune'
 	.c 'system'
