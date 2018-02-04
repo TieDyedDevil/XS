@@ -456,7 +456,7 @@ fn drawright {|text|
 	}
 }
 
-# Kill prior incarnation's processes that may have been orphaned
+# Kill prior incarnation's processes and fifos that avoided assassination
 taskfile = /tmp/panel-^$monitor^-tasks
 for (task pid) `{access -f $taskfile && cat $taskfile} {
 	if {kill -0 $pid >[2]/dev/null} {
@@ -465,6 +465,14 @@ for (task pid) `{access -f $taskfile && cat $taskfile} {
 	}
 }
 echo $taskpids >$taskfile
+fifofile = /tmp/panel-^$monitor^-fifos
+for fifo `{access -f $fifofile && cat $fifofile} {
+	if {access $fifo} {
+		logger 'cleanup fifo %s' $fifo
+		rm -f $fifo
+	}
+}
+echo $fifo $trigger $osdmsg >$fifofile
 
 # Process events
 fn terminate {
