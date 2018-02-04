@@ -39,16 +39,18 @@
 # ========================================================================
 #                      C O N F I G U R A T I O N
 
-panel_height = 22
+panel_height_px = 22
 # Setting the light-off string to a character
 # might be desirable with a monospaced font.
 _a = ''  # alert light
 _s = ''  # status light
-panel_font = 'NotoSans-12'         # X or Xft
+panel_font = 'NotoSans-12'         # XLFD or Xft
 clockfmt = '%a %Y-%m-%d %H:%M %Z'  # date(1)
 trackfmt = '%title%'               # mpc(1)
 
-osd_font = '-*-liberation mono-bold-r-*-*-*-420-*-*-*-*-iso10646-1'  # X
+osd_font = '-*-liberation mono-bold-r-*-*-*-420-*-*-*-*-iso10646-1'  # XLFD
+osd_offset_px = 50
+osd_dwell_s = 3
 
 battery_low_% = 10
 battery_critical_% = 5
@@ -67,6 +69,7 @@ enable_network_status = true
 enable_other_status = true
 enable_cpubar = true
 
+# If true, write startup information and main-loop errors to stderr
 debug = false
 
 # ========================================================================
@@ -132,14 +135,16 @@ alert_marker_attr = `{attr $alrbg $sepfg}
 alert_indicator_attr = `{attr $alrbg $alrfg}
 separator_attr = `{attr $sepbg $sepfg}
 
-dzopts = -w $panel_width -x $x -y $y -fn $panel_font -h $panel_height \
-	-ta l -bg $bgcolor -fg $fgcolor
+dzen2_opts = -w $panel_width -x $x -y $y -h $panel_height_px \
+	-ta l -bg $bgcolor -fg $fgcolor -fn $panel_font
 
-cpuopts = -h `($panel_height/2) -fg $cpubar_meter -bg $cpubar_background \
+dzen2_gcpubar_opts = -h `($panel_height_px/2) \
+	-fg $cpubar_meter -bg $cpubar_background \
 	-i 0.7
 
-osdopts = -f $osd_font -i `($x+30) -o `($y+30+$panel_height) \
-	-s 5 -c $alrfg -d 3
+osd_cat_opts = -f $osd_font \
+	-i `($x+$osd_offset_px) -o `($y+$osd_offset_px+$panel_height_px) \
+	-s 5 -c $alrfg -d $osd_dwell_s
 
 # Uncomment these two utility functions if they're not in your library
 #fn %argify {|*|
@@ -162,7 +167,7 @@ osdopts = -f $osd_font -i `($x+30) -o `($y+30+$panel_height) \
 fn logger {|fmt args| if $debug {printf 'PANEL: '^$fmt^\n $args >[1=2]}}
 
 # Carve out space for the panel
-herbstclient pad $monitor $panel_height
+herbstclient pad $monitor $panel_height_px
 
 # Create the status-lights trigger fifo
 trigger = $tmpfile_base^-trigger-^$monitor
@@ -203,7 +208,7 @@ if $enable_track {
 
 # Send CPU bar events
 if $enable_cpubar {
-	%with-read-lines <{dzen2-gcpubar $cpuopts} {|*|
+	%with-read-lines <{dzen2-gcpubar $dzen2_gcpubar_opts} {|*|
 		echo cpubar\t$* >$fifo
 	} &
 	rt cpu
@@ -211,7 +216,7 @@ if $enable_cpubar {
 
 # Start the OSD
 <$osdmsg while true {
-	osd_cat $osdopts
+	osd_cat $osd_cat_opts
 	sleep 1
 } &
 rt osd
@@ -520,8 +525,6 @@ logger 'starting: %s; %s; %s' \
 	<={%argify `{var enable_other_status}} \
 	<={%argify `{var enable_cpubar}}
 
-logger 'tasks: %s' <={%argify $taskpids}
-
 let (tags; sep; title; track; lights; at = ''; st = ''; cpubar; clock) {
 	tags = `` \n {drawtags}
 	sep = $separator_attr^'|'
@@ -551,5 +554,5 @@ let (tags; sep; title; track; lights; at = ''; st = ''; cpubar; clock) {
 				`{if $enable_track {drawcenter $track}} \
 				`{if $enable_clock {drawright $clock}}
 		}
-	} | dzen2 $dzopts
+	} | dzen2 $dzen2_opts
 } |[2] {if $debug {cat >>/dev/stderr}}
