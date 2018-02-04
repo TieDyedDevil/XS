@@ -138,7 +138,8 @@ dzopts = -w $panel_width -x $x -y $y -fn $panel_font -h $panel_height \
 cpuopts = -h `($panel_height/2) -fg $cpubar_meter -bg $cpubar_background \
 	-i 0.7
 
-osdopts = -f $osd_font -i `($x+30) -o `($y+30) -s 5 -c $alrfg -d 3
+osdopts = -f $osd_font -i `($x+30) -o `($y+30+$panel_height) \
+	-s 5 -c $alrfg -d 3
 
 # Uncomment these two utility functions if they're not in your library
 #fn %argify {|*|
