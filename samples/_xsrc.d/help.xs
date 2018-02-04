@@ -63,3 +63,10 @@ fn valgrind-help {
 	.c 'help'
 	web http://valgrind.org/
 }
+
+# Local web documents
+fn ffl-help {
+	.d 'Forth Foundation Library documentation'
+	.c 'help'
+	web -t /usr/share/doc/gforth-ffl/html/index.html
+}
