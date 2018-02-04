@@ -380,6 +380,21 @@ fn oc {
 		}
 	}
 }
+fn osd {|msg|
+	.d 'Display message on OSD'
+	.a 'MESSAGE...'
+	.c 'system'
+	%only-X
+	let (m; fl; f; _; k) {
+		for m `{herbstclient list_monitors|cut -d: -f1} {
+			fl = /tmp/panel-^$m^-fifos
+			for f `{access -f $fl && cat $fl} {
+				(_ k) = <={~~ $f *-*-osd-^$m}
+				!~ $k () && echo $msg >/tmp/panel-^$k^-osd-^$m
+			}
+		}
+	}
+}
 fn panel {|*|
 	.d 'Query/set Intel backlight intensity'
 	.a '[1..100]'
