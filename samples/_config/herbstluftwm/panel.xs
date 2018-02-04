@@ -94,7 +94,7 @@ geometry = `{herbstclient monitor_rect $monitor >[2]/dev/null}
 ~ $geometry () && {throw error panel.sh 'Invalid monitor '^$monitor}
 (x y panel_width _) = $geometry
 
-# Define the common part of the fifo names
+# Define the common part of the temporary file names
 tmpfile_base = `{mktemp -u /tmp/panel-XXXXXXXX}
 
 # Define colors and bg/fg pairs
@@ -455,6 +455,16 @@ fn drawright {|text|
 			printf '^p(_RIGHT)^p(-%d)%s'\n `($w+$pad) $t
 	}
 }
+
+# Kill prior incarnation's processes that may have been orphaned
+taskfile = /tmp/panel-^$monitor^-tasks
+for (task pid) `{access -f $taskfile && cat $taskfile} {
+	if {kill -0 $pid >[2]/dev/null} {
+		logger 'cleanup pgroup %d (%s)' $pid $task
+		pkill -g $pid
+	}
+}
+echo $taskpids >$taskfile
 
 # Process events
 fn terminate {
