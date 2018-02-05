@@ -76,15 +76,15 @@ debug = false
 #                       A R C H I T E C T U R E
 
 # herbstclient& ----------------------------\  ; async
-# clock& -----------------------------------\  ; poll/sleep
+# clock& -----------------------------------\  ; poll/sleep       (60s)
 # mpc& -------------------------------------\  ; async
 # cpu& -------------------------------------\  ; wait
-# alert& -----------------------------------\  ; poll/sleep
-#               /--> trigger| lights& ------\  ; poll/sleep
+# alert& -----------------------------------\  ; poll/sleep       (10s)
+#               /--> trigger| lights& ------\  ; poll/sleep       ( 1s)
 #              /                             ----> fifo| ---\
 # netstat& ---/                                ; async       |
-# other& ----/                                 ; poll/sleep  |
-#   \----+------> osdmsg| ---> osd& + osd_cat  ; wait/sleep  |
+# other& ----/                                 ; poll/sleep  |    ( 3s)
+#   \----+------> osdmsg| ---> osd& + osd_cat  ; wait/sleep  |    ( 1s)
 #       /                                      ; wait:       v
 #      /                                               event-loop | dzen2
 # osd-cli-client
@@ -225,8 +225,9 @@ if $enable_track {
 
 # Send CPU bar events
 if $enable_cpubar {
-	%with-read-lines <{dzen2-gcpubar $dzen2_gcpubar_opts} {|*|
-		echo cpubar\t$* >$fifo
+	{
+		dzen2-gcpubar $dzen2_gcpubar_opts \
+			| stdbuf -oL sed 's/.*/cpubar'\t'&/' >$fifo
 	} &
 	rt cpu
 }
