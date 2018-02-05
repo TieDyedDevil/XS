@@ -80,7 +80,7 @@ debug = false
 # mpc& -------------------------------------\  ; async
 # cpu& -------------------------------------\  ; wait
 # alert& -----------------------------------\  ; poll/sleep       (10s)
-#               /--> trigger| lights& ------\  ; poll/sleep       ( 1s)
+#               /--> trigger| lights& ------\  ; wait
 #              /                             ----> fifo| ---\
 # netstat& ---/                                ; async       |
 # other& ----/                                 ; poll/sleep  |    ( 3s)
@@ -421,9 +421,8 @@ let (i4 = $_s; i6 = $_s; a = $_s; b = $_s; c = $_s; e = $_s; \
 		switch <=read (
 		network {update_network_status_lights}
 		other {update_other_status_lights}
-		{}
+		{sleep 1}
 		)
-		sleep 1
 	} &
 }
 rt lights
@@ -431,18 +430,18 @@ rt lights
 if $enable_network_status {
 	{
 		sleep 1
-		echo network >$trigger
+		echo network
 		sleep 1
-		nmcli monitor|while true {read; echo network >$trigger}
-	} &
+		nmcli monitor|while true {read; echo network}
+	} >$trigger &
 	rt netstat
 }
 
 if $enable_other_status {
 	while true {
-		echo other >$trigger
+		echo other
 		sleep 3
-	} &
+	} >$trigger &
 	rt other
 }
 
