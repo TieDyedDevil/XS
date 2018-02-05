@@ -80,7 +80,8 @@ debug = false
 # mpc& -------------------------------------\  ; async
 # cpu& -------------------------------------\  ; poll/sleep
 # alert& -----------------------------------\  ; poll/sleep
-#              /--> trigger| ---> lights& ---+---> fifo| ----\
+#               /--> trigger| lights& ------\  ; poll/sleep
+#              /                             ----> fifo| ----\
 # netstat& ---/                                ; async        |
 # other& ----/                                 ; poll/sleep   |
 #   \---+-------> osdmsg| ---> osd& + osd_cat  ; select       v
