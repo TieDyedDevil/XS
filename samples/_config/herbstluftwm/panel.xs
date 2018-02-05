@@ -78,14 +78,15 @@ debug = false
 # herbstclient& ----------------------------\  ; async
 # clock& -----------------------------------\  ; poll/sleep
 # mpc& -------------------------------------\  ; async
-# cpu& -------------------------------------\  ; poll/sleep
+# cpu& -------------------------------------\  ; wait
 # alert& -----------------------------------\  ; poll/sleep
 #               /--> trigger| lights& ------\  ; poll/sleep
-#              /                             ----> fifo| ----\
-# netstat& ---/                                ; async        |
-# other& ----/                                 ; poll/sleep   |
-#   \---+-------> osdmsg| ---> osd& + osd_cat  ; select       v
-#      /                                                event-loop | dzen2
+#              /                             ----> fifo| ---\
+# netstat& ---/                                ; async       |
+# other& ----/                                 ; poll/sleep  |
+#   \----+------> osdmsg| ---> osd& + osd_cat  ; wait/sleep  |
+#       /                                      ; wait:       v
+#      /                                               event-loop | dzen2
 # osd-cli-client
 
 # ========================================================================
