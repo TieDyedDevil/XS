@@ -33,12 +33,6 @@ fn battery {
 		!~ $curr 0 && printf '%.1f%%'\n `(100.0*$curr/$full)
 	}
 }
-fn boc {|*|
-	.d 'Bell on completion'
-	.a 'COMMAND'
-	.c 'system'
-	unwind-protect {$*} {printf %c \a}
-}
 fn cookie {
 	.d 'Fortune'
 	.c 'system'
@@ -377,21 +371,6 @@ fn oc {
 		%without-cursor {
 			watch -t -n 1 -p -c banner \\' '^\`date +%T\`\; \
 							cal -n 3 --color=always
-		}
-	}
-}
-fn osd {|msg|
-	.d 'Display message on OSD'
-	.a 'MESSAGE...'
-	.c 'system'
-	%only-X
-	let (m; fl; f; _; k) {
-		for m `{herbstclient list_monitors|cut -d: -f1} {
-			fl = /tmp/panel-^$m^-fifos
-			for f `{access -f $fl && cat $fl} {
-				(_ k) = <={~~ $f *-*-osd-^$m}
-				!~ $k () && echo $msg >/tmp/panel-^$k^-osd-^$m
-			}
 		}
 	}
 }

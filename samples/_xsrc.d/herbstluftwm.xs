@@ -1,8 +1,17 @@
+fn boc {|*|
+	.d 'Bell on completion'
+	.a 'COMMAND'
+	.c 'wm'
+	.r 'em hc mons osd wmb'
+	%only-X
+	unwind-protect {$*} {printf %c \a}
+}
 fn em {|*|
 	.d 'Enable one monitor'
 	.a '[external|internal]  # first and second in xrandr list'
 	.a '(none) # first in xrandr list'
-	.c 'system'
+	.c 'wm'
+	.r 'boc hc mons osd wmb'
 	%only-X
 	let (i; hc = herbstclient; \
 		mnl = `{xrandr|grep '^[^ ]\+ connected' \
@@ -33,12 +42,17 @@ fn em {|*|
 	xsetroot -solid 'Slate Gray'
 }
 fn hc {|*|
-	.c 'alias'
+	.d 'herbstclient'
+	.a 'herbstclient_ARGS'
+	.c 'wm'
+	.r 'boc em mons osd wmb'
+	%only-X
 	herbstclient $*
 }
 fn mons {
 	.d 'List active monitors'
-	.c 'system'
+	.c 'wm'
+	.r 'boc em hc osd wmb'
 	%only-X
 	let (i; hc = herbstclient; xrinfo; size; w; h; diag; f; _; xres; dpi; \
 		mnl = `{xrandr|grep '^[^ ]\+ connected .* [^ ]\+ x [^ ]\+$' \
@@ -77,8 +91,26 @@ fn mons {
 			| column -t
 	}
 }
+fn osd {|msg|
+	.d 'Display message on OSD'
+	.a 'MESSAGE...'
+	.c 'wm'
+	.r 'boc em hc mons wmb'
+	%only-X
+	let (m; fl; f; _; k) {
+		for m `{herbstclient list_monitors|cut -d: -f1} {
+			fl = /tmp/panel-^$m^-fifos
+			for f `{access -f $fl && cat $fl} {
+				(_ k) = <={~~ $f *-*-osd-^$m}
+				!~ $k () && echo $msg >/tmp/panel-^$k^-osd-^$m
+			}
+		}
+	}
+}
 fn wmb {
 	.d 'List WM bindings'
-	.c 'alias'
+	.c 'wm'
+	.r 'boc em hc mons osd'
+	%only-X
 	herbstclient list_keybinds|column -t|less -FXSi
 }
