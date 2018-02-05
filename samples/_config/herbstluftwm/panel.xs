@@ -75,19 +75,17 @@ debug = false
 # ========================================================================
 #                       A R C H I T E C T U R E
 
-# herbstclient& ----------------------------\  ; async
-# clock& -----------------------------------\  ; poll/sleep       (60s)
-# mpc& -------------------------------------\  ; async
-# cpu& -------------------------------------\  ; wait
-# alert& -----------------------------------\  ; poll/sleep       (10s)
-#               /--> trigger| lights& ------\  ; wait
-#              /                             ----> fifo| ---\
-# netstat& ---/                                ; async       |
-# other& ----/                                 ; poll/sleep  |    ( 3s)
-#   \----+------> osdmsg| ---> osd& + osd_cat  ; wait/sleep  |    ( 1s)
-#       /                                      ; wait:       v
-#      /                                               event-loop | dzen2
-# osd-cli-client
+# herbstclient& ------------------->---------------\   ; async
+# clock& -------------------------->---------------|   ; poll/sleep (60s)
+# mpc& ---------------------------->---------------|   ; async
+# cpu& ---------------------------->---------------|   ; wait
+# alert& -------------------------->---------------|   ; poll/sleep (10s)
+#   \----+---->[ osdmsg| ---> osd& + osd_cat       |   ; wait/sleep ( 1s)
+#       /         -----> trigger| lights& ---->----|   ; wait
+# osd-client     /   /-------------<---------------/   ; cli
+# netstat& -----/    |                                 ; async
+# other& ------/     v                                 ; poll/sleep ( 3s)
+#                  fifo| ----> event-loop | dzen2      ; wait
 
 # ========================================================================
 #             H  E  R  E     B  E     D  R  A  G  O  N  S
