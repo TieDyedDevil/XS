@@ -157,7 +157,7 @@ dzen2_opts = -w $panel_width -x $x -y $y -h $panel_height_px \
 
 dzen2_gcpubar_opts = -h `($panel_height_px/2) \
 	-fg $cpubar_meter -bg $cpubar_background \
-	-i 0.7
+	-i 1.5
 
 osd_cat_opts = -f $osd_font \
 	-i `($x+$osd_offset_px) -o `($y+$osd_offset_px+$panel_height_px) \
