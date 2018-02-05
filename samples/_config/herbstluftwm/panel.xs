@@ -73,6 +73,21 @@ enable_cpubar = true
 debug = false
 
 # ========================================================================
+#                       A R C H I T E C T U R E
+
+# herbstclient& ----------------------------\  ; async
+# clock& -----------------------------------\  ; poll/sleep
+# mpc& -------------------------------------\  ; async
+# cpu& -------------------------------------\  ; poll/sleep
+# alert& -----------------------------------\  ; poll/sleep
+#              /--> trigger| ---> lights& ---+---> fifo| ----\
+# netstat& ---/                                ; async        |
+# other& ----/                                 ; poll/sleep   |
+#   \---+-------> osdmsg| ---> osd& + osd_cat  ; select       v
+#      /                                                event-loop | dzen2
+# osd-cli-client
+
+# ========================================================================
 #             H  E  R  E     B  E     D  R  A  G  O  N  S
 #             IOW: Change the following at your own risk.
 
