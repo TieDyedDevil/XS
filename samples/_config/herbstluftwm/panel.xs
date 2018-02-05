@@ -208,11 +208,11 @@ rt herbstclient
 
 # Send clock events
 if $enable_clock {
+	printf 'clock'\t'%s'\n <={%argify `{date +^$clockfmt}} >$fifo &
 	while true {
-		n = <={%argify `{date +^$clockfmt}}
-		!~ $l $n && {printf 'clock'\t'%s'\n $n}
-		l = $n
-		sleep 1
+		s = `{date +%s}
+		sleep `(60-$s%60)
+		printf 'clock'\t'%s'\n <={%argify `{date +^$clockfmt}}
 	} >$fifo &
 	rt clock
 }
