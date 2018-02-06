@@ -63,8 +63,9 @@ swap_usage_% = 5
 
 # Presumed approximately-increasing order of CPU load:
 enable_track = true
-enable_herbstclient_and_alerts = true  # value ignored; always enabled
 enable_clock = true
+enable_herbstclient = true  # value ignored; always enabled
+enable_alerts = true
 enable_network_status = true
 enable_other_status = true
 enable_cpubar = true
@@ -357,16 +358,18 @@ fn temperature () {
 	} else {result false}
 }
 
-while true {
-	if <=battery {b = B} else {b = $_a}
-	if <=disk {d = D} else {d = $_a}
-	if <=fan {f = F} else {f = $_a}
-	if <=swap {s = S} else {s = $_a}
-	if <=temperature {t = T} else {t = $_a}
-	echo alert\t$b$d$f$s$t
-	sleep 10
-} >$fifo &
-rt alert
+if $enable_alerts {
+	while true {
+		if <=battery {b = B} else {b = $_a}
+		if <=disk {d = D} else {d = $_a}
+		if <=fan {f = F} else {f = $_a}
+		if <=swap {s = S} else {s = $_a}
+		if <=temperature {t = T} else {t = $_a}
+		echo alert\t$b$d$f$s$t
+		sleep 10
+	} >$fifo &
+	rt alert
+}
 
 # Send status events
 let (i4 = $_s; i6 = $_s; a = $_s; b = $_s; c = $_s; e = $_s; \
@@ -516,13 +519,23 @@ fn terminate {
 
 fn lights {|alert status|
 	if {$enable_network_status || $enable_other_status} {
-		printf '%s«%s%s%s»%s«%s%s%s»%s'\n \
-			$alert_marker_attr \
-			$alert_indicator_attr $alert $alert_marker_attr \
-			$status_marker_attr \
-			$status_indicator_attr $status $status_marker_attr \
-			$normal_attr
-	} else {
+		if $enable_alerts {
+			printf '%s«%s%s%s»%s«%s%s%s»%s'\n \
+				$alert_marker_attr \
+				$alert_indicator_attr $alert \
+					$alert_marker_attr \
+				$status_marker_attr \
+				$status_indicator_attr $status \
+					$status_marker_attr \
+				$normal_attr
+		} else {
+			printf '%s«%s%s%s»%s'\n \
+				$status_marker_attr \
+				$status_indicator_attr $status \
+					$status_marker_attr \
+				$normal_attr
+		}
+	} else if $enable_alerts {
 		printf '%s«%s%s%s»%s'\n \
 			$alert_marker_attr \
 			$alert_indicator_attr $alert $alert_marker_attr \
