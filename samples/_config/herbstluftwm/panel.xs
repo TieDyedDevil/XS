@@ -423,15 +423,17 @@ let (i4 = $_s; i6 = $_s; a = $_s; b = $_s; c = $_s; e = $_s; \
 		post_status_event
 	}
 
-	<$trigger while true {
-		switch <=read (
-		network {update_network_status_lights}
-		other {update_other_status_lights}
-		{sleep 1}
-		)
-	} &
+	if {$enable_alerts || $enable_network_status || $enable_other_status} {
+		<$trigger while true {
+			switch <=read (
+			network {update_network_status_lights}
+			other {update_other_status_lights}
+			{sleep 1}
+			)
+		} &
+		rt lights
+	}
 }
-rt lights
 
 if $enable_network_status {
 	{
