@@ -69,23 +69,28 @@ enable_network_status = true
 enable_other_status = true
 enable_cpubar = true
 
-# If true, write startup information and main-loop errors to stderr
+# If true, write startup information and event-loop errors to stderr
 debug = false
 
 # ========================================================================
 #                       A R C H I T E C T U R E
 
-# herbstclient& ------------------->---------------\   ; async
-# clock& -------------------------->---------------|   ; poll/sleep (60s)
-# mpc& ---------------------------->---------------|   ; async
-# cpu& ---------------------------->---------------|   ; wait
-# alert& -------------------------->---------------|   ; poll/sleep (10s)
-#   \----+---->[ osdmsg| ---> osd& + osd_cat       |   ; wait/sleep ( 1s)
-#       /         -----> trigger| lights& ---->----|   ; wait
-# osd-client     /   /-------------<---------------/   ; cli
-# netstat& -----/    |                                 ; async
-# other& ------/     v                                 ; poll/sleep ( 3s)
-#                  fifo| ----> event-loop | dzen2      ; wait
+# herbstclient& ------------------------------>----\   ; async
+# clock& ------------------------------------->----|   ; poll/sleep (60s)
+# mpc& --------------------------------------->----|   ; async
+# cpu& --------------------------------------->----|   ; async
+# alert& ------------------------------------->----|   ; poll/sleep (10s)
+#  \                                               |
+#   \------------+---> osdmsg| osd& + osd_cat      |   ; wait
+#               /                                  |
+# nothing& ----/                                   |   ; stdout = open
+#             /    ----> trigger| lights& ---->----|   ; wait
+#    osd-client   /                                |   ; cli
+#                /   /------------------------<----/
+#               /    |
+# netstat& ----/     |                                 ; async
+# other& -----/      |                                 ; poll/sleep ( 3s)
+#                    \---> fifo| event-loop | dzen2    ; wait
 
 # ========================================================================
 #             H  E  R  E     B  E     D  R  A  G  O  N  S
@@ -231,9 +236,11 @@ if $enable_cpubar {
 }
 
 # Start the OSD
+tail -f /dev/null >$osdmsg &
+rt nothing
 <$osdmsg while true {
 	osd_cat $osd_cat_opts
-	sleep 1
+	sleep 1  # reached on $osdmsg EOF; shouldn't happen
 } &
 rt osd
 fn osd {|msg| echo $msg >$osdmsg}
