@@ -257,8 +257,6 @@ fn alert_if_fullscreen {|fmt args|
 fn battery () {
 	BAT = /sys/class/power_supply/BAT
 	AC = /sys/class/power_supply/AC
-	LOW = $battery_low_%
-	CRITICAL = $battery_critical_%
 	let (w = false; cap = 0; chg = 0; v) {
 		if {{access -d $AC} && {~ `{cat $AC/online} 1}} {
 			# We're on line power at the moment
@@ -273,17 +271,18 @@ fn battery () {
 			}
 			if {!~ $cap 0} {
 				v = `(100.0*$chg/$cap)
-				if {$v :le $LOW} {w = true}
+				if {$v :le $battery_low_%} {w = true}
 			}
 		}
-		if {$v :le $CRITICAL} {osd 'Battery charge is critically low'}
-		$w && {alert_if_fullscreen 'Battery charge < %d%%' $LOW}
+		if {$v :le $battery_critical_%} \
+			{osd 'Battery charge is critically low'}
+		$w && {alert_if_fullscreen 'Battery charge < %d%%' \
+			$battery_low_%}
 		result $w
 	}
 }
 
 fn disk () {
-	THRPCT = $disk_full_%
 	VOLUMES = / /boot /home /run /tmp /var
 	utilizations = `{df | less -n +2 | grep -w '-e'^$VOLUMES | tr -d % \
 		| awk '{ print $5 "\t" $6 }'}
@@ -291,9 +290,9 @@ fn disk () {
 		while {!~ $utilizations ()} {
 			(occ name) = $utilizations(1 2)
 			utilizations = $utilizations(3 ...)
-			{$occ :ge $THRPCT} && {w = true}
+			{$occ :ge $disk_full_%} && {w = true}
 		}
-		$w && {alert_if_fullscreen 'Disk > %d%% full' $THRPCT}
+		$w && {alert_if_fullscreen 'Disk > %d%% full' $disk_full_%}
 		result $w
 	}
 }
@@ -319,10 +318,9 @@ fn get_curtemp {
 }
 
 fn fan () {
-	temp = <=get_curtemp
 	speeds = `{sensors|grep fan|cut -d: -f2|awk '{print $1}'}
 	speed = 0; for s $speeds {speed = `($speed+$s)}
-	if {{$temp :gt $FAN_THRESHOLD} && {~ $speed 0}} {
+	if {{<=get_curtemp :gt $FAN_THRESHOLD} && {~ $speed 0}} {
 		cycles = `($cycles+1)
 		{$cycles :gt 1} && {
 			alert_if_fullscreen 'Fan is stopped at %dC' \
@@ -336,23 +334,21 @@ fn fan () {
 }
 
 fn swap () {
-	THRPCT = $swap_usage_%
 	swapping = `{
 tail -n +2 /proc/swaps | awk '
 BEGIN { tot = 0; use = 0 }
 { tot += $3; use += $4; }
-END { print ((use * 100 / tot) > '^$THRPCT^') }
+END { print ((use * 100 / tot) > '^$swap_usage_%^') }
 '
 	}
 	if {~ $swapping 1} {
-		alert_if_fullscreen 'Swapfile > %d%% full' $THRPCT
+		alert_if_fullscreen 'Swapfile > %d%% full' $swap_usage_%
 		result true
 	} else {result false}
 }
 
 fn temperature () {
-	temp = <=get_curtemp
-	if {$temp :gt $TEMPERATURE_THRESHOLD} {
+	if {<=get_curtemp :gt $TEMPERATURE_THRESHOLD} {
 		alert_if_fullscreen 'Temperature > %dC' $TEMPERATURE_THRESHOLD
 		result true
 	} else {result false}
