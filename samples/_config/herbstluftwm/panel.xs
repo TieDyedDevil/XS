@@ -32,9 +32,9 @@
 # window. The battery-critical alert is always displayed on the OSD
 # regardless of whether the focused window is fullscreen.
 #
-# With the exception of the tag and alert indicators, bar content may be
-# enabled selectively, whether for cosmetic or functional preference or
-# to further reduce the panel's already low CPU load.
+# With the exception of the tag indicators and title, panel content may
+# be enabled selectively, whether for cosmetic or functional preference
+# or to further reduce the panel's already low CPU load.
 
 # ========================================================================
 #                      C O N F I G U R A T I O N
@@ -45,7 +45,7 @@ panel_height_px = 22
 _a = ''  # alert light
 _s = ''  # status light
 panel_font = 'NotoSans-12'         # XLFD or Xft
-clockfmt = '%a %Y-%m-%d %H:%M %Z'  # date(1)
+clockfmt = '%a %Y-%m-%d %H:%M %Z'  # date(1); one-minute resolution
 trackfmt = '%title%'               # mpc(1)
 
 osd_font = '-*-liberation mono-bold-r-*-*-*-420-*-*-*-*-iso10646-1'  # XLFD
@@ -81,14 +81,14 @@ debug = false
 # mpc& --------------------------------------->----|   ; async
 # cpu& --------------------------------------->----|   ; async
 # alert& ------------------------------------->----|   ; poll/sleep (10s)
-#  \                                               |
-#   \------------+---> osdmsg| osd& + osd_cat      |   ; wait
+#   |                                              |
+#   \------?-----+---> osdmsg| osd& + osd_cat      |   ; wait
 #               /                                  |
 # nothing& ----/                                   |   ; stdout = open
 #             /    ----> trigger| lights& ---->----|   ; wait
-#    osd-client   /                                |   ; cli
-#                /   /------------------------<----/
-#               /    |
+#            /    /                                |
+#   osd-client   /                                 |   ; cli (optional)
+#               /    /------------------------<----/
 # netstat& ----/     |                                 ; async
 # other& -----/      |                                 ; poll/sleep ( 3s)
 #                    \---> fifo| event-loop | dzen2    ; wait
