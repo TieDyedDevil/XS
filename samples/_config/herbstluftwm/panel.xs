@@ -82,6 +82,8 @@ debug = false
 # cpu& --------------------------------------->----|   ; async
 # alert& ------------------------------------->----|   ; poll/sleep (10s)
 #   |                                              |
+#   |      if (panel obscured or critical alert)   |
+#   |      |                                       |
 #   \------?-----+---> osdmsg| osd& + osd_cat      |   ; wait
 #               /                                  |
 # nothing& ----/                                   |   ; stdout = open
