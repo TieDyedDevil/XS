@@ -1,4 +1,5 @@
 #! /usr/bin/env xs
+#  xs 1.1 or later; https://github.com/TieDyedDevil/XS
 
 # Display a panel for herbstluftwm.
 #
