@@ -1,7 +1,11 @@
 #! /usr/bin/env xs
 #  xs 1.1 or later; https://github.com/TieDyedDevil/XS
 
-# Display a panel for herbstluftwm.
+#  IMPORTANT: Required functions %argify and %with-read-lines are defined
+#  in the samples/ directory of the xs repository. Copy the definitions to
+#  a file which is sourced by your ~/.xsrc script.
+
+# Purpose: Display a panel for herbstluftwm.
 #
 # The left region contains tag indicators, alert and status indicators, a CPU
 # load bar and the title of the focused window. The center region shows info
@@ -84,7 +88,7 @@ debug = false
 # alert& ------------------------------------->----|   ; poll/sleep (10s)
 #   |                                              |
 #   |      if (panel obscured or critical alert)   |
-#   |      |                                       |
+#   |      :                                       |
 #   \------?-----+---> osdmsg| osd& + osd_cat      |   ; wait
 #               /                                  |
 # nothing& ----/                                   |   ; stdout = open
@@ -169,23 +173,6 @@ dzen2_gcpubar_opts = -h `($panel_height_px/2) \
 osd_cat_opts = -f $osd_font \
 	-i `($x+$osd_offset_px) -o `($y+$osd_offset_px+$panel_height_px) \
 	-s 5 -c $alrfg -d $osd_dwell_s
-
-# Uncomment these two utility functions if they're not in your library
-#fn %argify {|*|
-#        # Always return a one-element list.
-#        if {~ $* ()} {result ''} else {result `` '' {echo -n $*}}
-#}
-#
-#fn %with-read-lines {|file body|
-#        # Run body with each line from file.
-#        # Body must be a lambda; its argument is bound to the line content.
-#        <$file let (__l = <=read) {
-#                while {!~ $__l ()} {
-#                        $body $__l
-#                        __l = <=read
-#                }
-#        }
-#}
 
 # Define a logger, enabled by the debug variable
 fn logger {|fmt args| if $debug {printf 'PANEL: '^$fmt^\n $args >[1=2]}}
@@ -429,7 +416,7 @@ let (i4 = $_s; i6 = $_s; a = $_s; b = $_s; c = $_s; e = $_s; \
 			switch <=read (
 			network {update_network_status_lights}
 			other {update_other_status_lights}
-			{sleep 1}
+			{sleep 1}  # reached on $trigger EOF; shouldn't happen
 			)
 		} &
 		rt lights
@@ -438,9 +425,7 @@ let (i4 = $_s; i6 = $_s; a = $_s; b = $_s; c = $_s; e = $_s; \
 
 if $enable_network_status {
 	{
-		sleep 1
-		echo network
-		sleep 1
+		echo network  # report current state
 		nmcli monitor|while true {read; echo network}
 	} >$trigger &
 	rt netstat
