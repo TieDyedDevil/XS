@@ -94,7 +94,7 @@ debug = false
 #               /    /------------------------<----/
 # netstat& ----/     |                                 ; async
 # other& -----/      |                                 ; poll/sleep ( 3s)
-#                    \---> fifo| event-loop | dzen2    ; wait
+#                    \---> event| event-loop | dzen2   ; wait
 
 # ========================================================================
 #             H  E  R  E     B  E     D  R  A  G  O  N  S
@@ -198,11 +198,11 @@ trigger = $tmpfile_base^-trigger-^$monitor
 mkfifo $trigger
 
 # Create the display event fifo
-fifo = $tmpfile_base^-fifo-^$monitor
-mkfifo $fifo
+event = $tmpfile_base^-event-^$monitor
+mkfifo $event
 
 # Create the OSD fifo
-osdmsg = $tmpfile_base^-osd-^$monitor
+osdmsg = $tmpfile_base^-osdmsg-^$monitor
 mkfifo $osdmsg
 
 # Initialize task management
@@ -210,23 +210,23 @@ taskpids =
 fn rt {|*| taskpids = $taskpids $* $apid}
 
 # Send window manager events
-herbstclient --idle >$fifo &
+herbstclient --idle >$event &
 rt herbstclient
 
 # Send clock events
 if $enable_clock {
-	printf 'clock'\t'%s'\n <={%argify `{date +^$clockfmt}} >$fifo &
+	printf 'clock'\t'%s'\n <={%argify `{date +^$clockfmt}} >$event &
 	while true {
 		s = `{date +%s}
 		sleep `(60-$s%60)
 		printf 'clock'\t'%s'\n <={%argify `{date +^$clockfmt}}
-	} >$fifo &
+	} >$event &
 	rt clock
 }
 
 # Send player events
 if $enable_track {
-	mpc idleloop >$fifo &
+	mpc idleloop >$event &
 	rt mpc
 }
 
@@ -234,7 +234,7 @@ if $enable_track {
 if $enable_cpubar {
 	{
 		dzen2-gcpubar $dzen2_gcpubar_opts \
-			| stdbuf -oL sed 's/.*/cpubar'\t'&/' >$fifo
+			| stdbuf -oL sed 's/.*/cpubar'\t'&/' >$event
 	} &
 	rt cpu
 }
@@ -366,7 +366,7 @@ if $enable_alerts {
 		if <=temperature {t = T} else {t = $_a}
 		echo alert\t$b$d$f$s$t
 		sleep 10
-	} >$fifo &
+	} >$event &
 	rt alert
 }
 
@@ -375,7 +375,7 @@ let (i4 = $_s; i6 = $_s; a = $_s; b = $_s; c = $_s; e = $_s; \
 	g = $_s; m = $_s; n = $_s; v = $_s; w = $_s; z = $_s) {
 
 	fn post_status_event {
-		echo status\t$i4$i6$a$b$c$e$g$m$n$v$w$z >$fifo
+		echo status\t$i4$i6$a$b$c$e$g$m$n$v$w$z >$event
 	}
 
 	fn update_network_status_lights {
@@ -504,11 +504,11 @@ for ff `{access -f $fifofile && cat $fifofile} {
 		rm -f $ff
 	}
 }
-echo $fifo $trigger $osdmsg >$fifofile
+echo $event $trigger $osdmsg >$fifofile
 
 # Process events
 fn terminate {
-	rm -f $fifo
+	rm -f $event
 	rm -f $trigger
 	rm -f $osdmsg
 	for (task pid) $taskpids {
@@ -567,7 +567,7 @@ let (tags; sep; title; track; lights; at = ''; st = ''; cpubar; clock) {
 	title = `title
 	track = `{drawcenter `{track}}
 	lights = `{lights $at $st}
-	<$fifo while true {
+	<$event while true {
 		let ((ev p1 p2) = <={%split \t <=read}) {
 			switch $ev (
 				tag_changed {tags = `` \n {drawtags}}
