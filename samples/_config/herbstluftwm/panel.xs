@@ -497,10 +497,10 @@ for (task pid) `{access -f $taskfile && cat $taskfile} {
 }
 echo $taskpids >$taskfile
 fifofile = /tmp/panel-^$monitor^-fifos
-for fifo `{access -f $fifofile && cat $fifofile} {
-	if {access $fifo} {
-		logger 'cleanup fifo %s' $fifo
-		rm -f $fifo
+for ff `{access -f $fifofile && cat $fifofile} {
+	if {access $ff} {
+		logger 'cleanup fifo %s' $ff
+		rm -f $ff
 	}
 }
 echo $fifo $trigger $osdmsg >$fifofile
