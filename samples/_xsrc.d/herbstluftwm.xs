@@ -101,8 +101,9 @@ fn osd {|msg|
 		for m `{herbstclient list_monitors|cut -d: -f1} {
 			fl = /tmp/panel-^$m^-fifos
 			for f `{access -f $fl && cat $fl} {
-				(_ k) = <={~~ $f *-*-osd-^$m}
-				!~ $k () && echo $msg >/tmp/panel-^$k^-osd-^$m
+				(_ k) = <={~~ $f *-*-osdmsg-^$m}
+				!~ $k () && echo $msg \
+					>/tmp/panel-^$k^-osdmsg-^$m
 			}
 		}
 	}
