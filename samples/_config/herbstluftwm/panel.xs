@@ -32,6 +32,7 @@
 #   V VPN connection active
 #   W WiFi connection active
 #   Z screensaver is enabled
+#   " host is virtualized
 #
 # Alerts display on the OSD when the panel is concealed by a fullscreen
 # window. The battery-critical alert is always displayed on the OSD
@@ -114,6 +115,7 @@ fn-mpc = <={access -1en mpc $path}
 fn-nmcli = <={access -1en nmcli $path}
 fn-osd_cat = <={access -1en osd_cat $path}
 fn-sensors = <={access -1en sensors $path}
+fn-systemd-detect-virt = <={access -1en systemd-detect-virt $path}
 fn-xftwidth = <={access -1en xftwidth $path}
 fn-xkbset = <={access -1en xkbset $path}
 fn-xset = <={access -1en xset $path}
@@ -124,6 +126,9 @@ monitor = $1
 geometry = `{herbstclient monitor_rect $monitor >[2]/dev/null}
 ~ $geometry () && {throw error panel.sh 'Invalid monitor '^$monitor}
 (x y panel_width _) = $geometry
+
+# Get virtualization info
+is_virt = if {~ <={systemd-detect-virt -q} 0} {result true} else {result false}
 
 # Define the common part of the temporary file names
 tmpfile_base = `{mktemp -u /tmp/panel-XXXXXXXX}
@@ -359,7 +364,7 @@ if $enable_alerts {
 
 # Send status events
 let (i4 = $_s; i6 = $_s; a = $_s; b = $_s; c = $_s; e = $_s; \
-	g = $_s; m = $_s; n = $_s; v = $_s; w = $_s; z = $_s) {
+	g = $_s; m = $_s; n = $_s; v = $_s; w = $_s; z = $_s; i" = $_s) {
 
 	fn post_status_event {
 		echo status\t$i4$i6$a$b$c$e$g$m$n$v$w$z >$event
@@ -410,6 +415,8 @@ let (i4 = $_s; i6 = $_s; a = $_s; b = $_s; c = $_s; e = $_s; \
 			{z = Z} else {z = $_s}
 		post_status_event
 	}
+
+	if $is_virt {i" = "}
 
 	if {$enable_alerts || $enable_network_status || $enable_other_status} {
 		<$trigger while true {
