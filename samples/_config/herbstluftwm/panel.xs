@@ -50,7 +50,7 @@ panel_height_px = 22
 # might be desirable with a monospaced font.
 _a = ''  # alert light
 _s = ''  # status light
-panel_font = 'NotoSans-12'         # XLFD or Xft
+panel_font = 'NotoSans-14'         # XLFD or Xft
 clockfmt = '%a %Y-%m-%d %H:%M %Z'  # date(1); one-minute resolution
 trackfmt = '%title%'               # mpc(1)
 

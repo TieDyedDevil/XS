@@ -12,6 +12,9 @@ setxkbmap -option keypad:pointerkeys -option compose:prsc
 xset dpms 0 0 900 s noblank
 xset r rate 500 30
 xset m 7/5 0
+if {systemd-detect-virt -q && xrandr|grep -q '^Virtual-0 connected primary'} {
+	xrandr --output Virtual-0 --fb 1920x1080 --mode 1920x1080
+}
 
 # remove all existing keybindings
 hc keyunbind --all
