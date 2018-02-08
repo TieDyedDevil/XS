@@ -303,12 +303,12 @@ TEMPERATURE_THRESHOLD = <={get_setpoint \
 FAN_THRESHOLD = <={get_setpoint $fan_margin_desktop_C $fan_margin_mobile_C}
 
 fn get_curtemp {
-	result `{sensors|grep Package\\\|Physical \
+	result `{sensors >[2]/dev/null|grep Package\\\|Physical \
 			|cut -d: -f2|cut -d\. -f1|tr -d ' +'}
 }
 
 fn fan () {
-	speeds = `{sensors|grep fan|cut -d: -f2|awk '{print $1}'}
+	speeds = `{sensors >[2]/dev/null|grep fan|cut -d: -f2|awk '{print $1}'}
 	speed = 0; for s $speeds {speed = `($speed+$s)}
 	if {{<=get_curtemp :gt $FAN_THRESHOLD} && {~ $speed 0}} {
 		cycles = `($cycles+1)
@@ -533,7 +533,9 @@ fn title {herbstclient attr clients.focus.title >[2]/dev/null}
 
 fn track {
 	let (info = `` '' {/usr/bin/mpc -f $trackfmt}) {
-		if {grep -qwF '[paused]' <<<$info} {
+		if {~ `{wc -l <<<$info} 1} {
+			echo
+		} else if {grep -qwF '[paused]' <<<$info} {
 			echo
 		} else {
 			head -1 <<<$info|iconv -tlatin1//translit
