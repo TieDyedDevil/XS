@@ -367,7 +367,7 @@ let (i4 = $_s; i6 = $_s; a = $_s; b = $_s; c = $_s; e = $_s; \
 	g = $_s; m = $_s; n = $_s; v = $_s; w = $_s; z = $_s; i" = $_s) {
 
 	fn post_status_event {
-		echo status\t$i4$i6$a$b$c$e$g$m$n$v$w$z$i" >$event
+		echo status\t$i4$i6$a$b$c$e$g$m$n$v$w$z$'i"' >$event
 	}
 
 	fn update_network_status_lights {
