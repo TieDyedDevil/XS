@@ -128,7 +128,11 @@ geometry = `{herbstclient monitor_rect $monitor >[2]/dev/null}
 (x y panel_width _) = $geometry
 
 # Get virtualization info
-is_virt = if {~ <={systemd-detect-virt -q} 0} {result true} else {result false}
+if {~ <={systemd-detect-virt -q} 0} {
+	is_virt = true
+} else {
+	is_virt = false
+}
 
 # Define the common part of the temporary file names
 tmpfile_base = `{mktemp -u /tmp/panel-XXXXXXXX}
@@ -193,11 +197,11 @@ mkfifo $trigger
 event = $tmpfile_base^-event-^$monitor
 mkfifo $event
 
-# Create the OSD fifo
+# Create the OSD message fifo
 osdmsg = $tmpfile_base^-osdmsg-^$monitor
 mkfifo $osdmsg
 
-# Initialize task management
+# Initialize task pid tracker
 taskpids =
 fn rt {|*| taskpids = $taskpids $* $apid}
 
