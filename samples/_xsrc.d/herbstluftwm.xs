@@ -76,8 +76,12 @@ fn mons {
 			{~ $f 5* 6* 7* 8*} && diag = `{printf %s%s $diag ½}
 			xres = `{echo $xrinfo|grep -o '^[^ ]\+ .* [0-9]\+x'}
 			xres = <={~~ $xres *x}
-			dpi = `(25.4*$xres/$w)
-			(dpi _) = <={~~ $dpi *.*}
+			if {~ $w 0} {
+				dpi = 0
+			} else {
+				dpi = `(25.4*$xres/$w)
+				(dpi _) = <={~~ $dpi *.*}
+			}
 			join -1 7 -o1.1,1.7,1.2,2.2,2.3,1.4,1.5,1.8 \
 				<{hc list_monitors|grep "$m"} \
 				<{printf "%s"\ %s\ %s"\;%dppi\n \
