@@ -56,7 +56,7 @@ trackfmt = '%title%'               # mpc(1)
 
 osd_font = '-*-liberation mono-bold-r-*-*-*-420-*-*-*-*-iso10646-1'  # XLFD
 osd_offset_px = 50
-osd_dwell_s = 3
+osd_dwell_s = 2
 
 battery_low_% = 10
 battery_critical_% = 5
@@ -179,9 +179,9 @@ dzen2_gcpubar_opts = -h `($panel_height_px/2) \
 	-fg $cpubar_meter -bg $cpubar_background \
 	-i 1.5
 
-osd_cat_opts = -f $osd_font \
+osd_cat_opts = -f $osd_font -s 5 -c $alrfg \
 	-i `($x+$osd_offset_px) -o `($y+$osd_offset_px+$panel_height_px) \
-	-s 5 -c $alrfg -d $osd_dwell_s
+	-d $osd_dwell_s -w -l 1
 
 # Define a logger, enabled by the debug variable
 fn logger {|fmt args| if $debug {printf 'PANEL: '^$fmt^\n $args >[1=2]}}
