@@ -25,7 +25,7 @@ Mod = Mod4   # Use the super key as the main modifier
 hc keybind $Mod^-Shift-q quit
 hc keybind $Mod^-Shift-r reload
 hc keybind $Mod^-Shift-c close
-hc keybind $Mod^-Return spawn st
+hc keybind $Mod^-Return spawn stq  # st >[2]/dev/null (~/.local/bin/stq)
 hc keybind $Mod^-e spawn dmenu_run
 
 # motions summarized
