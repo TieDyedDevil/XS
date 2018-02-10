@@ -37,7 +37,7 @@
 #
 # Inbox status requires a valid inbox.fetchmailrc file in the same
 # directory as this script; see fetchmail(1). The fetchmail configuration
-# must specify `no idle`.
+# *must* specify `no idle` and *should* specify `timeout 15`.
 #
 # Alerts display on the OSD when the panel is concealed by a fullscreen
 # window. The battery-critical alert is always displayed on the OSD
