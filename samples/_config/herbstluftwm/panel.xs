@@ -35,9 +35,9 @@
 #   Z screensaver is enabled
 #   " host is virtualized
 #
-# Inbox status requires a valid ~/.fetchmailrc file; see fetchmail(1).
-# The fetchmail configuration must specify `no idle`. No other
-# fetchmail instance in this session may access the same email host.
+# Inbox status requires a valid inbox.fetchmailrc file in the same
+# directory as this script; see fetchmail(1). The fetchmail configuration
+# must specify `no idle`.
 #
 # Alerts display on the OSD when the panel is concealed by a fullscreen
 # window. The battery-critical alert is always displayed on the OSD
@@ -482,10 +482,14 @@ if $enable_other_status {
 	rt other
 }
 
+ARG0 = $0
+HERE = `{cd `{dirname $ARG0}; pwd}
 if $enable_inbox {
-	access -f ~/.fetchmailrc && {
+	access -f $HERE/inbox.fetchmailrc && {
 		while true {
-			%with-read-lines <{fetchmail -c} {|line|
+			%with-read-lines <{fetchmail -c \
+					--fetchmailrc $HERE/inbox.fetchmailrc \
+					--pidfile $HERE/fetchmail.pid} {|line|
 				(tm rm _) = \
 					<={~~ $line *' messages ('*' seen)'*}
 				logger 'inbox %s %s' $tm $rm
