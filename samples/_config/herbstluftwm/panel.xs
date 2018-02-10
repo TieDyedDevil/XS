@@ -26,6 +26,7 @@
 #   C CDMA cellular connection active
 #   E Ethernet connection active
 #   G GSM cellular connection active
+#   I inbox flag
 #   M mouse keys active
 #   N network connected
 #   n network connected to a portal
@@ -33,6 +34,10 @@
 #   W WiFi connection active
 #   Z screensaver is enabled
 #   " host is virtualized
+#
+# Inbox status requires a valid ~/.fetchmailrc file; see fetchmail(1).
+# The fetchmail configuration must specify `no idle`. No other
+# fetchmail instance in this session may access the same email host.
 #
 # Alerts display on the OSD when the panel is concealed by a fullscreen
 # window. The battery-critical alert is always displayed on the OSD
@@ -75,6 +80,7 @@ enable_alerts = true
 enable_network_status = true
 enable_other_status = true
 enable_cpubar = true
+enable_inbox = true
 
 # If true, write startup information and event-loop errors to stderr
 debug = false
@@ -99,6 +105,7 @@ debug = false
 #               /    /------------------------<----/
 # netstat& ----/     |                                 ; async
 # other& -----/      |                                 ; poll/sleep ( 3s)
+# inbox& ----/       |                                 ; poll/sleep (30s)
 #                    \---> event| event-loop | dzen2   ; wait
 
 # ========================================================================
@@ -108,6 +115,7 @@ debug = false
 # Override any extant aliases and check for existence of the binary
 fn-dzen2 = <={access -1en dzen2 $path}
 fn-dzen2-gcpubar = <={access -1en dzen2-gcpubar $path}
+fn-fetchmail = <={access -1en fetchmail $path}
 fn-hcitool = <={access -1en hcitool $path}
 fn-herbstclient = <={access -1en herbstclient $path}
 fn-iconv = <={access -1en iconv $path}
@@ -132,6 +140,22 @@ if {~ <={systemd-detect-virt -q} 0} {
 	is_virt = true
 } else {
 	is_virt = false
+}
+
+# Kill prior incarnation's processes and fifos that avoided assassination
+taskfile = /tmp/panel-^$monitor^-tasks
+for (task pid) `{access -f $taskfile && cat $taskfile} {
+	if {kill -0 $pid >[2]/dev/null} {
+		logger 'cleanup pgroup %d (%s)' $pid $task
+		pkill -g $pid
+	}
+}
+fifofile = /tmp/panel-^$monitor^-fifos
+for ff `{access -f $fifofile && cat $fifofile} {
+	if {access $ff} {
+		logger 'cleanup fifo %s' $ff
+		rm -f $ff
+	}
 }
 
 # Define the common part of the temporary file names
@@ -367,11 +391,11 @@ if $enable_alerts {
 }
 
 # Send status events
-let (i4 = $_s; i6 = $_s; a = $_s; b = $_s; c = $_s; e = $_s; \
-	g = $_s; m = $_s; n = $_s; v = $_s; w = $_s; z = $_s; i" = $_s) {
+let (i4 = $_s; i6 = $_s; a = $_s; b = $_s; c = $_s; e = $_s; g = $_s; \
+	ii = $_s; m = $_s; n = $_s; v = $_s; w = $_s; z = $_s; i" = $_s) {
 
 	fn post_status_event {
-		echo status\t$i4$i6$a$b$c$e$g$m$n$v$w$z$'i"' >$event
+		echo status\t$i4$i6$a$b$c$e$g$ii$m$n$v$w$z$'i"' >$event
 	}
 
 	fn update_network_status_lights {
@@ -420,13 +444,21 @@ let (i4 = $_s; i6 = $_s; a = $_s; b = $_s; c = $_s; e = $_s; \
 		post_status_event
 	}
 
+	fn set_inbox_flag {|f|
+		if $f {ii = I} else {ii = $_s}
+		post_status_event
+	}
+
 	if $is_virt {i" = "}
 
-	if {$enable_alerts || $enable_network_status || $enable_other_status} {
+	if {$enable_alerts || $enable_network_status || $enable_other_status \
+			|| $enable_inbox} {
 		<$trigger while true {
 			switch <=read (
 			network {update_network_status_lights}
 			other {update_other_status_lights}
+			newmail {set_inbox_flag true}
+			nonewmail {set_inbox_flag false}
 			{sleep 1}  # reached on $trigger EOF; shouldn't happen
 			)
 		} &
@@ -448,6 +480,25 @@ if $enable_other_status {
 		sleep 3
 	} >$trigger &
 	rt other
+}
+
+if $enable_inbox {
+	access -f ~/.fetchmailrc && {
+		while true {
+			%with-read-lines <{fetchmail -c} {|line|
+				(tm rm _) = \
+					<={~~ $line *' messages ('*' seen)'*}
+				logger 'inbox %s %s' $tm $rm
+				if {$tm :gt $rm} {
+					echo newmail
+				} else {
+					echo nonewmail
+				}
+			}
+			sleep 30
+		} >$trigger &
+		rt inbox
+	}
 }
 
 # Draw the three panel regions
@@ -484,22 +535,8 @@ fn drawright {|text|
 	}
 }
 
-# Kill prior incarnation's processes and fifos that avoided assassination
-taskfile = /tmp/panel-^$monitor^-tasks
-for (task pid) `{access -f $taskfile && cat $taskfile} {
-	if {kill -0 $pid >[2]/dev/null} {
-		logger 'cleanup pgroup %d (%s)' $pid $task
-		pkill -g $pid
-	}
-}
+# Write summary info
 echo $taskpids >$taskfile
-fifofile = /tmp/panel-^$monitor^-fifos
-for ff `{access -f $fifofile && cat $fifofile} {
-	if {access $ff} {
-		logger 'cleanup fifo %s' $ff
-		rm -f $ff
-	}
-}
 echo $event $trigger $osdmsg >$fifofile
 
 # Process events
@@ -554,10 +591,14 @@ fn track {
 	}
 }
 
-logger 'starting: %s; %s; %s' \
+logger 'starting: %s; %s; %s; %s; %s; %s; %s' \
+	<={%argify `{var enable_track}} \
+	<={%argify `{var enable_clock}} \
+	<={%argify `{var enable_alerts}} \
 	<={%argify `{var enable_network_status}} \
 	<={%argify `{var enable_other_status}} \
-	<={%argify `{var enable_cpubar}}
+	<={%argify `{var enable_cpubar}} \
+	<={%argify `{var enable_inbox}}
 
 let (tags; sep; title; track; lights; at = ''; st = ''; cpubar; clock) {
 	tags = `` \n {drawtags}
@@ -574,6 +615,7 @@ let (tags; sep; title; track; lights; at = ''; st = ''; cpubar; clock) {
 				focus_changed {title = $p2}
 				window_title_changed {title = $p2}
 				player {track = `{track}}
+				inbox {set_inbox_flag $p1}
 				alert {at = <={%argify $p1}; \
 					lights = `{lights $at $st}}
 				status {st = <={%argify $p1}; \
