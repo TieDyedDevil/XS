@@ -520,11 +520,14 @@ if $enable_inbox {
 					--pidfile $HERE/fetchmail.pid} {|line|
 				(tm rm _) = \
 					<={~~ $line *' messages ('*' seen)'*}
-				logger 'inbox %s %s' $tm $rm
-				if {$tm :gt $rm} {
-					echo newmail
-				} else {
-					echo nonewmail
+				logger 'inbox %s %s' \
+					<={%argify $tm} <={%argify $rm}
+				if {{!~ $tm ()} && {!~ $rm ()}} {
+					if {$tm :gt $rm} {
+						echo newmail
+					} else {
+						echo nonewmail
+					}
 				}
 			}
 			sleep 30
