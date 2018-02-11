@@ -15,6 +15,7 @@
 #   B low battery
 #   D high disk utilization
 #   F fan failure (temperature rise w/stopped fan)
+#   I high I/O utilization
 #   S swapfile in-use
 #   T high temperature
 #
@@ -68,6 +69,7 @@ battery_critical_% = 5
 disk_full_% = 85
 fan_margin_desktop_C = 50
 fan_margin_mobile_C = 40
+io_active_% = 70
 temperature_margin_desktop_C = 25
 temperature_margin_mobile_C = 15
 swap_usage_% = 5
@@ -119,6 +121,7 @@ fn-fetchmail = <={access -1en fetchmail $path}
 fn-hcitool = <={access -1en hcitool $path}
 fn-herbstclient = <={access -1en herbstclient $path}
 fn-iconv = <={access -1en iconv $path}
+fn-iostat = <={access -1en iostat $path}
 fn-mpc = <={access -1en mpc $path}
 fn-nmcli = <={access -1en nmcli $path}
 fn-osd_cat = <={access -1en osd_cat $path}
@@ -140,6 +143,17 @@ if {~ <={systemd-detect-virt -q} 0} {
 	is_virt = true
 } else {
 	is_virt = false
+}
+
+# Define a logger, enabled by the debug variable
+fn logger {|fmt args|
+	if $debug {
+		catch {|e|
+			echo 'PANEL: logger failed: ' $e $fmt $args >[1=2]
+		} {
+			printf 'PANEL: '^$fmt^\n $args >[1=2]
+		}
+	}
 }
 
 # Kill prior incarnation's processes and fifos that avoided assassination
@@ -206,9 +220,6 @@ dzen2_gcpubar_opts = -h `($panel_height_px/2) \
 osd_cat_opts = -f $osd_font -s 5 -c $alrfg \
 	-i `($x+$osd_offset_px) -o `($y+$osd_offset_px+$panel_height_px) \
 	-d $osd_dwell_s -w -l 1
-
-# Define a logger, enabled by the debug variable
-fn logger {|fmt args| if $debug {printf 'PANEL: '^$fmt^\n $args >[1=2]}}
 
 # Carve out space for the panel
 herbstclient pad $monitor $panel_height_px
@@ -356,6 +367,16 @@ fn fan () {
 	}
 }
 
+fn io () {
+	busy = false
+	%with-read-lines <{iostat -dxy 3 1 \
+			| awk '/^[^D]/ {if ($14) print $1 " " $14}'} {|line|
+		(disk load) = <={~~ $line *\ *}
+		if {$load :ge $io_active_%} {busy = true}
+	}
+	result $busy
+}
+
 fn swap () {
 	swapping = `{
 tail -n +2 /proc/swaps | awk '
@@ -382,9 +403,10 @@ if $enable_alerts {
 		if <=battery {b = B} else {b = $_a}
 		if <=disk {d = D} else {d = $_a}
 		if <=fan {f = F} else {f = $_a}
+		if <=io {i = I} else {i = $_a}
 		if <=swap {s = S} else {s = $_a}
 		if <=temperature {t = T} else {t = $_a}
-		echo alert\t$b$d$f$s$t
+		echo alert\t$b$d$f$i$s$t
 		sleep 10
 	} >$event &
 	rt alert
@@ -635,4 +657,4 @@ let (tags; sep; title; track; lights; at = ''; st = ''; cpubar; clock) {
 				`{if $enable_clock {drawright $clock}}
 		}
 	} | dzen2 $dzen2_opts
-} |[2] {if $debug {cat >>/dev/stderr}}
+}
