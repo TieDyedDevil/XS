@@ -402,6 +402,8 @@ fn temperature () {
 }
 
 if $enable_alerts {
+	b = $_a; d = $_a; f = $_a; i = $_a; s = $_a; t = $_a
+	echo alert\t$b$d$f$i$s$t >$event &
 	while true {
 		if <=battery {b = B} else {b = $_a}
 		if <=disk {d = D} else {d = $_a}
@@ -478,6 +480,7 @@ let (i4 = $_s; i6 = $_s; a = $_s; b = $_s; c = $_s; e = $_s; g = $_s; \
 
 	if {$enable_alerts || $enable_network_status || $enable_other_status \
 			|| $enable_inbox} {
+		post_status_event &
 		<$trigger while true {
 			switch <=read (
 				network {update_network_status_lights}
