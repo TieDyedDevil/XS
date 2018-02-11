@@ -428,12 +428,12 @@ let (i4 = $_s; i6 = $_s; a = $_s; b = $_s; c = $_s; e = $_s; g = $_s; \
 						|cut -d: -f3,4} {|net_info|
 				(net_type dev) = <={~~ $net_info *:*}
 				switch $net_type (
-				'cdma' {c = C}
-				'802-3-ethernet' {e = E}
-				'gsm' {g = G}
-				'vpn' {v = V}
-				'802-11-wireless' {w = W}
-				{}
+					'cdma' {c = C}
+					'802-3-ethernet' {e = E}
+					'gsm' {g = G}
+					'vpn' {v = V}
+					'802-11-wireless' {w = W}
+					{}
 				)
 				if {nmcli -t device show $dev \
 					| grep -q '^IP4\.GATEWAY:.\+$' } \
@@ -444,9 +444,9 @@ let (i4 = $_s; i6 = $_s; a = $_s; b = $_s; c = $_s; e = $_s; g = $_s; \
 			}
 		}
 		switch `{nmcli --colors no networking connectivity} (
-		'portal' {n = n}
-		'full' {n = N}
-		{}
+			'portal' {n = n}
+			'full' {n = N}
+			{}
 		)
 		post_status_event
 	}
@@ -477,11 +477,11 @@ let (i4 = $_s; i6 = $_s; a = $_s; b = $_s; c = $_s; e = $_s; g = $_s; \
 			|| $enable_inbox} {
 		<$trigger while true {
 			switch <=read (
-			network {update_network_status_lights}
-			other {update_other_status_lights}
-			newmail {set_inbox_flag true}
-			nonewmail {set_inbox_flag false}
-			{sleep 1}  # reached on $trigger EOF; shouldn't happen
+				network {update_network_status_lights}
+				other {update_other_status_lights}
+				newmail {set_inbox_flag true}
+				nonewmail {set_inbox_flag false}
+				{sleep 1}  # reached on $trigger EOF; abnormal
 			)
 		} &
 		rt lights
@@ -532,11 +532,11 @@ fn drawtags {
 	for t `{herbstclient tag_status $monitor} {
 		let ((f n) = `{cut --output-delimiter=' ' -c1,2- <<<$t}) {
 			switch $f (
-			'#' {printf $selected_attr}
-			'+' {printf $unfocused_attr}
-			':' {printf $occupied_attr}
-			'!' {printf $urgent_attr}
-			{printf $default_attr}
+				'#' {printf $selected_attr}
+				'+' {printf $unfocused_attr}
+				':' {printf $occupied_attr}
+				'!' {printf $urgent_attr}
+				{printf $default_attr}
 			)
 			printf \ %s\n $n
 		}
