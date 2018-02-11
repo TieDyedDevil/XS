@@ -51,19 +51,20 @@
 # ========================================================================
 #                      C O N F I G U R A T I O N
 
+# Presentation
 panel_height_px = 22
-# Setting the light-off string to a character
-# might be desirable with a monospaced font.
-_a = ''  # alert light
-_s = ''  # status light
 panel_font = 'NotoSans-14'         # XLFD or Xft
-clockfmt = '%a %Y-%m-%d %H:%M %Z'  # date(1); one-minute resolution
+show_alert_placeholders = false
+show_status_placeholders = false
+
 trackfmt = '%title%'               # mpc(1)
+clockfmt = '%a %Y-%m-%d %H:%M %Z'  # date(1); one-minute resolution
 
 osd_font = '-*-liberation mono-bold-r-*-*-*-420-*-*-*-*-iso10646-1'  # XLFD
 osd_offset_px = 50
 osd_dwell_s = 2
 
+# Alert thresholds
 battery_low_% = 10
 battery_critical_% = 5
 disk_full_% = 85
@@ -74,7 +75,7 @@ temperature_margin_desktop_C = 25
 temperature_margin_mobile_C = 15
 swap_usage_% = 5
 
-# Presumed approximately-increasing order of CPU load:
+# Functionality, listed in presumed approximately-increasing order of CPU load
 enable_track = true
 enable_clock = true
 enable_herbstclient = true  # value ignored; always enabled
@@ -84,7 +85,7 @@ enable_other_status = true
 enable_cpubar = true
 enable_inbox = true
 
-# If true, write startup information and event-loop errors to stderr
+# If true, write logger information to stderr
 debug = false
 
 # ========================================================================
@@ -155,6 +156,10 @@ fn logger {|fmt args|
 		}
 	}
 }
+
+# Define placeholders
+if $show_alert_placeholders {_a = '.'} else {_a = ''}
+if $show_status_placeholders {_s = '.'} else {_s = ''}
 
 # Kill prior incarnation's processes and fifos that avoided assassination
 taskfile = /tmp/panel-^$monitor^-tasks
