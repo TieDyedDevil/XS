@@ -368,13 +368,11 @@ fn fan () {
 }
 
 fn io () {
-	busy = false
-	%with-read-lines <{iostat -dxy 3 1 \
-			| awk '/^[^D]/ {if ($14) print $1 " " $14}'} {|line|
-		(disk load) = <={~~ $line *\ *}
-		if {$load :ge $io_active_%} {busy = true}
-	}
-	result $busy
+	load = `{iostat -dxy -g all -H 3 1 | awk '/^[^A-Z]/ {print $14}'}
+	if {$load :ge $io_active_%} {
+		alert_if_fullscreen 'I/O activity > %d%%' $io_active_%
+		result true
+	} else {result false}
 }
 
 fn swap () {
@@ -407,7 +405,7 @@ if $enable_alerts {
 		if <=swap {s = S} else {s = $_a}
 		if <=temperature {t = T} else {t = $_a}
 		echo alert\t$b$d$f$i$s$t
-		sleep 10
+		sleep 7  # io runs for 3 sec; total is 10
 	} >$event &
 	rt alert
 }
