@@ -220,7 +220,7 @@ alert_indicator_attr = `{attr $alrbg $alrfg}
 separator_attr = `{attr $sepbg $sepfg}
 
 dzen2_opts = -w $panel_width -x $x -y $y -h $panel_height_px \
-	-ta l -bg $bgcolor -fg $fgcolor -fn $panel_font
+	-e button3= -ta l -bg $bgcolor -fg $fgcolor -fn $panel_font
 
 dzen2_gcpubar_opts = -h `($panel_height_px/2) \
 	-fg $cpubar_meter -bg $cpubar_background \
