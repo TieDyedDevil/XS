@@ -213,9 +213,9 @@ occupied_attr = `{attr $occbg $occfg}
 unfocused_attr = `{attr $unfbg $unffg}
 urgent_attr = `{attr $urgbg $urgfg}
 default_attr = `{attr $dflbg $dflfg}
-status_marker_attr = `{attr $stsbg $sepfg}
+status_marker_attr = `{attr $stsbg $stsfg}
 status_indicator_attr = `{attr $stsbg $stsfg}
-alert_marker_attr = `{attr $alrbg $sepfg}
+alert_marker_attr = `{attr $alrbg $alrfg}
 alert_indicator_attr = `{attr $alrbg $alrfg}
 separator_attr = `{attr $sepbg $sepfg}
 
