@@ -47,6 +47,22 @@
 # With the exception of the tag indicators and title, panel content may
 # be enabled selectively, whether for cosmetic or functional preference
 # or to further reduce the panel's already low CPU load.
+#
+# The panel "borrows" some of the colors defined by the wm, as follows:
+#   frame_border_normal_color
+#     Used as the primary background color. Used as the foreground color
+#     for selected, unfocused and urgent tags.
+#   frame_border_active_color
+#     Used as the background color for unfocused tags.
+#   window_border_normal_color
+#     Used as the foreground color for unfocused tags and the track and
+#     clock text.
+#   window_border_active_color
+#     Used as the background color for the selected tag.
+#   window_border_urgent_color
+#     Used as the background color for urgent tags.
+#
+# Additional panel colors are hardwired and presume a "dark" wm theme.
 
 # ========================================================================
 #                      C O N F I G U R A T I O N
