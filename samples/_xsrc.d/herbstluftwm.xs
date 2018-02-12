@@ -6,7 +6,8 @@ fn barre {
 	let (hc = herbstclient) {
 		hc emit_hook quit_panel
 		for monitor `{hc list_monitors | cut -d: -f1} {
-			setsid ~/.config/herbstluftwm/panel.xs $monitor &
+			setsid ~/.config/herbstluftwm/panel.xs $monitor \
+				>>[2]~/.startx.log &
 		}
 	}
 }
