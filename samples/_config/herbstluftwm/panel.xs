@@ -132,11 +132,15 @@ fn-xftwidth = <={access -1en xftwidth $path}
 fn-xkbset = <={access -1en xkbset $path}
 fn-xset = <={access -1en xset $path}
 
+# What's our name?
+ARG0 = $0
+PGM = `{basename $ARG0}
+
 # Get monitor info
 monitor = $1
 ~ $monitor () && monitor = 0
 geometry = `{herbstclient monitor_rect $monitor >[2]/dev/null}
-~ $geometry () && {throw error panel.sh 'Invalid monitor '^$monitor}
+~ $geometry () && {throw error $PGM 'Invalid monitor '^$monitor}
 (x y panel_width _) = $geometry
 
 # Get virtualization info
@@ -150,9 +154,9 @@ if {~ <={systemd-detect-virt -q} 0} {
 fn logger {|fmt args|
 	if $debug {
 		catch {|e|
-			echo 'PANEL: logger failed: ' $e $fmt $args >[1=2]
+			echo $PGM^': logger failed:' $e $fmt $args >[1=2]
 		} {
-			printf 'PANEL: '^$fmt^\n $args >[1=2]
+			printf '%s: '^$fmt^\n $PGM $args >[1=2]
 		}
 	}
 }
@@ -511,7 +515,6 @@ if $enable_other_status {
 	rt other
 }
 
-ARG0 = $0
 HERE = `{cd `{dirname $ARG0}; pwd}
 if $enable_inbox {
 	access -f $HERE/inbox.fetchmailrc && {
