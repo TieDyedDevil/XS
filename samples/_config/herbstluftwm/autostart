@@ -154,7 +154,7 @@ hc set frame_transparent_width 5
 hc set frame_gap 4
 hc set gapless_grid 0
 
-hc attr theme.active.color '#9fbc00'
+hc attr theme.active.color '#3366dd'
 hc attr theme.normal.color '#454545'
 hc attr theme.urgent.color orange
 hc attr theme.inner_width 1
