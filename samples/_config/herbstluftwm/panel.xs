@@ -429,8 +429,9 @@ let (i4 = $_s; i6 = $_s; a = $_s; b = $_s; c = $_s; e = $_s; g = $_s; \
 		c = $_s; e = $_s; g = $_s; v = $_s; w = $_s
 		i4 = $_s; i6 = $_s; n = $_s
 		let (net_type; dev) {
-			%with-read-lines <{nmcli -t connection show --active \
-						|cut -d: -f3,4} {|net_info|
+			%with-read-lines \
+			<{nmcli -t connection show --active |cut -d: -f3,4
+			} {|net_info|
 				(net_type dev) = <={~~ $net_info *:*}
 				switch $net_type (
 					'cdma' {c = C}
@@ -515,20 +516,20 @@ HERE = `{cd `{dirname $ARG0}; pwd}
 if $enable_inbox {
 	access -f $HERE/inbox.fetchmailrc && {
 		while true {
-			%with-read-lines <{fetchmail -c \
-					--fetchmailrc $HERE/inbox.fetchmailrc \
-					--pidfile $HERE/fetchmail.pid} {|line|
+			%with-read-lines \
+			<{fetchmail -c --fetchmailrc $HERE/inbox.fetchmailrc \
+				--pidfile $HERE/fetchmail.pid
+			} {|line|
 				(tm rm _) = \
 					<={~~ $line *' messages ('*' seen)'*}
-				logger 'inbox %s %s' \
-					<={%argify $tm} <={%argify $rm}
 				if {{!~ $tm ()} && {!~ $rm ()}} {
+					logger 'inbox %s %s' $tm $rm
 					if {$tm :gt $rm} {
 						echo newmail
 					} else {
 						echo nonewmail
 					}
-				}
+				} else {logger 'inbox %s' $line}
 			}
 			sleep 30
 		} >$trigger &
