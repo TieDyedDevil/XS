@@ -278,9 +278,12 @@ mkfifo $event
 osdmsg = $tmpfile_base^-osdmsg-^$monitor
 mkfifo $osdmsg
 
+# Write fifo summary info
+echo $event $trigger $osdmsg >$fifofile
+
 # Initialize task pid tracker
 taskpids =
-fn rt {|*| taskpids = $taskpids $* $apid}
+fn rt {|*| taskpids = $taskpids $* $apid; echo $taskpids >$taskfile}
 
 # Send window manager events
 herbstclient --idle >$event &
@@ -627,10 +630,6 @@ fn drawright {|text|
 			printf '^p(_RIGHT)^p(-%d)%s'\n `($w+$pad) $t
 	}
 }
-
-# Write summary info
-echo $taskpids >$taskfile
-echo $event $trigger $osdmsg >$fifofile
 
 # Process events
 fn terminate {
