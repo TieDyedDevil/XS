@@ -33,6 +33,24 @@ fn battery {
 		!~ $curr 0 && printf '%.1f%%'\n `(100.0*$curr/$full)
 	}
 }
+fn bell {|*|
+	.d 'Bell control'
+	.a 'on|off'
+	.c 'system'
+	%only-X
+	switch <={%argify $*} (
+		off {pacmd unload-module module-x11-bell}
+		on {pacmd load-module module-x11-bell sample=x11-bell \
+			display=:0.0}
+		{
+			if {pacmd list-modules|grep -q module-x11-bell} {
+				echo On
+			} else {
+				echo Off
+			}
+		}
+	)
+}
 fn cookie {
 	.d 'Fortune'
 	.c 'system'
