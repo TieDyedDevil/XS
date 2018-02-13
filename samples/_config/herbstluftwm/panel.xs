@@ -463,7 +463,12 @@ fn temperature () {
 
 if $enable_alerts {
 	b = $_a; d = $_a; f = $_a; i = $_a; l = $_a; s = $_a; t = $_a
-	echo alert\t$b$d$f$i$l$s$t >$event &
+
+	fn post_alert_event {
+		echo alert\t$b$d$f$i$l$s$t >$event
+	}
+
+	post_alert_event &
 	while true {
 		if <=battery {b = B} else {b = $_a}
 		if <=disk {d = D} else {d = $_a}
@@ -472,7 +477,7 @@ if $enable_alerts {
 		if <=load {l = L} else {l = $_a}
 		if <=swap {s = S} else {s = $_a}
 		if <=temperature {t = T} else {t = $_a}
-		echo alert\t$b$d$f$i$l$s$t
+		post_alert_event
 		sleep 7  # io runs for 3 sec; total is 10
 	} >$event &
 	rt alert
