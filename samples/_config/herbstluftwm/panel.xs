@@ -16,6 +16,7 @@
 #   D high disk space utilization
 #   F fan failure (temperature rise w/stopped fan)
 #   I high I/O utilization of physical block device
+#   L 1-minute load average exceeds number of available processors
 #   S swapfile in-use
 #   T high temperature
 #
@@ -337,7 +338,7 @@ fn battery () {
 			}
 			if {!~ $cap 0} {
 				v = `(100.0*$chg/$cap)
-				if {$v :le $battery_low_%} {w = true}
+				if {$v :lt $battery_low_%} {w = true}
 			}
 		}
 		if {$v :le $battery_critical_%} \
@@ -354,7 +355,7 @@ fn disk () {
 		| awk '{print $5 "\t" $6}'}
 	escape {|fn-return| {
 		for (occ name) $utilizations {
-			if {$occ :ge $disk_full_%} {
+			if {$occ :gt $disk_full_%} {
 				alert_if_fullscreen 'Disk > %d%% full' \
 					$disk_full_%
 				return true
@@ -408,7 +409,7 @@ fn io () {
 			| awk '/^[^A-Z]/ {print $1 ":" $14}'} \
 		{|line|
 			(disk load) = <={~~ $line *:*}
-			if {$load :ge $io_active_%} {
+			if {$load :gt $io_active_%} {
 				alert_if_fullscreen 'I/O activity > %d%%' \
 					$io_active_%
 				return true
@@ -416,6 +417,15 @@ fn io () {
 		}
 		return false
 	}}
+}
+
+fn load () {
+	la1m = `{cat /proc/loadavg|cut -d' ' -f1}
+	cpus = `nproc
+	if {$la1m :gt $cpus} {
+		alert_if_fullscreen '1-minute load average > %d' $cpus
+		result true
+	} else {result false}
 }
 
 fn swap () {
@@ -440,16 +450,17 @@ fn temperature () {
 }
 
 if $enable_alerts {
-	b = $_a; d = $_a; f = $_a; i = $_a; s = $_a; t = $_a
-	echo alert\t$b$d$f$i$s$t >$event &
+	b = $_a; d = $_a; f = $_a; i = $_a; l = $_a; s = $_a; t = $_a
+	echo alert\t$b$d$f$i$l$s$t >$event &
 	while true {
 		if <=battery {b = B} else {b = $_a}
 		if <=disk {d = D} else {d = $_a}
 		if <=fan {f = F} else {f = $_a}
 		if <=io {i = I} else {i = $_a}
+		if <=load {l = L} else {l = $_a}
 		if <=swap {s = S} else {s = $_a}
 		if <=temperature {t = T} else {t = $_a}
-		echo alert\t$b$d$f$i$s$t
+		echo alert\t$b$d$f$i$l$s$t
 		sleep 7  # io runs for 3 sec; total is 10
 	} >$event &
 	rt alert
