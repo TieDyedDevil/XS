@@ -229,14 +229,16 @@ fn list {|*|
 		}
 	}
 }
-fn lock {
+fn lock {|*|
 	.d 'Lock screen'
+	.a '-t  # transparent lock, disable DPMS; X only'
+	.a '-a  # lock all consoles; vt only'
 	.c 'system'
 	.r 'screensaver'
 	if {~ $DISPLAY ()} {
-		vlock
+		vlock $*
 	} else {
-		~/.local/bin/lock
+		~/.local/bin/lock $*
 	}
 }
 fn lpman {|man|

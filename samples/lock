@@ -1,11 +1,13 @@
-#! /usr/bin/env xs
+#! /usr/local/bin/xs --
 
 XL_UNAESTHETIC = -solitaire,-eyes,-world,-image,-nose,-dclock,-xjack,-daisy,\
 ^-lightning,-tube,-decay,-life1d,-star,-tetris,-puzzle,-marquee
 XL_BROKEN = -pacman
 XL_MODELIST = allnice,$XL_UNAESTHETIC,$XL_BROKEN
-AC_LOCKOPTS = -modelist $XL_MODELIST -erasemode squaretate -duration 150
+AC_LOCKOPTS = -modelist $XL_MODELIST -erasemode fizzle,squaretate \
+-erasedelay 5000 -duration 150
 DC_LOCKOPTS = -mode blank -dpmsoff 5 -delay 2000000
+TRANSPARENT_LOCKOPTS = -mode blank -geometry 0x0 -dpmsoff 0 -bg black
 
 fn locker {|*|
 	pkill -USR1 dunst
@@ -14,14 +16,17 @@ fn locker {|*|
 	-planfont '-*-liberation mono-bold-i-*-*-*-160-*-*-*-*-iso10646-1' \
 	-echokeys -echokey _ -icongeometry 256x256 +description -timeelapsed \
 	-saturation 0.5 -bg 'cadet blue' -fg white -timeout 15 +resetsaver \
-	-fullrandom -username 'Username: ' -password 'Password:' \
+	+usefirst -fullrandom -username 'Username: ' -password 'Password:' \
 	-info 'Enter password to unlock.' $*
 	pkill -USR2 dunst
 }
 
 AC = /sys/class/power_supply/AC
 
-if {{! access -d $AC} || {~ `{cat $AC/online} 1}} {
+if {~ $1 -t} {
+	osd Locked
+	locker $TRANSPARENT_LOCKOPTS
+} else if {{! access -d $AC} || {~ `{cat $AC/online} 1}} {
 	locker $AC_LOCKOPTS
 } else {
 	locker $DC_LOCKOPTS
