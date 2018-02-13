@@ -7,6 +7,14 @@
 
 # Purpose: Display a panel for herbstluftwm.
 #
+# Explicit goals: low power consumption (given the constraints of being
+# written in a shell language); good visual integration with wm; focus
+# attention on the most important elements; properly clean up resources
+# upon termination or restart.
+#
+# Explicit non-goals: pointer integration; keyboard control; configurability
+# beyond that already provided; support for "light" themes.
+#
 # The left region contains tag indicators, alert and status indicators, a CPU
 # load bar and the title of the focused window. The center region shows info
 # for the track being played by mpd. The right region shows a clock.
@@ -41,9 +49,10 @@
 # directory as this script; see fetchmail(1). The fetchmail configuration
 # *must* specify `no idle` and *should* specify `timeout 15`.
 #
-# Alerts display on the OSD when the panel is concealed by a fullscreen
-# window. The battery-critical alert is always displayed on the OSD
-# regardless of whether the focused window is fullscreen.
+# Alerts are displayed as short messages on the OSD if triggered when the
+# panel is concealed by a fullscreen window. The battery-critical alert
+# is always displayed on the OSD regardless of whether the focused window
+# is fullscreen.
 #
 # With the exception of the tag indicators and title, panel content may
 # be enabled selectively, whether for cosmetic or functional preference
