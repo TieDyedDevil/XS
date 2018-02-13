@@ -7,7 +7,8 @@ XL_MODELIST = allnice,$XL_UNAESTHETIC,$XL_BROKEN
 AC_LOCKOPTS = -modelist $XL_MODELIST -erasemode fizzle,squaretate \
 -erasedelay 5000 -duration 150
 DC_LOCKOPTS = -mode blank -dpmsoff 5 -delay 2000000
-TRANSPARENT_LOCKOPTS = -mode blank -geometry 0x0 -dpmsoff 0 -bg black
+TRANSPARENT_LOCKOPTS = -mode blank -geometry 0x0 -dpmsoff 0 -bg black \
+-timeout 2
 
 fn locker {|*|
 	pkill -USR1 dunst
