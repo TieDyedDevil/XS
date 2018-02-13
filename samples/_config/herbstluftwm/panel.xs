@@ -13,9 +13,9 @@
 #
 # The alert indicators are:
 #   B low battery
-#   D high disk utilization
+#   D high disk space utilization
 #   F fan failure (temperature rise w/stopped fan)
-#   I high I/O utilization
+#   I high I/O utilization of physical block device
 #   S swapfile in-use
 #   T high temperature
 #
@@ -350,17 +350,18 @@ fn battery () {
 
 fn disk () {
 	VOLUMES = / /boot /home /run /tmp /var
-	utilizations = `{df | less -n +2 | grep -w '-e'^$VOLUMES | tr -d % \
-		| awk '{ print $5 "\t" $6 }'}
-	let (w = false) {
-		while {!~ $utilizations ()} {
-			(occ name) = $utilizations(1 2)
-			utilizations = $utilizations(3 ...)
-			{$occ :ge $disk_full_%} && {w = true}
+	utilizations = `{df | less -n +2 | grep -w -e^$VOLUMES^\$ | tr -d % \
+		| awk '{print $5 "\t" $6}'}
+	escape {|fn-return| {
+		for (occ name) $utilizations {
+			if {$occ :ge $disk_full_%} {
+				alert_if_fullscreen 'Disk > %d%% full' \
+					$disk_full_%
+				return true
+			}
 		}
-		$w && {alert_if_fullscreen 'Disk > %d%% full' $disk_full_%}
-		result $w
-	}
+		return false
+	}}
 }
 
 HIGH = `{sensors|grep Package\\\|Physical|cut -d= -f2|cut -d\. -f1}
@@ -400,11 +401,21 @@ fn fan () {
 }
 
 fn io () {
-	load = `{iostat -dxy -g all -H 3 1 | awk '/^[^A-Z]/ {print $14}'}
-	if {$load :ge $io_active_%} {
-		alert_if_fullscreen 'I/O activity > %d%%' $io_active_%
-		result true
-	} else {result false}
+	blkdevs = `{lsblk -dln -o name}
+	escape {|fn-return| {
+		%with-read-lines \
+		<{iostat -dxy $blkdevs 3 1 \
+			| awk '/^[^A-Z]/ {print $1 ":" $14}'} \
+		{|line|
+			(disk load) = <={~~ $line *:*}
+			if {$load :ge $io_active_%} {
+				alert_if_fullscreen 'I/O activity > %d%%' \
+					$io_active_%
+				return true
+			}
+		}
+		return false
+	}}
 }
 
 fn swap () {
