@@ -202,5 +202,5 @@ fn worms {|*|
 fn zathura {|*|
 	.d 'Document viewer'
 	.c 'alias'
-	xembed -e /usr/bin/zathura $* >/dev/null >[2=1]
+	setsid xembed -e /usr/bin/zathura $* >/dev/null >[2=1] &
 }
