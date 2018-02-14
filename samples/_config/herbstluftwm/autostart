@@ -12,7 +12,7 @@ pacmd load-sample x11-bell /usr/share/sounds/freedesktop/stereo/bell.oga
 pacmd load-module module-x11-bell sample=x11-bell display=:0.0
 xautolock -time 30 -locker ~/.local/bin/lock -notify 60 -detectsleep &
 dunst &
-xvisbell &
+pgrep -c xvisbell >[2]/dev/null || xvisbell &
 if {systemd-detect-virt -q && xrandr|grep -q '^Virtual-0 connected primary'} {
 	xrandr --output Virtual-0 --fb 1920x1080 --mode 1920x1080
 }
