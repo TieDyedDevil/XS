@@ -20,16 +20,15 @@ fn boc {|*|
 	unwind-protect {$*} {printf %c \a}
 }
 fn em {|*|
-	.d 'Enable one monitor'
-	.a '[external|internal]  # first and second in xrandr list'
-	.a '(none) # first in xrandr list'
+	.d 'Enable monitors'
+	.a 'internal|external  # first and second in xrandr list'
+	.a 'both'
 	.c 'wm'
 	.r 'barre boc hc mons osd wmb'
 	%only-X
 	let (i; hc = herbstclient; \
 		mnl = `{xrandr|grep '^[^ ]\+ connected' \
 			|cut -d' ' -f1}) {
-		if {~ $#mnl 1} {throw error em 'One monitor'}
 		i = 0
 		for m $mnl {
 			if {xrandr|grep -q '^'^$m^' .*[^ ]\+ x [^ ]\+$'} {
@@ -38,21 +37,22 @@ fn em {|*|
 			i = `($i+1)
 		}
 		hc lock
-		if {~ $* <={%prefixes external}} {
+		if {~ $* <={%prefixes both}} {
+			if {~ $#mnl 1} {throw error em 'one monitor'}
+			xrandr --output $mnl(1) --auto \
+				--left-of $mnl(2) --auto --primary
+		} else if {~ $* <={%prefixes external}} {
+			if {~ $#mnl 1} {throw error em 'one monitor'}
 			xrandr --output $mnl(1) --off \
 				--output $mnl(2) --auto --primary
-			hc rename_monitor 0 $mnl(2)
-		} else {
+		} else if {~ $* <={%prefixes internal}} {
 			xrandr --output $mnl(1) --auto --primary \
 				--output $mnl(2) --off
-			hc rename_monitor 0 $mnl(1)
-		}
+		} else {throw error em 'which?'}
 		hc reload
-		hc unlock
 	}
 	# Since we've changed monitor size, remove wallpaper.
-	pkill -f 'while true \{wallpaper'
-	xsetroot -solid 'Slate Gray'
+	wallpaper
 }
 fn hc {|*|
 	.d 'herbstclient'
