@@ -651,3 +651,22 @@ fn %spawn-avoiding-duplication {|objname args body|
 		} &
 	}
 }
+
+fn %as-bool {|*|
+	# Convert args to boolean.
+	# (), '' and 0 are true; everything else is false.
+	if {~ $* ()} {
+		result true
+	} else {
+		let (r) {
+			for v $* {
+				if {result $v} {
+					r = $r true
+				} else {
+					r = $r false
+				}
+			}
+			result $r
+		}
+	}
+}
