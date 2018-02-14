@@ -7,17 +7,18 @@
 
 # Purpose: Display a panel for herbstluftwm.
 #
-# Explicit goals: low power consumption (given the constraints of being
-# written in a shell language); good visual integration with wm; focus
-# attention on the most important elements; properly clean up resources
-# upon termination or restart.
+# Goals: low power consumption (given the constraints of being written in a
+# shell language); good visual integration with wm; focus attention on the
+# most important elements; properly clean up resources upon termination or
+# restart.
 #
-# Explicit non-goals: pointer integration; keyboard control; configurability
-# beyond that already provided; support for "light" themes.
+# Non-goals: pointer integration; keyboard control; configurability beyond
+# that already provided; support for "light" themes.
 #
-# The left region contains tag indicators, alert and status indicators, a CPU
-# load bar and the title of the focused window. The center region shows info
-# for the track being played by mpd. The right region shows a clock.
+# The panel is divided into three regions. The left region contains tag
+# indicators, alert and status indicators, a CPU load bar and the title of
+# the focused window. The center region shows info for the track being
+# played by mpd. The right region shows a clock.
 #
 # The alert indicators are:
 #   B low battery
@@ -38,8 +39,8 @@
 #   G GSM cellular connection active
 #   I inbox flag
 #   M mouse keys active
-#   N network connected
-#   n network connected to a portal
+#   N network connected              | one; not both
+#   n network connected to a portal  | one; not both
 #   V VPN connection active
 #   W WiFi connection active
 #   Z screensaver is enabled
@@ -169,7 +170,25 @@ geometry = `{herbstclient monitor_rect $monitor >[2]/dev/null}
 ~ $geometry () && {throw error $PGM 'Invalid monitor '^$monitor}
 (x y panel_width _) = $geometry
 
-# Get virtualization info
+# These files store the task and fifo info
+taskfile = /tmp/panel-^$monitor^-tasks
+fifofile = /tmp/panel-^$monitor^-fifos
+
+# Kill prior incarnation's processes and fifos that avoided assassination
+for (task pid) `{access -f $taskfile && cat $taskfile} {
+	if {kill -0 $pid >[2]/dev/null} {
+		logger 'cleanup pgroup %d (%s)' $pid $task
+		pkill -g $pid
+	}
+}
+for ff `{access -f $fifofile && cat $fifofile} {
+	if {access $ff} {
+		logger 'cleanup fifo %s' $ff
+		rm -f $ff
+	}
+}
+
+# Are we running in a VM?
 if {~ <={systemd-detect-virt -q} 0} {
 	is_virt = true
 } else {
@@ -187,27 +206,11 @@ fn logger {|fmt args|
 	}
 }
 
-# Define placeholders
+# Define indicator placeholders
 if $show_alert_placeholders {_a = '.'} else {_a = ''}
 if $show_status_placeholders {_s = '.'} else {_s = ''}
 
-# Kill prior incarnation's processes and fifos that avoided assassination
-taskfile = /tmp/panel-^$monitor^-tasks
-for (task pid) `{access -f $taskfile && cat $taskfile} {
-	if {kill -0 $pid >[2]/dev/null} {
-		logger 'cleanup pgroup %d (%s)' $pid $task
-		pkill -g $pid
-	}
-}
-fifofile = /tmp/panel-^$monitor^-fifos
-for ff `{access -f $fifofile && cat $fifofile} {
-	if {access $ff} {
-		logger 'cleanup fifo %s' $ff
-		rm -f $ff
-	}
-}
-
-# Define the common part of the temporary file names
+# Define the common part of the fifo file names
 tmpfile_base = `{mktemp -u /tmp/panel-XXXXXXXX}
 
 # Fetch colors from wm
