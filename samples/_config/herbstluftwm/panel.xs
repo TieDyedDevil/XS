@@ -136,17 +136,24 @@ debug = false
 # netstat& ----/     |                                 ; async
 # other& -----/      |                                 ; poll/sleep ( 3s)
 # inbox& ----/       |                                 ; poll/sleep (30s)
-#                    \---> event| event-loop ---\      ; wait
-#        SERVER                                 |
-#                                               |
-#                                               |
-#       <---...---/------------<---------/------/
-#                 |                      |
-#              display| <--- hold&    display| <--- hold&
-#                 |                      |
-#               dzen2                  dzen2
+#                    \---> event| event-loop           ; wait
+#                                  ... |
+#        SERVER                   /   / \
+#                                /   |   |
+#    <---...--------------------/    |   |
+#                                    |   |
+#              /---------------------/   |
+#   .   .   .  |.   .   .   .   .   .   .|  .   .   .   .   .   .   .   .
+#              |                         |
+#       .      v                  .      v                  .
+#              |                         |
+#       .   display| <--- hold&   .   display| <--- hold&   .
+#              |                         |
+#       .      v                  .      v                  .
+#              |                         |
+#       .    dzen2                .    dzen2                .
 #
-#              CLIENT 2               CLIENT 1
+#       .         CLIENT 2        .         CLIENT 1        .
 
 # ========================================================================
 #             H  E  R  E     B  E     D  R  A  G  O  N  S
