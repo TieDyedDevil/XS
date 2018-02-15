@@ -208,6 +208,7 @@ display = $tmpfile_base^-display-^$monitor
 mkfifo $display
 setsid tail -f /dev/null >$display &
 setsid dzen2 <$display $dzen2_opts &
+client = $apid
 
 # ========================================================================
 #                              S E R V E R
@@ -215,16 +216,19 @@ setsid dzen2 <$display $dzen2_opts &
 # There can be only one...
 pidfile = /tmp/panel-server.pid
 dispfile = /tmp/panel.disp
+clntfile = /tmp/panel.clnt
 lockfile = /tmp/panel.lock
 lockfile $lockfile
 checkpid = `{cat $pidfile >[2]/dev/null}
 if {{access -f $pidfile} && {access -d /proc/$checkpid}} {
 	echo $display >>$dispfile
+	echo $client >>$clntfile
 	rm -f $lockfile
 	exit
 }
 echo $pid >$pidfile
 echo $display >$dispfile
+echo $client >$clntfile
 rm -f $lockfile
 
 # Kill prior incarnation's processes and fifos that avoided assassination
@@ -680,12 +684,17 @@ fn terminate {
 	rm -f $event
 	rm -f $trigger
 	rm -f $osdmsg
-	rm -f $pidfile
-	rm -f $dispfile
 	for (task pid) $taskpids {
 		logger 'killing pgroup %d (%s)' $pid $task
 		pkill -g $pid
 	}
+	for client `{cat $clntfile} {
+		logger 'killing client %d' $client
+		pkill $client
+	}
+	rm -f $pidfile
+	rm -f $dispfile
+	rm -f $clntfile
 	exit
 }
 
