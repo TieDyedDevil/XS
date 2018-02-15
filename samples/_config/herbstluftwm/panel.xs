@@ -174,6 +174,49 @@ geometry = `{herbstclient monitor_rect $monitor >[2]/dev/null}
 taskfile = /tmp/panel-^$monitor^-tasks
 fifofile = /tmp/panel-^$monitor^-fifos
 
+# Define the common part of the fifo file names
+tmpfile_base = `{mktemp -u /tmp/panel-XXXXXXXX}
+
+# Define a logger, enabled by the debug variable
+fn logger {|fmt args|
+	if $debug {
+		catch {|e|
+			echo $PGM^': logger failed:' $e $fmt $args >[1=2]
+		} {
+			printf '%s: '^$fmt^\n $PGM $args >[1=2]
+		}
+	}
+}
+
+# Initialize task pid tracker
+taskpids =
+fn rt {|*| taskpids = $taskpids $* $apid; echo $taskpids >$taskfile}
+
+# Start the client on this monitor
+dzen2_opts = -w $panel_width -x $x -y $y -h $panel_height_px \
+	-e button3= -ta l -fn $panel_font
+display = $tmpfile_base^-display-^$monitor
+mkfifo $display
+setsid tail -f /dev/null >$display &
+rt hold
+setsid dzen2 <$display $dzen2_opts &
+rt display
+
+# ========================================================================
+#                              S E R V E R
+
+# There can be only one...
+pidfile = /tmp/panel-server.pid
+lockfile = /tmp/panel.lock
+lockfile $lockfile
+checkpid = `{cat $lockfile}
+if {access -d /proc/$checkpid} {
+	rm -f $lockfile
+	exit
+}
+echo $pid >$pidfile
+rm -f $lockfile
+
 # Kill prior incarnation's processes and fifos that avoided assassination
 for (task pid) `{access -f $taskfile && cat $taskfile} {
 	if {kill -0 $pid >[2]/dev/null} {
@@ -195,23 +238,9 @@ if {~ <={systemd-detect-virt -q} 0} {
 	is_virt = false
 }
 
-# Define a logger, enabled by the debug variable
-fn logger {|fmt args|
-	if $debug {
-		catch {|e|
-			echo $PGM^': logger failed:' $e $fmt $args >[1=2]
-		} {
-			printf '%s: '^$fmt^\n $PGM $args >[1=2]
-		}
-	}
-}
-
 # Define indicator placeholders
 if $show_alert_placeholders {_a = '.'} else {_a = ''}
 if $show_status_placeholders {_s = '.'} else {_s = ''}
-
-# Define the common part of the fifo file names
-tmpfile_base = `{mktemp -u /tmp/panel-XXXXXXXX}
 
 # Fetch colors from wm
 wm_fbn_color = `{herbstclient get frame_border_normal_color}
@@ -255,9 +284,6 @@ alert_marker_attr = `{attr $alrbg $alrfg}
 alert_indicator_attr = `{attr $alrbg $alrfg}
 separator_attr = `{attr $sepbg $sepfg}
 
-dzen2_opts = -w $panel_width -x $x -y $y -h $panel_height_px \
-	-e button3= -ta l -fn $panel_font
-
 dzen2_gcpubar_opts = -h `($panel_height_px/2) \
 	-fg $cpubar_meter -bg $cpubar_background \
 	-i 1.5
@@ -283,10 +309,6 @@ mkfifo $osdmsg
 
 # Write fifo summary info
 echo $event $trigger $osdmsg >$fifofile
-
-# Initialize task pid tracker
-taskpids =
-fn rt {|*| taskpids = $taskpids $* $apid; echo $taskpids >$taskfile}
 
 # Send window manager events
 herbstclient --idle >$event &
@@ -730,5 +752,6 @@ let (tags; sep; title; track; lights; at = ''; st = ''; cpubar; clock) {
 				`{if $enable_track {drawcenter $track}} \
 				`{if $enable_clock {drawright $clock}}
 		}
-	} | dzen2 $dzen2_opts
+	# FINISH: distribute to each monitor's display fifo
+	} >$display
 }

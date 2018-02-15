@@ -36,11 +36,10 @@ fn em {|*|
 			}
 			i = `($i+1)
 		}
-		hc lock
 		if {~ $* <={%prefixes both}} {
 			if {~ $#mnl 1} {throw error em 'one monitor'}
-			xrandr --output $mnl(1) --auto \
-				--left-of $mnl(2) --auto --primary
+			xrandr --output $mnl(1) --auto --left-of $mnl(2) \
+				--output $mnl(2) --auto --primary
 		} else if {~ $* <={%prefixes external}} {
 			if {~ $#mnl 1} {throw error em 'one monitor'}
 			xrandr --output $mnl(1) --off \
@@ -49,6 +48,7 @@ fn em {|*|
 			xrandr --output $mnl(1) --auto --primary \
 				--output $mnl(2) --off
 		} else {throw error em 'which?'}
+		hc lock
 		hc reload
 	}
 	# Since we've changed monitor size, remove wallpaper.
