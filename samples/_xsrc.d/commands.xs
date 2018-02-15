@@ -693,6 +693,14 @@ fn where {
 	printf '%s@%s[%s;%d]:%s'\n \
 		$USER `{hostname -s} <={~~ `tty /dev/*} $pid `pwd
 }
+fn wlpq {
+	.d 'Watch lpq until empty'
+	.c 'system'
+	grep -c '^no entries' >/dev/null <{lpq} || {
+		lpq; echo; lpq +20 >/dev/null
+	}
+	echo 'lpq is empty'
+}
 fn xcolors {|*|
 	.d 'Display X11 colors with RGB values and names'
 	.a '[xs_filter_thunk]  # on $r, $g, $b and $d'
