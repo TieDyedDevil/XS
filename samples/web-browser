@@ -15,7 +15,8 @@ npf = ~/.local/noproxy
 }
 
 if {!~ $DISPLAY ()} {
-	setsid chromium-browser $prx $* >/dev/null >[2=1] &
+	env LD_PRELOAD= setsid chromium-browser --new-window $prx $* \
+					>/dev/null >[2=1] &
 	exit
 } else {
 	if {~ $#* 0} {
