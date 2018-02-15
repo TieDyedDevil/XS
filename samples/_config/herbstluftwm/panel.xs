@@ -217,8 +217,8 @@ pidfile = /tmp/panel-server.pid
 dispfile = /tmp/panel.disp
 lockfile = /tmp/panel.lock
 lockfile $lockfile
-checkpid = `{cat $lockfile}
-if {access -d /proc/$checkpid} {
+checkpid = `{cat $pidfile >[2]/dev/null}
+if {{access -f $pidfile} && {access -d /proc/$checkpid}} {
 	echo $display >>$dispfile
 	rm -f $lockfile
 	exit
