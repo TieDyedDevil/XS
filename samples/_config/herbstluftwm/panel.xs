@@ -201,19 +201,13 @@ fn logger {|fmt args|
 # ========================================================================
 #                              C L I E N T
 
-# Start the client on this monitor
+# Prepare the client settings for this monitor
 dzen2_opts = -w $panel_width -x $x -y $y -h $panel_height_px \
 	-e button3= -ta l -fn $panel_font
 display = $tmpfile_base^-display-^$monitor
 mkfifo $display
-setsid tail -f /dev/null >$display &
-setsid dzen2 <$display $dzen2_opts &
-client = $apid
 
-# ========================================================================
-#                              S E R V E R
-
-# There can be only one...
+# There can be only one server...
 pidfile = /tmp/panel-server.pid
 dispfile = /tmp/panel.disp
 clntfile = /tmp/panel.clnt
@@ -221,11 +215,24 @@ lockfile = /tmp/panel.lock
 lockfile $lockfile
 checkpid = `{cat $pidfile >[2]/dev/null}
 if {{access -f $pidfile} && {access -d /proc/$checkpid}} {
+	# Start a client on other (non-server) display
+	tail -f /dev/null >$display &
+	dzen2 <$display $dzen2_opts &
+	client = $apid
 	echo $display >>$dispfile
 	echo $client >>$clntfile
 	rm -f $lockfile
+	wait $client
 	exit
 }
+
+# ========================================================================
+#                              S E R V E R
+
+# Start a client on the server's display
+tail -f /dev/null >$display &
+dzen2 <$display $dzen2_opts &
+client = $apid
 echo $pid >$pidfile
 echo $display >$dispfile
 echo $client >$clntfile
