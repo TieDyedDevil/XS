@@ -771,6 +771,8 @@ let (tags; sep; title; track; lights; at = ''; st = ''; cpubar; clock; rend) {
 		let ((ev p1 p2) = <={%split \t <=read}) {
 			switch $ev (
 				tag_changed {tags = `` \n {drawtags}}
+				tag_added {tags = `` \n {drawtags}}
+				tag_removed {tags = `` \n {drawtags}}
 				tag_flags {tags = `` \n {drawtags}; \
 						title = `title}
 				focus_changed {title = $p2}
