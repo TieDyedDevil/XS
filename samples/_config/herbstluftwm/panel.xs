@@ -136,7 +136,17 @@ debug = false
 # netstat& ----/     |                                 ; async
 # other& -----/      |                                 ; poll/sleep ( 3s)
 # inbox& ----/       |                                 ; poll/sleep (30s)
-#                    \---> event| event-loop | dzen2   ; wait
+#                    \---> event| event-loop ---\      ; wait
+#        SERVER                                 |
+#                                               |
+#                                               |
+#       <---...---/------------<---------/------/
+#                 |                      |
+#              display| <--- hold&    display| <--- hold&
+#                 |                      |
+#               dzen2                  dzen2
+#
+#              CLIENT 2               CLIENT 1
 
 # ========================================================================
 #             H  E  R  E     B  E     D  R  A  G  O  N  S
@@ -188,9 +198,8 @@ fn logger {|fmt args|
 	}
 }
 
-# Initialize task pid tracker
-taskpids =
-fn rt {|*| taskpids = $taskpids $* $apid; echo $taskpids >$taskfile}
+# ========================================================================
+#                              C L I E N T
 
 # Start the client on this monitor
 dzen2_opts = -w $panel_width -x $x -y $y -h $panel_height_px \
@@ -198,23 +207,24 @@ dzen2_opts = -w $panel_width -x $x -y $y -h $panel_height_px \
 display = $tmpfile_base^-display-^$monitor
 mkfifo $display
 setsid tail -f /dev/null >$display &
-rt hold
 setsid dzen2 <$display $dzen2_opts &
-rt display
 
 # ========================================================================
 #                              S E R V E R
 
 # There can be only one...
 pidfile = /tmp/panel-server.pid
+dispfile = /tmp/panel.disp
 lockfile = /tmp/panel.lock
 lockfile $lockfile
 checkpid = `{cat $lockfile}
 if {access -d /proc/$checkpid} {
+	echo $display >>$dispfile
 	rm -f $lockfile
 	exit
 }
 echo $pid >$pidfile
+echo $display >$dispfile
 rm -f $lockfile
 
 # Kill prior incarnation's processes and fifos that avoided assassination
@@ -309,6 +319,10 @@ mkfifo $osdmsg
 
 # Write fifo summary info
 echo $event $trigger $osdmsg >$fifofile
+
+# Initialize task pid tracker
+taskpids =
+fn rt {|*| taskpids = $taskpids $* $apid; echo $taskpids >$taskfile}
 
 # Send window manager events
 herbstclient --idle >$event &
@@ -666,6 +680,8 @@ fn terminate {
 	rm -f $event
 	rm -f $trigger
 	rm -f $osdmsg
+	rm -f $pidfile
+	rm -f $dispfile
 	for (task pid) $taskpids {
 		logger 'killing pgroup %d (%s)' $pid $task
 		pkill -g $pid
@@ -722,7 +738,7 @@ logger 'starting: %s; %s; %s; %s; %s; %s; %s' \
 	<={%argify `{var enable_cpubar}} \
 	<={%argify `{var enable_inbox}}
 
-let (tags; sep; title; track; lights; at = ''; st = ''; cpubar; clock) {
+let (tags; sep; title; track; lights; at = ''; st = ''; cpubar; clock; rend) {
 	tags = `` \n {drawtags}
 	sep = $separator_attr^'|'
 	title = `title
@@ -748,10 +764,10 @@ let (tags; sep; title; track; lights; at = ''; st = ''; cpubar; clock) {
 				reload {terminate}
 				{}
 			)
-			echo $tags ' '$lights $cpubar $sep $title \
+			rend = $tags ' '$lights $cpubar $sep $title \
 				`{if $enable_track {drawcenter $track}} \
 				`{if $enable_clock {drawright $clock}}
 		}
-	# FINISH: distribute to each monitor's display fifo
-	} >$display
+		for client `{cat $dispfile} {echo $rend >$client}
+	}
 }
