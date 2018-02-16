@@ -8,6 +8,13 @@
 #  IMPORTANT: Required functions %argify and %with-read-lines are defined
 #  in the samples/ directory of the xs repository. Copy the definitions to
 #  a file which is sourced by your ~/.xsrc script.
+#
+#  The wm, upon receipt of the quit hook, doesn't give the panel a chance
+#  to clean up. I suggest binding the following shell script to the wm's
+#  quit key:
+#    herbstclient emit_hook quit panel
+#    sleep 1
+#    herbstclient quit
 
 # Purpose: Display a panel for herbstluftwm.
 #
