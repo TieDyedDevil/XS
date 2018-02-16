@@ -699,20 +699,20 @@ fn drawright {|text|
 
 # Process events
 fn terminate {
-	rm -f $event
-	rm -f $trigger
-	rm -f $osdmsg
-	for (task pid) $taskpids {
-		logger 'killing pgroup %d (%s)' $pid $task
-		pkill -g $pid
-	}
+	rm -f $pidfile
 	for client `{cat $clntfile} {
 		logger 'killing client %d' $client
 		kill $client
 	}
-	rm -f $pidfile
-	rm -f $dispfile
 	rm -f $clntfile
+	rm -f $dispfile
+	for (task pid) $taskpids {
+		logger 'killing pgroup %d (%s)' $pid $task
+		pkill -g $pid
+	}
+	rm -f $event
+	rm -f $trigger
+	rm -f $osdmsg
 	exit
 }
 

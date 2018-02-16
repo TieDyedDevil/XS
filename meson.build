@@ -60,7 +60,8 @@ project('xs', ['cpp'])
 		'doc/XS-FOR-LISPERS'],
 	install_dir: 'share/doc/xs')
   install_data(['samples/_config/herbstluftwm/autostart',
-		'samples/_config/herbstluftwm/panel.xs'],
+		'samples/_config/herbstluftwm/panel.xs',
+		'samples/_config/herbstluftwm/quit'],
 	install_dir: 'share/doc/xs/samples/_config/herbstluftwm')
   install_data(['samples/_xslib.d/attr.xs', 'samples/_xslib.d/subs.xs',
 		'samples/_xslib.d/util.xs'],

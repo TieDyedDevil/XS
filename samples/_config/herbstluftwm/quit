@@ -1,0 +1,7 @@
+#! /usr/bin/env xs
+
+# Give the panel a chance to exit gracefully.
+herbstclient emit_hook quit_panel
+sleep 1
+# Quit the wm.
+herbstclient quit
