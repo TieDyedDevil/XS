@@ -187,6 +187,9 @@ geometry = `{herbstclient monitor_rect $monitor >[2]/dev/null}
 ~ $geometry () && {throw error $PGM 'Invalid monitor '^$monitor}
 (x y panel_width _) = $geometry
 
+# Carve out space for the panel
+herbstclient pad $monitor $panel_height_px
+
 # These files store the task and fifo info
 taskfile = /tmp/panel-^$monitor^-tasks
 fifofile = /tmp/panel-^$monitor^-fifos
@@ -317,9 +320,6 @@ dzen2_gcpubar_opts = -h `($panel_height_px/2) \
 osd_cat_opts = -f $osd_font -s 5 -c $alrfg \
 	-i `($x+$osd_offset_px) -o `($y+$osd_offset_px+$panel_height_px) \
 	-d $osd_dwell_s -w -l 1
-
-# Carve out space for the panel
-herbstclient pad $monitor $panel_height_px
 
 # Create the status-lights trigger fifo
 trigger = $tmpfile_base^-trigger-^$monitor
