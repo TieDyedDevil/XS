@@ -1,6 +1,10 @@
 #! /usr/bin/env xs
-#  xs 1.1 or later; https://github.com/TieDyedDevil/XS
 
+# Requirements:
+#  xs 1.1 or later; https://github.com/TieDyedDevil/XS (or Fedora 27 distro).
+#  Linux with "the usual" tools packages (coreutils, gawk, grep, sed, ...).
+#  The tools listed just below the ARCHITECTURE diagram.
+#
 #  IMPORTANT: Required functions %argify and %with-read-lines are defined
 #  in the samples/ directory of the xs repository. Copy the definitions to
 #  a file which is sourced by your ~/.xsrc script.
@@ -9,11 +13,11 @@
 #
 # Goals: low power consumption (given the constraints of being written in a
 # shell language); good visual integration with wm; focus attention on the
-# most important elements; properly clean up resources upon termination or
+# most important elements; properly clean up resources upon termination and
 # restart.
 #
 # Non-goals: pointer integration; keyboard control; configurability beyond
-# that already provided; support for "light" themes.
+# that already provided; support for "light" themes; non-Linux OS support.
 #
 # The panel is divided into three regions. The left region contains tag
 # indicators, alert and status indicators, a CPU load bar and the title of
@@ -167,6 +171,7 @@ fn-hcitool = <={access -1en hcitool $path}
 fn-herbstclient = <={access -1en herbstclient $path}
 fn-iconv = <={access -1en iconv $path}
 fn-iostat = <={access -1en iostat $path}
+fn-lockfile = <={access -1en lockfile $path}
 fn-mpc = <={access -1en mpc $path}
 fn-nmcli = <={access -1en nmcli $path}
 fn-osd_cat = <={access -1en osd_cat $path}
@@ -222,29 +227,30 @@ pidfile = /tmp/panel-server.pid
 dispfile = /tmp/panel.disp
 clntfile = /tmp/panel.clnt
 lockfile = /tmp/panel.lock
-lockfile $lockfile
+lockfile -1 $lockfile
 checkpid = `{cat $pidfile >[2]/dev/null}
-if {{access -f $pidfile} && {access -d /proc/$checkpid}} {
-	# Start a client on other (non-server) display
+if {{access -f $pidfile} && {kill -0 $checkpid >[2]/dev/null}} {
+	# Start a client for a non-server's display
 	tail -f /dev/null >$display &
 	client = $apid
 	echo $display >>$dispfile
 	echo $client >>$clntfile
 	rm -f $lockfile
 	exec dzen2 <$display $dzen2_opts
+	# Client ends here
 }
 
 # ========================================================================
 #                              S E R V E R
 
-# Start a client on the server's display
+# Start a client for the server's display
+echo $pid >$pidfile
 tail -f /dev/null >$display &
 client = $apid
-dzen2 <$display $dzen2_opts &
-echo $pid >$pidfile
 echo $display >$dispfile
 echo $client >$clntfile
 rm -f $lockfile
+dzen2 <$display $dzen2_opts &
 
 # Kill prior incarnation's processes and fifos that avoided assassination
 for (task pid) `{access -f $taskfile && cat $taskfile} {
@@ -750,6 +756,7 @@ fn track {
 	}
 }
 
+# Run the server
 logger 'starting: %s; %s; %s; %s; %s; %s; %s' \
 	<={%argify `{var enable_track}} \
 	<={%argify `{var enable_clock}} \
