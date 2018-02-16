@@ -224,13 +224,11 @@ checkpid = `{cat $pidfile >[2]/dev/null}
 if {{access -f $pidfile} && {access -d /proc/$checkpid}} {
 	# Start a client on other (non-server) display
 	tail -f /dev/null >$display &
-	dzen2 <$display $dzen2_opts &
 	client = $apid
 	echo $display >>$dispfile
 	echo $client >>$clntfile
 	rm -f $lockfile
-	wait $client
-	exit
+	exec dzen2 <$display $dzen2_opts
 }
 
 # ========================================================================
@@ -238,8 +236,8 @@ if {{access -f $pidfile} && {access -d /proc/$checkpid}} {
 
 # Start a client on the server's display
 tail -f /dev/null >$display &
-dzen2 <$display $dzen2_opts &
 client = $apid
+dzen2 <$display $dzen2_opts &
 echo $pid >$pidfile
 echo $display >$dispfile
 echo $client >$clntfile
@@ -704,7 +702,7 @@ fn terminate {
 	}
 	for client `{cat $clntfile} {
 		logger 'killing client %d' $client
-		pkill $client
+		kill $client
 	}
 	rm -f $pidfile
 	rm -f $dispfile
