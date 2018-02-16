@@ -9,9 +9,10 @@
 #  in the samples/ directory of the xs repository. Copy the definitions to
 #  a file which is sourced by your ~/.xsrc script.
 #
-#  The wm, upon receipt of the quit hook, doesn't give the panel a chance
-#  to clean up. I suggest binding the following shell script to the wm's
-#  quit key:
+#  The wm, upon receipt of the quit hook, simply exits. This doesn't give
+#  the panel a chance to clean up; the residue will interfere with the
+#  proper startup of subsequent panels. To shut down the panel cleanly,
+#  bind the following shell script to the wm's quit key:
 #    herbstclient emit_hook quit panel
 #    sleep 1
 #    herbstclient quit
@@ -24,7 +25,8 @@
 # restart.
 #
 # Non-goals: pointer integration; keyboard control; configurability beyond
-# that already provided; support for "light" themes; non-Linux OS support.
+# that already provided; support for "light" themes; non-Linux OS support;
+# in-process recovery from improper termination of previous sesssion.
 #
 # The panel is divided into three regions. The left region contains tag
 # indicators, alert and status indicators, a CPU load bar and the title of
@@ -220,14 +222,14 @@ fn logger {|fmt args|
 	}
 }
 
-# ========================================================================
-#                              C L I E N T
-
-# Prepare the client settings for this monitor
+# Prepare the client for this monitor
 dzen2_opts = -w $panel_width -x $x -y $y -h $panel_height_px \
 	-e button3= -ta l -fn $panel_font
 display = $tmpfile_base^-display-^$monitor
 mkfifo $display
+
+# ========================================================================
+#                              C L I E N T
 
 # There can be only one server...
 pidfile = /tmp/panel-server.pid
@@ -244,7 +246,7 @@ if {{access -f $pidfile} && {kill -0 $checkpid >[2]/dev/null}} {
 	echo $client >>$clntfile
 	rm -f $lockfile
 	exec dzen2 <$display $dzen2_opts
-	# Client ends here
+	# CLIENT ENDS HERE
 }
 
 # ========================================================================
@@ -258,27 +260,6 @@ echo $display >$dispfile
 echo $client >$clntfile
 rm -f $lockfile
 dzen2 <$display $dzen2_opts &
-
-# Kill prior incarnation's processes and fifos that avoided assassination
-for (task pid) `{access -f $taskfile && cat $taskfile} {
-	if {kill -0 $pid >[2]/dev/null} {
-		logger 'cleanup pgroup %d (%s)' $pid $task
-		pkill -g $pid
-	}
-}
-for ff `{access -f $fifofile && cat $fifofile} {
-	if {access $ff} {
-		logger 'cleanup fifo %s' $ff
-		rm -f $ff
-	}
-}
-
-# Are we running in a VM?
-if {~ <={systemd-detect-virt -q} 0} {
-	is_virt = true
-} else {
-	is_virt = false
-}
 
 # Define indicator placeholders
 if $show_alert_placeholders {_a = '.'} else {_a = ''}
@@ -552,6 +533,12 @@ if $enable_alerts {
 }
 
 # Send status events
+if {~ <={systemd-detect-virt -q} 0} {
+	is_virt = true
+} else {
+	is_virt = false
+}
+
 let (i4 = $_s; i6 = $_s; a = $_s; b = $_s; c = $_s; e = $_s; g = $_s; \
 	ii = $_s; m = $_s; n = $_s; v = $_s; w = $_s; z = $_s; i" = $_s) {
 
@@ -712,6 +699,10 @@ fn terminate {
 		kill $client
 	}
 	rm -f $clntfile
+	for df `{cat $dispfile} {
+		logger 'removing display fifo %s' $df
+		rm -f $df
+	}
 	rm -f $dispfile
 	for (task pid) $taskpids {
 		logger 'killing pgroup %d (%s)' $pid $task
@@ -720,6 +711,8 @@ fn terminate {
 	rm -f $event
 	rm -f $trigger
 	rm -f $osdmsg
+	rm -f $taskfile
+	rm -f $fifofile
 	exit
 }
 
