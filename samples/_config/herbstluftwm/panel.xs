@@ -26,7 +26,7 @@
 #
 # Non-goals: pointer integration; keyboard control; configurability beyond
 # that already provided; support for "light" themes; non-Linux OS support;
-# in-process recovery from improper termination of previous sesssion.
+# in-process recovery from improper termination of previous session.
 #
 # The panel is divided into three regions. The left region contains tag
 # indicators, alert and status indicators, a CPU load bar and the title of
