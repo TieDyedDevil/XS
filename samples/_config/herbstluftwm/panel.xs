@@ -778,6 +778,7 @@ let (tags; sep; title; track; lights; at = ''; st = ''; cpubar; clock; rend) {
 				tag_changed {tags = `` \n {drawtags}}
 				tag_added {tags = `` \n {drawtags}}
 				tag_removed {tags = `` \n {drawtags}}
+				tag_renamed {tags = `` \n {drawtags}}
 				tag_flags {tags = `` \n {drawtags}; \
 						title = `title}
 				focus_changed {title = $p2}
