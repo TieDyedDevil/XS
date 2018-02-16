@@ -78,6 +78,11 @@
 #     for selected, unfocused and urgent tags.
 #   frame_border_active_color
 #     Used as the background color for unfocused tags.
+#   frame_bg_normal_color
+#     Used as the background color for unfocused tags on an unfocused monitor.
+#   frame_bg_active_color
+#     Used as the background color for an focused tag on an unfocused monitor.
+#     Used as the foreground color for unfocused tags on an unfocused monitor.
 #   window_border_normal_color
 #     Used as the foreground color for unfocused tags and the track and
 #     clock text.
@@ -268,6 +273,8 @@ if $show_status_placeholders {_s = '.'} else {_s = ''}
 # Fetch colors from wm
 wm_fbn_color = `{herbstclient get frame_border_normal_color}
 wm_fba_color = `{herbstclient get frame_border_active_color}
+wm_fgn_color = `{herbstclient get frame_bg_normal_color}
+wm_fga_color = `{herbstclient get frame_bg_active_color}
 wm_wbn_color = `{herbstclient get window_border_normal_color}
 wm_wba_color = `{herbstclient get window_border_active_color}
 wm_wbu_color = `{herbstclient get window_border_urgent_color}
@@ -285,6 +292,10 @@ urgbg = $wm_wbu_color
 urgfg = $bgcolor
 dflbg = $bgcolor
 dflfg = $wm_wbn_color
+omdfg = $bgcolor
+omdbg = $wm_fga_color
+omufg = $wm_fga_color
+omubg = $wm_fgn_color
 stsbg = '#002f00'
 stsfg = '#00cf00'
 alrbg = '#3f0000'
@@ -301,6 +312,8 @@ occupied_attr = `{attr $occbg $occfg}
 unfocused_attr = `{attr $unfbg $unffg}
 urgent_attr = `{attr $urgbg $urgfg}
 default_attr = `{attr $dflbg $dflfg}
+om_default_attr = `{attr $omdbg $omdfg}
+om_unfocused_attr = `{attr $omubg $omufg}
 status_marker_attr = `{attr $stsbg $stsfg}
 status_indicator_attr = `{attr $stsbg $stsfg}
 alert_marker_attr = `{attr $alrbg $alrfg}
@@ -658,20 +671,27 @@ if $enable_inbox {
 }
 
 # Draw the three panel regions
-fn drawtags {
-	for t `{herbstclient tag_status $monitor} {
-		let ((f n) = `{cut --output-delimiter=' ' -c1,2- <<<$t}) {
-			switch $f (
-				'#' {printf $selected_attr}
-				'+' {printf $unfocused_attr}
-				':' {printf $occupied_attr}
-				'!' {printf $urgent_attr}
-				{printf $default_attr}
-			)
-			printf \ %s\n $n
+fn drawtags {|m|
+	escape {|fn-return| {
+		for t `{herbstclient tag_status $m >[2]/dev/null} {
+			let ((f n) = `{cut --output-delimiter=' ' -c1,2- \
+						<<<$t}) {
+				switch <={%argify $f} (
+					'.' {printf $default_attr}
+					':' {printf $occupied_attr}
+					'+' {printf $unfocused_attr}
+					'#' {printf $selected_attr}
+					'-' {printf $om_default_attr}
+					'%' {printf $om_unfocused_attr}
+					'!' {printf $urgent_attr}
+					'' {printf ''; return}
+					{printf $default_attr}
+				)
+				printf \ %s\n $n
+			}
 		}
-	}
-	printf $normal_attr
+		printf $normal_attr
+	}}
 }
 
 fn drawcenter {|text|
@@ -766,8 +786,8 @@ logger 'starting: %s; %s; %s; %s; %s; %s; %s' \
 	<={%argify `{var enable_cpubar}} \
 	<={%argify `{var enable_inbox}}
 
-let (tags; sep; title; track; lights; at = ''; st = ''; cpubar; clock; rend) {
-	tags = `` \n {drawtags}
+let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; render; m) {
+	tags = `` \n {drawtags $monitor}
 	sep = $separator_attr^'|'
 	title = `title
 	track = `{drawcenter `{track}}
@@ -775,14 +795,15 @@ let (tags; sep; title; track; lights; at = ''; st = ''; cpubar; clock; rend) {
 	<$event while true {
 		let ((ev p1 p2) = <={%split \t <=read}) {
 			switch $ev (
-				tag_changed {tags = `` \n {drawtags}}
-				tag_added {tags = `` \n {drawtags}}
-				tag_removed {tags = `` \n {drawtags}}
-				tag_renamed {tags = `` \n {drawtags}}
-				tag_flags {tags = `` \n {drawtags}; \
-						title = `title}
+				tag_changed {}
+				tag_added {}
+				tag_removed {}
+				tag_renamed {}
+				tag_flags {title = `title}
 				focus_changed {title = $p2}
 				window_title_changed {title = $p2}
+				fullscreen {}
+				urgent {}
 				player {track = `{track}}
 				inbox {set_inbox_flag $p1}
 				alert {at = <={%argify $p1}; \
@@ -795,10 +816,15 @@ let (tags; sep; title; track; lights; at = ''; st = ''; cpubar; clock; rend) {
 				reload {terminate}
 				{}
 			)
-			rend = $tags ' '$lights $cpubar $sep $title \
+			render = ' '$lights $cpubar $sep $title \
 				`{if $enable_track {drawcenter $track}} \
 				`{if $enable_clock {drawright $clock}}
 		}
-		for client `{cat $dispfile} {echo $rend >$client}
+		for client `{cat $dispfile} {
+			let ((_ _ _ m) = <={~~ $client *-*-*-*}; tags) {
+				tags = `` \n {drawtags $m}
+				echo $tags $render >$client
+			}
+		}
 	}
 }
