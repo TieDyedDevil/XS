@@ -263,6 +263,7 @@ if {{access -f $pidfile} && {kill -0 $checkpid >[2]/dev/null}} {
 	echo $display >>$dispfile
 	echo $client >>$clntfile
 	rm -f $lockfile
+	logger 'client on monitor %d: %d; %d' $monitor $client $pid
 	exec dzen2 <$display $dzen2_opts
 	# CLIENT ENDS HERE
 }
@@ -270,14 +271,18 @@ if {{access -f $pidfile} && {kill -0 $checkpid >[2]/dev/null}} {
 # ========================================================================
 #                              S E R V E R
 
-# Start a client for the server's display
+# Identify the server
+logger 'server on monitor %d: %d' $monitor $pid
 echo $pid >$pidfile
+
+# Start a client for the server's display
 tail -f /dev/null >$display &
 client = $apid
 echo $display >$dispfile
 echo $client >$clntfile
 rm -f $lockfile
 dzen2 <$display $dzen2_opts &
+logger 'client on monitor %d: %d; %d' $monitor $client $apid
 
 # Define indicator placeholders
 if $show_alert_placeholders {_a = '.'} else {_a = ''}
@@ -292,8 +297,34 @@ wm_wbn_color = `{herbstclient get window_border_normal_color}
 wm_wba_color = `{herbstclient get window_border_active_color}
 wm_wbu_color = `{herbstclient get window_border_urgent_color}
 
+# Set fixed colors
+panel_fg_color = '$f0f0f0'
+panel_status_bg_color = '#003000'
+panel_status_fg_color = '#00d000'
+panel_alert_bg_color = '#400000'
+panel_alert_fg_color = '#f00000'
+cpu_fg_color = SkyBlue1
+cpu_bg_color = SkyBlue4
+
+# Report colors
+logger 'palette: %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s' \
+	<={%argify `{var panel_fg_color}} \
+	<={%argify `{var panel_status_bg_color}} \
+	<={%argify `{var panel_status_fg_color}} \
+	<={%argify `{var panel_alert_bg_color}} \
+	<={%argify `{var panel_alert_fg_color}} \
+	<={%argify `{var wm_fbn_color}} \
+	<={%argify `{var wm_fba_color}} \
+	<={%argify `{var wm_fgn_color}} \
+	<={%argify `{var wm_fga_color}} \
+	<={%argify `{var wm_wbn_color}} \
+	<={%argify `{var wm_wba_color}} \
+	<={%argify `{var wm_wbu_color}} \
+	<={%argify `{var cpu_fg_color}} \
+	<={%argify `{var cpu_bg_color}}
+
 # Define colors and bg/fg pairs
-fgcolor = '#efefef'
+fgcolor = $panel_fg_color
 bgcolor = $wm_fbn_color
 selbg = $wm_wba_color
 selfg = $bgcolor
@@ -309,14 +340,14 @@ omdfg = $bgcolor
 omdbg = $wm_fga_color
 omufg = $wm_fga_color
 omubg = $wm_fgn_color
-stsbg = '#002f00'
-stsfg = '#00cf00'
-alrbg = '#3f0000'
-alrfg = '#ff0000'
+stsbg = $panel_status_bg_color
+stsfg = $panel_status_fg_color
+alrbg = $panel_alert_bg_color
+alrfg = $panel_alert_fg_color
 sepbg = $bgcolor
 sepfg = $selbg
-cpubar_meter = SkyBlue1
-cpubar_background = SkyBlue4
+cpubar_meter = $cpu_fg_color
+cpubar_background = $cpu_bg_color
 
 fn attr {|bg fg| printf '^bg(%s)^fg(%s)' $bg $fg}
 normal_attr = `{attr $bgcolor $fgcolor}
@@ -726,6 +757,7 @@ fn drawright {|text|
 
 # Process events
 fn terminate {
+	logger 'terminate'
 	rm -f $pidfile
 	for client `{cat $clntfile} {
 		logger 'killing client %d' $client
