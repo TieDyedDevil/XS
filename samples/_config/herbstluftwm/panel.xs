@@ -1,9 +1,9 @@
 #! /usr/bin/env xs
 
 # Requirements:
-#  xs 1.1 or later; https://github.com/TieDyedDevil/XS (or Fedora 27 distro).
-#  Linux with "the usual" tools packages (coreutils, gawk, grep, sed, ...).
-#  The tools listed just below the ARCHITECTURE diagram.
+#  * xs 1.1; https://github.com/TieDyedDevil/XS (or Fedora 27 distro).
+#  * Linux with usual tools packages (coreutils, gawk, grep, sed, ...).
+#  * The additional tools listed just below the ARCHITECTURE diagram.
 #
 #  The wm, upon receipt of the quit hook, simply exits. This doesn't give
 #  the panel a chance to clean up; the residue will interfere with the
@@ -152,7 +152,7 @@ debug = false
 # inbox& ----/       |                                 ; poll/sleep (30s)
 #                    \---> event| event-loop           ; wait
 #                                  ... |
-#        SERVER                   /   / \
+#        SERVER                   /   / \              ; poll/demux
 #                                /   |   |
 #    <---...--------------------/    |   |
 #                                    |   |
