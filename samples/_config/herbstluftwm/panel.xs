@@ -695,7 +695,7 @@ if $enable_inbox {
 		while true {
 			%with-read-lines \
 			<{fetchmail -c --fetchmailrc $HERE/inbox.fetchmailrc \
-				--pidfile $HERE/fetchmail.pid
+				--pidfile /tmp/panel-fetchmail.pid
 			} {|line|
 				(tm rm _) = \
 					<={~~ $line *' messages ('*' seen)'*}
