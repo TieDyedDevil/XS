@@ -202,6 +202,9 @@ geometry = `{herbstclient monitor_rect $monitor >[2]/dev/null}
 ~ $geometry () && {throw error $PGM 'Invalid monitor '^$monitor}
 (x y panel_width _) = $geometry
 
+# Here's a customization hook; use it at your own peril
+access ~/.panel.xs && . ~/.panel.xs
+
 # Carve out space for the panel
 herbstclient pad $monitor $panel_height_px
 
