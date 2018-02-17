@@ -868,7 +868,7 @@ let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; render; m) {
 		for client `{cat $dispfile} {
 			let ((_ _ _ m) = <={~~ $client *-*-*-*}; tags) {
 				tags = `` \n {drawtags $m}
-				echo $tags $render >$client
+				!~ $tags () && echo $tags $render >$client
 			}
 		}
 	}
