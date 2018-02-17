@@ -831,7 +831,7 @@ logger 'starting: %s; %s; %s; %s; %s; %s; %s' \
 	<={%argify `{var enable_cpubar}} \
 	<={%argify `{var enable_inbox}}
 
-let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; render; m) {
+let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; render) {
 	tags = `` \n {drawtags $monitor}
 	sep = $separator_attr^'|'
 	title = `title
