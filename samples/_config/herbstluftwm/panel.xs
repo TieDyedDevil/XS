@@ -5,10 +5,6 @@
 #  Linux with "the usual" tools packages (coreutils, gawk, grep, sed, ...).
 #  The tools listed just below the ARCHITECTURE diagram.
 #
-#  IMPORTANT: Required functions %argify and %with-read-lines are defined
-#  in the samples/ directory of the xs repository. Copy the definitions to
-#  a file which is sourced by your ~/.xsrc script.
-#
 #  The wm, upon receipt of the quit hook, simply exits. This doesn't give
 #  the panel a chance to clean up; the residue will interfere with the
 #  proper startup of subsequent panels. To shut down the panel cleanly,
@@ -225,6 +221,23 @@ fn logger {|fmt args|
 			printf '%s: '^$fmt^\n $PGM $args >[1=2]
 		}
 	}
+}
+
+# Define utility functions
+fn %with-read-lines {|file body|
+	# Run body with each line from file.
+	# Body must be a lambda; its argument is bound to the line content.
+	<$file let (__l = <=read) {
+		while {!~ $__l ()} {
+			$body $__l
+			__l = <=read
+		}
+	}
+}
+
+fn %argify {|*|
+	# Always return a one-element list.
+	if {~ $* ()} {result ''} else {result `` '' {echo -n $*}}
 }
 
 # Prepare the client for this monitor
