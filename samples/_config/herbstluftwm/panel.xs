@@ -298,7 +298,7 @@ wm_wba_color = `{herbstclient get window_border_active_color}
 wm_wbu_color = `{herbstclient get window_border_urgent_color}
 
 # Set fixed colors
-panel_fg_color = '$f0f0f0'
+panel_fg_color = '#f0f0f0'
 panel_status_bg_color = '#003000'
 panel_status_fg_color = '#00d000'
 panel_alert_bg_color = '#400000'
