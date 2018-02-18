@@ -864,7 +864,8 @@ let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; render) {
 				reload {terminate}
 				{}
 			)
-			render = ' '$lights $cpubar $sep $title \
+			render = ' '$lights $cpubar $sep \
+				`{echo $title|iconv -tlatin1//translit} \
 				`{if $enable_track {drawcenter $track}} \
 				`{if $enable_clock {drawright $clock}}
 		}
