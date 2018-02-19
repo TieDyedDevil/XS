@@ -318,6 +318,11 @@ fn %mkobj {
 	}
 }
 
+fn %rmobj {|objname|
+	# Destroy a named object.
+	eval $objname^' ='
+}
+
 fn .objcheck {|objname|
 	# Throw an error if objname does not name an object.
 	if {{~ $objname ()} || {!~ $($objname) obj *\ obj}} {
