@@ -181,6 +181,9 @@ hc set smart_frame_surroundings 1
 hc set mouse_recenter_gap 0
 hc set tree_style '╾│ ├└╼─┐'
 
+# behaviors
+hc set swap_monitors_to_get_tag 0
+
 # rules
 hc unrule -F
 hc rule focus=on # normally focus new clients
