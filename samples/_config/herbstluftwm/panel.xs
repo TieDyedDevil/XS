@@ -506,19 +506,28 @@ fn get_curtemp {
 			|cut -d: -f2|cut -d\. -f1|tr -d ' +'}
 }
 
+nofans_logged = false
 fn fan () {
 	speeds = `{sensors >[2]/dev/null|grep fan|cut -d: -f2|awk '{print $1}'}
-	speed = 0; for s $speeds {speed = `($speed+$s)}
-	if {{<=get_curtemp :gt $FAN_THRESHOLD} && {~ $speed 0}} {
-		cycles = `($cycles+1)
-		{$cycles :gt 1} && {
-			alert_if_fullscreen 'Fan is stopped at %dC' \
-				$FAN_THRESHOLD
-			result true
+	if {~ $speeds ()} {
+		if {! $nofans_logged} {
+			logger 'No fan sensors found'
+			nofans_logged = true
 		}
-	} else {
-		cycles = 0
 		result false
+	} else {
+		speed = 0; for s $speeds {speed = `($speed+$s)}
+		if {{<=get_curtemp :gt $FAN_THRESHOLD} && {~ $speed 0}} {
+			cycles = `($cycles+1)
+			{$cycles :gt 1} && {
+				alert_if_fullscreen 'Fan is stopped at %dC' \
+					$FAN_THRESHOLD
+				result true
+			}
+		} else {
+			cycles = 0
+			result false
+		}
 	}
 }
 
