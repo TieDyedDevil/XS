@@ -114,14 +114,10 @@ fn osd {|msg|
 	.c 'wm'
 	.r 'barre boc em hc mons wmb'
 	%only-X
-	let (m; fl; f; _; k) {
-		for m `{herbstclient list_monitors|cut -d: -f1} {
-			fl = /tmp/panel-^$m^-fifos
-			for f `{access -f $fl && cat $fl} {
-				(_ k) = <={~~ $f *-*-osdmsg-^$m}
-				!~ $k () && echo $msg \
-					>/tmp/panel-^$k^-osdmsg-^$m
-			}
+	let (fl = /tmp/panel.fifos) {
+		for f `{access -f $fl && cat $fl} {
+			(_ k) = <={~~ $f *-*-osdmsg}
+			!~ $k () && echo $msg >/tmp/panel-^$k^-osdmsg
 		}
 	}
 }

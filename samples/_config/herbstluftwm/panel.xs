@@ -59,10 +59,10 @@
 # directory as this script; see fetchmail(1). The fetchmail configuration
 # *must* specify `no idle` and *should* specify `timeout 15`.
 #
-# Alerts are displayed as short messages on the OSD if triggered when the
-# panel is concealed by a fullscreen window. The battery-critical alert
-# is always displayed on the OSD regardless of whether the focused window
-# is fullscreen.
+# Alerts are displayed as short messages on the OSD (again, only on the
+# active monitor) if triggered when the panel is concealed by a fullscreen
+# window. The battery-critical alert is always displayed on the OSD
+# regardless of whether the focused window is fullscreen.
 #
 # With the exception of the tag indicators and title, panel content may
 # be enabled selectively, whether for cosmetic or functional preference
@@ -140,11 +140,9 @@ debug = false
 #   |                                              |
 #   |      if (panel obscured or critical alert)   |
 #   |      :                                       |
-#   \------?-----+---> osdmsg| osd& + osd_cat      |   ; wait
-#               /                                  |
-# nothing& ----/                                   |   ; stdout = open
+#   \------?----+----> osdmsg| osd& + osd_cat      |   ; wait
+#              /                                   |
 #             /    ----> trigger| lights& ---->----|   ; wait
-#            /    /                                |
 #   osd-client   /                                 |   ; cli (optional)
 #               /    /------------------------<----/
 # netstat& ----/     |                                 ; async
@@ -209,8 +207,8 @@ access ~/.panel.xs && . ~/.panel.xs
 herbstclient pad $monitor $panel_height_px
 
 # These files store the task and fifo info
-taskfile = /tmp/panel-^$monitor^-tasks
-fifofile = /tmp/panel-^$monitor^-fifos
+taskfile = /tmp/panel.tasks
+fifofile = /tmp/panel.fifos
 
 # Define the common part of the fifo file names
 tmpfile_base = `{mktemp -u /tmp/panel-XXXXXXXX}
@@ -371,9 +369,7 @@ dzen2_gcpubar_opts = -h `($panel_height_px/2) \
 	-fg $cpubar_meter -bg $cpubar_background \
 	-i 1.5
 
-osd_cat_opts = -f $osd_font -s 5 -c $alrfg \
-	-i `($x+$osd_offset_px) -o `($y+$osd_offset_px+$panel_height_px) \
-	-d $osd_dwell_s -w -l 1
+osd_cat_opts = -f $osd_font -s 5 -c $alrfg -d $osd_dwell_s -w -l 1
 
 # Create the status-lights trigger fifo
 trigger = $tmpfile_base^-trigger-^$monitor
@@ -384,11 +380,16 @@ event = $tmpfile_base^-event-^$monitor
 mkfifo $event
 
 # Create the OSD message fifo
-osdmsg = $tmpfile_base^-osdmsg-^$monitor
+osdmsg = $tmpfile_base^-osdmsg
 mkfifo $osdmsg
 
 # Write fifo summary info
 echo $event $trigger $osdmsg >$fifofile
+
+# We'll need to know which monitor has focus
+fn focused_monitor {
+	herbstclient list_monitors|grep '\[FOCUS\]$'|cut -d: -f1
+}
 
 # Initialize task pid tracker
 taskpids =
@@ -425,11 +426,14 @@ if $enable_cpubar {
 }
 
 # Start the OSD
-tail -f /dev/null >$osdmsg &
-rt nothing
-<$osdmsg while true {
-	osd_cat $osd_cat_opts
-	sleep 1  # reached on $osdmsg EOF; shouldn't happen
+while true {
+	msg = `{<$osdmsg cat}
+	fm = `focused_monitor
+	mi = `{herbstclient list_monitors|grep '^'^$fm^': '}
+	(_ mx my) = <={~~ $mi *+*+*}
+	osd_pos = -i `($mx+$osd_offset_px) \
+		-o `($my+$osd_offset_px+$panel_height_px)
+	echo $msg|osd_cat $osd_cat_opts $osd_pos
 } &
 rt osd
 fn osd {|msg| echo $msg >$osdmsg}
@@ -836,10 +840,6 @@ fn track {
 }
 
 # Run the server
-fn focused_monitor {
-	hc list_monitors|grep '\[FOCUS\]$'|cut -d: -f1
-}
-
 logger 'starting: %s; %s; %s; %s; %s; %s; %s' \
 	<={%argify `{var enable_track}} \
 	<={%argify `{var enable_clock}} \
