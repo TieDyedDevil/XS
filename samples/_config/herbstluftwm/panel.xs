@@ -834,6 +834,10 @@ fn track {
 }
 
 # Run the server
+fn focused_monitor {
+	hc list_monitors|grep '\[FOCUS\]$'|cut -d: -f1
+}
+
 logger 'starting: %s; %s; %s; %s; %s; %s; %s' \
 	<={%argify `{var enable_track}} \
 	<={%argify `{var enable_clock}} \
@@ -843,7 +847,7 @@ logger 'starting: %s; %s; %s; %s; %s; %s; %s' \
 	<={%argify `{var enable_cpubar}} \
 	<={%argify `{var enable_inbox}}
 
-let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; render) {
+let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; r1; r2; r3) {
 	tags = `` \n {drawtags $monitor}
 	sep = $separator_attr^'|'
 	title = `title
@@ -873,15 +877,22 @@ let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; render) {
 				reload {terminate}
 				{}
 			)
-			render = ' '$lights $cpubar $sep \
-				`{echo $title|iconv -tlatin1//translit} \
-				`{if $enable_track {drawcenter $track}} \
+			r1 = ' '$lights $cpubar $sep
+			r2 = `{echo $title|iconv -tlatin1//translit}
+			r3 = `{if $enable_track {drawcenter $track}} \
 				`{if $enable_clock {drawright $clock}}
 		}
 		for client `{cat $dispfile} {
-			let ((_ _ _ m) = <={~~ $client *-*-*-*}; tags) {
+			let ((_ _ _ m) = <={~~ $client *-*-*-*}; tags; out) {
 				tags = `` \n {drawtags $m}
-				!~ $tags () && echo $tags $render >$client
+				if {!~ $tags ()} {
+					if {~ `focused_monitor $m} {
+						out = $r1 $r2 $r3
+					} else {
+						out = $r1 $r3
+					}
+					echo $tags $out >$client
+				}
 			}
 		}
 	}
