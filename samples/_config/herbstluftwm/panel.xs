@@ -17,8 +17,8 @@
 #
 # Goals: low power consumption (given the constraints of being written in a
 # shell language); good visual integration with wm; focus attention on the
-# most important elements; properly clean up resources upon termination and
-# restart.
+# most important elements; properly clean up resources upon normal
+# termination.
 #
 # Non-goals: pointer integration; keyboard control; configurability beyond
 # that already provided; support for "light" themes; non-Linux OS support;
@@ -59,10 +59,10 @@
 # directory as this script; see fetchmail(1). The fetchmail configuration
 # *must* specify `no idle` and *should* specify `timeout 15`.
 #
-# Alerts are displayed as short messages on the OSD (again, only on the
-# active monitor) if triggered when the panel is concealed by a fullscreen
-# window. The battery-critical alert is always displayed on the OSD
-# regardless of whether the focused window is fullscreen.
+# Alerts are displayed as short messages on the OSD if triggered when the
+# panel on the active monitor is concealed by a focused fullscreen window.
+# The battery-critical alert is always displayed on the OSD regardless of
+# whether the focused window is fullscreen.
 #
 # With the exception of the tag indicators and title, panel content may
 # be enabled selectively, whether for cosmetic or functional preference
@@ -149,10 +149,10 @@ debug = false
 # other& -----/      |                                 ; poll/sleep ( 3s)
 # inbox& ----/       |                                 ; poll/sleep (30s)
 #                    \---> event| event-loop           ; wait
-#                                  ... |
-#        SERVER                   /   / \              ; poll/demux
+#       [SERVER]                   ... |
+#                                 /   / \              ; poll/merge/demux
 #                                /   |   |
-#    <---...--------------------/    |   |
+# (other clients) <---...-------/    |   |
 #                                    |   |
 #              /---------------------/   |
 #   .   .   .  |.   .   .   .   .   .   .|  .   .   .   .   .   .   .   .
@@ -165,7 +165,7 @@ debug = false
 #              |                         |
 #       .    dzen2                .    dzen2                .
 #
-#       .         CLIENT 2        .         CLIENT 1        .
+#       .        [CLIENT 2]       .        [CLIENT 1]       .
 
 # ========================================================================
 #             H  E  R  E     B  E     D  R  A  G  O  N  S
@@ -251,9 +251,9 @@ mkfifo $display
 #                              C L I E N T
 
 # There can be only one server...
-pidfile = /tmp/panel-server.pid
-dispfile = /tmp/panel.disp
-clntfile = /tmp/panel.clnt
+pidfile = /tmp/panel.server-pid
+dispfile = /tmp/panel.displays
+clntfile = /tmp/panel.clients
 lockfile = /tmp/panel.lock
 lockfile -1 $lockfile
 checkpid = `{cat $pidfile >[2]/dev/null}
@@ -372,11 +372,11 @@ dzen2_gcpubar_opts = -h `($panel_height_px/2) \
 osd_cat_opts = -f $osd_font -s 5 -c $alrfg -d $osd_dwell_s -w -l 1
 
 # Create the status-lights trigger fifo
-trigger = $tmpfile_base^-trigger-^$monitor
+trigger = $tmpfile_base^-trigger
 mkfifo $trigger
 
 # Create the display event fifo
-event = $tmpfile_base^-event-^$monitor
+event = $tmpfile_base^-event
 mkfifo $event
 
 # Create the OSD message fifo
@@ -711,7 +711,7 @@ if $enable_inbox {
 		while true {
 			%with-read-lines \
 			<{fetchmail -c --fetchmailrc $HERE/inbox.fetchmailrc \
-				--pidfile /tmp/panel-fetchmail.pid
+				--pidfile /tmp/panel.fetchmail-pid
 			} {|line|
 				(tm rm _) = \
 					<={~~ $line *' messages ('*' seen)'*}
