@@ -25,9 +25,9 @@
 # in-process recovery from improper termination of previous session.
 #
 # The panel is divided into three regions. The left region contains tag
-# indicators, alert and status indicators, a CPU load bar and the title of
-# the focused window. The center region shows info for the track being
-# played by mpd. The right region shows a clock.
+# indicators, alert and status indicators, a CPU load bar and (only on the
+# active monitor) the title of the focused window. The center region shows
+# info for the track being played by mpd. The right region shows a clock.
 #
 # The alert indicators are:
 #   B low battery
@@ -825,6 +825,8 @@ fn track {
 	let (info = `` '' {/usr/bin/mpc -f $trackfmt}) {
 		if {~ `{wc -l <<<$info} 1} {
 			echo
+		} else if {<<<$info head -2|tail -n+2|grep -q '^ERROR: '} {
+			echo 'mpd error'
 		} else if {grep -qwF '[paused]' <<<$info} {
 			echo
 		} else {
