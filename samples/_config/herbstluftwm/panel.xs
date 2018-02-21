@@ -257,7 +257,7 @@ private $display
 #                              C L I E N T
 
 # There can be only one server...
-pidfile = /tmp/panel.server-pid
+pidfile = /tmp/panel.server
 private $pidfile
 dispfile = /tmp/panel.displays
 private $dispfile
