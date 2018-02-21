@@ -206,9 +206,14 @@ access ~/.panel.xs && . ~/.panel.xs
 # Carve out space for the panel
 herbstclient pad $monitor $panel_height_px
 
+# We want our temporary files and fifos to be private
+fn private {|name| touch $name; chmod 600 $name}
+
 # These files store the task and fifo info
 taskfile = /tmp/panel.tasks
+private $taskfile
 fifofile = /tmp/panel.fifos
+private $fifofile
 
 # Define the common part of the fifo file names
 tmpfile_base = `{mktemp -u /tmp/panel-XXXXXXXX}
@@ -242,18 +247,22 @@ fn %argify {|*|
 }
 
 # Prepare the client for this monitor
-dzen2_opts = -w $panel_width -x $x -y $y -h $panel_height_px \
+dzen2_opts = -w $panel_width -x $x -y $y -h $panel_height_px -p \
 	-e button3= -ta l -fn $panel_font
 display = $tmpfile_base^-display-^$monitor
 mkfifo $display
+private $display
 
 # ========================================================================
 #                              C L I E N T
 
 # There can be only one server...
 pidfile = /tmp/panel.server-pid
+private $pidfile
 dispfile = /tmp/panel.displays
+private $dispfile
 clntfile = /tmp/panel.clients
+private $clntfile
 lockfile = /tmp/panel.lock
 lockfile -1 $lockfile
 checkpid = `{cat $pidfile >[2]/dev/null}
@@ -374,14 +383,17 @@ osd_cat_opts = -f $osd_font -s 5 -c $alrfg -d $osd_dwell_s -w -l 1
 # Create the status-lights trigger fifo
 trigger = $tmpfile_base^-trigger
 mkfifo $trigger
+private $trigger
 
 # Create the display event fifo
 event = $tmpfile_base^-event
 mkfifo $event
+private $event
 
 # Create the OSD message fifo
 osdmsg = $tmpfile_base^-osdmsg
 mkfifo $osdmsg
+private $osdmsg
 
 # Write fifo summary info
 echo $event $trigger $osdmsg >$fifofile
