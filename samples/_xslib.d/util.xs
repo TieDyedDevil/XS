@@ -195,7 +195,7 @@ fn %with-tempfile {|name body|
 		unwind-protect {
 			$body
 		} {
-			rm -f $name
+			rm -f $($name)
 		}
 	}
 }
