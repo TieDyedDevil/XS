@@ -126,6 +126,9 @@ enable_other_status = true
 enable_cpubar = true
 enable_inbox = true
 
+# The panel can be rendered either 'above' or 'below' wm content
+panel_site = above
+
 # If true, write logger information to stderr
 debug = false
 
@@ -204,7 +207,11 @@ geometry = `{herbstclient monitor_rect $monitor >[2]/dev/null}
 access ~/.panel.xs && . ~/.panel.xs
 
 # Carve out space for the panel
-herbstclient pad $monitor $panel_height_px
+herbstclient pad $monitor 0 0 0 0
+switch $panel_site (
+	above {herbstclient pad $monitor $panel_height_px}
+	below {herbstclient pad $monitor 0 0 $panel_height_px}
+)
 
 # We want our temporary files and fifos to be private
 fn private {|name| touch $name; chmod 600 $name}
@@ -247,7 +254,12 @@ fn %argify {|*|
 }
 
 # Prepare the client for this monitor
-dzen2_opts = -w $panel_width -x $x -y $y -h $panel_height_px -p \
+switch $panel_site (
+	above {panel_y = $y}
+	below {(_ _ _ panel_y) = `{herbstclient monitor_rect -p $monitor}}
+)
+
+dzen2_opts = -w $panel_width -x $x -y $panel_y -h $panel_height_px \
 	-e button3= -ta l -fn $panel_font
 display = $tmpfile_base^-display-^$monitor
 mkfifo $display
