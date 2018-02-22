@@ -192,6 +192,33 @@ fn-xftwidth = <={access -1en xftwidth $path}
 fn-xkbset = <={access -1en xkbset $path}
 fn-xset = <={access -1en xset $path}
 
+# Define utility functions
+fn %with-read-lines {|file body|
+	# Run body with each line from file.
+	# Body must be a lambda; its argument is bound to the line content.
+	<$file let (__l = <=read) {
+		while {!~ $__l ()} {
+			$body $__l
+			__l = <=read
+		}
+	}
+}
+fn %argify {|*|
+	# Always return a one-element list.
+	if {~ $* ()} {result ''} else {result `` '' {echo -n $*}}
+}
+
+# Define a logger, enabled by the debug variable
+fn logger {|fmt args|
+	if $debug {
+		catch {|e|
+			echo $PGM^': logger failed:' $e $fmt $args >[1=2]
+		} {
+			printf '%s: '^$fmt^\n $PGM $args >[1=2]
+		}
+	}
+}
+
 # What's our name?
 ARG0 = $0
 PGM = `{basename $ARG0}
@@ -206,13 +233,69 @@ geometry = `{herbstclient monitor_rect $monitor >[2]/dev/null}
 # Here's a customization hook; use it at your own peril
 access ~/.panel.xs && . ~/.panel.xs
 
+# Check for valid and reasonable settings
+fn vs {|name type parms|
+	switch $type (
+	int {
+		# parms: lo hi r-lo r-hi
+		echo $($name)|grep -q '^[0-9]\+$' || throw error $PGM \
+			`{var $name} '(integer value expected)'
+		if {{$($name) :lt $parms(1)} || {$($name) :gt $parms(2)}} {
+			throw error $PGM `{var $name} \
+				'(not in range '^$parms(1)^'..'^$parms(2)^')'
+		}
+		if {{$($name) :lt $parms(3)} || {$($name) :gt $parms(4)}} {
+			logger '%s (outside recommended range %d..%d)' \
+				<={%argify `{var $name}} $range(3 4)
+		}
+	}
+	pct {
+		# parms: r-lo r-hi
+		vs $name int 0 100 $parms
+	}
+	bool {
+		# parms: rec
+		vs $name enum true false
+		if {!~ $parms ()} {
+			~ $($name) $parms || logger '%s (%s recommended)' \
+				<={%argify `{var $name}} $parms
+		}
+	}
+	enum {
+		# parms: value ...
+		~ $($name) $parms || throw error $PGM \
+			`{var $name} '(must be one of: '^<={%argify $parms}^')'
+	}
+	)
+}
+vs panel_height_px int 0 500 10 150
+vs show_alert_placeholders bool
+vs show_status_placeholders bool
+vs osd_offset_px int 0 1000 10 250
+vs osd_dwell_s int 1 10 2 5
+vs battery_low_% pct 10 30
+vs disk_full_% pct 65 95
+vs fan_margin_desktop_C int 0 50 10 50
+vs fan_margin_mobile_C int 0 50 10 50
+vs io_active_% pct 50 95
+vs temperature_margin_desktop_C int 0 50 10 50
+vs temperature_margin_mobile_C int 0 50 10 50
+vs swap_usage_% pct 5 25
+vs enable_track bool
+vs enable_clock bool
+vs enable_herbstclient bool true
+vs enable_alerts bool
+vs enable_network_status bool
+vs enable_cpubar bool
+vs enable_inbox bool
+vs panel_site enum above below
+vs debug bool false
+
 # Carve out space for the panel
 herbstclient pad $monitor 0 0 0 0
 switch $panel_site (
 	above {herbstclient pad $monitor $panel_height_px}
 	below {herbstclient pad $monitor 0 0 $panel_height_px}
-	{throw error $PGM \
-		`{var panel_site} '(Must be ''above'' or ''below''.)'}
 )
 
 # We want our temporary files and fifos to be private
@@ -226,34 +309,6 @@ private $fifofile
 
 # Define the common part of the fifo file names
 tmpfile_base = `{mktemp -u /tmp/panel-XXXXXXXX}
-
-# Define a logger, enabled by the debug variable
-fn logger {|fmt args|
-	if $debug {
-		catch {|e|
-			echo $PGM^': logger failed:' $e $fmt $args >[1=2]
-		} {
-			printf '%s: '^$fmt^\n $PGM $args >[1=2]
-		}
-	}
-}
-
-# Define utility functions
-fn %with-read-lines {|file body|
-	# Run body with each line from file.
-	# Body must be a lambda; its argument is bound to the line content.
-	<$file let (__l = <=read) {
-		while {!~ $__l ()} {
-			$body $__l
-			__l = <=read
-		}
-	}
-}
-
-fn %argify {|*|
-	# Always return a one-element list.
-	if {~ $* ()} {result ''} else {result `` '' {echo -n $*}}
-}
 
 # Prepare the client for this monitor
 switch $panel_site (
