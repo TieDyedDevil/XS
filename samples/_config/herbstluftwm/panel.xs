@@ -211,6 +211,8 @@ herbstclient pad $monitor 0 0 0 0
 switch $panel_site (
 	above {herbstclient pad $monitor $panel_height_px}
 	below {herbstclient pad $monitor 0 0 $panel_height_px}
+	{throw error $PGM \
+		`{var panel_site} '(Must be ''above'' or ''below''.)'}
 )
 
 # We want our temporary files and fifos to be private
