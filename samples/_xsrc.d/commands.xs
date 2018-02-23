@@ -565,14 +565,6 @@ fn title {|*|
 	.r 'prompt name'
 	$&echo -n \e]0\;^$^*^\a
 }
-fn truecolor {|rb gb bb rf gf bf text|
-        .d 'Display text using Truecolor background and foreground colors'
-        .a 'RB GB BB RF GF BF TEXT...'
-        if {!~ $text ()} {
-                printf \e'[48;2;%s;%s;%sm'\e'[38;2;%s;%s;%sm  %s  '\n \
-                        $rb $gb $bb $rf $gf $bf <={%argify $text}
-        } else {throw error truecolor 'rb gb bb rf gf bf text...'}
-}
 fn tsmwd {
 	.d 'Return to tsm working directory'
 	.c 'system'

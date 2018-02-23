@@ -675,3 +675,16 @@ fn %as-bool {|*|
 		}
 	}
 }
+
+fn %withrgb {|bghex fghex text|
+	# Display text with Truecolor bg/fg colors.
+	# Hex values are prefixed with `#` and have six digits.
+	let (fn-hrgb2d = {|hex|
+			map {|*| echo $*|awk --non-decimal-data \
+				'{printf "%d ", $1}'} \
+				`{echo $hex|sed -E 's/\#(..)(..)(..)/' \
+					^'0x\1 0x\2 0x\3/'}}) { \
+		printf \e'[48;2;%03d;%03d;%03dm'\e'[38;2;%03d;%03d;%03dm%s' \
+			`{hrgb2d $bghex} `{hrgb2d $fghex} <={%argify $text}
+	}
+}
