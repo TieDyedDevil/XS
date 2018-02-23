@@ -1,7 +1,14 @@
+fn bari {
+	.d 'Status bar indicator description'
+	.c 'wm'
+	.r 'barre boc em hc mons osd wmb'
+	%only-X
+	~/.config/herbstluftwm/panel.xs info
+}
 fn barre {
 	.d 'Status bar restart'
 	.c 'wm'
-	.r 'boc em hc mons osd wmb'
+	.r 'bari boc em hc mons osd wmb'
 	%only-X
 	let (hc = herbstclient) {
 		hc emit_hook quit_panel
@@ -15,7 +22,7 @@ fn boc {|*|
 	.d 'Bell on completion'
 	.a 'COMMAND'
 	.c 'wm'
-	.r 'barre em hc mons osd wmb'
+	.r 'bari barre em hc mons osd wmb'
 	%only-X
 	unwind-protect {$*} {printf %c \a}
 }
@@ -24,7 +31,7 @@ fn em {|*|
 	.a 'internal|external  # first and second in xrandr list'
 	.a 'both'
 	.c 'wm'
-	.r 'barre boc hc mons osd wmb'
+	.r 'bari barre boc hc mons osd wmb'
 	%only-X
 	let (i; hc = herbstclient; \
 		mnl = `{xrandr|grep '^[^ ]\+ connected' \
@@ -58,14 +65,14 @@ fn hc {|*|
 	.d 'herbstclient'
 	.a 'herbstclient_ARGS'
 	.c 'wm'
-	.r 'barre boc em mons osd wmb'
+	.r 'bari barre boc em mons osd wmb'
 	%only-X
 	herbstclient $*
 }
 fn mons {
 	.d 'List active monitors'
 	.c 'wm'
-	.r 'barre boc em hc osd wmb'
+	.r 'bari barre boc em hc osd wmb'
 	%only-X
 	let (i; hc = herbstclient; xrinfo; size; w; h; diag; f; _; xres; dpi; \
 		mnl = `{xrandr|grep '^[^ ]\+ connected .* [^ ]\+ x [^ ]\+$' \
@@ -112,7 +119,7 @@ fn osd {|msg|
 	.d 'Display message on OSD'
 	.a 'MESSAGE...'
 	.c 'wm'
-	.r 'barre boc em hc mons wmb'
+	.r 'bari barre boc em hc mons wmb'
 	%only-X
 	let (fl = /tmp/panel.fifos) {
 		for f `{access -f $fl && cat $fl} {
@@ -124,7 +131,7 @@ fn osd {|msg|
 fn wmb {
 	.d 'List WM bindings'
 	.c 'wm'
-	.r 'barre boc em hc mons osd'
+	.r 'bari barre boc em hc mons osd'
 	%only-X
 	herbstclient list_keybinds|column -t|less -FXSi
 }

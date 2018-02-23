@@ -13,6 +13,11 @@
 #    sleep 1
 #    herbstclient quit
 
+# Parameters:
+#
+# Normal invocation accepts a monitor ID (default: 0).
+# Pass `info` to list a description of the indicators.
+
 # Purpose: Display a panel for herbstluftwm.
 #
 # Goals: low power consumption (given the constraints of being written in a
@@ -28,32 +33,6 @@
 # indicators, alert and status indicators, a CPU load bar and (only on the
 # active monitor) the title of the focused window. The center region shows
 # info for the track being played by mpd. The right region shows a clock.
-#
-# The alert indicators are:
-#   B low battery
-#   D high disk space utilization
-#   F fan failure (temperature rise w/stopped fan)
-#   I high I/O utilization of physical block device
-#   L 1-minute load average exceeds number of available processors
-#   S swapfile in-use
-#   T high temperature
-#
-# The status indicators are:
-#   4 an IPv4 connection exists
-#   6 an IPv6 connection exists
-#   A AC power to mobile device
-#   B Bluetooth device connection active
-#   C CDMA cellular connection active
-#   E Ethernet connection active
-#   G GSM cellular connection active
-#   I inbox flag
-#   M mouse keys active
-#   N network connected              | one; not both
-#   n network connected to a portal  | one; not both
-#   V VPN connection active
-#   W WiFi connection active
-#   Z screensaver is enabled
-#   " host is virtualized
 #
 # Inbox status requires a valid inbox.fetchmailrc file in the same
 # directory as this script; see fetchmail(1). The fetchmail configuration
@@ -88,6 +67,53 @@
 #     Used as the background color for urgent tags.
 #
 # Additional panel colors are hardwired and presume a "dark" wm theme.
+
+# ========================================================================
+#                         I N D I C A T O R S
+
+info = '
+Alert indicators
+  B low battery
+  D high disk space utilization
+  F fan failure (temperature rise w/stopped fan)
+  I high I/O utilization of physical block device
+  L 1-minute load average exceeds number of available processors
+  S swapfile in-use
+  T high temperature
+
+Status indicators
+  4 an IPv4 connection exists
+  6 an IPv6 connection exists
+  A AC power to mobile device
+  B Bluetooth device connection active
+  C CDMA cellular connection active
+  E Ethernet connection active
+  G GSM cellular connection active
+  I inbox flag
+  M mouse keys active
+  N network connected              | one; not both
+  n network connected to a portal  | one; not both
+  V VPN connection active
+  W WiFi connection active
+  Z screensaver is enabled
+  " host is virtualized
+'
+
+~ $1 info && {
+	if {test -t 1} {
+		awk <<<$info -f <{cat <<'FORMAT'
+BEGIN {color = 7}
+/^Alert/ {system("tput -Tansi setaf 7"); system("tput -Tansi smul");
+ print $0; system("tput -Tansi sgr0"); color = 1; next}
+/^Status/ {system("tput -Tansi setaf 7"); system("tput -Tansi smul");
+ print $0; system("tput -Tansi sgr0"); color = 2; next}
+{system("tput -Tansi setaf " color); printf "%s", substr($0, 1, 3);
+ system("tput -Tansi setaf 7"); print substr($0, 4)}
+FORMAT
+		}
+	} else {cat <<<$info}
+	exit
+}
 
 # ========================================================================
 #                      C O N F I G U R A T I O N
