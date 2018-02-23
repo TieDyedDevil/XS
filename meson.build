@@ -3,7 +3,10 @@ project('xs', ['cpp'])
   compile_flags = ['-I../src', '-Wall', '-Wextra']
   link_flags = []
   boost_dep = dependency('boost')
-  ffi_lib = compiler.find_library('ffi')
+  ffi_lib = dependency('libffi', required: false)
+  if not ffi_lib.found()
+    ffi_lib = compiler.find_library('ffi')
+  endif
   gc_lib = compiler.find_library('gc')
   readline_lib = compiler.find_library('readline')
   custom_target('.stamp',
