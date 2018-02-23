@@ -69,6 +69,71 @@
 # Additional panel colors are hardwired and presume a "dark" wm theme.
 
 # ========================================================================
+#                             C O L O R S
+
+# Fetch colors from wm
+wm_fbn_color = `{herbstclient get frame_border_normal_color}
+wm_fba_color = `{herbstclient get frame_border_active_color}
+wm_fgn_color = `{herbstclient get frame_bg_normal_color}
+wm_fga_color = `{herbstclient get frame_bg_active_color}
+wm_wbn_color = `{herbstclient get window_border_normal_color}
+wm_wba_color = `{herbstclient get window_border_active_color}
+wm_wbu_color = `{herbstclient get window_border_urgent_color}
+
+# Set fixed colors
+panel_fg_color = '#f0f0f0'
+panel_status_bg_color = '#003000'
+panel_status_fg_color = '#00d000'
+panel_alert_bg_color = '#400000'
+panel_alert_fg_color = '#f00000'
+cpu_fg_color = SkyBlue1
+cpu_bg_color = SkyBlue4
+
+# Define colors by function
+fgcolor = $panel_fg_color
+bgcolor = $wm_fbn_color
+selbg = $wm_wba_color
+selfg = $bgcolor
+occbg = $bgcolor
+occfg = $fgcolor
+unfbg = $wm_fba_color
+unffg = $bgcolor
+urgbg = $wm_wbu_color
+urgfg = $bgcolor
+dflbg = $bgcolor
+dflfg = $wm_wbn_color
+omdfg = $bgcolor
+omdbg = $wm_fga_color
+omufg = $wm_fga_color
+omubg = $wm_fgn_color
+stsbg = $panel_status_bg_color
+stsfg = $panel_status_fg_color
+alrbg = $panel_alert_bg_color
+alrfg = $panel_alert_fg_color
+sepbg = $bgcolor
+sepfg = $selbg
+cpubar_meter = $cpu_fg_color
+cpubar_background = $cpu_bg_color
+
+fn tag_samples {
+	echo `{tput -Tansi smul}^'Tag colors'^`{tput -Tansi sgr0}
+	%withrgb $dflbg $dflfg ' 1 '; tput -Tansi sgr0; \
+		echo ' Empty tag on this focused monitor'
+	%withrgb $occbg $occfg ' 2 '; tput -Tansi sgr0; \
+		echo ' Occupied tag on this focused monitor'
+	%withrgb $unfbg $unffg ' 3 '; tput -Tansi sgr0; \
+		echo ' Focused tag on this unfocused monitor'
+	%withrgb $selbg $selfg ' 4 '; tput -Tansi sgr0; \
+		echo ' Focused tag on this focused monitor'
+	%withrgb $omdbg $omdfg ' 5 '; tput -Tansi sgr0; \
+		echo ' Focused tag on other unfocused monitor'
+	%withrgb $omubg $omufg ' 6 '; tput -Tansi sgr0; \
+		echo ' Occupied tag on other unfocused monitor'
+	%withrgb $urgbg $urgfg ' 7 '; tput -Tansi sgr0; \
+		echo ' Occupied tag with notification'
+}
+
+# ========================================================================
 #                         I N D I C A T O R S
 
 info = '
@@ -101,6 +166,7 @@ Status indicators
 
 ~ $1 info && {
 	if {test -t 1} {
+		tag_samples
 		awk <<<$info -f <{cat <<'FORMAT'
 BEGIN {color = 7}
 /^Alert/ {system("tput -Tansi setaf 7"); system("tput -Tansi smul");
@@ -393,24 +459,6 @@ logger 'client on monitor %d: %d; %d' $monitor $client $apid
 if $show_alert_placeholders {_a = '.'} else {_a = ''}
 if $show_status_placeholders {_s = '.'} else {_s = ''}
 
-# Fetch colors from wm
-wm_fbn_color = `{herbstclient get frame_border_normal_color}
-wm_fba_color = `{herbstclient get frame_border_active_color}
-wm_fgn_color = `{herbstclient get frame_bg_normal_color}
-wm_fga_color = `{herbstclient get frame_bg_active_color}
-wm_wbn_color = `{herbstclient get window_border_normal_color}
-wm_wba_color = `{herbstclient get window_border_active_color}
-wm_wbu_color = `{herbstclient get window_border_urgent_color}
-
-# Set fixed colors
-panel_fg_color = '#f0f0f0'
-panel_status_bg_color = '#003000'
-panel_status_fg_color = '#00d000'
-panel_alert_bg_color = '#400000'
-panel_alert_fg_color = '#f00000'
-cpu_fg_color = SkyBlue1
-cpu_bg_color = SkyBlue4
-
 # Report colors
 logger 'palette: %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s' \
 	<={%argify `{var panel_fg_color}} \
@@ -428,32 +476,7 @@ logger 'palette: %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s' \
 	<={%argify `{var cpu_fg_color}} \
 	<={%argify `{var cpu_bg_color}}
 
-# Define colors and bg/fg pairs
-fgcolor = $panel_fg_color
-bgcolor = $wm_fbn_color
-selbg = $wm_wba_color
-selfg = $bgcolor
-occbg = $bgcolor
-occfg = $fgcolor
-unfbg = $wm_fba_color
-unffg = $bgcolor
-urgbg = $wm_wbu_color
-urgfg = $bgcolor
-dflbg = $bgcolor
-dflfg = $wm_wbn_color
-omdfg = $bgcolor
-omdbg = $wm_fga_color
-omufg = $wm_fga_color
-omubg = $wm_fgn_color
-stsbg = $panel_status_bg_color
-stsfg = $panel_status_fg_color
-alrbg = $panel_alert_bg_color
-alrfg = $panel_alert_fg_color
-sepbg = $bgcolor
-sepfg = $selbg
-cpubar_meter = $cpu_fg_color
-cpubar_background = $cpu_bg_color
-
+# Define bg/fg attribute pairs for dzen
 fn attr {|bg fg| printf '^bg(%s)^fg(%s)' $bg $fg}
 normal_attr = `{attr $bgcolor $fgcolor}
 selected_attr = `{attr $selbg $selfg}

@@ -163,7 +163,7 @@ hc set gapless_grid 0
 
 hc attr theme.active.color '#3366dd'
 hc attr theme.normal.color '#666666'
-hc attr theme.urgent.color orange
+hc attr theme.urgent.color '#ffa500' #orange
 hc attr theme.inner_width 1
 hc attr theme.inner_color black
 hc attr theme.border_width 3
