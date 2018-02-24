@@ -435,7 +435,8 @@ tmpfile_base = `{mktemp -u /tmp/panel-XXXXXXXX}
 # Prepare the client for this monitor
 switch $panel_site (
 	above {panel_y = $y}
-	below {(_ _ _ panel_y) = `{herbstclient monitor_rect -p $monitor}}
+	below {(_ yo _ yh) = `{herbstclient monitor_rect -p $monitor}; \
+		panel_y = `($yo+$yh)}
 )
 
 dzen2_opts = -w $panel_width -x $x -y $panel_y -h $panel_height_px \
