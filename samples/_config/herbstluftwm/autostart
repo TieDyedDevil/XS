@@ -126,9 +126,10 @@ hc keybind $Mod^-c cycle
 hc keybind $Mod^-i jumpto urgent
 
 # monitors
-hc keybind $Mod^-m           shift_to_monitor +1
-hc keybind $Mod^-Shift-m     shift_to_monitor -1
-hc keybind $Mod^-BackSpace   cycle_monitor
+hc keybind $Mod^-m                 shift_to_monitor +1
+hc keybind $Mod^-Shift-m           shift_to_monitor -1
+hc keybind $Mod^-BackSpace         cycle_monitor +1
+hc keybind $Mod^-Shift-BackSpace   cycle_monitor -1
 
 # bury pointer
 hc keybind $Mod^-b spawn xdotool mousemove 5000 5000
