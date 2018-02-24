@@ -688,3 +688,14 @@ fn %withrgb {|bghex fghex text|
 			`{hrgb2d $bghex} `{hrgb2d $fghex} <={%argify $text}
 	}
 }
+
+fn %rgbhex {|color|
+	# Return a hex color code given the same or an X11 color name
+	if {~ `{echo $color|cut -c1} '#'} {
+		printf %s $color
+	} else {
+		printf '#%02x%02x%02x' \
+			`{grep -wi '\W'^$color^'$' /usr/share/X11/rgb.txt \
+				|cut -c1-11}
+	}
+}
