@@ -118,19 +118,19 @@ cpubar_background = $cpu_bg_color
 fn tag_samples {
 	echo `{tput -Tansi smul}^'Tag colors'^`{tput -Tansi sgr0}
 	%withrgb $dflbg $dflfg ' 1 '; tput -Tansi sgr0; \
-		echo ' Empty tag on this focused monitor'
+		echo ' empty tag'
 	%withrgb $occbg $occfg ' 2 '; tput -Tansi sgr0; \
-		echo ' Occupied tag on this focused monitor'
-	%withrgb $unfbg $unffg ' 3 '; tput -Tansi sgr0; \
-		echo ' Focused tag on this unfocused monitor'
-	%withrgb $selbg $selfg ' 4 '; tput -Tansi sgr0; \
-		echo ' Focused tag on this focused monitor'
+		echo ' occupied tag on this focused monitor'
+	%withrgb $selbg $selfg ' 3 '; tput -Tansi sgr0; \
+		echo ' focused tag on this focused monitor'
+	%withrgb $unfbg $unffg ' 4 '; tput -Tansi sgr0; \
+		echo ' focused tag on this unfocused monitor'
 	%withrgb $omdbg $omdfg ' 5 '; tput -Tansi sgr0; \
-		echo ' Focused tag on other unfocused monitor'
+		echo ' focused tag on other unfocused monitor'
 	%withrgb $omubg $omufg ' 6 '; tput -Tansi sgr0; \
-		echo ' Occupied tag on other unfocused monitor'
+		echo ' occupied tag on other unfocused monitor'
 	%withrgb $urgbg $urgfg ' 7 '; tput -Tansi sgr0; \
-		echo ' Occupied tag with notification'
+		echo ' occupied tag with urgent notification'
 }
 
 # ========================================================================
