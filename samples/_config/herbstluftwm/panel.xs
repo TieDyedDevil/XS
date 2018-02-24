@@ -75,6 +75,46 @@
 # Additional panel colors are hardwired and presume a "dark" wm theme.
 
 # ========================================================================
+#                  L I B R A R Y   F U N C T I O N S
+
+fn %with-read-lines {|file body|
+	# Run body with each line from file.
+	# Body must be a lambda; its argument is bound to the line content.
+	<$file let (__l = <=read) {
+		while {!~ $__l ()} {
+			$body $__l
+			__l = <=read
+		}
+	}
+}
+fn %argify {|*|
+	# Always return a one-element list.
+	if {~ $* ()} {result ''} else {result `` '' {echo -n $*}}
+}
+fn %withrgb {|bghex fghex text|
+	# Display text with Truecolor bg/fg colors.
+	# Hex values are prefixed with `#` and have six digits.
+	let (fn-hrgb2d = {|hex|
+			map {|*| echo $*|awk --non-decimal-data \
+				'{printf "%d ", $1}'} \
+				`{%rgbhex $hex|sed -E 's/\#(..)(..)(..)/' \
+					^'0x\1 0x\2 0x\3/'}}) { \
+		printf \e'[48;2;%03d;%03d;%03dm'\e'[38;2;%03d;%03d;%03dm%s' \
+			`{hrgb2d $bghex} `{hrgb2d $fghex} <={%argify $text}
+	}
+}
+fn %rgbhex {|color|
+	# Return a hex color code given the same or an X11 color name
+	if {~ `{echo $color|cut -c1} '#'} {
+		printf %s $color
+	} else {
+		printf '#%02x%02x%02x' \
+			`{grep -wi '\W'^$color^'$' /usr/share/X11/rgb.txt \
+				|cut -c1-11}
+	}
+}
+
+# ========================================================================
 #                             C O L O R S
 
 # Fetch colors from wm
@@ -289,22 +329,6 @@ fn-systemd-detect-virt = <={access -1en systemd-detect-virt $path}
 fn-xftwidth = <={access -1en xftwidth $path}
 fn-xkbset = <={access -1en xkbset $path}
 fn-xset = <={access -1en xset $path}
-
-# Define utility functions
-fn %with-read-lines {|file body|
-	# Run body with each line from file.
-	# Body must be a lambda; its argument is bound to the line content.
-	<$file let (__l = <=read) {
-		while {!~ $__l ()} {
-			$body $__l
-			__l = <=read
-		}
-	}
-}
-fn %argify {|*|
-	# Always return a one-element list.
-	if {~ $* ()} {result ''} else {result `` '' {echo -n $*}}
-}
 
 # Define a logger, enabled by the debug variable
 fn logger {|fmt args|
