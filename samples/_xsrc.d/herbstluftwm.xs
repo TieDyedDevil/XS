@@ -69,50 +69,55 @@ fn hc {|*|
 	%only-X
 	herbstclient $*
 }
-fn mons {
-	.d 'List active monitors'
+fn mons {|rects|
+	.d 'List or define monitors'
+	.a 'WxH+X+Y ...  # define logical monitors'
+	.a '(none)  # list physical and logical monitors'
 	.c 'wm'
 	.r 'bari barre boc em hc osd wmb'
 	%only-X
-	let (i; hc = herbstclient; xrinfo; size; w; h; diag; f; _; xres; dpi; \
-		mnl = `{xrandr|grep '^[^ ]\+ connected .* [^ ]\+ x [^ ]\+$' \
-			|cut -d' ' -f1}) {
-		i = 0
-		for m $mnl {
-			hc rename_monitor $i ''
-			hc rename_monitor $i $m
-			i = `($i+1)
+	if {!~ $rects ()} {
+		for r $rects {
+			<<<$r grep -q '^[0-9]\{1,5\}x[0-9]\{1,5\}' \
+					^'+[0-9]\{1,5\}+[0-9]\{1,5\}$' \
+				|| throw error mons 'invalid rect: '^$r
 		}
-		for m $mnl {
-			xrinfo = `{xrandr|grep \^^$m^' '}
-			size = <={%argify `{echo $xrinfo \
+		herbstclient set_monitors $rects
+		barre
+	} else {
+		let (xrinfo; rect; size; w; h; diag; f; xres; dpi; _) {
+			for m `{xrandr|grep '^[^ ]\+ connected .* [^ ]\+ ' \
+					^'x [^ ]\+$' |cut -d' ' -f1} {
+				xrinfo = `{xrandr|grep \^^$m^' '}
+				rect = `{echo $xrinfo \
+						|grep -o '[0-9]\+x[0-9]\+' \
+							^'+[0-9]\++[0-9]\+'}
+				size = <={%argify `{echo $xrinfo \
 						|grep -o '[^ ]\+ x [^ ]\+$' \
 						|tr -d ' '}}
-			(w h) = <={~~ $size *mmx*mm}
-			# 0 .. 0.3999... truncates
-			# 0.4?... .. 0.9?... is ½
-			diag = `{nickle -e 'sqrt('^$w^'**2+'^$h^'**2)/25.4+.1'}
-			(diag f) = <={~~ $diag *.*}
-			{~ $f 5* 6* 7* 8*} && diag = `{printf %s%s $diag ½}
-			xres = `{echo $xrinfo|grep -o '^[^ ]\+ .* [0-9]\+x'}
-			xres = <={~~ $xres *x}
-			if {~ $w 0} {
-				dpi = 0
-			} else {
-				dpi = `(25.4*$xres/$w)
-				(dpi _) = <={~~ $dpi *.*}
+				(w h) = <={~~ $size *mmx*mm}
+				# 0 .. 0.3999... truncates
+				# 0.4?... .. 0.9?... is ½
+				diag = `{nickle -e \
+					'sqrt('^$w^'**2+'^$h^'**2)/25.4+.1'}
+				(diag f) = <={~~ $diag *.*}
+				{~ $f 5* 6* 7* 8*} && \
+					diag = `{printf %s%s $diag ½}
+				xres = `{echo $xrinfo \
+					|grep -o '^[^ ]\+ .* [0-9]\+x'}
+				xres = <={~~ $xres *x}
+				if {~ $w 0} {
+					dpi = 0
+				} else {
+					dpi = `(25.4*$xres/$w)
+					(dpi _) = <={~~ $dpi *.*}
+				}
+				echo $m $rect $size $diag^" $dpi^ppi
 			}
-			join -1 7 -o1.1,1.7,1.2,2.2,2.3,1.4,1.5,1.8 \
-				<{hc list_monitors|grep "$m"} \
-				<{printf "%s"\ %s\ %s"\;%dppi\n \
-					$m $size $diag $dpi}
-		} \
-			| awk '{sub(/^.:/, sprintf("%c", 0x2460+$1)); print}' \
-			| sed 's/",/"/' \
-			| sed 's/"\([^" ]\+\)"/\1/g' \
-			| sed 's/tag\s/tag:/' \
-			| sed 's/\[FOCUS\]/🖵/' \
-			| column -t
+			echo -- '--'
+			herbstclient list_monitors|sed 's/ with [^[]\+//' \
+				|sed 's/\[FOCUS\]/ 🖵/'
+		} |column -t -R2
 	}
 }
 fn osd {|msg|
