@@ -3,7 +3,7 @@ fn bari {
 	.c 'wm'
 	.r 'barre boc em hc mons osd wmb'
 	%only-X
-	~/.config/herbstluftwm/panel.xs info
+	~/.config/herbstluftwm/panel.xs legend color|less -RFXi
 }
 fn barre {
 	.d 'Status bar restart'

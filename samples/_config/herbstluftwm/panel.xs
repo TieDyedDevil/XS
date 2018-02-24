@@ -15,8 +15,14 @@
 
 # Parameters:
 #
-# Normal invocation accepts a monitor ID (default: 0).
-# Pass `info` to list a description of the indicators.
+# Normal invocation accepts a monitor ID (default: 0). This starts a server
+# and client on the first monitor and only a client on subsequent monitors.
+#
+# Pass `legend` to list a description of the tag colors and indicator labels.
+# The `legend` display assumes a TrueColor terminal; colors (including the
+# entire tags section) are suppressed when output is to a pipe. Add `color`
+# as a second parameter to force color output to a pipe or `nocolor` to
+# suppress color output to a terminal.
 
 # Purpose: Display a panel for herbstluftwm.
 #
@@ -136,7 +142,7 @@ fn tag_samples {
 # ========================================================================
 #                         I N D I C A T O R S
 
-info = '
+indicator_info = '
 Alert indicators
   B low battery
   D high disk space utilization
@@ -164,10 +170,10 @@ Status indicators
   " host is virtualized
 '
 
-~ $1 info && {
-	if {test -t 1} {
+~ $1 legend && {
+	if {{!~ $2 nocolor} && {{~ $2 color} || {test -t 1}}} {
 		tag_samples
-		awk <<<$info -f <{cat <<'FORMAT'
+		awk <<<$indicator_info -f <{cat <<'FORMAT'
 BEGIN {color = 7}
 /^Alert/ {system("tput -Tansi setaf 7"); system("tput -Tansi smul");
  print $0; system("tput -Tansi sgr0"); color = 1; next}
@@ -177,7 +183,7 @@ BEGIN {color = 7}
  system("tput -Tansi setaf 7"); print substr($0, 4)}
 FORMAT
 		}
-	} else {cat <<<$info}
+	} else {cat <<<$indicator_info}
 	exit
 }
 
