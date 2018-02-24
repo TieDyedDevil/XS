@@ -157,7 +157,8 @@ stsfg = $panel_status_fg_color
 alrbg = $panel_alert_bg_color
 alrfg = $panel_alert_fg_color
 sepbg = $bgcolor
-sepfg = $selbg
+sepfg_f = $selbg
+sepfg_u = $omubg
 cpubar_meter = $cpu_fg_color
 cpubar_background = $cpu_bg_color
 
@@ -521,7 +522,8 @@ status_marker_attr = `{attr $stsbg $stsfg}
 status_indicator_attr = `{attr $stsbg $stsfg}
 alert_marker_attr = `{attr $alrbg $alrfg}
 alert_indicator_attr = `{attr $alrbg $alrfg}
-separator_attr = `{attr $sepbg $sepfg}
+separator_attr_f = `{attr $sepbg $sepfg_f}
+separator_attr_u = `{attr $sepbg $sepfg_u}
 
 dzen2_gcpubar_opts = -h `($panel_height_px/2) \
 	-fg $cpubar_meter -bg $cpubar_background \
@@ -1012,7 +1014,7 @@ logger 'starting: %s; %s; %s; %s; %s; %s; %s' \
 
 let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; r1; r2; r3) {
 	tags = `` \n {drawtags $monitor}
-	sep = $separator_attr^'|'
+	sep = '|'
 	title = `title
 	track = `{drawcenter `{track}}
 	lights = `{lights $at $st}
@@ -1040,8 +1042,8 @@ let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; r1; r2; r3) {
 				reload {terminate}
 				{}
 			)
-			r1 = ' '$lights $cpubar $sep
-			r2 = `{echo $title|iconv -tlatin1//translit}
+			r1 = ' '$lights $cpubar
+			r2 = $sep `{echo $title|iconv -tlatin1//translit}
 			r3 = `{if $enable_track {drawcenter $track}} \
 				`{if $enable_clock {drawright $clock}}
 		}
@@ -1050,9 +1052,11 @@ let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; r1; r2; r3) {
 				tags = `` \n {drawtags $m}
 				if {!~ $tags ()} {
 					if {~ `focused_monitor $m} {
-						out = $r1 $r2 $r3
+						out = $r1 $separator_attr_f \
+							$r2 $r3
 					} else {
-						out = $r1 $r3
+						out = $r1 $separator_attr_u \
+							$r2 $r3
 					}
 					echo $tags $out >$client
 				}
