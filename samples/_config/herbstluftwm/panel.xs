@@ -126,7 +126,7 @@ fn tag_samples {
 	%withrgb $dflbg $dflfg ' 1 '; tput -Tansi sgr0; \
 		echo ' empty tag'
 	%withrgb $occbg $occfg ' 2 '; tput -Tansi sgr0; \
-		echo ' occupied tag on this focused monitor'
+		echo ' occupied tag on this monitor'
 	%withrgb $selbg $selfg ' 3 '; tput -Tansi sgr0; \
 		echo ' focused tag on this focused monitor'
 	%withrgb $unfbg $unffg ' 4 '; tput -Tansi sgr0; \
@@ -134,7 +134,7 @@ fn tag_samples {
 	%withrgb $omdbg $omdfg ' 5 '; tput -Tansi sgr0; \
 		echo ' focused tag on other unfocused monitor'
 	%withrgb $omubg $omufg ' 6 '; tput -Tansi sgr0; \
-		echo ' occupied tag on other unfocused monitor'
+		echo ' occupied tag on other monitor'
 	%withrgb $urgbg $urgfg ' 7 '; tput -Tansi sgr0; \
 		echo ' occupied tag with urgent notification'
 }
@@ -902,7 +902,7 @@ fn drawcenter {|text|
 fn drawright {|text|
 	let (w = `{xftwidth $panel_font <={%argify \
 				`{sed 's/\^..([^)]*)//g' <<<$text}}}; \
-		t = <={%argify $text}; pad = 10) {
+		t = <={%argify $text}; pad = 15) {
 			printf '^p(_RIGHT)^p(-%d)%s'\n `($w+$pad) $t
 	}
 }
