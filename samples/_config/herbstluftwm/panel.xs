@@ -175,7 +175,7 @@ fn tag_samples {
 	%withrgb $omdbg $omdfg ' 5 '; tput -Tansi sgr0; \
 		echo ' focused tag is on other unfocused monitor'
 	%withrgb $omubg $omufg ' 6 '; tput -Tansi sgr0; \
-		echo ' occupied tag on unfocused monitor'
+		echo ' focused tag on unfocused monitor'
 	%withrgb $urgbg $urgfg ' 7 '; tput -Tansi sgr0; \
 		echo ' tag with urgent notification'
 }
