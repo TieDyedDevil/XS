@@ -53,23 +53,24 @@
 # be enabled selectively, whether for cosmetic or functional preference
 # or to further reduce the panel's already low CPU load.
 #
-# The panel "borrows" some of the colors defined by the wm, as follows:
-#   frame_border_normal_color
+# The panel "borrows" some of the colors defined by the wm. Note that the
+# wm's default colors are not ideal; try the colors noted in brackets:
+#   frame_border_normal_color [#101010]
 #     Used as the primary background color. Used as the foreground color
 #     for selected, unfocused and urgent tags.
-#   frame_border_active_color
+#   frame_border_active_color [#404040]
 #     Used as the background color for unfocused tags.
-#   frame_bg_normal_color
+#   frame_bg_normal_color [#402070]
 #     Used as the background color for unfocused tags on an unfocused monitor.
-#   frame_bg_active_color
+#   frame_bg_active_color [#407020]
 #     Used as the background color for an focused tag on an unfocused monitor.
 #     Used as the foreground color for unfocused tags on an unfocused monitor.
-#   window_border_normal_color
+#   window_border_normal_color [#666666]
 #     Used as the foreground color for unfocused tags and the track and
 #     clock text.
-#   window_border_active_color
+#   window_border_active_color [#3366dd]
 #     Used as the background color for the selected tag.
-#   window_border_urgent_color
+#   window_border_urgent_color [orange]
 #     Used as the background color for urgent tags.
 #
 # Additional panel colors are hardwired and presume a "dark" wm theme.
