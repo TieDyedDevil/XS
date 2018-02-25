@@ -986,7 +986,19 @@ fn lights {|alert status|
 	}
 }
 
-fn title {herbstclient attr clients.focus.title >[2]/dev/null}
+fn title {|monitor_id|
+	escape {|fn-return| {
+		k = `{hc attr monitors.^$monitor_id^.tag >[2]/dev/null}
+		cl = `{hc attr clients.|grep -o '0x[0-9a-fA-F]\+\.$'}
+		for c $cl {
+			ct = `{hc attr clients.^$c^.tag >[2]/dev/null}
+			~ $ct $k && {
+				hc attr clients.^$c^.title
+				return
+			}
+		}
+	}}
+}
 
 fn track {
 	let (info = `` '' {/usr/bin/mpc -f $trackfmt}) {
@@ -1012,10 +1024,9 @@ logger 'starting: %s; %s; %s; %s; %s; %s; %s' \
 	<={%argify `{var enable_cpubar}} \
 	<={%argify `{var enable_inbox}}
 
-let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; r1; r2; r3) {
+let (sep; track; lights; at = ''; st = ''; cpubar; clock; r1; r2; r3) {
 	tags = `` \n {drawtags $monitor}
 	sep = '|'
-	title = `title
 	track = `{drawcenter `{track}}
 	lights = `{lights $at $st}
 	<$event while true {
@@ -1025,9 +1036,9 @@ let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; r1; r2; r3) {
 				tag_added {}
 				tag_removed {}
 				tag_renamed {}
-				tag_flags {title = `title}
-				focus_changed {title = $p2}
-				window_title_changed {title = $p2}
+				tag_flags {}
+				focus_changed {}
+				window_title_changed {}
 				fullscreen {}
 				urgent {}
 				player {track = `{track}}
@@ -1043,7 +1054,6 @@ let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; r1; r2; r3) {
 				{}
 			)
 			r1 = ' '$lights $cpubar
-			r2 = $sep `{echo $title|iconv -tlatin1//translit}
 			r3 = `{if $enable_track {drawcenter $track}} \
 				`{if $enable_clock {drawright $clock}}
 		}
@@ -1051,6 +1061,7 @@ let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; r1; r2; r3) {
 			let ((_ _ _ m) = <={~~ $client *-*-*-*}; tags; out) {
 				tags = `` \n {drawtags $m}
 				if {!~ $tags ()} {
+					r2 = $sep `{title $m|iconv -tlatin1//translit}
 					if {~ `focused_monitor $m} {
 						out = $r1 $separator_attr_f \
 							$r2 $r3
