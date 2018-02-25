@@ -394,6 +394,18 @@ fn %mkdict {|*|
 	}
 }
 
+fn %with-object {|lambda|
+	# Execute lamba, passing a fresh object.
+	# The object is disposed upon leaving the lambda.
+	let (__o = <=%mkobj) {
+		unwind-protect {
+			$lambda $__o
+		} {
+			$__o =
+		}
+	}
+}
+
 fn %asort {
 	# Sort by length, then by name.
 	%with-read-lines /dev/stdin {|line|
