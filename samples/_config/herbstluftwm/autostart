@@ -122,7 +122,8 @@ hc mousebind $Mod^-Button3 resize
 # focus
 hc keybind $Mod^-Tab         cycle_all +1
 hc keybind $Mod^-Shift-Tab   cycle_all -1
-hc keybind $Mod^-c cycle
+hc keybind $Mod^-c           cycle +1
+hc keybind $Mod^-Shift-c     cycle -1
 hc keybind $Mod^-i jumpto urgent
 
 # monitors
