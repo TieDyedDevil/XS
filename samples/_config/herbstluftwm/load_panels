@@ -1,0 +1,6 @@
+#! /usr/bin/env xs
+
+for monitor `{hc list_monitors | cut -d: -f1} {
+	setsid ~/.config/herbstluftwm/panel.xs $monitor \
+		>>[2]~/.startx.log &
+}

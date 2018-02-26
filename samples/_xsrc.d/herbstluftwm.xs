@@ -12,10 +12,7 @@ fn barre {
 	%only-X
 	let (hc = herbstclient) {
 		hc emit_hook quit_panel
-		for monitor `{hc list_monitors | cut -d: -f1} {
-			setsid ~/.config/herbstluftwm/panel.xs $monitor \
-				>>[2]~/.startx.log &
-		}
+		~/.config/herbstluftwm/load_panels
 	}
 }
 fn boc {|*|
