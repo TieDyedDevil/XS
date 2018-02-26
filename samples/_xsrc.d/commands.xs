@@ -194,18 +194,15 @@ fn list {|*|
 			lpath = /usr/local/share/vis/lexers; \
 			fallback = false; \
 			fn-canon = {|ext|
-				let (extm = <={%mkdict (
-					1 man 3 man 5 man 7 man ascii text
+				%with-dict {|d|
+					result <={%objget $d $ext $ext}
+				} (1 man 3 man 5 man 7 man ascii text
 					iso-8859 text c ansi_c sh bash
 					dash bash posix bash bourne-again bash
 					patch diff md markdown fs forth
 					4th forth adb ada ads ada gpr ada
 					rs rust rst rest p pascal py python
-					js javascript es rc
-					)}) {
-					result <={%objget $extm $ext $ext}
-				}
-			} \
+					js javascript es rc)} \
 			) {
 			if {~ $*(1) -s} {
 				syn = $*(2)

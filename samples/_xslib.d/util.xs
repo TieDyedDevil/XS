@@ -406,6 +406,18 @@ fn %with-object {|lambda|
 	}
 }
 
+fn %with-dict {|lambda pairs|
+	# Execute lambda, passing a fresh object initialized with pairs.
+	# The object is disposed upon leaving the lambda.
+	let (__o = <={%mkdict $pairs}) {
+		unwind-protect {
+			$lambda $__o
+		} {
+			$__o =
+		}
+	}
+}
+
 fn %asort {
 	# Sort by length, then by name.
 	%with-read-lines /dev/stdin {|line|
