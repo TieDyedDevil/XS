@@ -139,8 +139,8 @@ fn mons {|rects|
 			}
 			echo -- '--'
 			herbstclient list_monitors|sed 's/ with [^[]\+//' \
-				|sed 's/\[FOCUS\]/ 🖵/'
-		} |column -t -R2,4,5
+				|sed 's/\[FOCUS\]/ 🖵/'|sed 's/\[LOCKED\]/ 🔒/'
+		} |column -t -R2,3,4,5
 	}
 }
 fn osd {|msg|
