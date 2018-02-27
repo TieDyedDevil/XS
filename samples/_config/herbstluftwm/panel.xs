@@ -552,7 +552,7 @@ echo $event $trigger $osdmsg >$fifofile
 
 # We'll need to know which monitor has focus
 fn focused_monitor {
-	herbstclient list_monitors|grep '\[FOCUS\]$'|cut -d: -f1
+	herbstclient list_monitors|grep '\[FOCUS\]'|cut -d: -f1
 }
 
 # Initialize task pid tracker
