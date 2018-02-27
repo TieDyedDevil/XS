@@ -914,6 +914,9 @@ fn drawtags {|m|
 				printf \ %s\n $n
 			}
 		}
+		if {~ `{hc attr monitors.$m.lock_tag} true} {
+			printf $default_attr^' ^c('^`($panel_height_px/2)^')'
+		}
 		printf $normal_attr
 	}}
 }
