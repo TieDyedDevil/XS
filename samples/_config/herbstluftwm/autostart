@@ -133,8 +133,8 @@ hc keybind $Mod^-BackSpace         cycle_monitor +1
 hc keybind $Mod^-Shift-BackSpace   cycle_monitor -1
 
 # tag lock
-hc keybind $Mod^-t           lock_tag
-hc keybind $Mod^-Shift-t     unlock_tag
+hc keybind $Mod^-t           chain + lock_tag + emit_hook redraw
+hc keybind $Mod^-Shift-t     chain + unlock_tag + emit_hook redraw
 
 # bury pointer
 hc keybind $Mod^-b spawn xdotool mousemove 5000 5000

@@ -1042,6 +1042,7 @@ let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; r1; r2; r3) {
 					lights = `{lights $at $st}}
 				cpubar {cpubar = $p1}
 				clock {clock = $p1}
+				redraw {}
 				quit_panel {terminate}
 				reload {terminate}
 				{}
