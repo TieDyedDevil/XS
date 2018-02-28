@@ -437,7 +437,7 @@ tmpfile_base = `{mktemp -u /tmp/panel-XXXXXXXX}
 # Prepare the client for this monitor
 switch $panel_site (
 	above {panel_y = $y}
-	below {(_ yo _ yh) = `{herbstclient monitor_rect -p $monitor}; \
+	below {(_ yo _ yh) = `{herbstclient monitor_rect $monitor}; \
 		panel_y = `($yo+$yh)}
 )
 
