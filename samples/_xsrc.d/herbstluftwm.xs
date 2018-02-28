@@ -186,5 +186,6 @@ fn wmb {
 	.c 'wm'
 	.r 'bari barre boc dual em hc mons osd quad'
 	%only-X
-	herbstclient list_keybinds|column -t|less -FXSi
+	herbstclient list_keybinds|sed 's/'\t'/ /g'|sed 's/ /'\t'/' \
+		|column -t -s\t|less -FXSi
 }
