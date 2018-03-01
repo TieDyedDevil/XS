@@ -701,20 +701,24 @@ fn fan () {
 
 fn io () {
 	blkdevs = `{lsblk -dln -o name}
-	escape {|fn-return| {
-		%with-read-lines \
-		<{iostat -dxy $blkdevs 3 1 \
-			| awk '/^[^A-Z]/ {print $1 ":" $14}'} \
-		{|line|
-			(disk load) = <={~~ $line *:*}
-			if {$load :gt $io_active_%} {
-				alert_if_fullscreen 'I/O activity > %d%%' \
-					$io_active_%
-				return true
-			}
+	iobusy = false
+	%with-read-lines \
+	<{iostat -dxy $blkdevs 3 1 \
+		| awk '/^[^A-Z]/ {print $1 ":" $14}'} \
+	{|line|
+		(_ load) = <={~~ $line *:*}
+		if {$load :gt $io_active_%} {iobusy = true}
+	}
+	if $iobusy {
+		iocount = `($iocount+1)
+		if {$iocount :gt 1} {
+			alert_if_fullscreen 'I/O activity > %d%%' $io_active_%
+			result true
 		}
-		return false
-	}}
+	} else {
+		iocount = 0
+		result false
+	}
 }
 
 fn load () {
