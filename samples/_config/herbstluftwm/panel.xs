@@ -233,7 +233,7 @@ FORMAT
 #                      C O N F I G U R A T I O N
 
 # Presentation
-panel_height_px = 22
+panel_height = 22                  # scaled to X resolution; units ~ pt
 panel_font = 'NotoSans-14'         # XLFD or Xft
 show_alert_placeholders = false
 show_status_placeholders = false
@@ -357,6 +357,12 @@ geometry = `{herbstclient monitor_rect $monitor >[2]/dev/null}
 # Here's a customization hook; use it at your own peril
 access ~/.panel.xs && . ~/.panel.xs
 
+# Scale the panel height
+base_dpi = 96
+X_dpi = `{xrdb -query|grep dpi:|cut -f2}
+~ $X_dpi () && X_dpi = $base_dpi
+(panel_height_px _) = <={~~ `(1.0*$X_dpi/$base_dpi*$panel_height) *.*}
+
 # Check for valid and reasonable settings
 fn vs {|name type parms|
 	switch $type (
@@ -392,7 +398,7 @@ fn vs {|name type parms|
 	}
 	)
 }
-vs panel_height_px int 0 500 10 150
+vs panel_height int 0 50 10 30
 vs show_alert_placeholders bool
 vs show_status_placeholders bool
 vs osd_offset_px int 0 1000 10 250
