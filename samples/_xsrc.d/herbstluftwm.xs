@@ -1,14 +1,14 @@
 fn bari {
 	.d 'Status bar indicator description'
 	.c 'wm'
-	.r 'barre boc dual em hc mons osd quad wmb'
+	.r 'barre boc dual em hc mons osd quad updres wmb'
 	%only-X
 	~/.config/herbstluftwm/panel.xs legend color|less -RFXi
 }
 fn barre {
 	.d 'Status bar restart'
 	.c 'wm'
-	.r 'bari boc dual em hc mons osd quad wmb'
+	.r 'bari boc dual em hc mons osd quad updres wmb'
 	%only-X
 	let (hc = herbstclient) {
 		hc emit_hook quit_panel
@@ -19,7 +19,7 @@ fn boc {|*|
 	.d 'Bell on completion'
 	.a 'COMMAND'
 	.c 'wm'
-	.r 'bari barre dual em hc mons osd quad wmb'
+	.r 'bari barre dual em hc mons osd quad updres wmb'
 	%only-X
 	unwind-protect {$*} {printf %c \a}
 }
@@ -27,7 +27,7 @@ fn dual {|*|
 	.d 'Divide focused monitor'
 	.a 'horizontal|vertical'
 	.c 'wm'
-	.r 'bari barre boc em hc mons osd quad wmb'
+	.r 'bari barre boc em hc mons osd quad updres wmb'
 	let ((xo yo w h) = `{hc monitor_rect}; \
 			ml = `{hc list_monitors|cut -d' ' -f2}) {
 		let (hw = `($w/2); hh = `($h/2); \
@@ -54,7 +54,7 @@ fn em {|*|
 	.a 'internal|external  # first and second in xrandr list'
 	.a 'both'
 	.c 'wm'
-	.r 'bari barre boc dual hc mons osd quad wmb'
+	.r 'bari barre boc dual hc mons osd quad updres wmb'
 	%only-X
 	let (i; hc = herbstclient; \
 		mnl = `{xrandr|grep '^[^ ]\+ connected' \
@@ -88,7 +88,7 @@ fn hc {|*|
 	.d 'herbstclient'
 	.a 'herbstclient_ARGS'
 	.c 'wm'
-	.r 'bari barre boc dual em mons osd quad wmb'
+	.r 'bari barre boc dual em mons osd quad updres wmb'
 	%only-X
 	herbstclient $*
 }
@@ -97,7 +97,7 @@ fn mons {|rects|
 	.a 'WxH+X+Y ...  # define logical monitors'
 	.a '(none)  # list physical and logical monitors'
 	.c 'wm'
-	.r 'bari barre boc dual em hc osd quad wmb'
+	.r 'bari barre boc dual em hc osd quad updres wmb'
 	%only-X
 	if {!~ $rects ()} {
 		for r $rects {
@@ -132,8 +132,7 @@ fn mons {|rects|
 				if {~ $w 0} {
 					dpi = 0
 				} else {
-					dpi = `(25.4*$xres/$w)
-					(dpi _) = <={~~ $dpi *.*}
+					dpi = <={%trunc `(25.4*$xres/$w)}
 				}
 				echo $m $rect $size $diag^" $dpi^ppi
 			}
@@ -149,7 +148,7 @@ fn osd {|msg|
 	.d 'Display message on OSD'
 	.a 'MESSAGE...'
 	.c 'wm'
-	.r 'bari barre boc dual em hc mons quad wmb'
+	.r 'bari barre boc dual em hc mons quad updres wmb'
 	%only-X
 	let (fl = /tmp/panel.fifos) {
 		for f `{access -f $fl && cat $fl} {
@@ -161,7 +160,7 @@ fn osd {|msg|
 fn quad {
 	.d 'Divide focused monitor'
 	.c 'wm'
-	.r 'bari barre boc dual em hc mons osd wmb'
+	.r 'bari barre boc dual em hc mons osd updres wmb'
 	let ((xo yo w h) = `{hc monitor_rect}; \
 			ml = `{hc list_monitors|cut -d' ' -f2}) {
 		let (hw = `($w/2); hh = `($h/2); \
@@ -181,10 +180,39 @@ fn quad {
 	}
 	barre
 }
+fn updres {
+	.d 'Use primary display resolution'
+	.c 'wm'
+	.r 'bari barre boc dual em hc mons osd quad wmb'
+	let (xrinfo = `{xrandr|grep '^[^ ]\+ connected primary'}; \
+		size; w; xres; dpi) {
+		size = <={%argify `{echo $xrinfo|grep -o '[^ ]\+ x [^ ]\+$' \
+			|tr -d ' '}}
+		(w _) = <= {~~ $size *mmx*mm}
+		if {~ $w 0} {error updres 'can''t get resolution'}
+		xres = `{echo $xrinfo|grep -o '^[^ ]\+ .* [0-9]\+x'}
+		xres = <={~~ $xres *x}
+		dpi = <={%trunc `(25.4*$xres/$w)}
+		%with-tempfile tf {
+			printf 'Xft.dpi: %d'\n $dpi >$tf
+			xrdb -merge $tf
+		}
+		%with-tempfile tf {
+			printf 'Xft/DPI %d'\n `($dpi*1024) >$tf
+			xsettingsd -c $tf >[2]/dev/null &
+		}
+		barre
+		printf '%s @ %dppi'\n `{echo $xrinfo|cut -d' ' -f1} $dpi
+		cat <<'END'
+Resolution has been adjusted to match the primary display. Programs
+already running may need to be restarted to use the new resolution.
+END
+	}
+}
 fn wmb {
 	.d 'List WM bindings'
 	.c 'wm'
-	.r 'bari barre boc dual em hc mons osd quad'
+	.r 'bari barre boc dual em hc mons osd quad updres'
 	%only-X
 	herbstclient list_keybinds|sed 's/'\t'/ /g'|sed 's/ /'\t'/' \
 		|column -t -s\t|less -FXSi
