@@ -114,6 +114,15 @@ fn %rgbhex {|color|
 				|cut -c1-11}
 	}
 }
+fn %trunc {|float|
+	# Truncate a floating point number.
+	let ((i f) = <={~~ $float *.*}) {result $i}
+}
+fn %round {|float|
+	# Round a floating point number.
+	# ½ rounds up.
+	result <={%trunc `($float+.5)}
+}
 
 # ========================================================================
 #                             C O L O R S
@@ -233,8 +242,9 @@ FORMAT
 #                      C O N F I G U R A T I O N
 
 # Presentation
-panel_height = 22                  # scaled to X resolution; units ~ pt
-panel_font = 'NotoSans-14'         # XLFD or Xft
+panel_height = 24                  # scaled to X resolution; units ~ pt
+font_height_pt = 13
+panel_font = 'NotoSans'            # Xft
 show_alert_placeholders = false
 show_status_placeholders = false
 
@@ -361,7 +371,7 @@ access ~/.panel.xs && . ~/.panel.xs
 base_dpi = 96
 X_dpi = `{xrdb -query|grep dpi:|cut -f2}
 ~ $X_dpi () && X_dpi = $base_dpi
-(panel_height_px _) = <={~~ `(1.0*$X_dpi/$base_dpi*$panel_height) *.*}
+panel_height_px = <={%round `(1.0*$X_dpi/$base_dpi*$panel_height)}
 
 # Check for valid and reasonable settings
 fn vs {|name type parms|
@@ -448,7 +458,7 @@ switch $panel_site (
 )
 
 dzen2_opts = -w $panel_width -x $x -y $panel_y -h $panel_height_px \
-	-e button3= -ta l -fn $panel_font
+	-e button3= -ta l -fn $panel_font^-^$font_height_pt
 display = $tmpfile_base^-display-^$monitor
 mkfifo $display
 private $display
