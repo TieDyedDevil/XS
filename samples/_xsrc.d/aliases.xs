@@ -187,6 +187,11 @@ fn vars {|*|
 	.c 'alias'
 	%_vars $* | less -RFXi
 }
+fn varss {|*|
+	.d 'List environment w/o objects and arrays'
+	.c 'alias'
+	%_vars $* | grep -av '^'\xff | less -RFXi
+}
 fn wavemon {|*|
 	.c 'alias'
 	sudo /usr/bin/wavemon $*
