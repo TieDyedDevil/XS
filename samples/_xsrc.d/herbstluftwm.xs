@@ -186,10 +186,11 @@ fn updres {
 	.r 'bari barre boc dual em hc mons osd quad wmb'
 	let (xrinfo = `{xrandr|grep '^[^ ]\+ connected primary'}; \
 		size; w; xres; dpi) {
+		if {~ $xrinfo ()} {throw error updres 'no primary display'}
 		size = <={%argify `{echo $xrinfo|grep -o '[^ ]\+ x [^ ]\+$' \
 			|tr -d ' '}}
 		(w _) = <= {~~ $size *mmx*mm}
-		if {~ $w 0} {error updres 'can''t get resolution'}
+		if {~ $w 0} {throw error updres 'can''t get resolution'}
 		xres = `{echo $xrinfo|grep -o '^[^ ]\+ .* [0-9]\+x'}
 		xres = <={~~ $xres *x}
 		dpi = <={%trunc `(25.4*$xres/$w)}
