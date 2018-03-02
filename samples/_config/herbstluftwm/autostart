@@ -11,8 +11,9 @@ xset r rate 500 30
 xset m 7/5 0
 pacmd load-sample x11-bell /usr/share/sounds/freedesktop/stereo/bell.oga
 pacmd load-module module-x11-bell sample=x11-bell display=:0.0
-pgrep -c xautolock >/dev/null || exec xautolock -time 30 -locker ~/.local/bin/lock \
-	-notify 60 -detectsleep &
+pgrep -c xautolock >/dev/null || \
+	exec xautolock -time 30 -locker ~/.local/bin/lock \
+		-notify 60 -detectsleep &
 pgrep -c dunst >/dev/null || exec dunst &
 pgrep -c xvisbell >/dev/null || exec xvisbell &
 if {systemd-detect-virt -q && xrandr|grep -q '^Virtual-0 connected primary'} {
@@ -30,10 +31,10 @@ hc keyunbind --all
 # keybindings
 Mod = Mod4   # Use the super key as the main modifier
 
-hc keybind $Mod^-Shift-q spawn quitwm
+hc keybind $Mod^-Shift-q spawn quitwm  # ~/.local/bin/quitwm
 hc keybind $Mod^-Shift-r reload
 hc keybind $Mod^-Control-c close
-hc keybind $Mod^-Return spawn stq  # st >[2]/dev/null (~/.local/bin/stq)
+hc keybind $Mod^-Return spawn stq  # ~/.local/bin/stq
 hc keybind $Mod^-e spawn dmenu_run
 
 # motions summarized
@@ -48,8 +49,7 @@ hc keybind $Mod^-e spawn dmenu_run
 # Mod + ⎨ Shift   ⎬ + ⎨ k (or ↑) ⎬  ═════> ⎨ move window  ⎬ ⎨ up
 #       ⎩ Control ⎭   ⎩ l (or →) ⎭         ⎩ resize frame ⎭ ⎩ right
 
-# basic movement
-# focusing clients
+# focus client
 hc keybind $Mod^-Left  focus left
 hc keybind $Mod^-Down  focus down
 hc keybind $Mod^-Up    focus up
@@ -59,7 +59,7 @@ hc keybind $Mod^-j     focus down
 hc keybind $Mod^-k     focus up
 hc keybind $Mod^-l     focus right
 
-# moving clients
+# move client
 hc keybind $Mod^-Shift-Left  shift left
 hc keybind $Mod^-Shift-Down  shift down
 hc keybind $Mod^-Shift-Up    shift up
@@ -69,14 +69,14 @@ hc keybind $Mod^-Shift-j     shift down
 hc keybind $Mod^-Shift-k     shift up
 hc keybind $Mod^-Shift-l     shift right
 
-# splitting frames
-# create an empty frame at the specified direction
+# split frame
 hc keybind $Mod^-u       split   bottom  0.5
 hc keybind $Mod^-o       split   right   0.5
-# let the current frame explode into subframes
+
+# explode into subframes
 hc keybind $Mod^-Control-space split explode
 
-# resizing frames
+# resize frame
 resizestep = 0.05
 hc keybind $Mod^-Control-h       resize left +$resizestep
 hc keybind $Mod^-Control-j       resize down +$resizestep
@@ -87,7 +87,7 @@ hc keybind $Mod^-Control-Down    resize down +$resizestep
 hc keybind $Mod^-Control-Up      resize up +$resizestep
 hc keybind $Mod^-Control-Right   resize right +$resizestep
 
-# tags
+# define tags
 tag_names = 1 2 3 4 5 6 7 8 9 0
 tag_keys  = 1 2 3 4 5 6 7 8 9 0
 
@@ -104,10 +104,11 @@ let (i = 0) {
 # cycle through tags
 hc keybind $Mod^-period use_index +1 --skip-visible
 hc keybind $Mod^-comma  use_index -1 --skip-visible
+
 # toggle between two most recent tags
 hc keybind $Mod^-grave  use_previous
 
-# layouting
+# layout
 hc keybind $Mod^-r remove
 hc keybind $Mod^-space cycle_layout 1
 hc keybind $Mod^-s floating toggle
