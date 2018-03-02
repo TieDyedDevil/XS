@@ -1,7 +1,8 @@
 #! /usr/bin/env xs
 
-# Configure X and herbstluftwm
+## Configure X and herbstluftwm
 
+# initialize common settings and services
 access -f ~/.Xresources && xrdb ~/.Xresources
 access -f ~/.xsettingsd && xsettingsd &
 xsetroot -solid 'Slate Gray'
@@ -16,9 +17,6 @@ pgrep -c xautolock >/dev/null || \
 		-notify 60 -detectsleep &
 pgrep -c dunst >/dev/null || exec dunst &
 pgrep -c xvisbell >/dev/null || exec xvisbell &
-if {systemd-detect-virt -q && xrandr|grep -q '^Virtual-0 connected primary'} {
-	xrandr --output Virtual-0 --fb 1920x1080 --mode 1920x1080
-}
 if {systemd-detect-virt -q} {screensaver off}
 
 # begin wm config
