@@ -18,6 +18,7 @@ if {~ $fn-%safe-wild ()} {
 	throw error \~/.xsrc \
 		'No %safe-wild (see ~/.xslib.d/*); ~/.xsuser.d/* is not loaded.'
 } else {
+	!~ $libloc () && %rmobj $libloc
 	libloc = <=%mkobj
 	%safe-wild '~/.xslib.d/*.xs' {|exp|
 		for f $exp {
