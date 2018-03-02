@@ -1,0 +1,3 @@
+#! /usr/local/bin/xs --
+
+let (font = NotoMono; size = 15) {exec st -f $font^-^$size $* >[2]/dev/null}
