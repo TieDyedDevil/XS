@@ -52,11 +52,11 @@ fn dual {|*|
 fn em {|*|
 	.d 'Enable monitors'
 	.a 'internal|external  # first and second in xrandr list'
-	.a 'both'
+	.a 'both [internal|external]  # primary: default = external'
 	.c 'wm'
 	.r 'bari barre boc dual hc mons osd quad updres wmb'
 	%only-X
-	let (i; hc = herbstclient; \
+	let (i; p; hc = herbstclient; \
 		mnl = `{xrandr|grep '^[^ ]\+ connected' \
 			|cut -d' ' -f1}) {
 		i = 0
@@ -69,7 +69,19 @@ fn em {|*|
 		if {~ $* <={%prefixes both}} {
 			if {~ $#mnl 1} {throw error em 'one monitor'}
 			xrandr --output $mnl(1) --auto --left-of $mnl(2) \
-				--output $mnl(2) --auto --primary
+				--output $mnl(2) --auto
+			if {~ $#* 2} {
+				if {~ $*(2) <={%prefixes external}} {
+					p = 2
+				} else if {~ $*(2) <={%prefixes internal}} {
+					p = 1
+				} else {
+					throw error em 'both internal|external'
+				}
+			} else {
+				p = 2
+			}
+			xrandr --output $mnl($p) --primary
 		} else if {~ $* <={%prefixes external}} {
 			if {~ $#mnl 1} {throw error em 'one monitor'}
 			xrandr --output $mnl(1) --off \
@@ -77,7 +89,8 @@ fn em {|*|
 		} else if {~ $* <={%prefixes internal}} {
 			xrandr --output $mnl(1) --auto --primary \
 				--output $mnl(2) --off
-		} else {throw error em 'which?'}
+		} else {throw error em 'internal|external|both' \
+					^' [internal|external]'}
 		hc lock
 		hc reload
 	}
