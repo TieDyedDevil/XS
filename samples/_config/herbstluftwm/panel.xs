@@ -457,8 +457,9 @@ switch $panel_site (
 		panel_y = `($yo+$yh)}
 )
 
+font = $panel_font^-^$font_height_pt
 dzen2_opts = -w $panel_width -x $x -y $panel_y -h $panel_height_px \
-	-e button3= -ta l -fn $panel_font^-^$font_height_pt
+	-e button3= -ta l -fn $font
 display = $tmpfile_base^-display-^$monitor
 mkfifo $display
 private $display
@@ -943,7 +944,7 @@ fn drawtags {|m|
 
 fn drawcenter {|text|
 	let (t = <={%argify $text}) {
-		let (w = `{xftwidth $panel_font $t}) {
+		let (w = `{xftwidth $font $t}) {
 			printf '^p(_CENTER)^p(-%d)%s%s'\n \
 				`($w/2) $default_attr $t
 		}
@@ -951,9 +952,9 @@ fn drawcenter {|text|
 }
 
 fn drawright {|text|
-	let (w = `{xftwidth $panel_font <={%argify \
+	let (w = `{xftwidth $font <={%argify \
 				`{sed 's/\^..([^)]*)//g' <<<$text}}}; \
-		t = <={%argify $text}; pad = 35) {
+		t = <={%argify $text}; pad = 15) {
 			printf '^p(_RIGHT)^p(-%d)%s'\n `($w+$pad) $t
 	}
 }
