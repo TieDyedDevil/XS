@@ -953,7 +953,7 @@ fn drawcenter {|text|
 fn drawright {|text|
 	let (w = `{xftwidth $panel_font <={%argify \
 				`{sed 's/\^..([^)]*)//g' <<<$text}}}; \
-		t = <={%argify $text}; pad = 15) {
+		t = <={%argify $text}; pad = 35) {
 			printf '^p(_RIGHT)^p(-%d)%s'\n `($w+$pad) $t
 	}
 }
