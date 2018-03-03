@@ -112,7 +112,7 @@ fn open {|*|
 fn p {
 	.d 'Pulse Audio mixer'
 	.c 'alias'
-	pamixer
+	%preserving-title pamixer
 }
 fn powertop {|*|
 	.c 'alias'

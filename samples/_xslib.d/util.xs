@@ -723,3 +723,19 @@ fn %rgbhex {|color|
 				|cut -c1-11}
 	}
 }
+
+fn %preserving-title {|cmd|
+	# Run a command, preserving the title of the focused window.
+	if {!~ $DISPLAY ()} {
+		let (__t = `{xdotool getwindowname `{herbstclient attr \
+							clients.focus.winid}}) {
+			unwind-protect {
+				$cmd
+			} {
+				title $__t
+			}
+		}
+	} else {
+		$cmd
+	}
+}
