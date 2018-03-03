@@ -4,7 +4,7 @@
 
 # initialize common settings and services
 access -f ~/.Xresources && xrdb ~/.Xresources
-access -f ~/.xsettingsd && xsettingsd &
+access -f ~/.xsettingsd && {pkill xsettingsd; setsid xsettingsd &}
 xsetroot -solid 'Slate Gray'
 setxkbmap -option keypad:pointerkeys -option compose:prsc
 xset dpms 0 0 900 s noblank
