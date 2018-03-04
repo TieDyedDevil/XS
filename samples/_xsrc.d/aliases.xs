@@ -175,6 +175,12 @@ fn treec {|*|
 	.c 'alias'
 	tree --du -hpugDFC $* | less -iRFX
 }
+fn tsm {|*|
+	.d 'Terminal session manager'
+	.a '[tsm_OPTIONS]'
+	.c 'alias'
+	%preserving-title ~/bin/tsm $*
+}
 fn upgrade {
 	.d 'Upgrade Fedora packages'
 	.c 'alias'
