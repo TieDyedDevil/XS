@@ -122,9 +122,9 @@ fn mons {|rects|
 		barre
 	} else {
 		let (xrinfo; rect; size; w; h; diag; f; xres; dpi; _) {
-			for m `{xrandr|grep '^[^ ]\+ connected .* [^ ]\+ ' \
-					^'x [^ ]\+$' |cut -d' ' -f1} {
-				xrinfo = `{xrandr|grep \^^$m^' '}
+			for m `{xrandr|grep '^[^ ]\+ connected' \
+					|cut -d' ' -f1} {
+				xrinfo = `{xrandr|grep -o \^^$m^' .*[0-9]\+mm'}
 				rect = `{echo $xrinfo \
 						|grep -o '[0-9]\+x[0-9]\+' \
 							^'+[0-9]\++[0-9]\+'}
