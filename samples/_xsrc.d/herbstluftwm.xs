@@ -28,6 +28,7 @@ fn dual {|*|
 	.a 'horizontal|vertical'
 	.c 'wm'
 	.r 'bari barre boc em hc mons osd quad updres wmb'
+	%only-X
 	let ((xo yo w h) = `{hc monitor_rect}; \
 			ml = `{hc list_monitors|cut -d' ' -f2}) {
 		let (hw = `($w/2); hh = `($h/2); \
@@ -174,6 +175,7 @@ fn quad {
 	.d 'Divide focused monitor'
 	.c 'wm'
 	.r 'bari barre boc dual em hc mons osd updres wmb'
+	%only-X
 	let ((xo yo w h) = `{hc monitor_rect}; \
 			ml = `{hc list_monitors|cut -d' ' -f2}) {
 		let (hw = `($w/2); hh = `($h/2); \
@@ -197,14 +199,17 @@ fn updres {
 	.d 'Use primary display resolution'
 	.c 'wm'
 	.r 'bari barre boc dual em hc mons osd quad wmb'
+	%only-X
+	herbstclient reload
 	let (xrinfo = `{xrandr|grep '^[^ ]\+ connected primary'}; \
 		size; w; xres; dpi) {
 		if {~ $xrinfo ()} {throw error updres 'no primary display'}
-		size = <={%argify `{echo $xrinfo|grep -o '[^ ]\+ x [^ ]\+$' \
+		size = <={%argify `{echo $xrinfo|grep -o '[^ ]\+ x [^ ]\+mm' \
 			|tr -d ' '}}
 		(w _) = <= {~~ $size *mmx*mm}
 		if {~ $w 0} {throw error updres 'can''t get resolution'}
-		xres = `{echo $xrinfo|grep -o '^[^ ]\+ .* [0-9]\+x'}
+		xres = `{echo $xrinfo|grep -o \
+					'^[^ ]\+ connected primary [0-9]\+x'}
 		xres = <={~~ $xres *x}
 		dpi = <={%trunc `(25.4*$xres/$w)}
 		%with-tempfile tf {
