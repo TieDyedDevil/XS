@@ -94,7 +94,7 @@ ARGS = <={%parse-args <={%args $ARGS} \& (
 	-l {@one_op; FLAG = $optopt}
 	-L {@one_op; FLAG = $optopt}
 	-i {@one_op; FLAG = $optopt}
-	-h {@usage help|less -FX}
+	-h {@usage help >[2]/dev/null|less -FX}
 )}
 }
 
