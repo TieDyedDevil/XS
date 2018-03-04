@@ -81,6 +81,7 @@ fn em {|*|
 			xrandr --output $mnl(1) --off \
 				--output $mnl(2) --auto --primary
 		} else if {~ $* <={%prefixes internal}} {
+			if {~ $#mnl 1} {throw error em 'one monitor'}
 			xrandr --output $mnl(1) --auto --primary \
 				--output $mnl(2) --off
 		} else {throw error em 'internal|external|both' \
