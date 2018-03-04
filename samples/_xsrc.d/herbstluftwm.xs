@@ -62,7 +62,7 @@ fn em {|*|
 			|cut -d' ' -f1}) {
 		i = 0
 		for m $mnl {
-			if {xrandr|grep -q '^'^$m^' .*[^ ]\+ x [^ ]\+$'} {
+			if {xrandr|grep -q '^'^$m^' .*[^ ]\+ x [^ ]\+mm'} {
 				hc rename_monitor $i '' >[2]/dev/null
 			}
 			i = `($i+1)
@@ -123,14 +123,14 @@ fn mons {|rects|
 		barre
 	} else {
 		let (xrinfo; rect; size; w; h; diag; f; xres; dpi; _) {
-			for m `{xrandr|grep '^[^ ]\+ connected' \
+			for m `{xrandr|grep '^[^ ]\+ connected .* [0-9]\+mm' \
 					|cut -d' ' -f1} {
 				xrinfo = `{xrandr|grep -o \^^$m^' .*[0-9]\+mm'}
 				rect = `{echo $xrinfo \
 						|grep -o '[0-9]\+x[0-9]\+' \
 							^'+[0-9]\++[0-9]\+'}
 				size = <={%argify `{echo $xrinfo \
-						|grep -o '[^ ]\+ x [^ ]\+$' \
+						|grep -o '[^ ]\+ x [^ ]\+mm' \
 						|tr -d ' '}}
 				(w h) = <={~~ $size *mmx*mm}
 				# 0 .. 0.3999... truncates
