@@ -57,16 +57,9 @@ fn em {|*|
 	.c 'wm'
 	.r 'bari barre boc dual hc mons osd quad updres wmb'
 	%only-X
-	let (i; p; hc = herbstclient; \
+	let (p; hc = herbstclient; \
 		mnl = `{xrandr|grep '^[^ ]\+ connected' \
 			|cut -d' ' -f1}) {
-		i = 0
-		for m $mnl {
-			if {xrandr|grep -q '^'^$m^' .*[^ ]\+ x [^ ]\+mm'} {
-				hc rename_monitor $i '' >[2]/dev/null
-			}
-			i = `($i+1)
-		}
 		if {~ $* <={%prefixes both}} {
 			if {~ $#mnl 1} {throw error em 'one monitor'}
 			xrandr --output $mnl(1) --auto --left-of $mnl(2) \
