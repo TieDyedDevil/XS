@@ -893,6 +893,10 @@ if $enable_other_status {
 HERE = `{cd `{dirname $ARG0}; pwd}
 if $enable_inbox {
 	access -f $HERE/inbox.fetchmailrc && {
+		if {~ <={~~ `{ls -l $HERE/inbox.fetchmailrc|cut -d' ' -f1} \
+				-r*-------.} ()} {
+			throw error $PGM 'inbox.fetchmailrc mode'
+		}
 		while true {
 			%with-read-lines \
 			<{fetchmail -c --fetchmailrc $HERE/inbox.fetchmailrc \
