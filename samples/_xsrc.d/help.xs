@@ -70,3 +70,8 @@ fn ffl-help {
 	.c 'help'
 	web -t /usr/share/doc/gforth-ffl/html/index.html
 }
+fn fsl-help {
+	.d 'Forth Scientific Library algorithm list'
+	.c 'help'
+	list /usr/share/gforth/site-forth/fsl/status.txt
+}
