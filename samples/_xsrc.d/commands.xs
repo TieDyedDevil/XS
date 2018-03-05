@@ -690,6 +690,11 @@ fn where {
 	printf '%s@%s[%s;%d]:%s'\n \
 		$USER `{hostname -s} <={~~ `tty /dev/*} $pid `pwd
 }
+fn wisepony {
+	.d 'Wise pony'
+	.c 'system'
+	cookie|ponysay|less -eRFX
+}
 fn wlpq {
 	.d 'Watch lpq until empty'
 	.c 'system'
