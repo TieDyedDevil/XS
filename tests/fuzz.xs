@@ -1,5 +1,10 @@
 #! /usr/bin/env xs
 
+# There's nothing special about the virt, but you'll appreciate not having to
+# clean up the mess left behind (zombies, random files, perhaps worse...)
+# by running xs with fuzzed inputs.
+if {!systemd-detect-virt -q} {throw error fuzz 'Please run this in a virt.'}
+
 XS = ./build/xs
 TESTFILE = `mktemp
 LOGFILE = ./tests/fuzz.log
