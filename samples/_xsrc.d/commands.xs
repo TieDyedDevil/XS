@@ -616,11 +616,12 @@ fn ulu {|*|
 	} else {let (ud = /usr/share/unicode/ucd/UnicodeData.txt) {
 		%with-read-lines <{egrep -i -o '^[0-9a-f]{4,};[^;]*' \
 						^$*^'[^;]*;' $ud} {|l|
-			let ((hex desc) = <={~~ $l *\;*\;}) {
-				hex = `{printf %8s $hex|tr ' ' 0}
-				uni = <={%U $hex}
-				!~ $desc \<control\> && \
+			let ((hex desc) = <={~~ $l *\;*\;}; uni) {
+				!~ $desc \<control\> && {
+					hex = `{printf %8s $hex|tr ' ' 0}
+					uni = <={%U $hex}
 					printf %s\tU+%s\t%s\n $uni $hex $desc
+				}
 			}
 		} | env LESSUTFBINFMT=*n!PRINT less -iFXS
 	}}
