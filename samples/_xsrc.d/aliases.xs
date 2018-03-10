@@ -16,12 +16,6 @@ fn atop {|*|
 	.c 'alias'
 	sudo /usr/bin/atop $*
 }
-fn avis {|*|
-	.d 'Edit w/ APL key bindings'
-	.a '[vis_OPTIONS|FILE]...'
-	.c 'alias'
-	akt vis $*
-}
 fn c {
 	.d 'Clear screen'
 	.c 'alias'
