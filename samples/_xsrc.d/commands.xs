@@ -618,8 +618,7 @@ fn ulu {|*|
 						^$*^'[^;]*;' $ud} {|l|
 			let ((hex desc) = <={~~ $l *\;*\;}) {
 				hex = `{printf %8s $hex|tr ' ' 0}
-				uni = `{eval echo '\U'^$hex >[2]/dev/null}
-				if {!result $bqstatus} {uni = !UTF-8}
+				uni = <={%U $hex}
 				!~ $desc \<control\> && \
 					printf %s\tU+%s\t%s\n $uni $hex $desc
 			}
