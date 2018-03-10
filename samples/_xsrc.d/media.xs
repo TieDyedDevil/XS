@@ -143,6 +143,31 @@ fn n {
 	if {~ `mpc \[playing\]} {mpc -q next} else {mpc -q play}
 	m
 }
+fn noise {|*|
+	.d 'Audio noise generator'
+	.a '[white|pink|brown [LEVEL_DB]]'
+	.c 'media'
+	let (pc = $*(1); pl = $*(2); color = pink; pad = -6; level = -20; \
+		volume) {
+		~ $pc brown && {color = brown; pad = 0}
+		~ $pc pink && {color = pink; pad = -6}
+		~ $pc white && {color = white; pad = -12}
+		if {~ $pl -* || ~ $pl 0} {level = $pl} else {level = -20}
+		volume = `($level + $pad)
+		unwind-protect {
+			play </dev/zero -q -t s32 -r 22050 -c 2 - \
+				synth $color^noise tremolo 0.05 30 \
+				vol $volume dB
+		} {
+			printf \n
+		}
+	}
+}
+fn p {
+	.d 'Pulse Audio mixer'
+	.c 'media'
+	%preserving-title pamixer
+}
 fn played {
 	.d 'List recently-played tracks'
 	.c 'media'

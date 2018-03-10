@@ -70,8 +70,8 @@ project('xs', ['cpp'])
 		'samples/_xsrc.d/commands.xs', 'samples/_xsrc.d/console.xs',
 		'samples/_xsrc.d/env.xs', 'samples/_xsrc.d/help.xs',
 		'samples/_xsrc.d/herbstluftwm.xs', 'samples/_xsrc.d/media.xs',
-		'samples/_xsrc.d/prompt.xs', 'samples/_xsrc.d/virts.xs',
-		'samples/_xsrc.d/web.xs'],
+		'samples/_xsrc.d/priv.xs', 'samples/_xsrc.d/prompt.xs',
+		'samples/_xsrc.d/virts.xs', 'samples/_xsrc.d/web.xs'],
 	install_dir: 'share/doc/xs/samples/_xsrc.d')
   install_data(['samples/_xsuser.d/prompt-config.xs'],
 	install_dir: 'share/doc/xs/samples/_xsuser.d')

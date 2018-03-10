@@ -331,26 +331,6 @@ fn net {|*|
 		nmcli --fields name,type,device connection show $flag
 	}
 }
-fn noise {|*|
-	.d 'Audio noise generator'
-	.a '[white|pink|brown [LEVEL_DB]]'
-	.c 'media'
-	let (pc = $*(1); pl = $*(2); color = pink; pad = -6; level = -20; \
-		volume) {
-		~ $pc brown && {color = brown; pad = 0}
-		~ $pc pink && {color = pink; pad = -6}
-		~ $pc white && {color = white; pad = -12}
-		if {~ $pl -* || ~ $pl 0} {level = $pl} else {level = -20}
-		volume = `($level + $pad)
-		unwind-protect {
-			play </dev/zero -q -t s32 -r 22050 -c 2 - \
-				synth $color^noise tremolo 0.05 30 \
-				vol $volume dB
-		} {
-			printf \n
-		}
-	}
-}
 fn objs {|*|
 	.d 'List object variables'
 	.a '[FILTER]'
@@ -377,28 +357,6 @@ fn oc {
 							cal -n 3 --color=always
 		}
 	}
-}
-fn panel {|*|
-	.d 'Query/set Intel backlight intensity'
-	.a '[1..100]'
-	.c 'system'
-	if {access -d /sys/class/backlight/intel_backlight} {
-		let (b = $*; bp = /sys/class/backlight/intel_backlight; mb) {
-			mb = `{cat $bp/max_brightness}
-			if {~ $#* 0} {
-				let (ab; p; i; f) {
-					ab = `{cat $bp/brightness}
-					p = `(1.0*$ab*100/$mb)
-					(i f) = <={~~ `($p+0.5) *.*}
-					echo $i
-				}
-			} else {
-				if {~ $* 0} {b = 1}
-				sudo su -c 'echo '^`($mb*$b/100)^' >'^$bp \
-					^'/brightness'
-			}
-		}
-	} else {throw error panel 'no Intel backlight'}
 }
 fn parse {|*|
 	.d 'Parse an xs expression'
@@ -729,6 +687,7 @@ fn wlpq {
 fn xcolors {|*|
 	.d 'Display X11 colors with RGB values and names'
 	.a '[xs_filter_thunk]  # on $r, $g, $b and $d'
+	.c 'system'
 	%with-read-lines <{showrgb} {|l|
 		(r g b d) = `{echo $l}
 		let (fn-render = {|f r g b d|
