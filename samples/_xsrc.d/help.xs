@@ -1,4 +1,10 @@
 # Help functions
+fn apropos {|*|
+	.d 'Find man pages by keyword'
+	.a '[apropos_OPTIONS] KEYWORD...'
+	.c 'help'
+	/usr/bin/apropos -l $*|less -iFXS
+}
 fn help {|*|
 	.d 'Help for xs function'
 	.a 'NAME'
@@ -33,6 +39,60 @@ fn help {|*|
 			}
 		} | less -irFX
 	}
+}
+fn lib {|*|
+	.d 'List names of library functions'
+	.a '-l  # sort by length, then name'
+	.c 'help'
+	let (fn-sf) {
+		if {~ $* -l} {fn-sf = %asort} else {fn-sf = cat}
+		vars -f | cut -c4- | cut -d' ' -f1 | grep -E '^(%|\.)' \
+			| grep -v -e %prompt -e '^%_' | sf \
+			| column -c `{tput cols} | less -iFX
+	}
+	# Ideally we'd hide all of the xs hook functions; not only %prompt.
+}
+fn libi {|*|
+	.d 'Show information about a library function.'
+	.a 'FUNCTION-NAME'
+	.c 'help'
+	if {~ $#* 0} {
+		.usage libi
+	} else {
+		{~ <={result $#(fn-$*)} 0} && {
+			throw error libi 'not a function'
+		}
+		{~ <={%objget $libloc $*} ()} && {
+			throw error libi 'not in library'
+		}
+		%header-doc $* | nl -w2 -s': '
+		printf \n'arglist : %s'\n'location: %s'\n \
+			<={%argify `` \n {%arglist $*}} <={%objget $libloc $*}
+	}
+}
+fn luc {|*|
+	.d 'List user commands'
+	.a '-l  # sort by length, then name'
+	.a '-s  # list commands on system paths'
+	.c 'help'
+	let (al = <={%args $*}; fn-sf) {
+		if {~ $al -l} {fn-sf = %asort} else {fn-sf = sort}
+		printf `.as^'@ ~/.xs*'^`.an^\n
+		vars -f | grep -o '^fn-[^ ]\+' | cut -d- -f2- | grep '^[a-z]' \
+			| sf | column -c `{tput cols}
+		printf `.as^'@ ~/bin'^`.an^\n
+		find -L ~/bin -mindepth 1 -maxdepth 1 -type f -executable \
+			| sf | xargs -n1 basename | column -c `{tput cols}
+		if {~ $al -s} {
+			printf `.as^'@ /usr/local/bin'^`.an^\n
+			ls /usr/local/bin | sf | column -c `{tput cols}
+			optbins = `{find /opt -type d -name bin}
+			for d $optbins {
+				printf `.as^'@ '^$d^`.an^\n
+				ls $d | sf | column -c `{tput cols}
+			}
+		}
+	} | less -irFX
 }
 
 ## Online documentation

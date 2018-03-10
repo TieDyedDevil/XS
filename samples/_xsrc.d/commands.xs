@@ -106,7 +106,7 @@ fn cs {|*|
 fn dt {|*|
 	.d 'List top directory usage'
 	.a '[-a] [DIR]'
-	.c 'system'
+	.c 'directory'
 	let (eo = --exclude './.*') {
 		if {~ $*(1) -a} {eo = ; * = $*(2 ...)}
 		du $eo -t1 -h -d1 $*|grep -vE '^[.0-9KMGTPEZY]+'\t'\.$' \
@@ -117,7 +117,7 @@ fn doc {|*|
 	.d 'pushd to documentation directory of package'
 	.a 'PACKAGE_NAME_GLOB'
 	.a '-n PACKAGE_NAME'
-	.c 'system'
+	.c 'directory'
 	if {~ $#* 0} {
 		.usage doc
 	} else if {~ $*(1) -n} {
@@ -152,41 +152,21 @@ fn import-abook {|*|
 		chmod 600 ~/.abook/addressbook
 	}
 }
-fn lib {|*|
-	.d 'List names of library functions'
-	.a '-l  # sort by length, then name'
-	.c 'system'
-	let (fn-sf) {
-		if {~ $* -l} {fn-sf = %asort} else {fn-sf = cat}
-		vars -f | cut -c4- | cut -d' ' -f1 | grep -E '^(%|\.)' \
-			| grep -v -e %prompt -e '^%_' | sf \
-			| column -c `{tput cols} | less -iFX
-	}
-	# Ideally we'd hide all of the xs hook functions; not only %prompt.
+fn la {|*|
+	.c 'directory'
+	.r 'll ls lt'
+	ls -a $*
 }
-fn libi {|*|
-	.d 'Show information about a library function.'
-	.a 'FUNCTION-NAME'
-	.c 'system'
-	if {~ $#* 0} {
-		.usage libi
-	} else {
-		{~ <={result $#(fn-$*)} 0} && {
-			throw error libi 'not a function'
-		}
-		{~ <={%objget $libloc $*} ()} && {
-			throw error libi 'not in library'
-		}
-		%header-doc $* | nl -w2 -s': '
-		printf \n'arglist : %s'\n'location: %s'\n \
-			<={%argify `` \n {%arglist $*}} <={%objget $libloc $*}
-	}
+fn latest {
+	.d 'List latest START processes for current user'
+	.c 'process'
+	%view-with-header 1 <{ps auk-start_time -U $USER} latest
 }
 fn list {|*|
 	.d 'List file with syntax highlighting'
 	.a '[-s SYNTAX|-f] FILE'
 	.a '-l  # list SYNTAX names'
-	.c 'system'
+	.c 'file'
 	if {~ $#* 0} {
 		.usage list
 	} else if {~ $* -l} {
@@ -248,6 +228,16 @@ fn list {|*|
 		}
 	}
 }
+fn ll {|*|
+	.c 'directory'
+	.r 'la ls lt'
+	ls -lh $*
+}
+fn load {
+	.d '1/5/15m loadavg; proc counts; last PID'
+	.c 'process'
+	cat /proc/loadavg
+}
 fn lock {|*|
 	.d 'Lock screen'
 	.a '-t  # transparent lock, disable DPMS; X only'
@@ -263,7 +253,7 @@ fn lock {|*|
 fn lpman {|man|
 	.d 'Print a man page'
 	.a 'PAGE'
-	.c 'system'
+	.c 'file'
 	if {~ $#man 0} {
 		.usage lpman
 	} else {
@@ -275,7 +265,7 @@ fn lpman {|man|
 fn lpmd {|md|
 	.d 'Print a markdown file'
 	.a 'FILE'
-	.c 'system'
+	.c 'file'
 	if {~ $#md 0} {
 		.usage lpmd
 	} else {
@@ -284,29 +274,22 @@ fn lpmd {|md|
 				-o page-left=60 -o lpi=8 -o cpi=12
 	}
 }
-fn luc {|*|
-	.d 'List user commands'
-	.a '-l  # sort by length, then name'
-	.a '-s  # list commands on system paths'
-	.c 'system'
-	let (al = <={%args $*}; fn-sf) {
-		if {~ $al -l} {fn-sf = %asort} else {fn-sf = sort}
-		printf `.as^'@ ~/.xs*'^`.an^\n
-		vars -f | grep -o '^fn-[^ ]\+' | cut -d- -f2- | grep '^[a-z]' \
-			| sf | column -c `{tput cols}
-		printf `.as^'@ ~/bin'^`.an^\n
-		find -L ~/bin -mindepth 1 -maxdepth 1 -type f -executable \
-			| sf | xargs -n1 basename | column -c `{tput cols}
-		if {~ $al -s} {
-			printf `.as^'@ /usr/local/bin'^`.an^\n
-			ls /usr/local/bin | sf | column -c `{tput cols}
-			optbins = `{find /opt -type d -name bin}
-			for d $optbins {
-				printf `.as^'@ '^$d^`.an^\n
-				ls $d | sf | column -c `{tput cols}
-			}
-		}
-	} | less -irFX
+fn ls {|*|
+	.c 'directory'
+	.a '[ls_ARGS|-P]'
+	.r 'la ll lt'
+	if {~ $* -P} {
+		* = `{echo $*|sed 's/-P//'}
+		/usr/bin/ls --group-directories-first -v --color=yes $* \
+			| less -RFXi
+	} else {
+		/usr/bin/ls --group-directories-first -v --color=auto $*
+	}
+}
+fn lt {|*|
+	.c 'directory'
+	.r 'la ll ls'
+	ls -lhtr $*
 }
 fn mamel {
 	.d 'List installed MAME games'
@@ -316,7 +299,7 @@ fn mamel {
 fn mdv {|*|
 	.d 'Markdown file viewer'
 	.a 'MARKDOWN_FILE'
-	.c 'system'
+	.c 'file'
 	if {!~ $#* 1} {
 		.usage mdv
 	} else if {!access -f $*} {
@@ -351,7 +334,7 @@ fn net {|*|
 fn noise {|*|
 	.d 'Audio noise generator'
 	.a '[white|pink|brown [LEVEL_DB]]'
-	.c 'system'
+	.c 'media'
 	let (pc = $*(1); pl = $*(2); color = pink; pad = -6; level = -20; \
 		volume) {
 		~ $pc brown && {color = brown; pad = 0}
@@ -428,7 +411,7 @@ fn parse {|*|
 }
 fn pn {
 	.d 'Users with active processes'
-	.c 'system'
+	.c 'process'
 	ps haux|cut -d' ' -f1|sort|uniq
 }
 fn pp {|*|
@@ -455,7 +438,7 @@ fn pp {|*|
 fn prs {|*|
 	.d 'Display process info'
 	.a '[-f] [prtstat_OPTIONS] NAME'
-	.c 'system'
+	.c 'process'
 	if {~ $#* 0} {
 		.usage prs
 	} else {
@@ -480,14 +463,14 @@ fn prs {|*|
 fn pt {|*|
 	.d 'ps for user; only processes with terminal'
 	.a '[[-fFcyM] USERNAME]'
-	.c 'system'
+	.c 'process'
 	.r 'pu'
 	%view-with-header 1 <{.pu $*|awk '{if ($14 != "?") print}'} pt
 }
 fn pu {|*|
 	.d 'ps for user'
 	.a '[[-fFCyM] USERNAME]'
-	.c 'system'
+	.c 'process'
 	.r 'pt'
 	%view-with-header 1 <{.pu $*} pu
 }
@@ -532,7 +515,7 @@ fn screensaver {|*|
 fn src {|*|
 	.d 'pushd to K source directories'
 	.a '[NAME]'
-	.c 'system'
+	.c 'directory'
 	if {~ $#* 0} {
 		find /usr/local/src -maxdepth 1 -mindepth 1 -type d \
 			|xargs -I\{\} basename \{\}|column -c `{tput cols}
@@ -566,9 +549,45 @@ fn title {|*|
 	.r 'prompt name'
 	$&echo -n \e]0\;^$^*^\a
 }
+fn topc {
+	.d 'List top %CPU processes'
+	.c 'process'
+	.r 'topm topr topt topv'
+	ps auxk-%cpu|head -11
+}
+fn topm {
+	.d 'List top %MEM processes'
+	.c 'process'
+	.r 'topc topr topt topv'
+	ps auxk-%mem|head -11
+}
+fn topr {
+	.d 'List top RSS processes'
+	.c 'process'
+	.r 'topc topm topt topv'
+	ps auxk-rss|head -11
+}
+fn topt {
+	.d 'List top TIME processes'
+	.c 'process'
+	.r 'topc topm topr topv'
+	ps auxk-time|head -11
+}
+fn topv {
+	.d 'List top VSZ processes'
+	.c 'process'
+	.r 'topc topm topr topt'
+	ps auk-vsz|head -11
+}
+fn treec {|*|
+	.d 'Display filesystem tree'
+	.a 'DIRECTORY'
+	.c 'directory'
+	tree --du -hpugDFC $* | less -iRFX
+}
 fn tsmwd {
 	.d 'Return to tsm working directory'
-	.c 'system'
+	.c 'directory'
 	if {!~ $TSMWD ()} {cd $TSMWD; echo $TSMWD} else echo .
 }
 fn tss {|*|
@@ -629,7 +648,7 @@ fn ulu {|*|
 fn vman {|*|
 	.d 'View man page'
 	.a '[man_OPTS] PAGE'
-	.c 'system'
+	.c 'file'
 	%only-X
 	if {~ $#* 0} {
 		.usage vman
@@ -723,4 +742,9 @@ fn xcolors {|*|
 			}
 		}
 	} | less -iFXR
+}
+fn zathura {|*|
+	.d 'Document viewer'
+	.c 'file'
+	setsid xembed -e /usr/bin/zathura $* >/dev/null >[2=1] &
 }

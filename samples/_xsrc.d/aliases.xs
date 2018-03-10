@@ -4,12 +4,6 @@ fn ag {|*|
 	.c 'alias'
 	/usr/bin/ag --pager='less -iRFX' $*
 }
-fn apropos {|*|
-	.d 'Find man pages by keyword'
-	.a '[apropos_OPTIONS] KEYWORD...'
-	.c 'alias'
-	/usr/bin/apropos -l $*|less -iFXS
-}
 fn atop {|*|
 	.d 'Advanced system & process monitor'
 	.a '[atop_OPTIONS]'
@@ -39,43 +33,6 @@ fn iotop {|*|
 fn iptraf-ng {|*|
 	.c 'alias'
 	sudo /usr/sbin/iptraf-ng $*
-}
-fn la {|*|
-	.c 'alias'
-	.r 'll ls lt'
-	ls -a $*
-}
-fn latest {
-	.d 'List latest START processes for current user'
-	.c 'alias'
-	%view-with-header 1 <{ps auk-start_time -U $USER} latest
-}
-fn ll {|*|
-	.c 'alias'
-	.r 'la ls lt'
-	ls -lh $*
-}
-fn load {
-	.d '1/5/15m loadavg; proc counts; last PID'
-	.c 'alias'
-	cat /proc/loadavg
-}
-fn ls {|*|
-	.c 'alias'
-	.a '[ls_ARGS|-P]'
-	.r 'la ll lt'
-	if {~ $* -P} {
-		* = `{echo $*|sed 's/-P//'}
-		/usr/bin/ls --group-directories-first -v --color=yes $* \
-			| less -RFXi
-	} else {
-		/usr/bin/ls --group-directories-first -v --color=auto $*
-	}
-}
-fn lt {|*|
-	.c 'alias'
-	.r 'la ll ls'
-	ls -lhtr $*
 }
 %cfn {%have mandelbulber} mb {|*|
 	.c 'alias'
@@ -133,42 +90,6 @@ fn tiptop {|*|
 	.c 'alias'
 	sudo /usr/bin/tiptop $*
 }
-fn topc {
-	.d 'List top %CPU processes'
-	.c 'alias'
-	.r 'topm topr topt topv'
-	ps auxk-%cpu|head -11
-}
-fn topm {
-	.d 'List top %MEM processes'
-	.c 'alias'
-	.r 'topc topr topt topv'
-	ps auxk-%mem|head -11
-}
-fn topr {
-	.d 'List top RSS processes'
-	.c 'alias'
-	.r 'topc topm topt topv'
-	ps auxk-rss|head -11
-}
-fn topt {
-	.d 'List top TIME processes'
-	.c 'alias'
-	.r 'topc topm topr topv'
-	ps auxk-time|head -11
-}
-fn topv {
-	.d 'List top VSZ processes'
-	.c 'alias'
-	.r 'topc topm topr topt'
-	ps auk-vsz|head -11
-}
-fn treec {|*|
-	.d 'Display filesystem tree'
-	.a 'DIRECTORY'
-	.c 'alias'
-	tree --du -hpugDFC $* | less -iRFX
-}
 fn tsm {|*|
 	.d 'Terminal session manager'
 	.a '[tsm_OPTIONS]'
@@ -203,9 +124,4 @@ fn worms {|*|
 	%with-quit {
 		/usr/bin/worms -n 7 -d 50 $*
 	}
-}
-fn zathura {|*|
-	.d 'Document viewer'
-	.c 'alias'
-	setsid xembed -e /usr/bin/zathura $* >/dev/null >[2=1] &
 }
