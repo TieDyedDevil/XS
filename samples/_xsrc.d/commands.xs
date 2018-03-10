@@ -152,12 +152,16 @@ fn import-abook {|*|
 		chmod 600 ~/.abook/addressbook
 	}
 }
-fn lib {
+fn lib {|*|
 	.d 'List names of library functions'
+	.a '-l  # sort by length, then name'
 	.c 'system'
-	vars -f | cut -c4- | cut -d' ' -f1 | grep -E '^(%|\.)' \
-		| grep -v -e %prompt \
-		| column -c `{tput cols} | less -iFX
+	let (fn-sf) {
+		if {~ $* -l} {fn-sf = %asort} else {fn-sf = cat}
+		vars -f | cut -c4- | cut -d' ' -f1 | grep -E '^(%|\.)' \
+			| grep -v -e %prompt -e '^%_' | sf \
+			| column -c `{tput cols} | less -iFX
+	}
 	# Ideally we'd hide all of the xs hook functions; not only %prompt.
 }
 fn libi {|*|
