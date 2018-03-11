@@ -615,6 +615,7 @@ while true {
 	osd_pos = -i `($mx+$osd_offset_px) \
 		-o `($my+$osd_offset_px+$panel_height_px)
 	echo $msg|osd_cat $osd_cat_opts $osd_pos
+	logger 'osd: %s' $msg
 } &
 rt osd
 fn osd {|msg| echo $msg >$osdmsg}
@@ -645,6 +646,7 @@ fn battery () {
 			if {!~ $cap 0} {
 				v = `(100.0*$chg/$cap)
 				if {$v :lt $battery_low_%} {w = true}
+				logger 'Battery: %f%%' $v
 			}
 		}
 		if {$v :le $battery_critical_%} \
@@ -661,6 +663,7 @@ fn disk () {
 		| awk '{print $5 "\t" $6}'}
 	escape {|fn-return| {
 		for (occ name) $utilizations {
+			logger 'Filesystem on %s: %d%%' $name $occ
 			if {$occ :gt $disk_full_%} {
 				alert_if_fullscreen 'Disk > %d%% full' \
 					$disk_full_%
@@ -705,6 +708,7 @@ fn fan () {
 		if {{<=get_curtemp :gt $FAN_THRESHOLD} && {~ $speed 0}} {
 			cycles = `($cycles+1)
 			{$cycles :gt 1} && {
+				logger 'Fan fault'
 				alert_if_fullscreen 'Fan is stopped at %dC' \
 					$FAN_THRESHOLD
 				result true
@@ -721,7 +725,7 @@ fn io () {
 	iobusy = false
 	%with-read-lines \
 	<{iostat -dxy $blkdevs 3 1 \
-		| awk '/^[^A-Z]/ {print $1 ":" $14}'} \
+		| awk '/^[^A-Z]/ {print $1 ":" $16}'} \
 	{|line|
 		(_ load) = <={~~ $line *:*}
 		if {$load :gt $io_active_%} {iobusy = true}
@@ -729,6 +733,7 @@ fn io () {
 	if $iobusy {
 		iocount = `($iocount+1)
 		if {$iocount :gt 1} {
+			logger 'I/O busy'
 			alert_if_fullscreen 'I/O activity > %d%%' $io_active_%
 			result true
 		}
@@ -742,6 +747,7 @@ fn load () {
 	la1m = `{cat /proc/loadavg|cut -d' ' -f1}
 	cpus = `nproc
 	if {$la1m :gt $cpus} {
+		logger 'High loadavg'
 		alert_if_fullscreen '1-minute load average > %d' $cpus
 		result true
 	} else {result false}
@@ -756,6 +762,7 @@ END { print ((use * 100 / tot) > '^$swap_usage_%^') }
 '
 	}
 	if {~ $swapping 1} {
+		logger 'Swapping'
 		alert_if_fullscreen 'Swapfile > %d%% full' $swap_usage_%
 		result true
 	} else {result false}
@@ -763,6 +770,7 @@ END { print ((use * 100 / tot) > '^$swap_usage_%^') }
 
 fn temperature () {
 	if {<=get_curtemp :gt $TEMPERATURE_THRESHOLD} {
+		logger 'Hot'
 		alert_if_fullscreen 'Temperature > %dC' $TEMPERATURE_THRESHOLD
 		result true
 	} else {result false}
@@ -777,12 +785,19 @@ if $enable_alerts {
 
 	post_alert_event &
 	while true {
+		logger \*B
 		if <=battery {b = B} else {b = $_a}
+		logger \*D
 		if <=disk {d = D} else {d = $_a}
+		logger \*F
 		if <=fan {f = F} else {f = $_a}
+		logger \*I
 		if <=io {i = I} else {i = $_a}
+		logger \*L
 		if <=load {l = L} else {l = $_a}
+		logger \*S
 		if <=swap {s = S} else {s = $_a}
+		logger \*T
 		if <=temperature {t = T} else {t = $_a}
 		post_alert_event
 		sleep 7  # io runs for 3 sec; total is 10
