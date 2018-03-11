@@ -168,11 +168,21 @@ fn p {
 	.c 'media'
 	%preserving-title pamixer
 }
-fn played {
+fn played {|*|
 	.d 'List recently-played tracks'
+	.a '[-w]'
+	.a '[playing]  # include current track'
 	.c 'media'
 	.r 'b m mpc n s'
+	if {~ $*(1) -w} {
+		%with-quit {
+			watch -t -n5 xs -c \
+				'"played '^<={%argify $*(2 ...)}^'"'}}
 	cat ~/.mpd/mpd.log|cut -c24-|grep '^played'|tail -n 15|tac|nl|tac
+	~ $* <={%prefixes playing} && {
+		printf '       playing "%s"'\n \
+			<={%argify `{mpc -f %file%|head -1}}
+	}
 }
 fn s {|*|
 	.d 'Seek within current track'
