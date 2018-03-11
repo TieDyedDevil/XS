@@ -279,8 +279,11 @@ enable_inbox = true
 # The panel can be rendered either 'above' or 'below' wm content
 panel_site = above
 
-# If true, write logger information to stderr
-debug = false
+# Controls amount of logger detail; -1 = silent; 0 = normal; >0 = debug
+loglevel = 0
+
+# Whether logger messages have a timestamp
+logstamp = false
 
 # ========================================================================
 #                       A R C H I T E C T U R E
@@ -342,14 +345,15 @@ fn-xftwidth = <={access -1en xftwidth $path}
 fn-xkbset = <={access -1en xkbset $path}
 fn-xset = <={access -1en xset $path}
 
-# Define a logger, enabled by the debug variable
-fn logger {|fmt args|
-	if $debug {
+# Define a logger, controlled by the loglevel variable
+fn stamp cat
+fn logger {|level fmt args|
+	if {$level :le $loglevel} {
 		catch {|e|
-			echo $PGM^': logger failed:' $e $fmt $args >[1=2]
+			echo $PGM^': logger failed:' $e $fmt $args
 		} {
-			printf '%s: '^$fmt^\n $PGM $args >[1=2]
-		}
+			printf '%s: '^$fmt^\n $PGM $args
+		} | stamp >[1=2]
 	}
 }
 
@@ -385,7 +389,7 @@ fn vs {|name type parms|
 				'(not in range '^$parms(1)^'..'^$parms(2)^')'
 		}
 		if {{$($name) :lt $parms(3)} || {$($name) :gt $parms(4)}} {
-			logger '%s (outside recommended range %d..%d)' \
+			logger 0 '%s (outside recommended range %d..%d)' \
 				<={%argify `{var $name}} $range(3 4)
 		}
 	}
@@ -397,7 +401,7 @@ fn vs {|name type parms|
 		# parms: rec
 		vs $name enum true false
 		if {!~ $parms ()} {
-			~ $($name) $parms || logger '%s (%s recommended)' \
+			~ $($name) $parms || logger 0 '%s (%s recommended)' \
 				<={%argify `{var $name}} $parms
 		}
 	}
@@ -429,7 +433,11 @@ vs enable_network_status bool
 vs enable_cpubar bool
 vs enable_inbox bool
 vs panel_site enum above below
-vs debug bool false
+vs loglevel int -1 5 0 1
+vs logstamp bool
+
+# Define the logger's timestamp function
+if $logstamp {fn stamp ts} else {fn stamp cat}
 
 # Carve out space for the panel
 herbstclient pad $monitor 0 0 0 0
@@ -484,7 +492,7 @@ if {{access -f $pidfile} && {kill -0 $checkpid >[2]/dev/null}} {
 	echo $display >>$dispfile
 	echo $client >>$clntfile
 	rm -f $lockfile
-	logger 'client on monitor %d: %d; %d' $monitor $client $pid
+	logger 2 'client on monitor %d: %d; %d' $monitor $client $pid
 	exec dzen2 <$display $dzen2_opts
 	# CLIENT ENDS HERE
 }
@@ -493,7 +501,7 @@ if {{access -f $pidfile} && {kill -0 $checkpid >[2]/dev/null}} {
 #                              S E R V E R
 
 # Identify the server
-logger 'server on monitor %d: %d' $monitor $pid
+logger 2 'server on monitor %d: %d' $monitor $pid
 echo $pid >$pidfile
 
 # Start a client for the server's display
@@ -503,14 +511,14 @@ echo $display >$dispfile
 echo $client >$clntfile
 rm -f $lockfile
 dzen2 <$display $dzen2_opts &
-logger 'client on monitor %d: %d; %d' $monitor $client $apid
+logger 2 'client on monitor %d: %d; %d' $monitor $client $apid
 
 # Define indicator placeholders
 if $show_alert_placeholders {_a = '.'} else {_a = ''}
 if $show_status_placeholders {_s = '.'} else {_s = ''}
 
 # Report colors
-logger 'palette: %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s' \
+logger 2 'palette: %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s' \
 	<={%argify `{var panel_fg_color}} \
 	<={%argify `{var panel_status_bg_color}} \
 	<={%argify `{var panel_status_fg_color}} \
@@ -615,7 +623,7 @@ while true {
 	osd_pos = -i `($mx+$osd_offset_px) \
 		-o `($my+$osd_offset_px+$panel_height_px)
 	echo $msg|osd_cat $osd_cat_opts $osd_pos
-	logger 'osd: %s' $msg
+	logger 2 'osd: %s' $msg
 } &
 rt osd
 fn osd {|msg| echo $msg >$osdmsg}
@@ -646,7 +654,7 @@ fn battery () {
 			if {!~ $cap 0} {
 				v = `(100.0*$chg/$cap)
 				if {$v :lt $battery_low_%} {w = true}
-				logger 'Battery: %f%%' $v
+				logger 2 'Battery: %f%%' $v
 			}
 		}
 		if {$v :le $battery_critical_%} \
@@ -663,7 +671,7 @@ fn disk () {
 		| awk '{print $5 "\t" $6}'}
 	escape {|fn-return| {
 		for (occ name) $utilizations {
-			logger 'Filesystem on %s: %d%%' $name $occ
+			logger 2 'Filesystem on %s: %d%%' $name $occ
 			if {$occ :gt $disk_full_%} {
 				alert_if_fullscreen 'Disk > %d%% full' \
 					$disk_full_%
@@ -699,7 +707,7 @@ fn fan () {
 	speeds = `{sensors >[2]/dev/null|grep fan|cut -d: -f2|awk '{print $1}'}
 	if {~ $speeds ()} {
 		if {! $nofans_logged} {
-			logger 'No fan sensors found'
+			logger 0 'No fan sensors found'
 			nofans_logged = true
 		}
 		result false
@@ -708,7 +716,7 @@ fn fan () {
 		if {{<=get_curtemp :gt $FAN_THRESHOLD} && {~ $speed 0}} {
 			cycles = `($cycles+1)
 			{$cycles :gt 1} && {
-				logger 'Fan fault'
+				logger 2 'Fan fault'
 				alert_if_fullscreen 'Fan is stopped at %dC' \
 					$FAN_THRESHOLD
 				result true
@@ -733,7 +741,7 @@ fn io () {
 	if $iobusy {
 		iocount = `($iocount+1)
 		if {$iocount :gt 1} {
-			logger 'I/O busy'
+			logger 2 'I/O busy'
 			alert_if_fullscreen 'I/O activity > %d%%' $io_active_%
 			result true
 		}
@@ -747,7 +755,7 @@ fn load () {
 	la1m = `{cat /proc/loadavg|cut -d' ' -f1}
 	cpus = `nproc
 	if {$la1m :gt $cpus} {
-		logger 'High loadavg'
+		logger 2 'High loadavg'
 		alert_if_fullscreen '1-minute load average > %d' $cpus
 		result true
 	} else {result false}
@@ -762,7 +770,7 @@ END { print ((use * 100 / tot) > '^$swap_usage_%^') }
 '
 	}
 	if {~ $swapping 1} {
-		logger 'Swapping'
+		logger 2 'Swapping'
 		alert_if_fullscreen 'Swapfile > %d%% full' $swap_usage_%
 		result true
 	} else {result false}
@@ -770,7 +778,7 @@ END { print ((use * 100 / tot) > '^$swap_usage_%^') }
 
 fn temperature () {
 	if {<=get_curtemp :gt $TEMPERATURE_THRESHOLD} {
-		logger 'Hot'
+		logger 2 'Hot'
 		alert_if_fullscreen 'Temperature > %dC' $TEMPERATURE_THRESHOLD
 		result true
 	} else {result false}
@@ -785,19 +793,19 @@ if $enable_alerts {
 
 	post_alert_event &
 	while true {
-		logger \*B
+		logger 3 \*B
 		if <=battery {b = B} else {b = $_a}
-		logger \*D
+		logger 3 \*D
 		if <=disk {d = D} else {d = $_a}
-		logger \*F
+		logger 3 \*F
 		if <=fan {f = F} else {f = $_a}
-		logger \*I
+		logger 3 \*I
 		if <=io {i = I} else {i = $_a}
-		logger \*L
+		logger 3 \*L
 		if <=load {l = L} else {l = $_a}
-		logger \*S
+		logger 3 \*S
 		if <=swap {s = S} else {s = $_a}
-		logger \*T
+		logger 3 \*T
 		if <=temperature {t = T} else {t = $_a}
 		post_alert_event
 		sleep 7  # io runs for 3 sec; total is 10
@@ -920,13 +928,13 @@ if $enable_inbox {
 				(tm rm _) = \
 					<={~~ $line *' messages ('*' seen)'*}
 				if {{!~ $tm ()} && {!~ $rm ()}} {
-					logger 'inbox %s %s' $tm $rm
+					logger 2 'inbox %s %s' $tm $rm
 					if {$tm :gt $rm} {
 						echo newmail
 					} else {
 						echo nonewmail
 					}
-				} else {logger 'Inbox: %s' $line}
+				} else {logger 2 'Inbox: %s' $line}
 			}
 			sleep 30
 		} >$trigger &
@@ -980,20 +988,20 @@ fn drawright {|text|
 
 # Process events
 fn terminate {
-	logger 'terminate'
+	logger 1 'terminate'
 	rm -f $pidfile
 	for client `{cat $clntfile} {
-		logger 'killing client %d' $client
+		logger 2 'killing client %d' $client
 		kill $client
 	}
 	rm -f $clntfile
 	for df `{cat $dispfile} {
-		logger 'removing display fifo %s' $df
+		logger 2 'removing display fifo %s' $df
 		rm -f $df
 	}
 	rm -f $dispfile
 	for (task pid) $taskpids {
-		logger 'killing pgroup %d (%s)' $pid $task
+		logger 2 'killing pgroup %d (%s)' $pid $task
 		pkill -g $pid
 	}
 	rm -f $event
@@ -1047,7 +1055,7 @@ fn track {
 }
 
 # Run the server
-logger 'starting: %s; %s; %s; %s; %s; %s; %s' \
+logger 1 'starting: %s; %s; %s; %s; %s; %s; %s' \
 	<={%argify `{var enable_track}} \
 	<={%argify `{var enable_clock}} \
 	<={%argify `{var enable_alerts}} \
