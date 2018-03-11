@@ -658,7 +658,7 @@ fn battery () {
 }
 
 fn disk () {
-	VOLUMES = / /boot /home /run /tmp /var
+	VOLUMES = / /boot /boot/efi /home /run /tmp /var /opt
 	utilizations = `{df | less -n +2 | grep -w -e^$VOLUMES^\$ | tr -d % \
 		| awk '{print $5 "\t" $6}'}
 	escape {|fn-return| {
@@ -926,7 +926,7 @@ if $enable_inbox {
 					} else {
 						echo nonewmail
 					}
-				} else {logger 'inbox %s' $line}
+				} else {logger 'Inbox: %s' $line}
 			}
 			sleep 30
 		} >$trigger &
