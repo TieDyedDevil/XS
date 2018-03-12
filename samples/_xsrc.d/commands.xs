@@ -10,7 +10,8 @@ fn astat {
 	.d 'Display a status screen'
 	.c 'system'
 	%with-quit {
-		watch -t -p -c -n1 'xs -c ''d;load;thermal;vol;played;m'''
+		watch -t -p -c -n1 \
+			'xs -c ''d;load;thermal;vol;played playing'''
 	}
 }
 fn battery {
