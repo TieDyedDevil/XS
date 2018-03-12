@@ -180,7 +180,8 @@ fn played {|*|
 				'"played '^<={%argify $*(2 ...)}^'"'}}
 	cat ~/.mpd/mpd.log|cut -c24-|grep '^played'|tail -n 15|tac|nl|tac
 	~ $* <={%prefixes playing} && {
-		printf '       playing "%s"'\n \
+		printf '%14s "%s"'\n \
+			`{mpc|head -2|tail -1|grep -o '\[[^]]\+\]'|tr -d []} \
 			<={%argify `{mpc -f %file%|head -1}}
 	}
 }
