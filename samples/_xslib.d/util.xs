@@ -749,3 +749,9 @@ fn %U {|cp|
 	# Return the UTF-8 character denoted by its codepoint of 8 hex digits.
 	eval result '\U'$cp
 }
+
+fn %with-application-keypad {|cmd|
+	# Run command with keypad application keys.
+	printf \e\=
+	unwind-protect {$cmd} {printf \e\>}
+}
