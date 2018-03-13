@@ -143,6 +143,14 @@ fn n {
 	if {~ `mpc \[playing\]} {mpc -q next} else {mpc -q play}
 	m
 }
+fn ncmpcpp {
+	.d 'MPD client'
+	.a '[ncmpcpp_OPTIONS]'
+	.c 'media'
+	.r 'b mpc n played s'
+	# This is the quickest way to emit proper keypad codes for ncmpcpp.
+	env TERM=dvtm-256color /usr/local/bin/ncmpcpp
+}
 fn noise {|*|
 	.d 'Audio noise generator'
 	.a '[white|pink|brown [LEVEL_DB]]'
