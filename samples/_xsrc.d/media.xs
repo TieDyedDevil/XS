@@ -148,7 +148,7 @@ fn ncmpcpp {
 	.a '[ncmpcpp_OPTIONS]'
 	.c 'media'
 	.r 'b mpc n played s'
-	%with-application-keypad /usr/local/bin/ncmpcpp
+	%preserving-title %with-application-keypad /usr/local/bin/ncmpcpp
 }
 fn noise {|*|
 	.d 'Audio noise generator'
