@@ -495,6 +495,11 @@ fn startwm {
 		cd; exec startx -- -logverbose 0 >~/.startx.log >[2=1]
 	}
 }
+fn swapflush {
+	.d 'Flush swapfile(s)'
+	.c 'system'
+	sudo swapoff -a && sudo swapon -a
+}
 fn thermal {
 	.d 'Summarize system thermal status'
 	.c 'system'
