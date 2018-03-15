@@ -11,7 +11,6 @@ TRANSPARENT_LOCKOPTS = -mode blank -geometry 0x0 -dpmsoff 0 -bg black \
 -timeout 2
 
 fn locker {|*|
-	pkill -USR1 dunst
 	xlock -nice 25 \
 	-font '-*-liberation mono-bold-i-*-*-*-180-*-*-*-*-iso10646-1' \
 	-planfont '-*-liberation mono-bold-i-*-*-*-160-*-*-*-*-iso10646-1' \
@@ -19,7 +18,6 @@ fn locker {|*|
 	-saturation 0.5 -bg 'cadet blue' -fg white -timeout 15 +resetsaver \
 	+usefirst -fullrandom -username 'Username: ' -password 'Password:' \
 	-info 'Enter password to unlock.' $*
-	pkill -USR2 dunst
 }
 
 AC = /sys/class/power_supply/AC

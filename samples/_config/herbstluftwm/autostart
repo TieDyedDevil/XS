@@ -15,7 +15,7 @@ pacmd load-module module-x11-bell sample=x11-bell display=:0.0
 pgrep -c xautolock >/dev/null || \
 	exec xautolock -time 30 -locker ~/.local/bin/lock \
 		-notify 60 -detectsleep &
-pgrep -c dunst >/dev/null || exec dunst &
+pgrep -c twmnd >/dev/null || exec twmnd &
 pgrep -c xvisbell >/dev/null || exec xvisbell &
 if {systemd-detect-virt -q} {screensaver off}
 
