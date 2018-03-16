@@ -8,6 +8,7 @@ access -f ~/.xsettingsd && {pkill xsettingsd; setsid xsettingsd &}
 xsetroot -solid 'Slate Gray'
 setxkbmap -option keypad:pointerkeys -option compose:prsc
 xset dpms 0 0 900 s noblank
+xset s 900 0
 xset r rate 500 30
 xset m 7/5 0
 pacmd load-sample x11-bell /usr/share/sounds/freedesktop/stereo/bell.oga

@@ -469,7 +469,7 @@ fn screensaver {|*|
 				}
 			} else {
 				switch $* (
-				on {xset +dpms; xset s on}
+				on {xset +dpms; xset s on; xset s 900 0}
 				off {xset -dpms; xset s off}
 				{error = true})
 			}
