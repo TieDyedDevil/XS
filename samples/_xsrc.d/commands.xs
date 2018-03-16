@@ -139,6 +139,12 @@ fn doc {|*|
 		}
 	}
 }
+fn hd {
+	.d 'Simple hex dump'
+	.c 'system'
+	hexdump -e '"%07.7_Ax  (%_Ad)\n"' \
+		-e '"%07.7_ax  " 8/1 "%02x " "  " 8/1 "%02x " "\n"'
+}
 fn import-abook {|*|
 	.d 'Import vcard to abook'
 	.a 'VCARD_FILE'
