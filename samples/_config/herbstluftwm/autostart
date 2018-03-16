@@ -141,6 +141,7 @@ hc keybind $Mod^-b spawn xdotool mousemove 5000 5000
 
 # media keys
 hc keybind XF86AudioPlay spawn mpc -q toggle
+hc keybind $Mod^-n spawn mpc -q toggle
 hc keybind Shift-XF86AudioPlay spawn mpc -q seek 0
 hc keybind XF86AudioNext spawn mpc -q next
 hc keybind Shift-XF86AudioNext spawn mpc -q seek +20
