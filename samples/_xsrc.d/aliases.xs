@@ -15,11 +15,6 @@ fn calc {|*|
 	.c 'alias'
 	~ $#* 0 || nickle -e $*
 }
-fn d {
-	.d 'Date/time (local and UTC)'
-	.c 'alias'
-	date; date -u; date +%t%s.%N
-}
 %cfn {%have mandelbulber} mb {|*|
 	.c 'alias'
 	mandelbulber $*

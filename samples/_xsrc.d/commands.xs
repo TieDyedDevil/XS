@@ -104,6 +104,23 @@ fn cs {|*|
 				^'gensub(/ +/, " ", "g", $2)}' \
 		| env LESSUTFBINFMT='*s?' less -iSFX
 }
+fn d {
+	.d 'Date/time (local, UTC and TAI)'
+	.c 'system'
+	date
+	date -u
+	date +%t%s.%N
+	let (a = `` '' {grep \^Leap /usr/share/zoneinfo/leapseconds|cut -f6}; \
+		s = `{date +%s}; pf; nf; p; n; l; t) {
+		pf = `{grep -e + <<<$a}
+		nf = `{grep -e - <<<$a}
+		p = $#pf
+		n = $#nf
+		l = `($p-$n)
+		t = `($s+$l)
+		printf %+d\t%u\n $l $t
+	}
+}
 fn dt {|*|
 	.d 'List top directory usage'
 	.a '[-a] [DIR]'
