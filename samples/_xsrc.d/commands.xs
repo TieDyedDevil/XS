@@ -116,7 +116,7 @@ fn d {
 		nf = `{grep -e - <<<$a}
 		p = $#pf
 		n = $#nf
-		l = `($p-$n)
+		l = `(10+$p-$n)
 		t = `($s+$l)
 		printf %+d\t%u\n $l $t
 	}
