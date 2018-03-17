@@ -105,7 +105,7 @@ fn cs {|*|
 		| env LESSUTFBINFMT='*s?' less -iSFX
 }
 fn d {
-	.d 'Date/time (local, UTC and TAI)'
+	.d 'Date/time (local, UTC, POSIX and TAI)'
 	.c 'system'
 	date
 	date -u
