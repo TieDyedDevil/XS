@@ -1,6 +1,8 @@
 #! /usr/bin/env xs
 
 ## Configure X and herbstluftwm
+ARG0 = $0
+HERE = `{cd `{dirname $ARG0}; pwd}
 
 # initialize common settings and services
 access -f ~/.Xresources && xrdb ~/.Xresources
@@ -205,7 +207,8 @@ hc detect_monitors
 # unlock, just to be sure
 hc unlock
 
+# do other intializations
+access -f $HERE/inits && $HERE/inits
+
 # start the panel(s)
-ARG0 = $0
-HERE = `{cd `{dirname $ARG0}; pwd}
 $HERE/load_panels
