@@ -649,48 +649,61 @@ fn wallpaper {|*|
 	.d 'Set wallpaper'
 	.a '[-m MONITOR] FILE-OR-DIRECTORY'
 	.a '[-m MONITOR] DELAY_MINUTES DIRECTORY'
+	.a '-c  # cycle'
 	.a '(none)  # restore root window'
 	.c 'system'
 	%only-X
 	local (pageopt = $pageopt) {
 		let (geom; mon; monopt = '') {
-			if {~ $*(1) -m} {
-				mon = $*(2)
-				monopt = $*(1 2); monopt = $^monopt
-				* = $*(3 ...)
-				geom = `{grep \^$mon <{xrandr}| \
-					cut -d' ' -f3}
-			}
-			!~ $geom () && pageopt = -page $geom
-			switch $#* (
-			1 {	let (f) {
-					access -f $* && f = $*
-					access -d $* && wallpaper \
-						`{find -L $* \
-						\( -name '*.jpg' \
-						-o -name '*.png' \) \
-						|shuf|head -1}
-					!~ $f () && {
-						display -window root \
-							$pageopt $f
+			if {~ $* -c} {
+				let (pp = `{pgrep -f \
+					'while true \{wallpaper'}) {
+					if {!~ $pp ()} {
+						 pkill -P $pp
+					} else {
+						throw error wallpaper \
+							'not active'
 					}
 				}
-			}
-			2 {	let (m = $*(1); d = $*(2); \
-					p = 'while true {wallpaper '; \
-					f = 'while true \{wallpaper') {
-					access -d $d && {
-						pkill -f $f
-						setsid xs -c \
-						$p^$monopt^' ' \
-						^$d^'; sleep ' \
-						^`($m*60)^'}' &
+			} else {
+				if {~ $*(1) -m} {
+					mon = $*(2)
+					monopt = $*(1 2); monopt = $^monopt
+					* = $*(3 ...)
+					geom = `{grep \^$mon <{xrandr}| \
+						cut -d' ' -f3}
+				}
+				!~ $geom () && pageopt = -page $geom
+				switch $#* (
+				1 {	let (f) {
+						access -f $* && f = $*
+						access -d $* && wallpaper \
+							`{find -L $* \
+							\( -name '*.jpg' \
+							-o -name '*.png' \) \
+							|shuf|head -1}
+						!~ $f () && {
+							display -window root \
+								$pageopt $f
+						}
 					}
 				}
+				2 {	let (m = $*(1); d = $*(2); \
+						p = 'while true {wallpaper '; \
+						f = 'while true \{wallpaper') {
+						access -d $d && {
+							pkill -f $f
+							setsid xs -c \
+							$p^$monopt^' ' \
+							^$d^'; sleep ' \
+							^`($m*60)^'}' &
+						}
+					}
+				}
+				{	pkill -f 'while true \{wallpaper'
+					xsetroot -solid 'Slate Gray'
+				})
 			}
-			{	pkill -f 'while true \{wallpaper'
-				xsetroot -solid 'Slate Gray'
-			})
 		}
 	}
 }

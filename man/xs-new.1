@@ -1,0 +1,885 @@
+.TH XS 1 "2017 - v1.1"
+.SH NAME
+xs \- extensible shell
+.SH SYNOPSIS
+.RI "xs [-silevxnpodV] [[-c " command " | " file ] " arguments" ]
+.SH DESCRIPTION
+.I Xs
+is a command interpreter for Linux.
+.I Xs
+allows programming in a functional style and has a simple, consistent syntax.
+.I Xs
+also provides a set of hooks which allow for customization of the semantics
+of many operations. Furthermore, an
+.I xs
+program is able to generate
+.I xs
+code; this facilitates the creation of new language constructs.
+.PP
+.I Xs
+is a descendant of
+.IR rc "(1) and " es (1);
+the three implementations are similar in scope and style, but are not
+interoperable.
+.SH OPTIONS
+TBCL
+.SH LANGUAGE
+Lexically, an
+.I xs
+program consists of words and punctuation.
+.SS Words
+In its simplest form, a word is a
+sequence of non-special characters. The special characters are:
+.PP
+.RS
+.B "# $ & ' ( ) ; < > \e ^ ` { | } space tab newline"
+.RE
+.PP
+Any of the special characters may be escaped by preceeding it with a
+backslash (\e); this causes the character following the backslash to be
+treated as a non-special character.
+.PP
+Certain sequences beginning with backslash denote control characters:
+.PP
+.RS
+.TP
+.B \ea
+alert (bell)
+.TP
+.B \eb
+backspace
+.TP
+.B \ee
+escape
+.TP
+.B \ef
+form feed
+.TP
+.B \en
+newline
+.TP
+.B \er
+carriage return
+.TP
+.B \et
+tab
+.RE
+.PP
+A character octet may be denoted by its hexadecimal or octal code point:
+.PP
+.RS
+.TP
+.BI \ex nn
+character octet
+.IR nn ,
+for
+.I n
+in {0..0, a..f, A..F}
+.TP
+.BI \e mnn
+character octet
+.IR mnn ,
+for
+.I m
+in {0..3} and
+.I n
+in {0..7}
+.RE
+.PP
+A UTF-8 octet sequence may be denoted using one of the escape sequences:
+.RS
+.TP
+.BI \eu nnnn
+UTF-8 character having codepoint
+.IR nnnn ,
+for
+.I n
+in {0..9, a..f, A-F}
+.TP
+.BI \eU nnnnnnnn
+UTF-8 character having codepoint
+.IR nnnn ,
+for
+.I n
+in {0..9, a..f, A-F}
+.RE
+.PP
+.I Xs
+does not allow a NUL character to be spelled by an escape sequence; thus the
+following are all invalid:
+.PP
+.RS
+.BR \e000 ", " \ex00 ", " \eu0000 " and " \eU00000000 .
+.RE
+.PP
+A backslash must not be followed by a sequence of characters other than those
+described above.
+.PP
+A sequence of characters enclosed by apostrophes (') is a word. An apostrophe
+is written by doubling it, e.g.:
+.PP
+.RS
+.B 'Sam''s word'
+.RE
+.PP
+All other special characters lose their meaning within a word enclosed by
+apostrophes.
+.PP
+The empty word is denoted by
+.BR '' .
+.SS Comments
+The hash mark (#) introduces a comment which ends at newline.
+.SS Line continuation
+Program text may be split across physical lines by ending each logical line
+with a backslash (\). The backslash and the immediately following newline
+are read as a space.
+.SS Lists
+A list is a space-separated sequence of words. The empty list is denoted by
+.BR () .
+All lists are flat in
+.IR xs ;
+parentheses may be written for grouping, but they do not create a tree. Thus
+.PP
+.RS
+.B this is a list of seven words
+.RE
+.PP
+and
+.PP
+.RS
+.B this (is a list) ((of) (seven words))
+.RE
+.PP
+are identical.
+.PP
+A list enclosed in parentheses may span multiple line without need of
+line continuation characters.
+.SS Concatenation
+Lists may be joined using the concatenation operator, caret (^).
+.PP
+A list of length one is a word. Concatenating two words creates a new word.
+.PP
+When either list has length greater than one, the result of concatenation is
+the cross product of the lists.
+.PP
+When either list is empty, the result of concatenation is the empty list.
+.SS Variables
+A variable is assigned a list value using the notation
+.PP
+.RS
+.IB var " = " list
+.RE
+.PP
+The spaces around
+.B =
+are mandatory.
+.PP
+A variable is undefined by assigning an empty list as its value. While
+.PP
+.RS
+.IB var " = " ()
+.RE
+.PP
+is valid, the preferred form is
+.PP
+.RS
+.IB var " ="
+.RE
+.PP
+All variables are exported to the environment unless declared within a
+.BR local " or " let " form (described below)."
+.PP
+A variable's value is retrieved by writing
+.B $
+before its name, like
+.B $
+.IR $ "var ."
+.PP
+An undefined variable yields the empty list when read.
+.PP
+A variable name may be constructed at runtime. Parentheses must be used to
+group multiple operators used to construct a name.
+.SS Subscripted reference
+Specific list elements may be selected via subscripting. This takes the form
+.PP
+.RS
+.BR $ var ( subscripts )
+.RE
+.PP
+List elements are indexed starting at 1. A subscript less than 1 is an error.
+A subscript greater than the number of list elements returns an empty list.
+.PP
+.RS
+.TP
+.B a = w x y z; echo $a(2 3 4 4 3)
+prints
+.B x y z z y
+.RE
+.PP
+Subscripts may be specified as ranges by separating the range endpoints with
+.BR ... " ."
+The range operator must be separated from its arguments by spaces.
+.PP
+Either end of the range may be left unspecified.
+.PP
+.RS
+.TP
+.BR $ var (... 7)
+yields elements 1 through 7 of the list
+.TP
+.BR $ var (3 ...)
+yields elements 3 through the end of the list
+.RE
+.PP
+Reversing the endpoints of a range returns the values in reversed order:
+.PP
+.RS
+.B a = s d r a w k c a b
+.PP
+.B $a(5 ... 2)
+.RE
+.PP
+yeilds the list
+.PP
+.RS
+.B w a r d
+.SS Multiple assignment
+A list of variables may be specified on the left side of an assignment.
+Parentheses are mandatory around the list of variables.
+.PP
+Corresponding list elements on the right side are assigned to variables on
+the left. If the right side has more elements than their are variables on
+the left, the rightmost variable is assigned the list value of the remaining
+elements. If there are more variables than list elements, the excess variables
+are assigned the empty list.
+.PP
+Variable names may not be computed or subscripted on the left side of a
+multiple assignment.
+.SS List length
+The length of a list assigned to a variable is given by
+.PP
+.RS
+.BR $# var
+.RE
+.PP
+.SS Flattening
+A list may be flattened to a single word using the
+.B $^
+operator. This returns a word composed of the words of the given list,
+with a single space between each pair of words. As with the subscript
+operator, this applies only to a variable (not literal) list.
+.SS Free carets
+Concatenation may be written implicitly (rather than using the
+.B ^
+operator) in certain situations. If a word is followed by another word,
+.BR $ " or " `
+without intervening whitespace, then
+.I xs
+inserts a caret between them.
+.SS Pathname expansion
+Where a word may be treated as a pathname,
+.I xs
+expands wildcards.
+.PP
+.RS
+.TP
+.B *
+matches zero or more characters
+.TP
+.B ?
+matches exactly one character
+.TP
+.BI [ class ]
+matches any of the characters specified by the class, following the same
+rules as those for
+.IR ed (1),
+except that class negation is denoted by
+.B ~
+since
+.B ^
+has another interpretation in
+.IR xs .
+.RE
+.PP
+The pathname separator,
+.BR /,
+is never matched by
+.BR * .
+The
+.B ?
+wildcard never matches a dot at the beginning of a pathname component.
+.PP
+A tilde (~) alone or followed by a slash (/) is replaced by the value of
+.BR $home .
+A tilde followed by a username is replaced with the home directory path
+of that user. (See
+.IR getpwent (3).)
+.PP
+A quoted wildcard loses its meaning as a wildcard.
+.SS Pattern matching
+The pattern matching operator (~) returns true when a subject matches
+any of the given patterns:
+.PP
+.RS
+.BR ~ " subject pattern ..."
+.RE
+.PP
+A subject may be a list. If composed of individual words or expressions,
+the subject list must be enclosed by parentheses.
+.PP
+A pattern is a word which may contain wildcards:
+.RS
+.TP
+.B *
+matches zero or more characters
+.TP
+.B ?
+matches exactly one character
+.TP
+.BI [ class ]
+matches any of the characters specified by the class, following the same
+rules as those for
+.IR ed (1),
+except that class negation is denoted by
+.B ~
+since
+.B ^
+has another interpretation in
+.IR xs .
+.RE
+.PP
+Pattern wildcards are never expanded with pathnames from the filesystem.
+.SS Pattern extraction
+The pattern extraction operator (~~) returns the parts of each subject that
+match a wildcard in the patterns:
+.PP
+.RS
+.BR ~ " subject pattern ..."
+.RE
+.PP
+Subjects and patterns are the same as for the pattern matching operator.
+.SS Arithmetic substitution
+An infix arithmetic expression may be evaluated to produced a single word
+representing its value:
+.PP
+.RS
+.BR `( expression )
+.RE
+.PP
+The expression consists of numeric values and the operators
+.BR + ", " - ", " * ", " / " and " % (modulus),
+which obey the usual precedence rules.
+.PP
+A value is either a numeric constant or a variable having a numeric value.
+Numbers may be integer or floating-point; the latter are stored with limited
+precision (usually six significant digits).
+.PP
+If any value is floating-point, the result will be floating-point.
+.PP
+Division of integers produces an integer result via truncation. Modulus
+behaves as
+.BR fmod (3)
+if either argument is floating-point.
+.PP
+An undefined variable (a variable having value
+.BR () )
+is treated as zero within an arithmetic expression.
+.PP
+Variables having subscripted or constructed names may not be used in an
+arithmetic expression.
+.SS Program fragments
+A program fragment is a sequence of zero or more words enclosed in braces:
+.PP
+.RS
+.BR { words* }
+.RE
+.PP
+The first word is always treated as a function name or the name of an
+executable on $PATH; the remaining words are evaluated and passed as
+arguments.
+.PP
+The value of a program fragment is the result code returned by the function
+or executable. An empty fragment
+.RB ( {} )
+has a result of zero. A fragment containing a pipeline returns a list of
+results: one for each function or executable in the pipeline.
+.PP
+The braces may be elided if the program or executable is a single word
+having no arguments.
+.SS Pipes
+Standard output of one command may be piped to the standard input of
+another:
+.PP
+.RS
+.RB command1 | command2
+.RE
+.PP
+Other file descriptors may be connected:
+.PP
+.RS
+.RB command1 |[ fd1 = fd2 ] command2
+.RE
+.PP
+The form
+.PP
+.RS
+.RB command1 |[ fd1 ] command2
+.RE
+.PP
+is identical to
+.PP
+.RS
+.RB command2 |[ fd1 =0] command2
+.RE
+.PP
+.SS Command substitution
+The backquote form creates a list from the standard output of a program
+fragment:
+.PP
+.RS
+.BR ` fragment
+.RE
+.PP
+Words are parsed from the standard output using the separators defined by
+.BR $ifs .
+.PP
+This variant backquote form binds
+.B $ifs
+to the given list of separators:
+.PP
+.RS
+.BR `` " separators fragment"
+.RE
+.SS Functions
+.I Xs
+has two forms by which a function is defined:
+.PP
+.RS
+.BR fn " name fragment"
+.RE
+.PP
+and
+.PP
+.RS
+.BR fn- name " = " fragment
+.RE
+.PP
+The former is normally used for top-level and nested definitions; the latter
+must be used when binding a function for local use. Because the latter is an
+assignment, the spaces around
+.B =
+are mandatory.
+.SS Lambda list
+A lambda list binds names to function arguments. Its form is:
+.PP
+.RS
+.BR | "name ..." |
+.RE
+.PP
+A lambda list may only appear as the first element of a program fragment.
+.SS Truth values
+The values
+.BR 0 ", " '' " and " ()
+are all treated as true; everything else is false.
+.PP
+The keywords
+.BR true " and " false
+are equivalent to
+.BR "result 0" " and " "result 1" ,
+respectively.
+.SS Return values
+The value of evaluating a fragment is the return value of the last function
+or executable evaluated before leaving the fragment.
+.PP
+A specific result may be returned by:
+.PP
+.RS
+.BR result list
+.RE
+.SS Logical operators
+The following operators apply to truth values:
+.PP
+.RS
+.TP
+.RB value1 && value2
+True if both
+.BR value1 " and " value2
+are true.
+.TP
+.RB value1 || value2
+True if value1 is true or if value1 is false and value2 is true.
+.TP
+.BR ! value
+True if value is false.
+.RE
+.PP
+The
+.BR && " and " ||
+operators evaluate their arguments from left to right, stopping when the
+value of the expression is determined.
+.SS Relational operators
+Numbers and strings may be compared using the relational operators:
+.PP
+.RS
+.TP
+.B value1 " :lt " value2
+True if value1 is less than value2.
+.TP
+.B value1 " :le " value2
+True if value1 is less than or equal to value2.
+.TP
+.B value1 " :gt " value2
+True if value1 is greater than value2.
+.TP
+.B value1 " :ge " value2
+True if value1 is greater than or equal to value2.
+.TP
+.B value1 " :eq " value2
+True if value1 is equal to value2.
+.TP
+.B value1 " :ne " value2
+True if value1 is not equal to value2.
+.RE
+.PP
+If either argument is non-numeric, the arguments are compared according to
+the current locale's collation order.
+.SS Input and output
+Input may be redirected from a file to standard input:
+.PP
+.RS
+.BR < "filename command"
+.RE
+.PP
+or
+.PP
+.RS
+.RB command " <" filename
+.RE
+.PP
+It is an error if the file does not exist or is not readable.
+.PP
+Output may be redirected from standard output to a file:
+.PP
+.RS
+.RB command " >" filename
+.RE
+.PP
+or
+.PP
+.RS
+.BR > "filename command"
+.RE
+.PP
+The file is created if it does not exist. If the file already exists, its
+contents are replaced. It is an error for the the file to not be writeable.
+.PP
+Other file descriptors may be specified:
+.PP
+.RS
+.RB "command " >[ ofd ] filename
+.RE
+.PP
+and
+.PP
+.RS
+.RB "command " <[ ifd ] filename
+.RE
+A file descriptor may be duplicated using the form:
+.PP
+.RS
+.BR >[ fd1 = fd2 ]
+.RE
+.PP
+This causes output to
+.I fd1
+to be written instead to
+.IR fd2 .
+Thus,
+.PP
+.RS
+.RB command > file >[2=1] filename
+.RE
+.PP
+causes both standard output and standard error to be written to the same file.
+.PP
+Other redirection operators have their own semantics:
+.PP
+.RS
+.TP
+.BR >> filename
+appends to an existing file; the file is created if nonexistent.
+.TP
+.BR <> filename
+opens a file for reading and writing (on standard input unless otherwise
+specified).
+.TP
+.BR <>> filename
+opens a file for reading and appending (on standard input unless otherwise
+specified).
+.TP
+.BR >< filename
+truncates a file and opens it for reading and writing (on standard output
+unless otherwise specified).
+.TP
+.BR >>< filename
+opens a files for reading and appending (on standard output unless otherwise
+specified).
+.RE
+.PP
+An open file descriptor is closed using this form:
+.PP
+.RS
+.BR >[ fd =]
+.RE
+.PP
+File descriptors must be integer constants.
+.PP
+Input may be read from a script with a "here document":
+.PP
+.RS
+.RB command << eof-marker
+.RE
+.PP
+or
+.PP
+.RS
+.RB command <<' eof-marker '
+.RE
+.PP
+The
+.I eof-marker
+is a word which must appear immediately following the final newline of textual
+data taken as input. The first form (with the unquoted
+.IR eof-marker )
+replaces variables within the textual data. (Only simple variables; subscripts
+and constructed names are not allowed.) A
+.B $
+can be emitted literally by writing
+.BR $$ .
+To emit the value of a variable followed immediately by a literal word, write:
+.BR $ var ^ word.
+.PP
+The second form (with the quoted
+.IR eof-marker )
+copies the textual data without substitution of any kind.
+.SS Process substitution
+.PP
+Process substitution allows for the output of a command to be read from a
+file descriptor or for data written to a file descriptor to be read by a
+command, using the forms:
+.PP
+.RS
+.BR <{ command }
+.RE
+.PP
+and
+.PP
+.RS
+.BR >{ command }
+.RE
+.PP
+The files created by process substitution may be implemented using pipes,
+which are not seekable.
+.PP
+Note that the braces are an essential part of this syntax; these are not
+.BR > fragment
+and
+.BR < fragment.
+.SS Local variables
+Local variables exist only during execution of their binding form:
+.PP
+.RS
+.BR "local (" "binding ..." ) " fragment"
+.RE
+.PP
+where
+.B binding
+is either
+.RB name " = " value
+or just name (and value is taken as
+.BR () ).
+.PP
+While bound by
+.BR local ,
+variables are accessible within the environment.
+.SS Lexical variables
+Lexical variables are bound by the form:
+.PP
+.RS
+.BR "let (" "binding ..." ) " fragment"
+.RE
+.PP
+where
+.B binding
+is either
+.RB name " = " value
+or just name (and value is taken as
+.BR () ).
+.PP
+A lexical variable is accessible to all code lexically enclosed by the
+binding form. Furthermore, a lexical variable persists across executions
+of a function which is defined within the
+.B let
+form. A lexical binding is never written to the environment.
+.SS Conditionals
+.I Xs
+has two main conditional forms:
+.PP
+.RS
+.BR if " condition fragment " else " fragment"
+.RE
+.PP
+where condition is a boolean expression and the
+.I else
+branch is optional, and
+.PP
+.RS
+.BR switch " var cases"
+.RE
+.PP
+where
+.I cases
+is a list of
+.IR "word fragment" ,
+each representing the code to be executed for a specific value of
+.IR var ,
+followed by a
+.I fragment
+to be executed when none of the
+.IR word s
+match
+.IR var .
+.SS Loops
+.I Xs
+has three main looping forms:
+.PP
+.RS
+.BR while " condition fragment"
+.RE
+.RS
+.BR until " condition fragment"
+.RE
+.RS
+.BR for " vars-and-values " fragment
+.RE
+.PP
+The
+.B while
+form executes
+.I fragment
+while
+.I condition
+is true.
+.PP
+The
+.B until
+form executes
+.I fragment
+until
+.I condition
+is false.
+.PP
+The
+.B for
+form executes
+.I fragment
+with variables bound to consecutive values in
+.IR vars-and-values ,
+which is a sequence of one or more
+.I var list
+forms separated by
+.BR ; .
+Variables are bound until the longest list is exhausted; shorter lists are
+implicitly padded with
+.B ()
+to match the length of the longest list.
+.SS Settors
+A settor function is a variable of the form
+.BR set- var
+.PP
+When
+.I var
+is assigned,
+.BR set- var
+is called as a function, passing the value to be assigned.
+.B $0
+is bound to the name of the variable being assigned. The result of
+the settor function is used as the assignment's value.
+.PP
+A settor is never invoked on a lexical variable.
+.SS Exceptions
+Exceptions in
+.I xs
+are used for non-lexical control constructs. An exception is passed up the
+call chain to the most recently established catcher. The catcher may handle
+the exception, retry the code which caused the exception or pass the
+exception to the next catcher.
+.PP
+An exception is a list. The first word denotes the exception type, one of
+.PP
+.RS
+.TP
+.B eof
+raised by the
+.I xs
+parser at end of input.
+.TP
+.B error
+where the following words are the source (typically a descriptive name
+such as the name of the function which signalled the error) and a message.
+
+.I xs
+provides a last-resort catcher to print the message and restart the top loop.
+.TP
+.B exit
+where the next word is an optional numeric return code (default: 0). This
+exception, when caught by
+.IR xs ,
+exits the shell with the given return code.
+.TP
+.B retry
+when raised by a catcher, causes the body of the
+.B catch
+form to run again. Note that the catcher must have done something to clear
+the cause of the exception; otherwise
+.B retry
+will cause an infinite loop.
+.RE
+.PP
+The
+.B catch
+form executes its body in the context of a catcher:
+.PP
+.RS
+.BR catch " catcher body"
+.RE
+.PP
+The
+.IR catcher " and " body
+are program fragments.
+.SH VARIABLES
+TBCL
+.SH BUILTINS
+TBCL
+.SH HOOKS
+TBCL
+.SH UTILITIES
+TBCL
+.SH PRIMITIVES
+TBCL
+.SH EDITING
+TBCL
+.SH FILES
+TBCL
+.SH BUGS
+TBCL
+.SH SEE ALSO
+TBCL
+
+TODO:
+define command as executable or function;
+consistently use italic for metasyntactic vars;
+close up lists
+
+MAYBE:
+syntactic sugar

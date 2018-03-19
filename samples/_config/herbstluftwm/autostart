@@ -1,7 +1,10 @@
 #! /usr/bin/env xs
 
 ## Configure X and herbstluftwm
+ARG0 = $0
+HERE = `{cd `{dirname $ARG0}; pwd}
 
+# --------------------
 # initialize common settings and services
 access -f ~/.Xresources && xrdb ~/.Xresources
 access -f ~/.xsettingsd && {pkill xsettingsd; setsid xsettingsd &}
@@ -20,14 +23,15 @@ pgrep -c twmnd >/dev/null || exec twmnd &
 pgrep -c xvisbell >/dev/null || exec xvisbell &
 if {systemd-detect-virt -q} {screensaver off}
 
+# --------------------
 # begin wm config
 fn hc {|*| herbstclient $*}
 hc emit_hook reload
 
-# remove all existing keybindings
+# --------------------
+# keybindings
 hc keyunbind --all
 
-# keybindings
 Mod = Mod4   # Use the super key as the main modifier
 
 hc keybind $Mod^-Shift-q spawn quitwm  # ~/.local/bin/quitwm
@@ -68,6 +72,13 @@ hc keybind $Mod^-Shift-j     shift down
 hc keybind $Mod^-Shift-k     shift up
 hc keybind $Mod^-Shift-l     shift right
 
+# focus
+hc keybind $Mod^-Tab         cycle_all +1
+hc keybind $Mod^-Shift-Tab   cycle_all -1
+hc keybind $Mod^-c           cycle +1
+hc keybind $Mod^-Shift-c     cycle -1
+hc keybind $Mod^-i jumpto urgent
+
 # split frame
 hc keybind $Mod^-u       split   bottom  0.5
 hc keybind $Mod^-o       split   right   0.5
@@ -86,26 +97,16 @@ hc keybind $Mod^-Control-Down    resize down +$resizestep
 hc keybind $Mod^-Control-Up      resize up +$resizestep
 hc keybind $Mod^-Control-Right   resize right +$resizestep
 
-# define tags
-tag_names = 1 2 3 4 5 6 7 8 9 0
-tag_keys  = 1 2 3 4 5 6 7 8 9 0
-
-hc rename default $tag_names(1) >[2]/dev/null || true
-let (i = 0) {
-    for tn $tag_names; tk $tag_keys {
-        hc add $tn
-        hc keybind $Mod^-^$tk use_index $i
-        hc keybind $Mod^-Shift-^$tk move_index $i
-        i = `($i+1)
-    }
-}
-
-# cycle through tags
+# cycle tags
 hc keybind $Mod^-period use_index +1 --skip-visible
 hc keybind $Mod^-comma  use_index -1 --skip-visible
 
 # toggle between two most recent tags
 hc keybind $Mod^-grave  use_previous
+
+# tag lock
+hc keybind $Mod^-t           chain + lock_tag + emit_hook redraw
+hc keybind $Mod^-Shift-t     chain + unlock_tag + emit_hook redraw
 
 # layout
 hc keybind $Mod^-r remove
@@ -114,28 +115,11 @@ hc keybind $Mod^-s floating toggle
 hc keybind $Mod^-f fullscreen toggle
 hc keybind $Mod^-p pseudotile toggle
 
-# mouse
-hc mouseunbind --all
-hc mousebind $Mod^-Button1 move
-hc mousebind $Mod^-Button2 zoom
-hc mousebind $Mod^-Button3 resize
-
-# focus
-hc keybind $Mod^-Tab         cycle_all +1
-hc keybind $Mod^-Shift-Tab   cycle_all -1
-hc keybind $Mod^-c           cycle +1
-hc keybind $Mod^-Shift-c     cycle -1
-hc keybind $Mod^-i jumpto urgent
-
 # monitors
 hc keybind $Mod^-m                 shift_to_monitor +1
 hc keybind $Mod^-Shift-m           shift_to_monitor -1
 hc keybind $Mod^-BackSpace         cycle_monitor +1
 hc keybind $Mod^-Shift-BackSpace   cycle_monitor -1
-
-# tag lock
-hc keybind $Mod^-t           chain + lock_tag + emit_hook redraw
-hc keybind $Mod^-Shift-t     chain + unlock_tag + emit_hook redraw
 
 # bury pointer
 hc keybind $Mod^-b spawn xdotool mousemove 5000 5000
@@ -155,20 +139,35 @@ hc keybind XF86AudioMicMute spawn pactl set-source-mute @DEFAULT_SOURCE@ toggle
 hc keybind XF86Sleep spawn lock
 hc keybind Shift-XF86Sleep spawn lock -t
 
+# wallpaper
+hc keybind $Mod^-w spawn next-wallpaper
+
+# --------------------
+# mouse
+hc mouseunbind --all
+hc mousebind $Mod^-Button1 move
+hc mousebind $Mod^-Button2 zoom
+hc mousebind $Mod^-Button3 resize
+
+# --------------------
+# tags
+tag_names = 1 2 3 4 5 6 7 8 9 0
+tag_keys  = 1 2 3 4 5 6 7 8 9 0
+
+hc rename default $tag_names(1) >[2]/dev/null || true
+let (i = 0) {
+    for tn $tag_names; tk $tag_keys {
+        hc add $tn
+        hc keybind $Mod^-^$tk use_index $i
+        hc keybind $Mod^-Shift-^$tk move_index $i
+        i = `($i+1)
+    }
+}
+
+# --------------------
 # theme
 hc attr theme.tiling.reset 1
 hc attr theme.floating.reset 1
-hc set frame_border_active_color '#404040'
-hc set frame_border_normal_color '#101010'
-hc set frame_bg_normal_color '#402070'
-hc set frame_bg_active_color '#407020'
-hc set frame_border_width 1
-hc set always_show_frame 1
-hc set frame_bg_transparent 1
-hc set frame_transparent_width 5
-hc set frame_gap 4
-hc set gapless_grid 0
-
 hc attr theme.active.color '#3366dd'
 hc attr theme.normal.color '#666666'
 hc attr theme.urgent.color orange
@@ -182,16 +181,27 @@ hc attr theme.active.inner_color '#3E4A00'
 hc attr theme.active.outer_color '#3E4A00'
 hc attr theme.background_color '#141414'
 
+# --------------------
+# behaviors
+hc set frame_border_active_color '#404040'
+hc set frame_border_normal_color '#101010'
+hc set frame_bg_normal_color '#402070'
+hc set frame_bg_active_color '#407020'
+hc set frame_border_width 1
+hc set always_show_frame 1
+hc set frame_bg_transparent 1
+hc set frame_transparent_width 5
+hc set frame_gap 4
+hc set gapless_grid 0
 hc set window_gap 0
 hc set frame_padding 0
 hc set smart_window_surroundings 0
 hc set smart_frame_surroundings 1
 hc set mouse_recenter_gap 0
 hc set tree_style '╾│ ├└╼─┐'
-
-# behaviors
 hc set swap_monitors_to_get_tag 0
 
+# --------------------
 # rules
 hc unrule -F
 hc rule focus=on # normally focus new clients
@@ -199,13 +209,18 @@ hc rule windowtype~'_NET_WM_WINDOW_TYPE_(DIALOG|UTILITY|SPLASH)' pseudotile=on
 hc rule windowtype='_NET_WM_WINDOW_TYPE_DIALOG' focus=on
 hc rule windowtype~'_NET_WM_WINDOW_TYPE_(NOTIFICATION|DOCK|DESKTOP)' manage=off
 
-# do multi monitor configuration
+# --------------------
+# multi monitor configuration
 hc detect_monitors
 
+# --------------------
 # unlock, just to be sure
 hc unlock
 
+# --------------------
+# other intializations
+access -f $HERE/inits && $HERE/inits
+
+# --------------------
 # start the panel(s)
-ARG0 = $0
-HERE = `{cd `{dirname $ARG0}; pwd}
 $HERE/load_panels
