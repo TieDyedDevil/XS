@@ -4,39 +4,42 @@ xs \- extensible shell
 .SH SYNOPSIS
 .RI "xs [-silevxnpodV] [[-c " command " | " file ] " arguments" ]
 .SH DESCRIPTION
-.I Xs
+.B Xs
 is a command interpreter for Linux.
-.I Xs
+.B Xs
 allows programming in a functional style and has a simple, consistent syntax.
-.I Xs
+.B Xs
 also provides a set of hooks which allow for customization of the semantics
 of many operations. Furthermore, an
-.I xs
+.B xs
 program is able to generate
-.I xs
+.B xs
 code; this facilitates the creation of new language constructs.
 .PP
-.I Xs
+.B Xs
 is a descendant of
-.IR rc "(1) and " es (1);
+.BR rc "(1) and " es (1);
 the three implementations are similar in scope and style, but are not
 interoperable.
 .SH OPTIONS
 TBCL
 .SH LANGUAGE
 Lexically, an
-.I xs
+.B xs
 program consists of words and punctuation.
 .SS Words
 In its simplest form, a word is a
 sequence of non-special characters. The special characters are:
 .PP
 .RS
-.B "# $ & ' ( ) ; < > \e ^ ` { | } space tab newline"
+.B "# $ & ' ( ) ; < > \e ^ ` { | }"
+.I "space tab newline"
 .RE
 .PP
 Any of the special characters may be escaped by preceeding it with a
-backslash (\e); this causes the character following the backslash to be
+backslash
+.RB ( \e );
+this causes the character following the backslash to be
 treated as a non-special character.
 .PP
 Certain sequences beginning with backslash denote control characters:
@@ -104,7 +107,7 @@ for
 in {0..9, a..f, A-F}
 .RE
 .PP
-.I Xs
+.B Xs
 does not allow a NUL character to be spelled by an escape sequence; thus the
 following are all invalid:
 .PP
@@ -115,8 +118,9 @@ following are all invalid:
 A backslash must not be followed by a sequence of characters other than those
 described above.
 .PP
-A sequence of characters enclosed by apostrophes (') is a word. An apostrophe
-is written by doubling it, e.g.:
+A sequence of characters enclosed by apostrophes
+.RB ( ' )
+is a word. An apostrophe is written by doubling it, e.g.:
 .PP
 .RS
 .B 'Sam''s word'
@@ -128,16 +132,19 @@ apostrophes.
 The empty word is denoted by
 .BR '' .
 .SS Comments
-The hash mark (#) introduces a comment which ends at newline.
+The hash mark
+.RB ( # )
+introduces a comment which ends at newline.
 .SS Line continuation
 Program text may be split across physical lines by ending each logical line
-with a backslash (\). The backslash and the immediately following newline
-are read as a space.
+with a backslash
+.RB ( \e ).
+The backslash and the immediately following newline are read as a space.
 .SS Lists
 A list is a space-separated sequence of words. The empty list is denoted by
 .BR () .
 All lists are flat in
-.IR xs ;
+.BR xs ;
 parentheses may be written for grouping, but they do not create a tree. Thus
 .PP
 .RS
@@ -155,7 +162,8 @@ are identical.
 A list enclosed in parentheses may span multiple line without need of
 line continuation characters.
 .SS Concatenation
-Lists may be joined using the concatenation operator, caret (^).
+Lists may be joined using the concatenation operator, caret
+.BR ( ^ ).
 .PP
 A list of length one is a word. Concatenating two words creates a new word.
 .PP
@@ -203,7 +211,7 @@ group multiple operators used to construct a name.
 Specific list elements may be selected via subscripting. This takes the form
 .PP
 .RS
-.BR $ var ( subscripts )
+.BI $ var ( subscripts )
 .RE
 .PP
 List elements are indexed starting at 1. A subscript less than 1 is an error.
@@ -224,10 +232,10 @@ Either end of the range may be left unspecified.
 .PP
 .RS
 .TP
-.BR $ var (... 7)
+.BI $ var "(... 7)"
 yields elements 1 through 7 of the list
 .TP
-.BR $ var (3 ...)
+.BI $ var "(3 ...)"
 yields elements 3 through the end of the list
 .RE
 .PP
@@ -235,7 +243,8 @@ Reversing the endpoints of a range returns the values in reversed order:
 .PP
 .RS
 .B a = s d r a w k c a b
-.PP
+.RE
+.RS
 .B $a(5 ... 2)
 .RE
 .PP
@@ -259,7 +268,7 @@ multiple assignment.
 The length of a list assigned to a variable is given by
 .PP
 .RS
-.BR $# var
+.BI $# var
 .RE
 .PP
 .SS Flattening
@@ -274,11 +283,11 @@ Concatenation may be written implicitly (rather than using the
 operator) in certain situations. If a word is followed by another word,
 .BR $ " or " `
 without intervening whitespace, then
-.I xs
+.B xs
 inserts a caret between them.
 .SS Pathname expansion
 Where a word may be treated as a pathname,
-.I xs
+.B xs
 expands wildcards.
 .PP
 .RS
@@ -292,36 +301,41 @@ matches exactly one character
 .BI [ class ]
 matches any of the characters specified by the class, following the same
 rules as those for
-.IR ed (1),
+.BR ed (1),
 except that class negation is denoted by
 .B ~
 since
 .B ^
 has another interpretation in
-.IR xs .
+.BR xs .
 .RE
 .PP
 The pathname separator,
-.BR /,
+.BR / ,
 is never matched by
 .BR * .
 The
 .B ?
 wildcard never matches a dot at the beginning of a pathname component.
 .PP
-A tilde (~) alone or followed by a slash (/) is replaced by the value of
+A tilde
+.RB ( ~ )
+alone or followed by a slash
+.RB ( / )
+is replaced by the value of
 .BR $home .
 A tilde followed by a username is replaced with the home directory path
 of that user. (See
-.IR getpwent (3).)
+.BR getpwent (3).)
 .PP
 A quoted wildcard loses its meaning as a wildcard.
 .SS Pattern matching
-The pattern matching operator (~) returns true when a subject matches
-any of the given patterns:
+The pattern matching operator
+.RB ( ~ )
+returns true when a subject matches any of the given patterns:
 .PP
 .RS
-.BR ~ " subject pattern ..."
+.BI ~ " subject pattern ..."
 .RE
 .PP
 A subject may be a list. If composed of individual words or expressions,
@@ -339,22 +353,23 @@ matches exactly one character
 .BI [ class ]
 matches any of the characters specified by the class, following the same
 rules as those for
-.IR ed (1),
+.BR ed (1),
 except that class negation is denoted by
 .B ~
 since
 .B ^
 has another interpretation in
-.IR xs .
+.BR xs .
 .RE
 .PP
 Pattern wildcards are never expanded with pathnames from the filesystem.
 .SS Pattern extraction
-The pattern extraction operator (~~) returns the parts of each subject that
-match a wildcard in the patterns:
+The pattern extraction operator
+.RB ( ~~ )
+returns the parts of each subject that match a wildcard in the patterns:
 .PP
 .RS
-.BR ~ " subject pattern ..."
+.BI ~~ " subject pattern ..."
 .RE
 .PP
 Subjects and patterns are the same as for the pattern matching operator.
@@ -363,11 +378,11 @@ An infix arithmetic expression may be evaluated to produced a single word
 representing its value:
 .PP
 .RS
-.BR `( expression )
+.BI `( expression )
 .RE
 .PP
 The expression consists of numeric values and the operators
-.BR + ", " - ", " * ", " / " and " % (modulus),
+.BR + ", " - ", " * ", " / " and " % " (modulus),"
 which obey the usual precedence rules.
 .PP
 A value is either a numeric constant or a variable having a numeric value.
@@ -391,7 +406,7 @@ arithmetic expression.
 A program fragment is a sequence of zero or more words enclosed in braces:
 .PP
 .RS
-.BR { words* }
+.BI { words* }
 .RE
 .PP
 The first word is always treated as a function name or the name of an
@@ -411,25 +426,25 @@ Standard output of one command may be piped to the standard input of
 another:
 .PP
 .RS
-.RB command1 | command2
+.IB command1 | command2
 .RE
 .PP
 Other file descriptors may be connected:
 .PP
 .RS
-.RB command1 |[ fd1 = fd2 ] command2
+.IB command1 |[ fd1 = fd2 ] command2
 .RE
 .PP
 The form
 .PP
 .RS
-.RB command1 |[ fd1 ] command2
+.IB command1 |[ fd1 ] command2
 .RE
 .PP
 is identical to
 .PP
 .RS
-.RB command2 |[ fd1 =0] command2
+.IB command2 |[ fd1 =0] command2
 .RE
 .PP
 .SS Command substitution
@@ -437,7 +452,7 @@ The backquote form creates a list from the standard output of a program
 fragment:
 .PP
 .RS
-.BR ` fragment
+.BI ` fragment
 .RE
 .PP
 Words are parsed from the standard output using the separators defined by
@@ -448,20 +463,20 @@ This variant backquote form binds
 to the given list of separators:
 .PP
 .RS
-.BR `` " separators fragment"
+.BI `` " separators fragment"
 .RE
 .SS Functions
-.I Xs
+.B Xs
 has two forms by which a function is defined:
 .PP
 .RS
-.BR fn " name fragment"
+.BI fn " name fragment"
 .RE
 .PP
 and
 .PP
 .RS
-.BR fn- name " = " fragment
+.BI fn- name " = " fragment
 .RE
 .PP
 The former is normally used for top-level and nested definitions; the latter
@@ -473,7 +488,7 @@ are mandatory.
 A lambda list binds names to function arguments. Its form is:
 .PP
 .RS
-.BR | "name ..." |
+.BI | "name ..." |
 .RE
 .PP
 A lambda list may only appear as the first element of a program fragment.
@@ -494,22 +509,22 @@ or executable evaluated before leaving the fragment.
 A specific result may be returned by:
 .PP
 .RS
-.BR result list
+.BI result list
 .RE
 .SS Logical operators
 The following operators apply to truth values:
 .PP
 .RS
 .TP
-.RB value1 && value2
+.IB value1 && value2
 True if both
 .BR value1 " and " value2
 are true.
 .TP
-.RB value1 || value2
+.IB value1 || value2
 True if value1 is true or if value1 is false and value2 is true.
 .TP
-.BR ! value
+.BI ! value
 True if value is false.
 .RE
 .PP
@@ -522,22 +537,22 @@ Numbers and strings may be compared using the relational operators:
 .PP
 .RS
 .TP
-.B value1 " :lt " value2
+.IB value1 " :lt " value2
 True if value1 is less than value2.
 .TP
-.B value1 " :le " value2
+.IB value1 " :le " value2
 True if value1 is less than or equal to value2.
 .TP
-.B value1 " :gt " value2
+.IB value1 " :gt " value2
 True if value1 is greater than value2.
 .TP
-.B value1 " :ge " value2
+.IB value1 " :ge " value2
 True if value1 is greater than or equal to value2.
 .TP
-.B value1 " :eq " value2
+.IB value1 " :eq " value2
 True if value1 is equal to value2.
 .TP
-.B value1 " :ne " value2
+.IB value1 " :ne " value2
 True if value1 is not equal to value2.
 .RE
 .PP
@@ -547,13 +562,13 @@ the current locale's collation order.
 Input may be redirected from a file to standard input:
 .PP
 .RS
-.BR < "filename command"
+.BI < "filename command"
 .RE
 .PP
 or
 .PP
 .RS
-.RB command " <" filename
+.IB command " <" filename
 .RE
 .PP
 It is an error if the file does not exist or is not readable.
@@ -561,13 +576,13 @@ It is an error if the file does not exist or is not readable.
 Output may be redirected from standard output to a file:
 .PP
 .RS
-.RB command " >" filename
+.IB command " >" filename
 .RE
 .PP
 or
 .PP
 .RS
-.BR > "filename command"
+.BI > "filename command"
 .RE
 .PP
 The file is created if it does not exist. If the file already exists, its
@@ -576,18 +591,18 @@ contents are replaced. It is an error for the the file to not be writeable.
 Other file descriptors may be specified:
 .PP
 .RS
-.RB "command " >[ ofd ] filename
+.IB "command " >[ ofd ] filename
 .RE
 .PP
 and
 .PP
 .RS
-.RB "command " <[ ifd ] filename
+.IB "command " <[ ifd ] filename
 .RE
 A file descriptor may be duplicated using the form:
 .PP
 .RS
-.BR >[ fd1 = fd2 ]
+.BI >[ fd1 = fd2 ]
 .RE
 .PP
 This causes output to
@@ -597,7 +612,7 @@ to be written instead to
 Thus,
 .PP
 .RS
-.RB command > file >[2=1] filename
+.IB command > file >[2=1] filename
 .RE
 .PP
 causes both standard output and standard error to be written to the same file.
@@ -606,22 +621,22 @@ Other redirection operators have their own semantics:
 .PP
 .RS
 .TP
-.BR >> filename
+.BI >> filename
 appends to an existing file; the file is created if nonexistent.
 .TP
-.BR <> filename
+.BI <> filename
 opens a file for reading and writing (on standard input unless otherwise
 specified).
 .TP
-.BR <>> filename
+.BI <>> filename
 opens a file for reading and appending (on standard input unless otherwise
 specified).
 .TP
-.BR >< filename
+.BI >< filename
 truncates a file and opens it for reading and writing (on standard output
 unless otherwise specified).
 .TP
-.BR >>< filename
+.BI >>< filename
 opens a files for reading and appending (on standard output unless otherwise
 specified).
 .RE
@@ -629,7 +644,7 @@ specified).
 An open file descriptor is closed using this form:
 .PP
 .RS
-.BR >[ fd =]
+.BI >[ fd =]
 .RE
 .PP
 File descriptors must be integer constants.
@@ -637,13 +652,13 @@ File descriptors must be integer constants.
 Input may be read from a script with a "here document":
 .PP
 .RS
-.RB command << eof-marker
+.IB command << eof-marker
 .RE
 .PP
 or
 .PP
 .RS
-.RB command <<' eof-marker '
+.IB command <<' eof-marker '
 .RE
 .PP
 The
@@ -657,7 +672,7 @@ and constructed names are not allowed.) A
 can be emitted literally by writing
 .BR $$ .
 To emit the value of a variable followed immediately by a literal word, write:
-.BR $ var ^ word.
+.BI $ var ^ word.
 .PP
 The second form (with the quoted
 .IR eof-marker )
@@ -669,33 +684,33 @@ file descriptor or for data written to a file descriptor to be read by a
 command, using the forms:
 .PP
 .RS
-.BR <{ command }
+.BI <{ command }
 .RE
 .PP
 and
 .PP
 .RS
-.BR >{ command }
+.BI >{ command }
 .RE
 .PP
 The files created by process substitution may be implemented using pipes,
 which are not seekable.
 .PP
 Note that the braces are an essential part of this syntax; these are not
-.BR > fragment
+.BI > fragment
 and
-.BR < fragment.
+.BI < fragment.
 .SS Local variables
 Local variables exist only during execution of their binding form:
 .PP
 .RS
-.BR "local (" "binding ..." ) " fragment"
+.BI "local (" "binding ..." ) " fragment"
 .RE
 .PP
 where
 .B binding
 is either
-.RB name " = " value
+.IB name " = " value
 or just name (and value is taken as
 .BR () ).
 .PP
@@ -706,13 +721,13 @@ variables are accessible within the environment.
 Lexical variables are bound by the form:
 .PP
 .RS
-.BR "let (" "binding ..." ) " fragment"
+.BI "let (" "binding ..." ) " fragment"
 .RE
 .PP
 where
 .B binding
 is either
-.RB name " = " value
+.IB name " = " value
 or just name (and value is taken as
 .BR () ).
 .PP
@@ -722,11 +737,11 @@ of a function which is defined within the
 .B let
 form. A lexical binding is never written to the environment.
 .SS Conditionals
-.I Xs
+.B Xs
 has two main conditional forms:
 .PP
 .RS
-.BR if " condition fragment " else " fragment"
+.BI if " condition fragment " else " fragment"
 .RE
 .PP
 where condition is a boolean expression and the
@@ -734,7 +749,7 @@ where condition is a boolean expression and the
 branch is optional, and
 .PP
 .RS
-.BR switch " var cases"
+.BI switch " var cases"
 .RE
 .PP
 where
@@ -750,17 +765,17 @@ to be executed when none of the
 match
 .IR var .
 .SS Loops
-.I Xs
+.B Xs
 has three main looping forms:
 .PP
 .RS
-.BR while " condition fragment"
+.BI while " condition fragment"
 .RE
 .RS
-.BR until " condition fragment"
+.BI until " condition fragment"
 .RE
 .RS
-.BR for " vars-and-values " fragment
+.BI for " vars-and-values " fragment
 .RE
 .PP
 The
@@ -795,12 +810,12 @@ implicitly padded with
 to match the length of the longest list.
 .SS Settors
 A settor function is a variable of the form
-.BR set- var
+.BI set- var
 .PP
 When
 .I var
 is assigned,
-.BR set- var
+.BI set- var
 is called as a function, passing the value to be assigned.
 .B $0
 is bound to the name of the variable being assigned. The result of
@@ -809,7 +824,7 @@ the settor function is used as the assignment's value.
 A settor is never invoked on a lexical variable.
 .SS Exceptions
 Exceptions in
-.I xs
+.B xs
 are used for non-lexical control constructs. An exception is passed up the
 call chain to the most recently established catcher. The catcher may handle
 the exception, retry the code which caused the exception or pass the
@@ -821,20 +836,19 @@ An exception is a list. The first word denotes the exception type, one of
 .TP
 .B eof
 raised by the
-.I xs
+.B xs
 parser at end of input.
 .TP
 .B error
 where the following words are the source (typically a descriptive name
 such as the name of the function which signalled the error) and a message.
-
-.I xs
+.B xs
 provides a last-resort catcher to print the message and restart the top loop.
 .TP
 .B exit
 where the next word is an optional numeric return code (default: 0). This
 exception, when caught by
-.IR xs ,
+.BR xs ,
 exits the shell with the given return code.
 .TP
 .B retry
@@ -851,7 +865,7 @@ The
 form executes its body in the context of a catcher:
 .PP
 .RS
-.BR catch " catcher body"
+.BI catch " catcher body"
 .RE
 .PP
 The
@@ -878,8 +892,8 @@ TBCL
 
 TODO:
 define command as executable or function;
-consistently use italic for metasyntactic vars;
-close up lists
+close up lists;
+define fragment as word
 
 MAYBE:
 syntactic sugar
