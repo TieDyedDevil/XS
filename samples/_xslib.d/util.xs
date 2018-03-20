@@ -200,6 +200,18 @@ fn %with-tempfile {|name body|
 	}
 }
 
+fn %with-suffixed-tempfile {|name suffix body|
+	# Bind a temporary file to name while evaluating body.
+	# The file is named using the given suffix.
+	local ($name = `{mktemp --suffix=$suffix}) {
+		unwind-protect {
+			$body
+		} {
+			rm -f $($name)
+		}
+	}
+}
+
 fn %aset {|name index value|
 	# Emulate indexed assignment.
 	\xff^$name[$index] = $value
