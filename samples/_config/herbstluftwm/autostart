@@ -21,7 +21,6 @@ pgrep -c xautolock >/dev/null || \
 		-notify 60 -detectsleep &
 pgrep -c twmnd >/dev/null || exec twmnd &
 pgrep -c xvisbell >/dev/null || exec xvisbell &
-if {systemd-detect-virt -q} {screensaver off}
 
 # --------------------
 # begin wm config
@@ -214,12 +213,17 @@ hc rule windowtype~'_NET_WM_WINDOW_TYPE_(NOTIFICATION|DOCK|DESKTOP)' manage=off
 hc detect_monitors
 
 # --------------------
-# unlock, just to be sure
-hc unlock
+# environment-specific adjustments
+if {systemd-detect-virt -q} {screensaver off}
+if {xrandr|grep '^[^ ]\+ connected'|cut -d' ' -f1|grep -q '\w$'} {updres}
 
 # --------------------
 # other intializations
 access -f $HERE/inits && $HERE/inits
+
+# --------------------
+# unlock, just to be sure
+hc unlock
 
 # --------------------
 # start the panel(s)
