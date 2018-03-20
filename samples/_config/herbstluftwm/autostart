@@ -215,14 +215,14 @@ hc detect_monitors
 # --------------------
 # environment-specific adjustments
 if {systemd-detect-virt -q} {screensaver off}
-if {xrandr|grep '^[^ ]\+ connected'|cut -d' ' -f1|grep -q '\w$'} {updres}
+#if {xrandr|grep '^[^ ]\+ connected'|cut -d' ' -f1|grep -q '\w$'} {updres}
 
 # --------------------
 # other intializations
 access -f $HERE/inits && $HERE/inits
 
 # --------------------
-# unlock, just to be sure
+# wm config finished
 hc unlock
 
 # --------------------
