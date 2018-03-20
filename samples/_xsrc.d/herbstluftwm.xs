@@ -116,7 +116,7 @@ fn mons {|rects|
 		herbstclient set_monitors $rects
 		barre
 	} else {
-		let (xrinfo; rect; size; w; h; diag; f; xres; dpi; _) {
+		let (xrinfo; rect; size; w; h; diag; f; xres; dpi; pm; _) {
 			for m `{xrandr|grep '^[^ ]\+ connected .* [0-9]\+mm' \
 					|cut -d' ' -f1} {
 				xrinfo = `{xrandr|grep -o \^^$m^' .*[0-9]\+mm'}
@@ -142,7 +142,8 @@ fn mons {|rects|
 				} else {
 					dpi = <={%trunc `(25.4*$xres/$w)}
 				}
-				echo $m $rect $size $diag^" $dpi^ppi
+				pm = `{xrandr|grep \^$m|grep -o primary}
+				echo $m $rect $size $diag^" $dpi^ppi $pm
 			}
 			echo -- '--'
 			herbstclient list_monitors|sed 's/ with [^[]\+//' \
