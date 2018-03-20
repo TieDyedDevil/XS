@@ -131,10 +131,39 @@ apostrophes.
 .PP
 The empty word is denoted by
 .BR '' .
-.SS Statement separator
-A statement must occupy one logical line. Statements are separated by
+.PP
+Words are immutable.
+.SS Commands
+A command is a sequence of words separated by whitespace. The first word
+is always the name of an executable program on
+.BR $path ,
+an
+.B xs
+function, or a lambda (defined below).
+.SS Command separator
+A command must occupy one logical line. Commands are separated by
 newlines or semicolons
 .RB ( ; ).
+.SS Program fragments
+A program fragment (henceforth fragment) is a sequence of zero or more
+commands enclosed in braces:
+.PP
+.RS
+.BI { command* }
+.RE
+.PP
+A fragment may span multiple physical lines.
+.PP
+The value of a fragment is the result code returned by the last
+command executed. An empty fragment
+.RB ( {} )
+has a result of zero. A fragment containing a pipeline returns a list of
+results: one for each function or executable in the pipeline.
+.PP
+A fragment appearing as a parameter of a function or executable is
+treated as a single word. Fragments are immutable.
+.PP
+The braces may be elided if the command is a single word having no arguments.
 .SS Comments
 The hash mark
 .RB ( # )
@@ -175,7 +204,24 @@ When either list has length greater than one, the result of concatenation is
 the cross product of the lists.
 .PP
 When either list is empty, the result of concatenation is the empty list.
-.SS Variables
+.SS Variable names
+Letters, digits and the characters percent
+.RB ( % ),
+star
+.RB ( * ),
+hyphen
+.RB ( - )
+and underscore
+.RB ( _ )
+may be used in variable names. These character may appear in any order or
+combination.
+.PP
+The
+.B xs
+special characters (see Words, above) may also appear in a variable name if
+quoted or escaped. Likewise, character escapes (octal, hex and Unicode) may
+be part of a variable name.
+.SS Assignment
 A variable is assigned a list value using the notation
 .PP
 .RS
@@ -407,49 +453,30 @@ is treated as zero within an arithmetic expression.
 .PP
 Variables having subscripted or constructed names may not be used in an
 arithmetic expression.
-.SS Program fragments
-A program fragment is a sequence of zero or more words enclosed in braces:
-.PP
-.RS
-.BI { words* }
-.RE
-.PP
-The first word is always treated as a function name or the name of an
-executable on $PATH; the remaining words are evaluated and passed as
-arguments.
-.PP
-The value of a program fragment is the result code returned by the function
-or executable. An empty fragment
-.RB ( {} )
-has a result of zero. A fragment containing a pipeline returns a list of
-results: one for each function or executable in the pipeline.
-.PP
-The braces may be elided if the program or executable is a single word
-having no arguments.
 .SS Pipes
-The standard output of one command may be piped to the standard input of
+The standard output of one fragment may be piped to the standard input of
 another:
 .PP
 .RS
-.IB command1 | command2
+.IB fragment1 | fragment2
 .RE
 .PP
 Other file descriptors may be connected:
 .PP
 .RS
-.IB command1 |[ fd1 = fd2 ] command2
+.IB fragment1 |[ fd1 = fd2 ] fragment2
 .RE
 .PP
 The form
 .PP
 .RS
-.IB command1 |[ fd1 ] command2
+.IB fragment1 |[ fd1 ] fragment2
 .RE
 .PP
 is identical to
 .PP
 .RS
-.IB command2 |[ fd1 =0] command2
+.IB fragment2 |[ fd1 =0] fragment2
 .RE
 .PP
 .SS Command substitution
@@ -489,6 +516,11 @@ must be used when binding a function for local use. Because the latter is an
 assignment, the spaces around
 .B =
 are mandatory.
+.SS Lambdas
+A lambda is an unnamed function. In
+.BR xs ,
+a lambda is written as a program frament in which the first element may be
+a lambda list (see below).
 .SS Lambda list
 A lambda list binds names to function arguments. Its form is:
 .PP
@@ -496,7 +528,7 @@ A lambda list binds names to function arguments. Its form is:
 .BI | "name ..." |
 .RE
 .PP
-A lambda list may only appear as the first element of a program fragment.
+A lambda list may only appear as the first element of a fragment.
 .SS Truth values
 The values
 .BR 0 ", " '' " and " ()
@@ -567,13 +599,13 @@ the current locale's collation order.
 Input may be redirected from a file to standard input:
 .PP
 .RS
-.BI < "filename command"
+.BI < "filename fragment"
 .RE
 .PP
 or
 .PP
 .RS
-.IB command " <" filename
+.IB fragment " <" filename
 .RE
 .PP
 It is an error if the file does not exist or is not readable.
@@ -581,13 +613,13 @@ It is an error if the file does not exist or is not readable.
 Output may be redirected from standard output to a file:
 .PP
 .RS
-.IB command " >" filename
+.IB fragment " >" filename
 .RE
 .PP
 or
 .PP
 .RS
-.BI > "filename command"
+.BI > "filename fragment"
 .RE
 .PP
 The file is created if it does not exist. If the file already exists, its
@@ -596,13 +628,13 @@ contents are replaced. It is an error for the the file to not be writeable.
 Other file descriptors may be specified:
 .PP
 .RS
-.IB "command " >[ ofd ] filename
+.IB "fragment " >[ ofd ] filename
 .RE
 .PP
 and
 .PP
 .RS
-.IB "command " <[ ifd ] filename
+.IB "fragment " <[ ifd ] filename
 .RE
 A file descriptor may be duplicated using the form:
 .PP
@@ -617,7 +649,7 @@ to be written instead to
 Thus,
 .PP
 .RS
-.IB command > file >[2=1] filename
+.IB fragment > file >[2=1] filename
 .RE
 .PP
 causes both standard output and standard error to be written to the same file.
@@ -657,13 +689,13 @@ File descriptors must be integer constants.
 Input may be read from a script with a "here document":
 .PP
 .RS
-.IB command << eof-marker
+.IB fragment << eof-marker
 .RE
 .PP
 or
 .PP
 .RS
-.IB command <<' eof-marker '
+.IB fragment <<' eof-marker '
 .RE
 .PP
 The
@@ -689,17 +721,21 @@ file descriptor or for data written to a file descriptor to be read by a
 command, using the forms:
 .PP
 .RS
-.BI <{ command }
+.BI <{ command+ }
 .RE
 .PP
 and
 .PP
 .RS
-.BI >{ command }
+.BI >{ command+ }
 .RE
 .PP
 The files created by process substitution may be implemented using pipes,
 which are not seekable.
+.PP
+Multiple
+.IR command s
+may appear within the braces.
 .PP
 Note that the braces are an essential part of this syntax; these are not
 .BI > fragment
@@ -875,7 +911,7 @@ form executes its body in the context of a catcher:
 .PP
 The
 .IR catcher " and " body
-are program fragments.
+are fragments.
 .SH VARIABLES
 TBCL
 .SH BUILTINS
@@ -885,6 +921,8 @@ TBCL
 .SH UTILITIES
 TBCL
 .SH PRIMITIVES
+TBCL
+.SH CANONICAL FORM
 TBCL
 .SH EDITING
 TBCL
@@ -898,12 +936,3 @@ TBCL
 TBCL
 .SH SEE ALSO
 TBCL
-
-TODO:
-variable names;
-define command as executable or function;
-close up lists;
-define fragment as statement sequence and as word
-
-MAYBE:
-syntactic sugar
