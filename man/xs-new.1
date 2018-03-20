@@ -42,7 +42,7 @@ backslash
 this causes the character following the backslash to be
 treated as a non-special character.
 .PP
-Certain sequences beginning with backslash denote control characters:
+Certain escapes denote control characters:
 .PP
 .RS
 .TP
@@ -108,14 +108,14 @@ in {0..9, a..f, A-F}
 .RE
 .PP
 .B Xs
-does not allow a NUL character to be spelled by an escape sequence; thus the
+does not allow scripts to contain a NUL character; thus the
 following are all invalid:
 .PP
 .RS
 .BR \e000 ", " \ex00 ", " \eu0000 " and " \eU00000000 .
 .RE
 .PP
-A backslash must not be followed by a sequence of characters other than those
+A backslash must not be followed by a sequence of characters other than as
 described above.
 .PP
 A sequence of characters enclosed by apostrophes
@@ -131,6 +131,10 @@ apostrophes.
 .PP
 The empty word is denoted by
 .BR '' .
+.SS Statement separator
+A statement must occupy one logical line. Statements are separated by
+newlines or semicolons
+.RB ( ; ).
 .SS Comments
 The hash mark
 .RB ( # )
@@ -200,13 +204,13 @@ All variables are exported to the environment unless declared within a
 A variable's value is retrieved by writing
 .B $
 before its name, like
-.B $
-.IR $ "var ."
+.BI $ var
+.RI .
 .PP
-An undefined variable yields the empty list when read.
+An undefined variable yields the empty list when referenced.
 .PP
-A variable name may be constructed at runtime. Parentheses must be used to
-group multiple operators used to construct a name.
+A variable name may be constructed at runtime. Parentheses must enclose
+multiple operators used to construct a name.
 .SS Subscripted reference
 Specific list elements may be selected via subscripting. This takes the form
 .PP
@@ -381,15 +385,16 @@ representing its value:
 .BI `( expression )
 .RE
 .PP
-The expression consists of numeric values and the operators
-.BR + ", " - ", " * ", " / " and " % " (modulus),"
-which obey the usual precedence rules.
+The expression consists of numeric values and the infix operators
+.BR + ", " - ", " * ", " / " and " % " (modulus);"
+these obey the usual precedence rules.
 .PP
 A value is either a numeric constant or a variable having a numeric value.
 Numbers may be integer or floating-point; the latter are stored with limited
 precision (usually six significant digits).
 .PP
-If any value is floating-point, the result will be floating-point.
+If an expression involves any floating-point value, the result will be
+floating-point.
 .PP
 Division of integers produces an integer result via truncation. Modulus
 behaves as
@@ -422,7 +427,7 @@ results: one for each function or executable in the pipeline.
 The braces may be elided if the program or executable is a single word
 having no arguments.
 .SS Pipes
-Standard output of one command may be piped to the standard input of
+The standard output of one command may be piped to the standard input of
 another:
 .PP
 .RS
@@ -895,10 +900,10 @@ TBCL
 TBCL
 
 TODO:
+variable names;
 define command as executable or function;
 close up lists;
-define fragment as word;
-semicolon/newline as command separator
+define fragment as statement sequence and as word
 
 MAYBE:
 syntactic sugar
