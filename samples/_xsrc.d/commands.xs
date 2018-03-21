@@ -640,8 +640,8 @@ fn vman {|*|
 	if {~ $#* 0} {
 		.usage vman
 	} else {
-		%with-suffixed-tempfile f .pdf {
-			{man -Tpdf $* >$f} && {/usr/bin/zathura $f >/dev/null}
+		%with-suffixed-tempfile f .ps {
+			{man -Tps $* >$f} && {/usr/bin/zathura $f >/dev/null}
 		}
 	}
 }
