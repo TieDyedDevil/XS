@@ -19,8 +19,7 @@ code; this facilitates the creation of new language constructs.
 .B Xs
 is a descendant of
 .BR rc "(1) and " es (1);
-the three implementations are similar in scope and style, but are not
-interoperable.
+the three implementations are not interoperable.
 .SH OPTIONS
 .RS
 .TP
@@ -47,8 +46,7 @@ to be a login shell, as if it had been invoked as
 .TP
 .B -e
 Exit if any command (apart from those appearing as tests in conditional forms
-or as arguments to logical operators) returns a non-zero status.
-.I Is this correct? What about () and ''?
+or as arguments to logical operators) returns a false status.
 .TP
 .B -v
 Echo input to standard error.
@@ -82,13 +80,11 @@ sequence of non-special characters. The special characters are:
 .I "space tab newline"
 .RE
 .PP
-Any of the special characters may be escaped by preceeding it with a
-backslash
+A special character may escaped by preceeding it with a backslash
 .RB ( \e );
-this causes the character following the backslash to be
-treated as a non-special character.
+this removes the character's special meaning.
 .PP
-Certain escapes denote control characters:
+Other escapes denote control characters:
 .PP
 .RS
 .TP
@@ -260,8 +256,8 @@ the cross product of the lists.
 .PP
 When either list is empty, the result of concatenation is the empty list.
 .SS Variable names
-Letters, digits all UTF-8 characters encoded as at least two octets and
-the characters percent
+Letters, digits all UTF-8 characters encoded as at least two octets (i.e.:
+code points greater than \u007f) and the characters percent
 .RB ( % ),
 star
 .RB ( * ),
@@ -274,7 +270,7 @@ combination.
 .PP
 The
 .B xs
-special characters (see Words, above) may also appear in a variable name if
+special characters (see Words) may also appear in a variable name if
 quoted or escaped. Likewise, character escapes (octal, hex and Unicode) may
 be part of a variable name.
 .PP
@@ -1007,6 +1003,8 @@ These dynamic variables form a part of the programming interface to
 .B *
 The arguments passed to
 .BR xs .
+Individual arguments may be referenced via subscripts or as
+.BR $1 ", " $2 ", " $3 ", etc."
 .TP
 .B 0
 At the top level, this variable
@@ -1049,7 +1047,6 @@ will not export to the environment.
 A list of directories to be searched for executable programs. The current
 directory is denoted by the empty word
 .RB ( '' ).
-.PP
 .BR $path " and " $PATH
 are aliased to each other, with appropriate syntactic adjustments.
 .TP
@@ -1106,7 +1103,7 @@ started.
 maintains
 .B $SHLVL
 for interoperability with other shells.
-.SH BUILTIN FUNCTIONS
+.SH BUILTIN COMMANDS
 TBCL
 .SH HOOKS
 TBCL
