@@ -1105,7 +1105,69 @@ maintains
 .B $SHLVL
 for interoperability with other shells.
 .SH BUILTIN COMMANDS
-TBCL
+These commands are built into
+.BR xs ,
+and execute within the
+.B xs
+process.
+.TP
+.B .
+.RI " [-einvx] " file " [" args... ]
+Sources
+.IR file .
+The options are a subset of those recognized by
+.BR xs;
+see Options.
+.TP
+.B access
+.RI " [-n " name "] [-1e] [-rwx] [fdcblsp] " path...
+Tests
+.IR path s
+for accessibility. Without the
+.BR -1 " or " -e
+options,
+.B access
+returns true for paths which are accessible as specified. A printable
+error message (which evaluates as false; see Truth Values) is returned
+for paths which are not accessible. The default test (no options) is
+identical to
+.BR -f .
+These options determine the test to apply to the paths:
+.RS
+.TP
+.B -r
+Is the file readable?
+.TP
+.B -w
+Is the file writeable?
+.TP
+.B -x
+Is the file executable?
+.TP
+.B -f
+Is the file a plain file?
+.TP
+.B -d
+Is the file a directory?
+.TP
+.B -c
+Is the file a character device?
+.TP
+.B -b
+Is the file a block device?
+.TP
+.B -l
+Is the file a symbolic link?
+.TP
+.B -s
+Is the file a socket?
+.TP
+.B -p
+Is the file a named pipe?
+.PP
+more here...
+.RE
+.I finish
 .SH HOOKS
 TBCL
 .SH UTILITIES
