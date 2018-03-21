@@ -780,22 +780,23 @@ can be emitted literally by writing
 To emit the value of a variable followed immediately by a literal word, write:
 .BI $ var ^ word.
 .PP
-A single line of text may provide the content of a readable file via
-a "here string":
+The second form (with the quoted
+.IR eof-marker )
+copies the textual data without substitution of any kind.
+.PP
+Text may also provide the content of a readable file via a "here string":
 .PP
 .RS
 .BI <<<' text '
 .RE
 .PP
 The
-.B '
-are part of the syntax; this is not
-.BI <<< quoted-word
-.RI " ."
+.I text
+may span lines. No substitution is performed within a here string.
 .PP
-The second form (with the quoted
-.IR eof-marker )
-copies the textual data without substitution of any kind.
+A here string may also be created using a variable for the content, like
+.BI <<<$ var
+.RI .
 .SS Process substitution
 .PP
 Process substitution allows for the output of a command to be read from a
@@ -1114,14 +1115,75 @@ TBCL
 .SH CANONICAL FORM
 TBCL
 .SH EDITING
-TBCL
+Input editing is provided by
+.BR readline (3)
+and configured by
+.BR ~/.inputrc .
 .SH FILES
-TBCL
+These files are read and interpreted when
+.B xs
+starts:
+.RS
+.TP
+.B ~/xsrc
+is read when
+.B xs
+is a login shell.
+.TP
+.B ~/xsin
+is read when
+.B xs
+is an interactive shell.
+.RE
+.PP
+When both
+.BR ~/.xsrc " and " ~/.xsin
+are read,
+.B ~/.xsrc
+is read first.
+.PP
+Additional documentation and sample codes is installed in
+.IB prefix /share/doc/xs
+.RI .
+.I Prefix
+is typically
+.BR /usr " or " /usr/local .
 .SH BUGS
-TBCL
+The interpreter does not implement tail recursion.
+.PP
+Returning a function from a function (i.e. an "upward funarg") does not work.
+.PP
+Dead code needs to be pruned, particularly w.r.t. support for non-Linux
+platforms.
+.PP
+Please report issues at <https://github.com/TieDyedDevil/XS>.
 .SH SOURCE
-TBCL
+The
+.BR git (1)
+source repository is at <https://github.com/TieDyedDevil/XS>.
+.SH PACKAGES
+.B Xs
+is packaged for Fedora. The
+.B xs
+1.1 release first appeared in Fedora 27.
 .SH AUTHORS
-TBCL
+.B Xs
+1.1 and later is maintained by David B. Lamkins <david@lamkins.net>.
+.PP
+.B Xs
+1.0 (self-reporting as 0.1) was maintained by Frederic Koehler
+<fkfire@gmail.com>. This is where the translation to C++ occurred.
+.PP
+.B Es
+to 0.9-beta was maintained by Soren Dayton <csdayton@cs.uchicago.edu>.
+.B Es
+up through 0.84 was maintained by Paul Haar <haahr@adobe.com> and
+Byron Rakitzis <byron@netapp.com>.
+.PP
+The
+.B rc
+shell for Plan 9 was written at Bell Labs by Tom Duff. The Unix port was
+written by Byron Rakitizis and maintained by Toby Goodwin.
+See <http://tobold.org/article/rc>.
 .SH SEE ALSO
 TBCL
