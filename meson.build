@@ -60,6 +60,7 @@ project('xs', ['cpp'])
 		'doc/XS-FOR-LISPERS'],
 	install_dir: 'share/doc/xs')
   install_data(['samples/_config/herbstluftwm/autostart',
+		'samples/_config/herbstluftwm/inits',
 		'samples/_config/herbstluftwm/panel.xs',
 		'samples/_config/herbstluftwm/quitwm'],
 	install_dir: 'share/doc/xs/samples/_config/herbstluftwm')
