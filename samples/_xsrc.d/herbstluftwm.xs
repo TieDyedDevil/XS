@@ -195,7 +195,6 @@ fn updres {
 	.c 'wm'
 	.r 'bari barre boc dual em hc mons osd quad wmb'
 	%only-X
-	{result `{herbstclient get monitors_locked}} && herbstclient reload
 	let (xrinfo = `{xrandr|grep '^[^ ]\+ connected primary'}; \
 		size; w; xres; dpi) {
 		if {~ $xrinfo ()} {throw error updres 'no primary display'}

@@ -1,10 +1,15 @@
 #! /usr/bin/env xs
 
-# If there's only one active display, try to set wallpaper.
+# If there's only one active display, try to adapt to its resolution
+# and set wallpaper.
 let (am = `` '' {xrandr|grep '^[^ ]\+ connected .* [0-9]\+mm'}; ws; wd) {
 	if {~ $#am 1} {
+		updres
 		ws = `{grep -o '[0-9]\+x[0-9]\+' <<<$am}
 		wd = ~/Pictures/wallpaper-$ws
 		access -d $wd && wallpaper 10 $wd
 	}
 }
+
+# No screensaver when running in a virt.
+if {systemd-detect-virt -q} {screensaver off}
