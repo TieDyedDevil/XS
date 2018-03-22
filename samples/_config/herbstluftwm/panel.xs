@@ -475,11 +475,11 @@ pidfile = /tmp/panel.server
 private $pidfile
 checkpid = `{cat $pidfile >[2]/dev/null}
 dispfile = /tmp/panel.displays
-private $dispfile
 rm -f $dispfile
+private $dispfile
 clntfile = /tmp/panel.clients
-private $clntfile
 rm -f $clntfile
+private $clntfile
 
 # ========================================================================
 #                              C L I E N T
