@@ -195,32 +195,12 @@ fn updres {
 	.c 'wm'
 	.r 'bari barre boc dual em hc mons osd quad wmb'
 	%only-X
-	let (xrinfo = `{xrandr|grep '^[^ ]\+ connected primary'}; \
-		size; w; xres; dpi) {
-		if {~ $xrinfo ()} {throw error updres 'no primary display'}
-		size = <={%argify `{echo $xrinfo|grep -o '[^ ]\+ x [^ ]\+mm' \
-			|tr -d ' '}}
-		(w _) = <= {~~ $size *mmx*mm}
-		if {~ $w 0} {throw error updres 'can''t get resolution'}
-		xres = `{echo $xrinfo|grep -o \
-					'^[^ ]\+ connected primary [0-9]\+x'}
-		xres = <={~~ $xres *x}
-		dpi = <={%trunc `(25.4*$xres/$w)}
-		%with-tempfile tf {
-			printf 'Xft.dpi: %d'\n $dpi >$tf
-			xrdb -merge $tf
-		}
-		%with-tempfile tf {
-			printf 'Xft/DPI %d'\n `($dpi*1024) >$tf
-			xsettingsd -c $tf >[2]/dev/null &
-		}
-		barre
-		printf '%s @ %dppi'\n `{echo $xrinfo|cut -d' ' -f1} $dpi
-		cat <<'END'
+	.adapt-resolution
+	barre
+	cat <<'END'
 Resolution has been adjusted to match the primary display. Programs
 already running may need to be restarted to use the new resolution.
 END
-	}
 }
 fn wmb {
 	.d 'List WM bindings'

@@ -335,7 +335,6 @@ fn-hcitool = <={access -1en hcitool $path}
 fn-herbstclient = <={access -1en herbstclient $path}
 fn-iconv = <={access -1en iconv $path}
 fn-iostat = <={access -1en iostat $path}
-fn-lockfile = <={access -1en lockfile $path}
 fn-mpc = <={access -1en mpc $path}
 fn-nmcli = <={access -1en nmcli $path}
 fn-osd_cat = <={access -1en osd_cat $path}
@@ -390,7 +389,7 @@ fn vs {|name type parms|
 		}
 		if {{$($name) :lt $parms(3)} || {$($name) :gt $parms(4)}} {
 			logger 0 '%s (outside recommended range %d..%d)' \
-				<={%argify `{var $name}} $range(3 4)
+				<={%argify `{var $name}} $parms(3 4)
 		}
 	}
 	pct {
@@ -456,7 +455,7 @@ fifofile = /tmp/panel.fifos
 private $fifofile
 
 # Define the common part of the fifo file names
-tmpfile_base = `{mktemp -u /tmp/panel-XXXXXXXX}
+tmpfile_base = /tmp/panel
 
 # Prepare the client for this monitor
 switch $panel_site (
@@ -468,31 +467,32 @@ switch $panel_site (
 font = $panel_font^-^$font_height_pt
 dzen2_opts = -w $panel_width -x $x -y $panel_y -h $panel_height_px \
 	-e button3= -ta l -fn $font
+rm -f $tmpfile_base^-display-^*
 display = $tmpfile_base^-display-^$monitor
-mkfifo $display
-private $display
+
+# Prepare client/server housekeeping
+pidfile = /tmp/panel.server
+private $pidfile
+checkpid = `{cat $pidfile >[2]/dev/null}
+dispfile = /tmp/panel.displays
+private $dispfile
+rm -f $dispfile
+clntfile = /tmp/panel.clients
+private $clntfile
+rm -f $clntfile
 
 # ========================================================================
 #                              C L I E N T
 
-# There can be only one server...
-pidfile = /tmp/panel.server
-private $pidfile
-dispfile = /tmp/panel.displays
-private $dispfile
-clntfile = /tmp/panel.clients
-private $clntfile
-lockfile = /tmp/panel.lock
-lockfile -1 $lockfile
-checkpid = `{cat $pidfile >[2]/dev/null}
-if {{access -f $pidfile} && {kill -0 $checkpid >[2]/dev/null}} {
-	# Start a client for a non-server's display
+# Start client on additional monitor
+if {!~ $monitor 0} {
+	mkfifo $display
+	private $display
 	tail -f /dev/null >$display &
 	client = $apid
 	echo $display >>$dispfile
 	echo $client >>$clntfile
-	rm -f $lockfile
-	logger 2 'client on monitor %d: %d; %d' $monitor $client $pid
+	logger 1 'client on other monitor %d: %d; %d' $monitor $client $pid
 	exec dzen2 <$display $dzen2_opts
 	# CLIENT ENDS HERE
 }
@@ -500,18 +500,22 @@ if {{access -f $pidfile} && {kill -0 $checkpid >[2]/dev/null}} {
 # ========================================================================
 #                              S E R V E R
 
+# There can be only one server; always on the first monitor
+~ $monitor 0 || exit
+
 # Identify the server
-logger 2 'server on monitor %d: %d' $monitor $pid
+logger 1 'server on monitor %d: %d' $monitor $pid
 echo $pid >$pidfile
 
 # Start a client for the server's display
+mkfifo $display
+private $display
 tail -f /dev/null >$display &
 client = $apid
-echo $display >$dispfile
-echo $client >$clntfile
-rm -f $lockfile
+echo $display >>$dispfile
+echo $client >>$clntfile
 dzen2 <$display $dzen2_opts &
-logger 2 'client on monitor %d: %d; %d' $monitor $client $apid
+logger 1 'client on server monitor %d: %d; %d' $monitor $client $apid
 
 # Define indicator placeholders
 if $show_alert_placeholders {_a = '.'} else {_a = ''}
@@ -715,12 +719,12 @@ fn fan () {
 		speed = 0; for s $speeds {speed = `($speed+$s)}
 		if {{<=get_curtemp :gt $FAN_THRESHOLD} && {~ $speed 0}} {
 			cycles = `($cycles+1)
-			{$cycles :gt 1} && {
+			if {$cycles :gt 1} {
 				logger 2 'Fan fault'
 				alert_if_fullscreen 'Fan is stopped at %dC' \
 					$FAN_THRESHOLD
 				result true
-			}
+			} else {result false}
 		} else {
 			cycles = 0
 			result false

@@ -43,3 +43,28 @@ fn .web-query {|site path query|
 		}
 	}
 }
+
+fn .adapt-resolution {
+	# Adapt X and GTK resolution to that of primary display.
+	let (xrinfo = `{xrandr|grep '^[^ ]\+ connected primary'}; \
+		size; w; xres; dpi) {
+		if {~ $xrinfo ()} {throw error updres 'no primary display'}
+		size = <={%argify `{echo $xrinfo|grep -o '[^ ]\+ x [^ ]\+mm' \
+			|tr -d ' '}}
+		(w _) = <= {~~ $size *mmx*mm}
+		if {~ $w 0} {throw error updres 'can''t get resolution'}
+		xres = `{echo $xrinfo|grep -o \
+					'^[^ ]\+ connected primary [0-9]\+x'}
+		xres = <={~~ $xres *x}
+		dpi = <={%trunc `(25.4*$xres/$w)}
+		%with-tempfile tf {
+			printf 'Xft.dpi: %d'\n $dpi >$tf
+			xrdb -merge $tf
+		}
+		%with-tempfile tf {
+			printf 'Xft/DPI %d'\n `($dpi*1024) >$tf
+			xsettingsd -c $tf >[2]/dev/null &
+		}
+		printf '%s @ %dppi'\n `{echo $xrinfo|cut -d' ' -f1} $dpi
+	}
+}
