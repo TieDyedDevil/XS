@@ -1162,8 +1162,91 @@ Is the file a socket?
 .TP
 .B -p
 Is the file a named pipe?
-.PP
-more here...
+.TP
+.BI alias " name expansion..."
+Define a function with
+.I expansion
+as its body. The first word of
+.I expansion
+is replaced with its
+.B whats
+value to prevent the recursion that would occur if
+.I name
+and the first word of
+.I expansion
+are the same.
+.TP
+.BI catch " catcher body"
+Run
+.IR body .
+If an exception is raised, run
+.IR catcher .
+The exception is passed as an argument to
+.IR catcher .
+.TP
+.BR cd " [" \fIdirectory ]
+Set the working directory to
+.IR directory .
+With no argument, this is the same as
+.BR "cd $home" .
+.TP
+.BR dirs " [" -c ]
+Show the directory stack (see BUILTIN COMMANDS pushd and popd). With
+.BR -c ,
+clear the directory stack.
+.TP
+.BR echo " [" -n "] [" -- ] /fIargs...
+Print
+.I args
+to standard output, separated by spaces. The output ends with a newline unless
+suppressed by
+.BR -n .
+Arguments following
+.B --
+are taken literally.
+.TP
+.BI escape " lambda"
+Run
+.IR lambda ,
+a function of one argument. The argument names a function which,
+when evaluated within
+.IR lambda ,
+transfers control to just after the
+.B escape
+form. Arguments of the escape function are returned as the value of the form.
+.TP
+.BI eval " list"
+Convert
+.I list
+to a word and pass it to the
+.B xs
+interpreter for parsing and execution.
+.TP
+.BI exec " cmd"
+Replace
+.B xs
+with
+.IR cmd .
+If
+.I cmd
+has only redirections, then apply the redirections to the current
+.BR xs .
+.TP
+.BR exit " [" \fIstatus ]
+Cause
+.B xs
+to exit with the given
+.IR status ,
+or with zero if
+.I status
+is not given.
+.TP
+.B false
+Identical to
+.BR "result 1" .
+.TP
+.BI for " binding... " fragment
+See Loops.
 .RE
 .I finish
 .SH HOOKS
