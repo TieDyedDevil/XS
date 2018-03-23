@@ -1685,11 +1685,219 @@ are coalesced.
 Return the definition of each
 .IR var .
 .SH PRIMITIVE FUNCTIONS
-TBCL
+Primitives provide the underlying behaviors for many hooks as well as other
+parts of
+.BR xs 's
+operation, and may not be redefined. By convention, primitive names begin
+with
+.B &
+and are referenced as
+.BR $& "\fIname\fR ."
+.PP
+.TS
+l l l l l .
+&access	&dup	&isinteractive	&read	&time
+&apids	&echo	&islogin	&readfrom	&umask
+&background	&exec	&len	&resetterminal	&var
+&backquote	&exitonfalse	&limit	&result	&vars
+&batchloop	&flatten	&newfd	&run	&version
+&catch	&forever	&newpgrp	&seq	&wait
+&cd	&fork	&openfile	&sethistory	&whats
+&close	&fsplit	&parse	&setmaxevaldepth	&wid
+&cmp	&here	&pipe	&setnoexport	&writeto
+&collect	&home	&primitives	&setsignals
+&count	&if	&printf	&split
+&dot	&internals	&random	&throw
+.TE
 .SH TOPLOOPS
 TBCL - see Hook Functions in original manual. %eval-..., %noeval-..., %...-loop, %parse and %prompt.
+A toploop repeatedly reads a command, executes it and prints the result.
+.B Xs
+includes several toploops, one of which is selected depending upon
+.B xs
+options.
+.PP
+.TP
+.B %batch-loop
+This is the toploop for a non-interactive shell and for the dot
+.RB ( . )
+and
+.B eval
+commands when their input is non-interactive.
+.B %batch-loop
+returns upon catching an
+.B eof
+exception.
+.TP
+.B %interactive-loop
+This is the toploop for an interactive shell and for the dot
+.RB ( . )
+and
+.B eval
+commands when their input is interactive.
+.B %interactive-loop
+returns upon catching an
+.B eof
+exception.
+
+This is the toploop for an interactive shell and for the dot
+.RB ( . )
+and
+.B eval
+commands when their input is interactive.
+.B %interactive-loop
+returns upon catching an
+.B eof
+exception.
+.PP
+.B Xs
+binds one of the following functions to
+.B fn-%dispatch
+for use by the toploop. The choice of function is determined by whether
+the shell is interactive and by the
+.BR -n " and " -x
+options.
+.PP
+.RS
+.BI %eval-noprint " command"
+.RE
+.RS
+.BI %eval-print " command"
+.RE
+.RS
+.BI %noeval-noprint " command"
+.RE
+.RS
+.BI %noeval-print " command"
+.RE
+.PP
+These functions handle command input for the shell.
+.TP
+.BI %parse " prompt1 prompt2"
+Read input, printing
+.I prompt1
+initially and
+.I prompt2
+for continuation lines. Return a fragment suitable for execution. Raise an
+.B eof
+exception at end of input.
+.P
+.B %prompt
+This is a hook, called immediately before
+.BR %parse .
+A common use is to update the value of
+.BR $prompt .
 .SH CANONICAL FORM
-TBCL
+.B Xs
+rewrites surface syntax in terms of hook functions.
+.SS Control Flow
+.RS
+.TP
+.BI ! " command"
+%not {\fIcommand\fR}
+.TP
+.IB "command " &
+%background {\fIcommand\fR}
+.TP
+.IB "command1 " ; " command2"
+%seq {\fIcommand1\fR} {\fIcommand2\fR}
+.TP
+.IB "command1 " && " command2"
+%and {\fIcommand1\fR} {\fIcommand2\fR}
+.TP
+.IB "command1 " || " command2"
+%or {\fIcommand1\fR} {\fIcommand2\fR}
+.TP
+.BR fn " \fIname\fR {|\fIarg...\fR| \fIcommand\fR}
+fn-^\fIname\fR = {|\fIarg...\fR| command}
+.RE
+.SS Input/Output
+.RS
+.TP
+.IB command < file
+%open 0 \fIfile\fR {\fIcommand\fR}
+.TP
+.IB command > file
+%create 1 \fIfile\fR {\fIcommand\fR}
+.TP
+.IB command >[\fIn\fR] file
+%create \fIn\fR \fIfile\fR {\fIcommand\fR}
+.TP
+.IB command >> file
+%append 1 \fIfile\fR {\fIcommand\fR}
+.TP
+.IB command <> file
+%open-write 0 \fIfile\fR {\fIcommand\fR}
+.TP
+.IB command <>> file
+%open-append 0 \fIfile\fR {\fIcommand\fR}
+.TP
+.IB command >< file
+%open-create 1 \fIfile\fR {\fIcommand\fR}
+.TP
+.IB command >>< file
+%open-append 1 \fIfile\fR {\fIcommand\fR}
+.TP
+.IB command >[\fIn\fR=]
+%close \fIn\fR {\fIcommand\fR}
+.TP
+.IB command >[\fIm\fR=\fIn\fR]
+%dup \fIm\fR \fIn\fR {\fIcommand\fR}
+.TP
+.IB command << " tag input tag"
+%here 0 \fIinput\fR {\fIcommand\fR}
+.TP
+.IB command <<< word
+%here 0 \fIword\fR {\fIcommand\fR}
+.TP
+.IB command1 | command2
+%pipe {\fIcommand1\fR} 1 0 {\fIcommand2\fR}
+.TP
+.IB command1 |[\fIm\fR=\fIn\fR] command2
+%pipe {\fIcommand1\fR} \fIm\fR \fIn\fR {\fIcommand2\fR}
+.TP
+.IB command1 >{ command2 }
+%writeto \fIvar\fR {\fIcommand2\fR} {\fIcommand1\fR $\fIvar\fR}
+.TP
+.IB command1 <{ command2 }
+%readfrom \fIvar\fR {\fIcommand2\fR} {\fIcommand1\fR $\fIvar\fR}
+.RE
+.SS Expressions
+.RS
+.TP
+.BI $# var
+<={%count %\fIvar\fR}
+.TP
+.BI $^ var
+<={%flatten ' ' $\fIvar\fR}
+.TP
+.BI `{ "command arg..." }
+<={%backquote <={%flatten '' $ifs} {\fIcommand\fR \fIarg...\fR}}
+.TP
+.BI `` ifs { "command arg..." }
+<={%backquote <={%flatten '' \fIifs\fR} {\fIcommand\fR \fIarg...\fR}}
+.RE
+.SS Relational Operators
+.RS
+.TP
+.IB a :lt b
+{~ {%cmp \fIa\fR \fIb\fR} -1}
+.TP
+.IB a :le b
+{~ {%cmp \fIa\fR \fIb\fR} -1 0}
+.TP
+.IB a :gt b
+{~ {%cmp \fIa\fR \fIb\fR} 1}
+.TP
+.IB a :ge b
+{~ {%cmp \fIa\fR \fIb\fR} 1 0}
+.TP
+.IB a :eq b
+{~ {%cmp \fIa\fR \fIb\fR} 0}
+.TP
+.IB a :ne b
+{~ {%cmp \fIa\fR \fIb\fR} -1 1}
+.RE
 .SH EDITING
 Input editing is provided by
 .BR readline (3)
@@ -1761,5 +1969,3 @@ The
 shell for Plan 9 was written at Bell Labs by Tom Duff. The Unix port was
 written by Byron Rakitizis and maintained by Toby Goodwin.
 See <http://tobold.org/article/rc>.
-.SH SEE ALSO
-TBCL
