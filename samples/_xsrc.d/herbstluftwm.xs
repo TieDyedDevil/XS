@@ -161,8 +161,7 @@ fn osd {|msg|
 	%only-X
 	let (fl = /tmp/panel.fifos) {
 		for f `{access -f $fl && cat $fl} {
-			(_ k) = <={~~ $f *-*-osdmsg}
-			!~ $k () && echo $msg >/tmp/panel-^$k^-osdmsg
+			~ $f *-osdmsg && echo $msg >$f
 		}
 	}
 }
