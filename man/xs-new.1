@@ -1438,12 +1438,256 @@ by pathname, primitive, or fragment.
 .BI while " test body"
 See Loops.
 .RE
-.SH HOOKS
+.SH HOOK FUNCTIONS
+The following functions implement specific parts of
+.B xs
+semantics; a hook function can be rewritten to provide special behaviors.
+Hook functions are normally called as a result of
+.B xs
+translating programs into an internal form. See CANONICAL FORM.
+.TP
+.BI %and " command..."
+Execute
+.IR command (s)
+from left to right, stopping at the command that first yields a false
+value. The false value is returned by
+.BR %and .
+.TP
+.BI %append " fd file command"
+Run
+.I command
+with
+.I fd
+open in append mode on
+.IR file .
+.TP
+.B %background " command"
+Run
+.I command
+as a background process. If
+.B xs
+is an interactive shell, print the background process ID.
+.TP
+.BI %backquote " separator(s) command"
+Run command as a child process, splitting standard output into words at
+any character in
+.IR separator(s) .
+.TP
+.BI close " fd command"
+Run
+.I command
+with the closed file descriptor
+.IR fd .
+.TP
+.BI %cmp " word1 word2"
+Compare
+.IR word1 " to " word2
+and return -1, 0 or 1 if
+.I word1
+is respectively less than, equal to or greater than
+.IR word2 .
+If either argument is non-numeric, then a lexicographic comparison is
+done based upon the locale's collation order.
+.TP
+.BI count " list"
+Return the number of words in
+.IR list .
+.TP
+.B %create " fd file command"
+Run
+.I command
+with
+.I fd
+open for writing on
+.IR file .
+.TP
+.BI %dup "newfd oldfd command"
+Run
+.I command
+with
+.I oldfd
+copied to
+.IR newfd .
+.TP
+.BI %exit-on-false " command"
+Run
+.IR command ;
+exit
+.B xs
+if any part of
+.I command
+(outside of conditional tests and arguments to logical operators)
+returns a false value.
+.TP
+.BI %flatten " separator list"
+Concatenate the words of
+.IR list ,
+interposing
+.IR separator .
+.TP
+.BI %here " fd word... command"
+Run command with
+.IR word s
+passed as an input file on
+.IR fd .
+.TP
+.B %not " command"
+Run command and invert the boolean sense of its result.
+.TP
+.BI %one " list"
+Return
+.I list
+if it contains exactly one word; otherwise raise a "too many files in
+redirection" error.
+.TP
+.BI %open " fd file command"
+Run
+.I command
+with
+.I file
+open for reading on
+.IR fd .
+.TP
+.BI %open-append " fd file command"
+Run
+.I command
+with
+.I file
+open for reading and appending on
+.IR fd .
+.TP
+.BI %open-create " fd file command"
+Run
+.I command
+with
+.I file
+open for reading and writing on
+.IR fd .
+If the file exists, truncate it.
+.TP
+.BI %open-write " fd file command"
+Run
+.I command
+with
+.I file
+open for reading and writing on
+.IR fd .
+.TP
+.B %openfile " mode fd file command"
+Run
+.I command
+with
+.I file
+open on
+.I fd
+with the given
+.IR mode .
+.TP
+.BI %or " command..."
+Execute
+.IR command (s)
+from left to right, stopping at the command that first yields a true
+value. The true value is returned by
+.BR %or .
+.TP
+.BI %pathsearch " program"
+If
+.I program
+exists in a directory on
+.BR $path ,
+return the full path to
+.IR program .
+Otherwise raise an error.
+.TP
+.BR %pipe " \fIcommand1\fR [\fIoutfd infd command2\fR] ..."
+Run
+.IR command s
+with
+.I outfd
+of
+.I command1
+connected via a pipe to
+.I infd
+of
+.IR command2 .
+Additional commands may be added to the pipeline.
+.TP
+.BI %readfrom " var input command"
+Run command with
+.I var
+bound to the name of a file containing the standard output produced by the
+command
+.IR input .
+.TP
+.BI %seq " command..."
+Run
+.IR command s
+in order, from left to right.
+.TP
+.BI %whats " program..."
+Return the pathname, primitive, or fragment of each
+.IR program .
+.TP
+.BI %writeto " var output command"
+Run command with
+.I var
+bound to the name of a file containing the standard input to be consumed
+by the command
+.IR output .
+.SH UTILITY FUNCTIONS
+These functions also define
+.B xs
+behavior, but are less useful for customization:
+.TP
+.B %apids
+Return the process IDs of all background processes for which
+.B xs
+has not yet waited.
+.TP
+.BI %fsplit " separator(s) arg..."
+Split each
+.I arg
+word at any
+.I separator
+character, producing a list. Repeated instances of
+.I separator
+in
+.IR arg s
+create empty words
+.RB ( '' )
+in the result.
+.TP
+.B %is-interactive
+Return true if the innermost toploop is interactive.
+.TP
+.B %newfd
+Return a file descriptor that the shell believes is not otherwise used.
+.TP
+.BI %run " program argv0 args..."
+Run
+.IR program ,
+which must be an absolute pathname, passing
+.I argv0
+as the program's name and
+.IR arg s
+as its arguments.
+.TP
+.B %split " separator arg..."
+Like
+.BR %fsplit ,
+but repeated instances in
+.IR arg s
+of a
+.I separator
+are coalesced.
+.TP
+.BI %var " var..."
+Return the definition of each
+.IR var .
+.SH PRIMITIVE FUNCTIONS
 TBCL
-.SH UTILITIES
-TBCL
-.SH PRIMITIVES
-TBCL
+.SH TOPLOOPS
+TBCL - see Hook Functions in original manual. %eval-..., %noeval-..., %...-loop, %parse and %prompt.
 .SH CANONICAL FORM
 TBCL
 .SH EDITING
