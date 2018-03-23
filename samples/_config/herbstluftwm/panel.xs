@@ -448,14 +448,14 @@ switch $panel_site (
 # We want our temporary files and fifos to be private
 fn private {|name| touch $name; chmod 600 $name}
 
-# These files store the task and fifo info
-taskfile = /tmp/panel.tasks
-private $taskfile
-fifofile = /tmp/panel.fifos
-private $fifofile
-
-# Define the common part of the fifo file names
+# Define the common part of the housekeeping and fifo file names
 tmpfile_base = /tmp/panel
+
+# These files store the task and fifo info
+taskfile = $tmpfile_base^.tasks
+private $taskfile
+fifofile = $tmpfile_base^.fifos
+private $fifofile
 
 # Prepare the client for this monitor
 switch $panel_site (
@@ -471,13 +471,13 @@ rm -f $tmpfile_base^-display-^*
 display = $tmpfile_base^-display-^$monitor
 
 # Prepare client/server housekeeping
-pidfile = /tmp/panel.server
+pidfile = $tmpfile_base^.server
 private $pidfile
 checkpid = `{cat $pidfile >[2]/dev/null}
-dispfile = /tmp/panel.displays
+dispfile = $tmpfile_base^.displays
 rm -f $dispfile
 private $dispfile
-clntfile = /tmp/panel.clients
+clntfile = $tmpfile_base^.clients
 rm -f $clntfile
 private $clntfile
 
@@ -927,7 +927,7 @@ if $enable_inbox {
 		while true {
 			%with-read-lines \
 			<{fetchmail -c --fetchmailrc $HERE/inbox.fetchmailrc \
-				--pidfile /tmp/panel.fetchmail-pid >[2=1]
+				--pidfile $tmpfile_base^.fetchmail-pid >[2=1]
 			} {|line|
 				(tm rm _) = \
 					<={~~ $line *' messages ('*' seen)'*}
