@@ -1305,8 +1305,139 @@ or a number. Numbers representing size allow the suffixes
 .B h
 (hours) as well as durations like
 .IR hh : mm : "ss and mm" : ss.
+.TP
+.BI map " action list"
+Apply
+.I action
+individually to each element of
+.IR list ;
+collect the results as
+.BR map 's
+result.
+.TP
+.BI omap " action list"
+Like map, but collect a list of the outputs of
+.IR action .
+.TP
+.B popd
+Pop the directory stack to set the working directory, and print the new
+stack. The command is ignored if the directory stack is empty.
+.TP
+.BI printf " format args..."
+Print
+.I args
+on standard output according to
+.IR format .
+Valid
+.I format
+conversions are those of
+.BR printf (3p),
+except that (1) There must a one-to-correspondence between format specs
+(excluding
+.BR %% )
+and arguments: positional argument specs, variable width and precision,
+and excess arguments are all disallowed. (2) Backslash escapes are not
+interpreted in
+.IR format .
+.TP
+.BR pushd " [" \fIdir ]
+Push
+.IR dir 's
+absolute path onto the directory stack, set the working directory to
+.I dir
+and show the new stack. If
+.I dir
+is omitted and the stack is at least two deep, then alternate between
+the two top directories.
+.TP
+.B read
+Read from standard input and return a single word containing a line of
+text (without the newline). Return
+.B ()
+upon end-of-file.
+.TP
+.BI result " value..."
+Return
+.IR value 's.
+.TP
+.BR switch " \fIvalue [" "\fIcase \fIaction" "]... [" \fIdefault-action ]
+See Conditionals.
+.TP
+.BI throw " exception arg..."
+See Exceptions.
+.TP
+.BI time " command arg..."
+Execute
+.I command
+with
+.IR arg s.
+Print consumed real, user and system time to standard error.
+.TP
+.B true
+Identical to
+.BR "result 0" .
+.TP
+.BR umask " [\fImask\fR]
+Set or show the umask.
+.TP
+.BI until " test body"
+See Loops.
+.TP
+.BI unwind-protect " body cleanup"
+Execute
+.IR body ;
+when it completes or raises an exception, run
+.IR cleanup .
+.TP
+.BI var " var..."
+Print definition of
+.IR var (s).
+.TP
+.BR vars " [" -vfs "] [" -epi ]
+Print definition of all variables which satisfy the given options:
+.RS
+.TP
+.B -v
+variables (not functions or settors). This is the default if none of
+.BR -v ", " -f " or " -s
+is given.
+.TP
+.B -f
+functions
+.TP
+.B -s
+settors
+.TP
+.B -e
+exported. This is the default if none of
+.BR -e ", " -p " or " -i
+is given.
+.TP
+.B -p
+private (not exported)
+.TP
+.B -i
+internal (predefined and builtin)
+.TP
+.B -a
+all of the above
 .RE
-.I finish
+.TP
+.BR wait " [\fIpid\fR]
+Wait for a child process denoted by its
+.I pid
+to exit. If no
+.I pid
+is given, wait for any child process.
+.TP
+.BI whats " command..."
+Identify
+.IR command (s)
+by pathname, primitive, or fragment.
+.TP
+.BI while " test body"
+See Loops.
+.RE
 .SH HOOKS
 TBCL
 .SH UTILITIES
