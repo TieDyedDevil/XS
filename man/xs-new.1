@@ -934,6 +934,11 @@ This continues until the longest list is exhausted; shorter lists are
 implicitly padded with
 .B ()
 to match the length of the longest list.
+.PP
+The
+.BI forever " fragment"
+form loops forever, like
+.BR "while true \fIfragment" .
 .SS Settors
 A settor function is a variable of the form
 .BI set- var
@@ -1162,6 +1167,7 @@ Is the file a socket?
 .TP
 .B -p
 Is the file a named pipe?
+.RE
 .TP
 .BI alias " name expansion..."
 Define a function with
@@ -1247,6 +1253,58 @@ Identical to
 .TP
 .BI for " binding... " fragment
 See Loops.
+.TP
+.BI forever " fragment"
+See Loops.
+.TP
+.BI fork " command"
+Run
+.I command
+in a subshell.
+.TP
+.BR history " [" \fI# | -c | "-d \fI#" | -n | -y ]
+Without arguments, show command history.
+.I #
+shows the most recent
+.I #
+history entries.
+.B -c
+clears the history.
+.BI -d " #"
+deletes history entry
+.IR # .
+.B -n
+and
+.B -y
+disable and enable history recording.
+.TP
+.BI if " condition fragment \fR[" else " fragment\fR"
+See Conditionals.
+.TP
+.B jobs
+List background jobs.
+.TP
+.BR limit " [" -h "] [" \fIresource " [" \fIvalue ]]
+Display or alter process resource limits.
+.B -h
+for hard limits.
+.I value
+is either
+.B unlimited
+or a number. Numbers representing size allow the suffixes
+.B k
+(kilobyte),
+.B m
+(megabyte), and
+.B g
+(gigabyte). Numbers representing time allow the suffixes
+.B s
+(seconds),
+.B m
+(minutes), and
+.B h
+(hours) in addition to durations of the form
+.IR hh : mm : "ss and mm" : ss.
 .RE
 .I finish
 .SH HOOKS
