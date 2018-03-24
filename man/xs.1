@@ -78,7 +78,7 @@ In its simplest form, a word is a
 sequence of non-special characters. The special characters are:
 .PP
 .RS
-.B "# $ & ' ( ) ; < > \e ^ ` { | }"
+.B "# $ & \(aq ( ) ; < > \e ^ \` { | }"
 .I "space tab newline"
 .RE
 .PP
@@ -152,22 +152,22 @@ A backslash must not be followed by a sequence of characters other than as
 described above.
 .PP
 A sequence of characters enclosed by apostrophes
-.RB ( ' )
+.RB ( \(aq )
 is a word; the bounding
-.B '
+.B \(aq
 are not part of the word. We refer to this form as a
 .IR "quoted word" .
 .PP
 An apostrophe is written within a quoted word by doubling it, e.g.:
 .PP
 .RS
-.B 'Sam''s word'
+.B \(aqSam\(aq\(aqs word\(aq
 .RE
 .PP
 All other special characters lose their meaning within a quoted word.
 .PP
 The empty word is denoted by
-.BR '' .
+.BR \(aq\(aq .
 .PP
 Words are indivisible and immutable.
 .SS Commands
@@ -380,7 +380,7 @@ operator, this applies only to a variable (not literal) list.
 Concatenation may be written implicitly (rather than using the
 .B ^
 operator) in certain situations. If a word is followed by another word,
-.BR $ " or " `
+.BR $ " or " \`
 without intervening whitespace, then
 .B xs
 inserts a caret between them.
@@ -477,7 +477,7 @@ An infix arithmetic expression may be evaluated to produced a single word
 representing its value:
 .PP
 .RS
-.BI `( expression )
+.BI \`( expression )
 .RE
 .PP
 The expression consists of numeric values and the infix operators
@@ -533,7 +533,7 @@ The backquote form creates a list from the standard output of a program
 fragment:
 .PP
 .RS
-.BI ` fragment
+.BI \` fragment
 .RE
 .PP
 Words are parsed from the standard output using the separators defined by
@@ -544,7 +544,7 @@ This variant backquote form binds
 to the given list of separators:
 .PP
 .RS
-.BI `` " separators fragment"
+.BI \`\` " separators fragment"
 .RE
 .SS Functions
 .B Xs
@@ -581,7 +581,7 @@ A lambda list binds names to function arguments. Its form is:
 A lambda list may only appear as the first element of a fragment.
 .SS Truth values
 The values
-.BR 0 ", " '' " and " ()
+.BR 0 ", " \(aq\(aq " and " ()
 are all treated as true; everything else (including 0.0) is false.
 .PP
 The keywords
@@ -753,7 +753,7 @@ Multiple lines of input may be read from a script using a "here document":
 or
 .PP
 .RS
-.IB fragment " <<'" eof-marker '
+.IB fragment " <<\(aq" eof-marker \(aq
 .RE
 .PP
 The
@@ -776,7 +776,7 @@ copies the textual data without substitution of any kind.
 Text may also provide the content of a readable file via a "here string":
 .PP
 .RS
-.BI <<<' text '
+.BI <<<\(aq text \(aq
 .RE
 .PP
 The
@@ -1028,7 +1028,7 @@ are aliased to each other.
 .TP
 .B ifs
 The input field separator, used by backquote
-.RB ( ` )
+.RB ( \` )
 to split command output into words. The initial value is the list
 .RS
 .I "space tab newline"
@@ -1045,7 +1045,7 @@ will not export to the environment.
 .B path
 A list of directories to be searched for executable programs. The current
 directory is denoted by the empty word
-.RB ( '' ).
+.RB ( \(aq\(aq ).
 .BR $path " and " $PATH
 are aliased to each other, with appropriate syntactic adjustments.
 .TP
@@ -1059,7 +1059,7 @@ is printed before reading a command.
 .B $prompt(2)
 is printed before reading a continuation line.
 The default,
-.BR "';' ''" ,
+.BR "\(aq;\(aq \(aq\(aq" ,
 facilitates copy-paste from a terminal session into a script file.
 .B $prompt
 may contain ANSI terminal control characters and sequences.
@@ -1334,7 +1334,7 @@ upon end-of-file.
 .TP
 .BI result " value..."
 Return
-.IR value 's.
+.IR value s.
 .TP
 .BR switch " \fIvalue [" "\fIcase \fIaction" "]... [" \fIdefault-action ]
 See Conditionals.
@@ -1630,7 +1630,7 @@ character, producing a list. Repeated instances of
 in
 .IR arg s
 create empty words
-.RB ( '' )
+.RB ( \(aq\(aq )
 in the result.
 .TP
 .B %is-interactive
@@ -1836,13 +1836,13 @@ fn-^\fIname\fR = {|\fIarg...\fR| command}
 <={%count %\fIvar\fR}
 .TP
 .BI $^ var
-<={%flatten ' ' $\fIvar\fR}
+<={%flatten \(aq \(aq $\fIvar\fR}
 .TP
-.BI `{ "command arg..." }
-<={%backquote <={%flatten '' $ifs} {\fIcommand\fR \fIarg...\fR}}
+.BI \`{ "command arg..." }
+<={%backquote <={%flatten \(aq\(aq $ifs} {\fIcommand\fR \fIarg...\fR}}
 .TP
-.BI `` " ifs " { "command arg..." }
-<={%backquote <={%flatten '' \fIifs\fR} {\fIcommand\fR \fIarg...\fR}}
+.BI \`\` " ifs " { "command arg..." }
+<={%backquote <={%flatten \(aq\(aq \fIifs\fR} {\fIcommand\fR \fIarg...\fR}}
 .RE
 .SS Relational Operators
 .RS
