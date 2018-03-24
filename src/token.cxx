@@ -399,8 +399,19 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 			unsigned n = 0;
 			int i = 0;
 			int dc = c == 'u' ? 4 : 8;
+			int qf = 0;
+			c = GETC();
+			if (c == '\'') {
+				if (dc == 8) goto badescape;
+				dc = 6; /* limit */
+				qf = 1;
+			} else {
+				UNGETC(c);
+			}
 			while (dc) {
 				c = GETC();
+				if (qf && c == '\'')
+					break;
 				if (!isxdigit(c))
 					break;
 				n = (n << 4)
@@ -409,8 +420,13 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
                                      : ((islower(c) ? 'a' : 'A') - 0xA)));
 				--dc;
 			}
-			if (dc != 0 || n == 0)
-				goto badescape;
+			if (qf) {
+				if (dc == 0) c = GETC();
+				if (dc == 6 || c != '\'') goto badescape;
+			} else {
+				if (dc != 0) goto badescape;
+			}
+			if (n == 0) goto badescape;
 			if (n < 0x80) bufput(i++, n);
 			else if (n < 0x800) {
 				bufput(i++, 192+n/64);
