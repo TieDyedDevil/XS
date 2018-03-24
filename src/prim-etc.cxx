@@ -360,12 +360,6 @@ const char *mzwcs(const char *prompt) {
 	}
 	if (mark) *t++ = RL_PROMPT_END_IGNORE;
 	*t = '\0';
-#if 0
-	FILE *fp = fopen("prompt.log", "a");
-	fwrite(outbuf, sizeof(char), strlen(outbuf), fp);
-	fwrite("\n", sizeof(char), 1, fp);
-	fclose(fp);
-#endif
 	return (const char*)gcdup(outbuf);
 }
 #else
