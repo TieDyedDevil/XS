@@ -1814,52 +1814,52 @@ fn-^\fIname\fR = {|\fIarg...\fR| command}
 .SS Input/Output
 .RS
 .TP
-.IB command < file
+.IB command " <" file
 %open 0 \fIfile\fR {\fIcommand\fR}
 .TP
-.IB command > file
+.IB command " >" file
 %create 1 \fIfile\fR {\fIcommand\fR}
 .TP
-.IB command >[\fIn\fR] file
+.IB command " >[\fIn\fR]" file
 %create \fIn\fR \fIfile\fR {\fIcommand\fR}
 .TP
-.IB command >> file
+.IB command " >>" file
 %append 1 \fIfile\fR {\fIcommand\fR}
 .TP
-.IB command <> file
+.IB command " <>" file
 %open-write 0 \fIfile\fR {\fIcommand\fR}
 .TP
-.IB command <>> file
+.IB command " <>>" file
 %open-append 0 \fIfile\fR {\fIcommand\fR}
 .TP
-.IB command >< file
+.IB command " ><" file
 %open-create 1 \fIfile\fR {\fIcommand\fR}
 .TP
-.IB command >>< file
+.IB command " >><" file
 %open-append 1 \fIfile\fR {\fIcommand\fR}
 .TP
-.IB command >[\fIn\fR=]
+.IB command " >[\fIn\fR=]"
 %close \fIn\fR {\fIcommand\fR}
 .TP
-.IB command >[\fIm\fR=\fIn\fR]
+.IB command " >[\fIm\fR=\fIn\fR]"
 %dup \fIm\fR \fIn\fR {\fIcommand\fR}
 .TP
-.IB command << " tag input tag"
+.IB command " <<" "tag input tag"
 %here 0 \fIinput\fR {\fIcommand\fR}
 .TP
-.IB command <<< word
+.IB command " <<<" word
 %here 0 \fIword\fR {\fIcommand\fR}
 .TP
-.IB command1 | command2
+.IB command1 " | " command2
 %pipe {\fIcommand1\fR} 1 0 {\fIcommand2\fR}
 .TP
-.IB command1 |[\fIm\fR=\fIn\fR] command2
+.IB command1 " |[\fIm\fR=\fIn\fR] " command2
 %pipe {\fIcommand1\fR} \fIm\fR \fIn\fR {\fIcommand2\fR}
 .TP
-.IB command1 >{ command2 }
+.IB command1 " >{" command2 }
 %writeto \fIvar\fR {\fIcommand2\fR} {\fIcommand1\fR $\fIvar\fR}
 .TP
-.IB command1 <{ command2 }
+.IB command1 " <{" command2 }
 %readfrom \fIvar\fR {\fIcommand2\fR} {\fIcommand1\fR $\fIvar\fR}
 .RE
 .SS Expressions
@@ -1874,28 +1874,28 @@ fn-^\fIname\fR = {|\fIarg...\fR| command}
 .BI `{ "command arg..." }
 <={%backquote <={%flatten '' $ifs} {\fIcommand\fR \fIarg...\fR}}
 .TP
-.BI `` ifs { "command arg..." }
+.BI `` " ifs " { "command arg..." }
 <={%backquote <={%flatten '' \fIifs\fR} {\fIcommand\fR \fIarg...\fR}}
 .RE
 .SS Relational Operators
 .RS
 .TP
-.IB a :lt b
+.IB a " :lt " b
 {~ {%cmp \fIa\fR \fIb\fR} -1}
 .TP
-.IB a :le b
+.IB a " :le " b
 {~ {%cmp \fIa\fR \fIb\fR} -1 0}
 .TP
-.IB a :gt b
+.IB a " :gt " b
 {~ {%cmp \fIa\fR \fIb\fR} 1}
 .TP
-.IB a :ge b
+.IB a " :ge " b
 {~ {%cmp \fIa\fR \fIb\fR} 1 0}
 .TP
-.IB a :eq b
+.IB a " :eq " b
 {~ {%cmp \fIa\fR \fIb\fR} 0}
 .TP
-.IB a :ne b
+.IB a " :ne " b
 {~ {%cmp \fIa\fR \fIb\fR} -1 1}
 .RE
 .SH EDITING
