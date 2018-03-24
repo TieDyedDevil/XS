@@ -9,12 +9,12 @@ is a command interpreter for Linux.
 .B Xs
 allows programming in a functional style and has a simple, consistent syntax.
 .B Xs
-also provides a set of hooks which allow for customization of the semantics
+also provides a set of hooks to allow customization of the semantics
 of many operations. Furthermore, an
 .B xs
-program is able to generate
+program is able to construct
 .B xs
-code; this facilitates the creation of new language constructs.
+code; this facilitates the creation of new language syntax.
 .PP
 .B Xs
 is a descendant of
@@ -70,7 +70,7 @@ Don't trap SIGQUIT or SIGTERM.
 .SH LANGUAGE
 Lexically, an
 .B xs
-program consists of words and punctuation.
+program consists of words and punctuation. (See FOOTNOTE.)
 .SS Words
 In its simplest form, a word is a
 sequence of non-special characters. The special characters are:
@@ -82,7 +82,7 @@ sequence of non-special characters. The special characters are:
 .PP
 A special character may escaped by preceeding it with a backslash
 .RB ( \e );
-this removes the character's special meaning.
+this defeats the character's special meaning.
 .PP
 Other escapes denote control characters:
 .PP
@@ -139,14 +139,14 @@ UTF-8 character having codepoint
 .IR nnnn ,
 for
 .I n
-in {0..9, a..f, A-F}
+in {0..9, a..f, A..F}
 .TP
 .BI \eU nnnnnnnn
 UTF-8 character having codepoint
-.IR nnnn ,
+.IR nnnnnnnn ,
 for
 .I n
-in {0..9, a..f, A-F}
+in {0..9, a..f, A..F}
 .RE
 .PP
 .B Xs
@@ -243,7 +243,7 @@ and
 .PP
 are identical.
 .PP
-A list enclosed in parentheses may span multiple line without need of
+A list enclosed in parentheses may span multiple lines without need of
 line continuation characters.
 .SS Concatenation
 Lists may be joined using the concatenation operator, caret
@@ -256,7 +256,7 @@ the cross product of the lists.
 .PP
 When either list is empty, the result of concatenation is the empty list.
 .SS Variable names
-Letters, digits all UTF-8 characters encoded as at least two octets (i.e.:
+Letters, digits, all UTF-8 characters encoded as at least two octets (i.e.:
 code points greater than \u007f) and the characters percent
 .RB ( % ),
 star
@@ -265,14 +265,15 @@ hyphen
 .RB ( - )
 and underscore
 .RB ( _ )
-may be used in variable names. These character may appear in any order or
+may be used in variable names. These characters may appear in any order or
 combination.
 .PP
 The
 .B xs
 special characters (see Words) may also appear in a variable name if
-quoted or escaped. Likewise, character escapes (octal, hex and Unicode) may
-be part of a variable name.
+quoted or escaped. Likewise, character escapes (octal, hex, Unicode
+and the single-letter control character escapes) may be part of a
+variable name.
 .PP
 Variable names having the prefix
 .B fn-
@@ -288,9 +289,11 @@ A variable is assigned a list value using the notation
 .PP
 The spaces around
 .B =
-are mandatory.
+are mandatory. Indirection (multiple
+.BR $)
+is allowed.
 .PP
-A variable is undefined by assigning an empty list as its value. While
+A variable becomes undefined by assigning an empty list as its value. While
 .PP
 .RS
 .IB var " = " ()
@@ -305,7 +308,7 @@ is valid, the preferred form is
 The value of an assignment is its assigned value.
 .SS Variables
 All variables are exported to the environment unless declared within a
-.BR local " or " let " form (described below)."
+.BR local ", " let " or " for " form (described below)."
 .PP
 A variable's value is retrieved by writing
 .B $
@@ -316,7 +319,7 @@ before its name, like
 An undefined variable yields the empty list when referenced.
 .PP
 A variable name may be constructed at runtime. Parentheses must enclose
-multiple operators used to construct a name.
+expressions used to construct a name.
 .SS Subscripted reference
 Specific list elements may be selected via subscripting. This takes the form
 .PP
@@ -324,7 +327,7 @@ Specific list elements may be selected via subscripting. This takes the form
 .BI $ var ( subscripts )
 .RE
 .PP
-List elements are indexed starting at 1. A subscript less than 1 is an error.
+List elements are indexed starting at one. A subscript less than 1 is an error.
 A subscript greater than the number of list elements yields the empty list.
 .PP
 .RS
@@ -352,16 +355,11 @@ yields elements 3 through the end of the list
 Reversing the endpoints of a range returns the values in reversed order:
 .PP
 .RS
-.B a = s d r a w k c a b
-.RE
-.RS
-.B $a(5 ... 2)
-.RE
-.PP
+.TP
+.B a = s d r a w k c a b; $a(5 ... 2)
 yeilds the list
-.PP
-.RS
 .B w a r d
+.RE
 .SS Multiple assignment
 A list of variables may be specified on the left side of an assignment.
 Parentheses are mandatory around the list of variables.
@@ -384,7 +382,7 @@ The length of a list assigned to a variable is given by
 .SS Flattening
 A list may be flattened to a single word using the
 .B $^
-operator. This returns a word composed of the words of the given list,
+operator. This yields a word composed of the words of the given list,
 with a single space between each pair of words. As with the subscript
 operator, this applies only to a variable (not literal) list.
 .SS Free carets
@@ -518,25 +516,25 @@ The standard output of one fragment may be piped to the standard input of
 another:
 .PP
 .RS
-.IB fragment1 | fragment2
+.IB fragment1 " | " fragment2
 .RE
 .PP
 Other file descriptors may be connected:
 .PP
 .RS
-.IB fragment1 |[ fd1 = fd2 ] fragment2
+.IB fragment1 " |[ fd1 = fd2 ] " fragment2
 .RE
 .PP
 The form
 .PP
 .RS
-.IB fragment1 |[ fd1 ] fragment2
+.IB fragment1 " |[ fd1 ] " fragment2
 .RE
 .PP
 is identical to
 .PP
 .RS
-.IB fragment2 |[ fd1 =0] fragment2
+.IB fragment2 " |[ fd1 =0] " fragment2
 .RE
 .PP
 .SS Command substitution
@@ -593,7 +591,7 @@ A lambda list may only appear as the first element of a fragment.
 .SS Truth values
 The values
 .BR 0 ", " '' " and " ()
-are all treated as true; everything else is false.
+are all treated as true; everything else (including 0.0) is false.
 .PP
 The keywords
 .BR true " and " false
@@ -614,12 +612,12 @@ The following operators apply to truth values:
 .PP
 .RS
 .TP
-.IB value1 && value2
+.IB value1 " && " value2
 True if both
 .IR value1 " and " value2
 are true.
 .TP
-.IB value1 || value2
+.IB value1 " || " value2
 True if
 .I value1
 is true or if
@@ -628,7 +626,7 @@ is false and
 .I value2
 is true.
 .TP
-.BI ! value
+.BI ! " value"
 True if
 .I value
 is false.
@@ -718,7 +716,7 @@ to be written instead to
 Thus,
 .PP
 .RS
-.IB fragment > file >[2=1] filename
+.IB fragment " >" file " >[2=1]" filename
 .RE
 .PP
 causes both standard output and standard error to be written to the same file.
@@ -758,13 +756,13 @@ File descriptors must be integer constants.
 Multiple lines of input may be read from a script using a "here document":
 .PP
 .RS
-.IB fragment << eof-marker
+.IB fragment " <<" eof-marker
 .RE
 .PP
 or
 .PP
 .RS
-.IB fragment <<' eof-marker '
+.IB fragment " <<'" eof-marker '
 .RE
 .PP
 The
@@ -772,8 +770,8 @@ The
 is a word which must appear immediately following the final newline of textual
 data taken as input. The first form (with the unquoted
 .IR eof-marker )
-replaces variables within the textual data. (Only simple variables; subscripts
-and constructed names are not allowed.) A
+replaces variables within the textual data. (Only simple variables;
+indirection, subscripts and constructed names are not allowed.) A
 .B $
 can be emitted literally by writing
 .BR $$ .
@@ -837,6 +835,8 @@ is either
 .IB name " = " value
 or just name (and value is taken as
 .BR () ).
+Multiple bindings are separated by
+.BR ; .
 .PP
 While bound by
 .BR local ,
@@ -854,6 +854,8 @@ is either
 .IB name " = " value
 or just name (and value is taken as
 .BR () ).
+Multiple bindings are separated by
+.BR ; .
 .PP
 A lexical variable is accessible to all code lexically enclosed by the
 binding form. Furthermore, a lexical variable persists across executions
@@ -941,7 +943,7 @@ form loops forever, like
 .BR "while true \fIfragment" .
 .SS Settors
 A settor function is a variable like
-.BI set- var
+.BI set- var \fR.
 .PP
 When
 .I var
@@ -1710,7 +1712,6 @@ l l l l l .
 &dot	&internals	&random	&throw
 .TE
 .SH TOPLOOPS
-TBCL - see Hook Functions in original manual. %eval-..., %noeval-..., %...-loop, %parse and %prompt.
 A toploop repeatedly reads a command, executes it and prints the result.
 .B Xs
 includes several toploops, one of which is selected depending upon
@@ -1771,7 +1772,7 @@ options.
 .BI %noeval-print " command"
 .RE
 .PP
-These functions handle command input for the shell.
+These functions handle command input for the shell:
 .TP
 .BI %parse " prompt1 prompt2"
 Read input, printing
@@ -1969,3 +1970,5 @@ The
 shell for Plan 9 was written at Bell Labs by Tom Duff. The Unix port was
 written by Byron Rakitizis and maintained by Toby Goodwin.
 See <http://tobold.org/article/rc>.
+.SH FOOTNOTE
+Yes, and of course whitespace. Some things should be left unsaid.
