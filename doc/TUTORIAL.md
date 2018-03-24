@@ -85,13 +85,12 @@ code points in hexadecimal and octal notation:
     * \MNN where M is {0..3} and N is an octal digit
 
 You can also write Unicode characters (most of which are represented
-by multiple bytes) using their 16-bit or 32-bit code points:
+by multiple bytes) using their hexadecimal code points:
 
-    * \uNNNN where N is a hex digit
-    * \UNNNNNNNN where N is a hex digit
+    * \u'N...' where N... is one to six hex digits
 
 `xs` does not permit creation of a NUL character using escapes. The
-characters `\x00`, `\000`, `\u0000` and `\U00000000` are all invalid.
+characters `\x00`, `\000` and `\u'0'` are all invalid.
 
 It's an error in `xs` to use `\` except as noted above. In the shell
 you usually use, applying `\` to escape some other character simply
@@ -339,14 +338,14 @@ fragment. One such use might be to construct a Unicode character from
 a code point computed at run time:
 
 ```
-; echo `{{ |cp| eval echo '\u'$cp} 01dd}
+; echo `{{ |cp| eval echo '\u'''$cp''''} 01dd}
 ǝ
 ```
 
 Looking at the above example from the inside out, we're constructing
-a word like `\uNNNN`. This is how `xs` names a Unicode code point. The
+a word like `\u'N...'`. This is how `xs` names a Unicode code point. The
 value of `$cp` is lambda-bound; that's the `|cp|` notation in the inner
-program fragment. `eval` expects a string, but `\uNNNN` is a word. `echo`
+program fragment. `eval` expects a string, but `\u'N...'` is a word. `echo`
 does what it always does: it prints a string. `eval` parses and evaluates
 the given text, producing the `ǝ` as a word. Now look at the two program
 fragments. The inner fragment, the lambda expression, is in the command

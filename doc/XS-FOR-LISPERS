@@ -14,7 +14,7 @@ familiar to Lisp users. If that's you, here's what you need to know:
   (`\###`) notation.
 
 - A nonzero UTF-8 byte sequence may be spelled as its hex code point using
-  either `\u####` or `\U########`.
+  `\u'#...'`.
 
 - `xs` uses two different kinds of brackets whereas Lisp (conventionally) uses
   only one. Use `{}` to bracket code and `()` to bracket data in `xs`.
