@@ -1814,7 +1814,7 @@ fn-^\fIname\fR = {|\fIarg...\fR| command}
 .IB command " >" file
 %create 1 \fIfile\fR {\fIcommand\fR}
 .TP
-.IB command " >[\fIn\fR]" file
+.IB command " >[\fIn\fB]" file
 %create \fIn\fR \fIfile\fR {\fIcommand\fR}
 .TP
 .IB command " >>" file
@@ -1832,10 +1832,10 @@ fn-^\fIname\fR = {|\fIarg...\fR| command}
 .IB command " >><" file
 %open-append 1 \fIfile\fR {\fIcommand\fR}
 .TP
-.IB command " >[\fIn\fR=]"
+.IB command " >[\fIn\fB=]"
 %close \fIn\fR {\fIcommand\fR}
 .TP
-.IB command " >[\fIm\fR=\fIn\fR]"
+.IB command " >[\fIm\fB=\fIn\fB]"
 %dup \fIm\fR \fIn\fR {\fIcommand\fR}
 .TP
 .IB command " <<" "tag input tag"
@@ -1847,7 +1847,7 @@ fn-^\fIname\fR = {|\fIarg...\fR| command}
 .IB command1 " | " command2
 %pipe {\fIcommand1\fR} 1 0 {\fIcommand2\fR}
 .TP
-.IB command1 " |[\fIm\fR=\fIn\fR] " command2
+.IB command1 " |[\fIm\fB=\fIn\fB] " command2
 %pipe {\fIcommand1\fR} \fIm\fR \fIn\fR {\fIcommand2\fR}
 .TP
 .IB command1 " >{" command2 }
