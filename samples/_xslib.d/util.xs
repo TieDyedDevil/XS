@@ -753,13 +753,8 @@ fn %preserving-title {|cmd|
 }
 
 fn %u {|cp|
-	# Return the UTF-8 character denoted by its codepoint of 4 hex digits.
-	eval result '\u'$cp
-}
-
-fn %U {|cp|
-	# Return the UTF-8 character denoted by its codepoint of 8 hex digits.
-	eval result '\U'$cp
+	# Return the UTF-8 character denoted by its codepoint.
+	eval result '\u'''$cp''''
 }
 
 fn %with-application-keypad {|cmd|

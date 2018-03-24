@@ -624,8 +624,8 @@ fn ulu {|*|
 						^$*^'[^;]*;' $ud} {|l|
 			let ((hex desc) = <={~~ $l *\;*\;}; uni) {
 				!~ $desc \<control\> && {
-					hex = `{printf %8s $hex|tr ' ' 0}
-					uni = <={%U $hex}
+					hex = `{printf %6s $hex|tr ' ' 0}
+					uni = <={%u $hex}
 					printf %s\tU+%s\t%s\n $uni $hex $desc
 				}
 			}
