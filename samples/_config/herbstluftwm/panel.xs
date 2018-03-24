@@ -1105,7 +1105,7 @@ let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; r1; r2; r3) {
 				`{if $enable_clock {drawright $clock}}
 		}
 		for client `{cat $dispfile} {
-			let ((_ _ _ m) = <={~~ $client *-*-*-*}; tags; out) {
+			let ((_ _ m) = <={~~ $client *-*-*}; tags; out) {
 				tags = `` \n {drawtags $m}
 				if {!~ $tags ()} {
 					if {~ `focused_monitor $m} {
