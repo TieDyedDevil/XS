@@ -1911,6 +1911,11 @@ reserves the octets \e001 and \e002 to annotate variables stored in
 the environment. This may present problems for interchange of variables
 with another program that stores these octets in the environment.
 .PP
+It was a bad idea to have both
+.RI \eu xxxx " and \eU" xxxxxxxx
+rather than just
+.RI \eu xxxxxx .
+.PP
 Dead code needs to be pruned, particularly w.r.t. support for non-Linux
 platforms.
 .PP
