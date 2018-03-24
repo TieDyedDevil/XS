@@ -154,7 +154,7 @@
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "1.1"
+#define VERSION "1.2"
 
 /* Signal handlers have void return type instead of int */
 #define VOID_SIGNALS /**/
