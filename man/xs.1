@@ -12,9 +12,12 @@ allows programming in a functional style and has a simple, consistent syntax.
 also provides a set of hooks to allow customization of the semantics
 of many operations. Furthermore, an
 .B xs
-program is able to construct
+program is able to synthesize binding and control regimes;
+this facilitates the creation of new language syntax. It is with these
+facilities that a significant portion of
 .B xs
-code; this facilitates the creation of new language syntax.
+is implemented in
+.BR xs .
 .PP
 .B Xs
 is a descendant of
@@ -1740,16 +1743,6 @@ commands when their input is interactive.
 returns upon catching an
 .B eof
 exception.
-
-This is the toploop for an interactive shell and for the dot
-.RB ( . )
-and
-.B eval
-commands when their input is interactive.
-.B %interactive-loop
-returns upon catching an
-.B eof
-exception.
 .PP
 .B Xs
 binds one of the following functions to
@@ -1957,7 +1950,7 @@ is packaged for Fedora. The
 .PP
 .B Xs
 1.0 (self-reporting as 0.1) was maintained by Frederic Koehler
-<fkfire@gmail.com>. This is where the translation to C++ occurred.
+<fkfire@gmail.com>.
 .PP
 .B Es
 to 0.9-beta was maintained by Soren Dayton <csdayton@cs.uchicago.edu>.
