@@ -9,11 +9,10 @@ is a command interpreter for Linux.
 .B Xs
 allows programming in a functional style and has a simple, consistent syntax.
 .B Xs
-also provides a set of hooks to allow customization of the semantics
-of many operations. Furthermore, an
+also provides a set of hooks to customize many operations. Furthermore, an
 .B xs
 program is able to synthesize binding and control regimes;
-this facilitates the creation of new language syntax. It is with these
+this facilitates the creation of new language syntax. It is via these
 facilities that a significant portion of
 .B xs
 is implemented in
@@ -90,27 +89,16 @@ this defeats the character's special meaning.
 Other escapes denote control characters:
 .PP
 .RS
-.TP
-.B \ea
-alert (bell)
-.TP
-.B \eb
-backspace
-.TP
-.B \ee
-escape
-.TP
-.B \ef
-form feed
-.TP
-.B \en
-newline
-.TP
-.B \er
-carriage return
-.TP
-.B \et
-tab
+.TS
+lb l .
+\ea	alert (bell)
+\eb	backspace
+\ee	escape
+\ef	form feed
+\en	newline
+\er	return
+\et	tab
+.TE
 .RE
 .PP
 A character octet may be denoted by its hexadecimal or octal code point:
@@ -1142,36 +1130,19 @@ identical to
 .BR -f .
 These options determine the test to apply to the paths:
 .RS
-.TP
-.B -r
-Is the file readable?
-.TP
-.B -w
-Is the file writeable?
-.TP
-.B -x
-Is the file executable?
-.TP
-.B -f
-Is the file a plain file?
-.TP
-.B -d
-Is the file a directory?
-.TP
-.B -c
-Is the file a character device?
-.TP
-.B -b
-Is the file a block device?
-.TP
-.B -l
-Is the file a symbolic link?
-.TP
-.B -s
-Is the file a socket?
-.TP
-.B -p
-Is the file a named pipe?
+.TS
+lb l .
+-r	Is the file readable?
+-w	Is the file writeable?
+-x	Is the file executable?
+-f	Is the file a plain file?
+-d	Is the file a directory?
+-c	Is the file a character device?
+-b	Is the file a block device?
+-l	Is the file a symbolic link?
+-s	Is the file a socket?
+-p	Is the file a named pipe?
+.TE
 .RE
 .TP
 .BI alias " name expansion..."
@@ -1466,7 +1437,7 @@ with
 open in append mode on
 .IR file .
 .TP
-.B %background " command"
+.BI %background " command"
 Run
 .I command
 as a background process. If
@@ -1478,7 +1449,7 @@ Run command as a child process, splitting standard output into words at
 any character in
 .IR separator(s) .
 .TP
-.BI close " fd command"
+.BI %close " fd command"
 Run
 .I command
 with the closed file descriptor
@@ -1494,11 +1465,11 @@ is respectively less than, equal to or greater than
 If either argument is non-numeric, then a lexicographic comparison is
 done based upon the locale's collation order.
 .TP
-.BI count " list"
+.BI %count " list"
 Return the number of words in
 .IR list .
 .TP
-.B %create " fd file command"
+.BI %create " fd file command"
 Run
 .I command
 with
@@ -1506,7 +1477,7 @@ with
 open for writing on
 .IR file .
 .TP
-.BI %dup "newfd oldfd command"
+.BI %dup " newfd oldfd command"
 Run
 .I command
 with
@@ -1536,7 +1507,7 @@ Run command with
 passed as an input file on
 .IR fd .
 .TP
-.B %not " command"
+.BI %not " command"
 Run command and invert the boolean sense of its result.
 .TP
 .BI %one " list"
@@ -1578,7 +1549,7 @@ with
 open for reading and writing on
 .IR fd .
 .TP
-.B %openfile " mode fd file command"
+.BI %openfile " mode fd file command"
 Run
 .I command
 with
@@ -1665,6 +1636,9 @@ in the result.
 .B %is-interactive
 Return true if the innermost toploop is interactive.
 .TP
+.B %is-login
+Return true if this is a login shell.
+.TP
 .B %newfd
 Return a file descriptor that the shell believes is not otherwise used.
 .TP
@@ -1690,10 +1664,8 @@ are coalesced.
 Return the definition of each
 .IR var .
 .SH PRIMITIVE FUNCTIONS
-Primitives provide the underlying behaviors for many hooks as well as other
-parts of
-.BR xs 's
-operation, and may not be redefined. By convention, primitive names begin
+Primitives provide the underlying behaviors for many hooks and builtins,
+and may not be redefined. By convention, primitive names begin
 with
 .B &
 and are referenced as
@@ -1715,9 +1687,9 @@ l l l l l .
 &dot	&internals	&random	&throw
 .TE
 .SH TOPLOOPS
-A toploop repeatedly reads a command, executes it and prints the result.
+A toploop repeatedly reads and executes a command and prints its result.
 .B Xs
-includes several toploops, one of which is selected depending upon
+has two toploops, one of which is selected depending upon
 .B xs
 options.
 .PP
@@ -1768,7 +1740,7 @@ options.
 These functions handle command input for the shell:
 .TP
 .BI %parse " prompt1 prompt2"
-Read input, printing
+Read input after printing
 .I prompt1
 initially and
 .I prompt2
@@ -1777,7 +1749,8 @@ for continuation lines. Return a fragment suitable for execution. Raise an
 exception at end of input.
 .P
 .B %prompt
-This is a hook, called immediately before
+.B Xs
+calls this hook immediately before
 .BR %parse .
 A common use is to update the value of
 .BR $prompt .
@@ -1903,15 +1876,15 @@ These files are read and interpreted when
 starts:
 .RS
 .TP
-.B ~/xsrc
-is read when
+.B ~/.xsrc
+when
 .B xs
-is a login shell.
+is a login shell
 .TP
-.B ~/xsin
-is read when
+.B ~/.xsin
+when
 .B xs
-is an interactive shell.
+is an interactive shell
 .RE
 .PP
 When both
@@ -1927,9 +1900,16 @@ Additional documentation and sample code is installed in
 is typically
 .BR /usr " or " /usr/local .
 .SH BUGS
+The shell does not support job control.
+.PP
 The interpreter does not implement tail recursion.
 .PP
 Returning a function from a function (i.e. an "upward funarg") does not work.
+.PP
+.B Xs
+reserves the octets \e001 and \e002 to annotate variables stored in
+the environment. This may present problems for interchange of variables
+with another program that stores these octets in the environment.
 .PP
 Dead code needs to be pruned, particularly w.r.t. support for non-Linux
 platforms.
