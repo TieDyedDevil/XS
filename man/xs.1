@@ -1172,7 +1172,7 @@ Show the directory stack (see BUILTIN COMMANDS pushd and popd). With
 .BR -c ,
 clear the directory stack.
 .TP
-.BR echo " [" -n "] [" -- ] /fIargs...
+.BR echo " [" -n "] [" -- ] " \fIargs..."
 Print
 .I args
 to standard output, separated by spaces. The output ends with a newline unless
@@ -1646,7 +1646,7 @@ as the program's name and
 .IR arg s
 as its arguments.
 .TP
-.B %split " separator arg..."
+.BI %split " separator arg..."
 Like
 .BR %fsplit ,
 but repeated instances in
@@ -1770,8 +1770,8 @@ rewrites surface syntax in terms of hook functions.
 .IB "command1 " || " command2"
 %or {\fIcommand1\fR} {\fIcommand2\fR}
 .TP
-.BR fn " \fIname\fR {|\fIarg...\fR| \fIcommand\fR}
-fn-^\fIname\fR = {|\fIarg...\fR| command}
+.BR fn " \fIname\fB {|\fIarg...\fB| \fIcommand\fB}
+fn-^\fIname\fR = {|\fIarg...\fR|\fI command\fR}
 .RE
 .SS Input/Output
 .RS
