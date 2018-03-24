@@ -57,7 +57,7 @@ project('xs', ['cpp'])
   install_data(['doc/AUTHORS', 'doc/CHANGES', 'doc/COPYING', 'doc/GOTCHAS',
 		'INSTALL', 'doc/NOTES', 'doc/PHILOSOPHY', 'doc/PROJECTS',
 		'README', 'doc/SYSTEMD_LOCALE', 'doc/TODO', 'doc/TUTORIAL.md',
-		'doc/XS-FOR-LISPERS'],
+		'doc/XS-FOR-LISPERS', 'doc/xs-1.1-original-man.1'],
 	install_dir: 'share/doc/xs')
   install_data(['samples/_config/herbstluftwm/autostart',
 		'samples/_config/herbstluftwm/inits',

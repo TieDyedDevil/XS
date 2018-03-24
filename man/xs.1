@@ -1,3158 +1,1971 @@
-.\" xs.1 -- xs manual page
-.\" macros stolen from rc.1
-.\"-------
-.\" Man page portability notes
-.\"
-.\" These are some notes on conventions to maintain for greatest
-.\" portability of this man page to various other versions of
-.\" nroff.
-.\"
-.\" When you want a \ to appear in the output, use \e in the man page.
-.\" (NOTE this comes up in the rc grammar, where to print out '\n' the
-.\" man page must contain '\en'.)
-.\"
-.\" Evidently not all versions of nroff allow the omission of the
-.\" terminal " on a macro argument.  Thus what could be written
-.\"
-.\" .Cr "exec >[2] err.out
-.\"
-.\" in true nroffs must be written
-.\"
-.\" .Cr "exec >[2] err.out"
-.\"
-.\" instead.
-.\"
-.\" Use symbolic font names (e.g. R, I, B) instead of the standard
-.\" font positions 1, 2, 3.  Note that for Xf to work the standard
-.\" font names must be single characters.
-.\"
-.\" Not all man macros have the RS and RE requests (I altered the Ds
-.\" and De macros and the calls to Ds accordingly).
-.\"
-.\" Thanks to Michael Haardt (u31b3hs@cip-s01.informatik.rwth-aachen.de)
-.\" for pointing out these problems.
-.\"
-.\" Note that sentences should end at the end of a line.  nroff and
-.\" troff will supply the correct intersentence spacing, but only if
-.\" the sentences end at the end of a line.  Explicit spaces, if given,
-.\" are apparently honored and the normal intersentence spacing is
-.\" supressed.
-.\"
-.\" DaviD W. Sanderson
-.\"-------
-.\" Dd	distance to space vertically before a "display"
-.\" These are what n/troff use for interparagraph distance
-.\"-------
-.if t .nr Dd .4v
-.if n .nr Dd 1v
-.\"-------
-.\" Ds	begin a display, indented .5 inches from the surrounding text.
-.\"
-.\" Note that uses of Ds and De may NOT be nested.
-.\"-------
-.de Ds
-.\" .RS \\$1
-.sp \\n(Ddu
-.in +0.5i
-.nf
-..
-.\"-------
-.\" De	end a display (no trailing vertical spacing)
-.\"-------
-.de De
-.fi
-.in
-.\" .RE
-..
-.\"-------
-.\" I stole the Xf macro from the -man macros on my machine (originally
-.\" "}S", I renamed it so that it won't conflict).
-.\"-------
-.\" Set Cf to the name of the constant width font.
-.\" It will be "C" or "(CW", typically.
-.\" NOTEZ BIEN the lines defining Cf must have no trailing white space:
-.\"-------
-.if t .ds Cf C
-.if n .ds Cf R
-.\"-------
-.\" Rc - Alternate Roman and Courier
-.\"-------
-.de Rc
-.Xf R \\*(Cf \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
-..
-.\"-------
-.\" Ic - Alternate Italic and Courier
-.\"-------
-.de Ic
-.Xf I \\*(Cf \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
-..
-.\"-------
-.\" Bc - Alternate Bold and Courier
-.\"-------
-.de Bc
-.Xf B \\*(Cf \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
-..
-.\"-------
-.\" Cr - Alternate Courier and Roman
-.\"-------
-.de Cr
-.Xf \\*(Cf R \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
-..
-.\"-------
-.\" Ci - Alternate Courier and Italic
-.\"-------
-.de Ci
-.Xf \\*(Cf I \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
-..
-.\"-------
-.\" Cb - Alternate Courier and Bold
-.\"-------
-.de Cb
-.Xf \\*(Cf B \& "\\$1" "\\$2" "\\$3" "\\$4" "\\$5" "\\$6"
-..
-.\"-------
-.\" Xf - Alternate fonts
-.\"
-.\" \$1 - first font
-.\" \$2 - second font
-.\" \$3 - desired word with embedded font changes, built up by recursion
-.\" \$4 - text for first font
-.\" \$5 - \$9 - remaining args
-.\"
-.\" Every time we are called:
-.\"
-.\" If		there is something in \$4
-.\" then	Call ourself with the fonts switched,
-.\"		with a new word made of the current word (\$3) and \$4
-.\"		rendered in the first font,
-.\"		and with the remaining args following \$4.
-.\" else	We are done recursing.  \$3 holds the desired output
-.\"		word.  We emit \$3, change to Roman font, and restore
-.\"		the point size to the default.
-.\" fi
-.\"
-.\" Use Xi to add a little bit of space after italic text.
-.\"-------
-.de Xf
-.ds Xi
-.\"-------
-.\" I used to test for the italic font both by its font position
-.\" and its name.  Now just test by its name.
-.\"
-.\" .if "\\$1"2" .if !"\\$5"" .ds Xi \^
-.\"-------
-.if "\\$1"I" .if !"\\$5"" .ds Xi \^
-.\"-------
-.\" This is my original code to deal with the recursion.
-.\" Evidently some nroffs can't deal with it.
-.\"-------
-.\" .ie !"\\$4"" \{\
-.\" .	Xf \\$2 \\$1 "\\$3\\f\\$1\\$4\\*(Xi" "\\$5" "\\$6" "\\$7" "\\$8" "\\$9"
-.\" .\}
-.\" .el \{\\$3
-.\" .	ft R	\" Restore the default font, since we don't know
-.\" .		\" what the last font change was.
-.\" .	ps 10	\" Restore the default point size, since it might
-.\" .		\" have been changed by an argument to this macro.
-.\" .\}
-.\"-------
-.\" Here is more portable (though less pretty) code to deal with
-.\" the recursion.
-.\"-------
-.if !"\\$4"" .Xf \\$2 \\$1 "\\$3\\f\\$1\\$4\\*(Xi" "\\$5" "\\$6" \
-"\\$7" "\\$8" "\\$9"
-.if "\\$4"" \\$3\fR\s10
-..
-.\"-------
-.\" IS, IE -- sublist begin and end
-.\"-------
-.de IS
-.ie \n(.g .RS
-.el \{\
-.nr )R +7m
-.nr )P -.5v
-.sp .7v \}
-..
-.de IE
-.ie \n(.g .RE
-.el \{\
-.nr )R -7m
-.nr )P +.5v
-.sp .4v \}
-..
 .TH XS 1 "2017 - v1.1"
 .SH NAME
 xs \- extensible shell
 .SH SYNOPSIS
-.B xs
-.RB [ \-silevxnpodV ]
-.RB [ \-c
-.IR command
-|
-.IR file ]
-.RI [ arguments ]
+.RI "xs [-c " command "] [-silevxnpod] [" file " [" arguments ]
 .SH DESCRIPTION
-.I Xs
-is a command interpreter and programming language which combines
-the features of other Unix shells and the features of a functional
-programming language such as Scheme.
-.I Xs
+.B Xs
+is a command interpreter for Linux.
+.B Xs
+allows programming in a functional style and has a simple, consistent syntax.
+.B Xs
+also provides a set of hooks which allow for customization of the semantics
+of many operations. Furthermore, an
+.B xs
+program is able to generate
+.B xs
+code; this facilitates the creation of new language constructs.
+.PP
+.B Xs
 is a descendant of
-.IR rc (1)
-and
-.IR es (1);
-the three implementations are similar in scope and style, but not
-compatible with each other.
-.PP
-.I Xs
-is intended for use both as an interactive shell and a programming
-language for scripts.
-.PP
-.I Xs
-is an extremely customizable language.
-The semantics can be altered radically by redefining functions that
-are called to implement internal operations.
-This manual page describes the default, initial configuration.
-See the section entitled
-.B "Hook Functions"
-for details on entry points which can be redefined to give
-the shell extended semantics.
-.SH LANGUAGE
-.I Xs
-is an interpreter which reads commands and executes them.
-The simplest form of command in
-.I xs
-is a sequence of words separated by white space (space and tab) characters.
-A word is either a string or a program fragment (see below).
-The first word is the command to be executed; the remaining
-words are passed as arguments to that command.
-If the first word is a string, it is a interpreted as the
-name of a program or shell function to run.
-If the name is the name of a shell function, that function
-is executed.
-Otherwise, the name is used as the name of an executable file.
-If the name begins with
-.Cr / ,
-.Cr ./ ,
-or
-.Cr ../ ,
-then it is used as the absolute path name of a file;
-if not,
-.I xs
-looks for an executable file in the directories named by
-.Cr $path .
-.PP
-Commands are terminated by newline or semicolon
-.Rc ( ; ).
-A command may also be terminated by an ampersand
-.Rc ( & ),
-which causes the command to be run in the background:
-the shell does not wait for the command
-to finish before continuing execution.
-Background processes have an implicit redirection of
-.Cr /dev/null
-as their standard input that may be overridden by an explicit redirection.
-.SS Quoting
-.IR Xs
-gives several characters special meaning;
-special characters automatically terminate words.
-The following characters, along with space, tab, and newline, are special:
-.Ds
-.Cr "# $ & \' ( ) ; < > \e ^ \` { | }"
-.De
-.PP
-The single quote
-.Rc ( ' )
-prevents special treatment of any character other than itself.
-Any characters between single quotes, including newlines, backslashes,
-and control characters, are treated as an uninterpreted string.
-A quote character itself may be quoted by placing two quotes in a row.
-A single quote character is therefore represented by the sequence
-.Cr '''' .
-The empty string is represented by
-.Cr '' .
-Thus:
-.Ds
-.Cr "echo 'What''s the plan, Stan?'"
-.De
-.PP
-prints out
-.Ds
-.Cr "What's the plan, Stan?"
-.De
-.PP
-The backslash
-.Cr ( \e )
-quotes the immediately following character, if it is
-one of the special characters, except for newline.
-In addition,
-.IR xs
-recognizes backslash sequences similar to those used in C strings:
-.IS
+.BR rc "(1) and " es (1);
+the three implementations are not interoperable.
+.SH OPTIONS
+.RS
 .TP
-.Cr \ea
+.BI -c " command"
+Execute the
+.IR command .
+.TP
+.B -s
+Read commands from standard input; pass the first argument to
+.B xs
+rather than taking the argument as the name of a file to source.
+.TP
+.B -i
+Force
+.B xs
+to be an interactive shell even if commands do not come from standard input
+via a terminal.
+.TP
+.B -l
+Cause
+.B xs
+to be a login shell, as if it had been invoked as
+.BR -xs .
+.TP
+.B -e
+Exit if any command (apart from those appearing as tests in conditional forms
+or as arguments to logical operators) returns a false status.
+.TP
+.B -v
+Echo input to standard error.
+.TP
+.B -x
+Print commands to standard error.
+.TP
+.B -n
+Disable command execution.
+.TP
+.B -p
+Don't initialize functions from the environment.
+.TP
+.B -o
+If any of file descriptors 0, 1 or 2 are inherited closed, leave them closed
+rather than open on /dev/null.
+.TP
+.B -d
+Don't trap SIGQUIT or SIGTERM.
+.RE
+.SH LANGUAGE
+Lexically, an
+.B xs
+program consists of words and punctuation.
+.SS Words
+In its simplest form, a word is a
+sequence of non-special characters. The special characters are:
+.PP
+.RS
+.B "# $ & ' ( ) ; < > \e ^ ` { | }"
+.I "space tab newline"
+.RE
+.PP
+A special character may escaped by preceeding it with a backslash
+.RB ( \e );
+this removes the character's special meaning.
+.PP
+Other escapes denote control characters:
+.PP
+.RS
+.TP
+.B \ea
 alert (bell)
 .TP
-.Cr \eb
+.B \eb
 backspace
 .TP
-.Cr \ee
+.B \ee
 escape
 .TP
-.Cr \ef
-form-feed
+.B \ef
+form feed
 .TP
-.Cr \en
+.B \en
 newline
 .TP
-.Cr \er
+.B \er
 carriage return
 .TP
-.Cr \et
+.B \et
 tab
+.RE
+.PP
+A character octet may be denoted by its hexadecimal or octal code point:
+.PP
+.RS
 .TP
-.Ci \ex nn
-hexadecimal character
+.BI \ex nn
+character octet
 .IR nn ,
 for
 .I n
-in {0..9, a..f, A..F}
+in {0..0, a..f, A..F}
 .TP
-.Ci \e mnn
-octal character
+.BI \e mnn
+character octet
 .IR mnn ,
 for
 .I m
 in {0..3} and
 .I n
 in {0..7}
+.RE
+.PP
+A UTF-8 octet sequence may be denoted using one of the escape sequences:
+.RS
 .TP
-.Ci \eu nnnn
-Unicode character
+.BI \eu nnnn
+UTF-8 character having codepoint
 .IR nnnn ,
 for
 .I n
-in {0..9, a..f, A..F}
+in {0..9, a..f, A-F}
 .TP
-.Ci \eU nnnnnnnn
-Unicode character
-.IR nnnnnnnn ,
+.BI \eU nnnnnnnn
+UTF-8 character having codepoint
+.IR nnnn ,
 for
 .I n
-in {0..9, a..f, A..F}
-.IE
+in {0..9, a..f, A-F}
+.RE
 .PP
+.B Xs
+does not allow scripts to contain a NUL character; thus the
+following are all invalid:
+.PP
+.RS
+.BR \e000 ", " \ex00 ", " \eu0000 " and " \eU00000000 .
+.RE
+.PP
+A backslash must not be followed by a sequence of characters other than as
+described above.
+.PP
+A sequence of characters enclosed by apostrophes
+.RB ( ' )
+is a word; the bounding
+.B '
+are not part of the word. We refer to this form as a
+.IR "quoted word" .
+.PP
+An apostrophe is written within a quoted word by doubling it, e.g.:
+.PP
+.RS
+.B 'Sam''s word'
+.RE
+.PP
+All other special characters lose their meaning within a quoted word.
+.PP
+The empty word is denoted by
+.BR '' .
+.PP
+Words are indivisible and immutable.
+.SS Commands
+A command is a sequence of words separated by whitespace. The first word
+is always the name of an executable program on
+.BR $path ,
+an
 .B xs
-does not permit creation of a
-.I NUL
-character (i.e.
-.IR \ex00 ", " \[u005C]000 ", " \eu0000 " and " \eU00000000 ")."
+function, or a lambda (defined below). Subsequent words are arguments; these
+are subject to evaluation, expansion and substitution. Because the arguments
+are passed as a list, any argument that yields
+.B ()
+will "disappear" (see Lists).
+.SS Command separator
+A command must occupy one logical line. Commands are separated by
+newlines or semicolons
+.RB ( ; ).
+.SS Program fragments
+A program fragment (henceforth fragment) is a sequence of zero or more
+commands enclosed in braces:
 .PP
-The character escapes may be used with
-.Cr eval
-to create characters from codepoints at runtime.
-.Ds
-.Cr "echo `{{ |cp| eval echo '\eu'$cp} 01dd}"
-.De
+.RS
+.BI { command* }
+.RE
+.PP
+A fragment may span multiple physical lines.
+.PP
+The value of a fragment is the result code returned by the last
+command executed. An empty fragment
+.RB ( {} )
+has a result of zero. A fragment containing a pipeline returns a list of
+results: one for each function or executable in the pipeline.
+.PP
+A fragment appearing as a parameter of a function or executable is
+treated as a single word. Fragments are indivisible and immutable.
+.PP
+The braces may be elided if the command is a single word having no arguments.
 .SS Comments
-The number sign
-.Rc ( # )
-begins a comment in
-.IR xs .
-All characters up to but not including the next newline are ignored.
-.SS "Line continuation"
-A long logical line may be continued over several physical lines by
-terminating each line (except the last) with a backslash
-.Rc ( \e ).
-The backslash-newline sequence is treated as a space.
-Note that line continuation does not work in comments, where the backslash is
-treated as part of the comment, and inside quoted strings, where the backslash
-and newline are quoted.
+The hash mark
+.RB ( # )
+introduces a comment which ends at newline.
+.SS Line continuation
+Program text may be split across physical lines by ending each logical line
+with a backslash
+.RB ( \e ).
+The backslash and the immediately following newline are read as a space.
 .SS Lists
-The primary data structure in
-.IR xs
-is the list, which is a sequence of words.
-Parentheses are used to group lists.
-The empty list is represented by
-.Cr "()" .
-Lists have no hierarchical structure;
-a list inside another list is expanded so that the
-outer list contains all the elements of the inner list.
-(This is the same as perl's "list interpolation".)
-Thus, the following are all equivalent:
-.Ds
-.Cr "one two three"
-.Cr "(one two three)"
-.Cr "((one) () ((two three)))"
-.De
+A list is a space-separated sequence of words. The empty list is denoted by
+.BR () .
+All lists are flat in
+.BR xs ;
+balanced parentheses may be written for grouping, but they do not create
+a tree. Thus
 .PP
-Note that the null string,
-.Cr "''" ,
-and the empty list,
-.Cr "()" ,
-are two very
-different things.
-Assigning the null string to variable is a valid
-operation, but it does not remove its definition.
+.RS
+.B this is a list of seven words
+.RE
 .PP
-Since lists can span multiple lines without explicit line
-continuations, they are ideal for long commands. For example:
-.Ds
-.Cr "switch $x \e"
-.Cr "   error   { result 1 } \e"
-.Cr "   warning { echo oops! } \e"
-.Cr "   good    { echo no problem  }"
-.De
-.PP is the same as
-.Ds
-.Cr "switch $x ("
-.Cr "   error   { result 1 }" 
-.Cr "   warning { echo oops! }"
-.Cr "   good    { echo no problem  }"
-.Cr ")"
-.De
+and
 .PP
-Finally, note that there are some uses of parentheses
-not following ordinary list rules: in let/local/%closure bindings,
-and in assignments.
+.RS
+.B this (is a list) ((of) () (seven words)) ()
+.RE
+.PP
+are identical.
+.PP
+A list enclosed in parentheses may span multiple line without need of
+line continuation characters.
 .SS Concatenation
-Two lists may be joined by the concatenation operator
-.Rc ( ^ ).
-A single word is a list of length one, so
-.Ds
-.Cr "echo foo^bar"
-.De
+Lists may be joined using the concatenation operator, caret
+.BR ( ^ ).
 .PP
-produces the output
-.Ds
-.Cr foobar
-.De
+A list of length one is a word. Concatenating two words creates a new word.
 .PP
-For lists of more than one element,
-concatenation produces the cross (Cartesian) product of
-the elements in both lists:
-.Ds
-.Cr "echo (a\- b\- c\-)^(1 2)"
-.De
+When either list has length greater than one, the result of concatenation is
+the cross product of the lists.
 .PP
-produces the output
-.Ds
-.Cr "a\-1 a\-2 b\-1 b\-2 c\-1 c\-2"
-.De
-.PP
-Be aware that the cross product of anything with an empty list
-is an empty list.
-.SS "Variables"
-A list may be assigned to a variable, using the notation 
-.Ds
-.Ic var " = " list
-.De
-.PP
-Whitespace is required 
-around the assignment operator; this allows
-it to be treated as a normal string character.
-This is true also for assignment in let-forms and the like.
-Any sequence of non-special characters, except a sequence including
-only digits, may be used as a variable name.
-.I Xs
-exports all user-defined variables into the environment unless
-it is explicitly told not to.
-.PP
-The value of a variable is referenced with the notation:
-.Ds
-.Ci $ var
-.De
-.PP
-Any variable which has not been assigned a value returns the empty list
-when referenced.
-In addition, multiple references are allowed:
-.Ds
-.Cr "a = foo"
-.Cr "b = a"
-.Cr "echo $$b"
-.De
-.PP
-prints
-.Ds
-.Cr foo
-.De
-.PP
-A variable's definition may be removed by
-assigning the empty list to a variable:
-.Ds
-.Ic var " ="
-.De
-.PP
-Multiple variables may be assigned with a single assignment statment.
-The left hand side of the assignment operation consists of a list of
-variables which are assigned, one by one, to the values in the list
-on the right hand side.  If there are more variables than values in
-the list, the empty list is assigned to the remaining variables.
-If there are fewer variables than elements in the list, the last
-variable is bound to all the remaining list values.
-.PP
-For example,
-.Ds
-.Cr "(a b) = 1 2 3"
-.De
-.PP
-has the same effect as
-.Ds
-.Cr "a = 1"
-.Cr "b = 2 3"
-.Ds
-.PP
-and
-.Ds
-.Cr "(a b c) = 1 2"
-.De
-.PP
-is the same as
-.Ds
-.Cr "a = 1"
-.Cr "b = 2"
-.Cr "c ="
-.De
-.PP
-Note that when assigning values to more than one variable,
-the list of variables must be enclosed in parentheses.
-.PP
-For ``free careting'' (see below) to work correctly,
-.I xs
-must make certain assumptions
-about what characters may appear in a variable name.
-.I Xs
-assumes that a variable name consists only of alphanumeric characters,
-percent
-.Rc ( % ),
+When either list is empty, the result of concatenation is the empty list.
+.SS Variable names
+Letters, digits all UTF-8 characters encoded as at least two octets (i.e.:
+code points greater than \u007f) and the characters percent
+.RB ( % ),
 star
-.Rc ( * ),
-dash
-.Rc ( - ),
+.RB ( * ),
+hyphen
+.RB ( - )
 and underscore
-.Rc ( \|_\| ).
-To reference a variable with other
-characters in its name, quote the variable name.
-Thus:
-.Ds
-.Cr "echo $'we$Ird\Variab!le'"
-.De
+.RB ( _ )
+may be used in variable names. These character may appear in any order or
+combination.
 .PP
-A variable name produced by some complex operation,
-such as concatenation, should be enclosed in parentheses:
-.Ds
-.Ci $( var )
-.De
+The
+.B xs
+special characters (see Words) may also appear in a variable name if
+quoted or escaped. Likewise, character escapes (octal, hex and Unicode) may
+be part of a variable name.
 .PP
-Thus:
-.Ds
-.Cr "Good\-Morning = Bonjour"
-.Cr "Guten = Good"
-.Cr "Morgen = Morning"
-.Cr "echo $($Guten^\-^$Morgen)"
-.De
-.PP
-prints
-.Ds
-.Cr "Bonjour"
-.De
-.PP
-Each element of the list in parentheses is treated as an
-independent variable and expanded separately.
-Thus, given the above definitions,
-.Ds
-.Cr "echo $(Guten Morgen)"
-.De
-.PP
-prints
-.Ds
-.Cr "Good Morning"
-.De
-.PP
-To count the number of elements in a variable, use
-.Ds
-.Ci $# var
-.De
-.PP
-This returns a single-element list with the number of elements in
-.Ci $ var\fR.
-.SS Subscripting
-Variables may be indexed with the notation
-.Ds
-.Ci $ var ( n )
-.De
-.PP
-where
-.I n
-is a list of integers or ranges.
-Subscript indexes are based at one.
-The list of subscripts need
-not be in order or even unique.
-Thus, if
-.Ds
-.Cr "a = one two three"
-.De
-.PP
-then
-.Ds
-.Cr "echo $a(3 3 3)"
-.De
-.PP
-prints
-.Ds
-.Cr "three three three"
-.De
-.PP
-Subscript indices which refer to nonexistent elements
-expand to the empty list.  Thus, given the definition above
-.Ds
-.Cr "echo $a(3 1 4 1 5 9 2 6 5)"
-.De
-.PP
-prints
-.Ds
-.Cr "three one one two"
-.De
-.PP
-Subscript ranges are of the form
-.Ic lo ... hi
-and refer to all the elements between
-.I lo
-and
-.IR hi .
-If
-.I lo
-is omitted, then
-.Cr 1
-is used as a default value; if
-.I hi
-is omitted, the length of the list is used.
-Thus
-.Ds
-.Cr "* = $*(2 ...)"
-.De
-.PP
-removes the first element of
-.Cr * ,
-similar to the effect of
-.Cr shift
-in
-.IR rc (1)
+Variable names having the prefix
+.B fn-
 or
-.IR sh (1).
+.B var-
+have special meaning; see Functions and Settors, respectively.
+.SS Assignment
+A variable is assigned a list value using the notation
 .PP
-If
-.I lo
-is greater than
-.IR hi ,
-the elements in the result are listed from
-.I hi
-to
-.IR lo .
+.RS
+.IB var " = " list
+.RE
 .PP
-The notation
-.Ci "$" n\fR,
-where
-.I n
-is an integer, is a shorthand for
-.Ci $*( n )\fR.
-Thus,
-.IR xs 's
-arguments may be referred to as
-.Cr "$1" ,
-.Cr "$2" ,
-and so on.
+The spaces around
+.B =
+are mandatory.
 .PP
-Note that the list of subscripts may be given by any
-.IR xs
-expression, so
-.Ds
-.Cr "$var(\`{awk 'BEGIN{for(i=1;i<=10;i++)print i;exit }'})"
-.De
+A variable is undefined by assigning an empty list as its value. While
 .PP
-returns the first 10 elements of
-.Cr $var .
+.RS
+.IB var " = " ()
+.RE
 .PP
-Constructed variables, such as
-.Cr $(a$b) ,
-may not be subscripted.
+is valid, the preferred form is
 .PP
-Subscripted variables may not be used on the left-hand side
-of the assignment operator.
-.SS "Free Carets"
-.I Xs
-inserts carets (concatenation operators) for free in certain situations,
-in order to save some typing on the user's behalf.
-For example, the following are all equivalent:
-.Ds
-.Cr "cc \-O \-g \-c malloc.c alloca.c"
-.Cr "cc \-^(O g c) (malloc alloca)^.c"
-.Cr "opts=O g c; files=malloc alloca; cc \-$opts $files.c"
-.De
+.RS
+.IB var " ="
+.RE
 .PP
-.I Xs
-inserts a free-caret between the
-.Rc `` \- ''
-and
-.Cr "$opts" ,
-as well
-as between
-.Cr $files
-and
-.Cr ".c" .
+The value of an assignment is its assigned value.
+.SS Variables
+All variables are exported to the environment unless declared within a
+.BR local " or " let " form (described below)."
 .PP
-The rule for free carets is as follows:
-if a word or keyword is immediately
-followed by another word, keyword, dollar-sign or
-backquote without any intervening spaces, then
-.I xs
+A variable's value is retrieved by writing
+.B $
+before its name, like
+.BI $ var
+.RI .
+.PP
+An undefined variable yields the empty list when referenced.
+.PP
+A variable name may be constructed at runtime. Parentheses must enclose
+multiple operators used to construct a name.
+.SS Subscripted reference
+Specific list elements may be selected via subscripting. This takes the form
+.PP
+.RS
+.BI $ var ( subscripts )
+.RE
+.PP
+List elements are indexed starting at 1. A subscript less than 1 is an error.
+A subscript greater than the number of list elements yields the empty list.
+.PP
+.RS
+.TP
+.B a = w x y z; echo $a(2 3 4 4 3)
+prints
+.B x y z z y
+.RE
+.PP
+Subscripts may be specified as ranges by separating the range endpoints with
+.BR ... " ."
+The range operator must be separated from its arguments by spaces.
+.PP
+Either end of the range may be left unspecified.
+.PP
+.RS
+.TP
+.BI $ var "(... 7)"
+yields elements 1 through 7 of the list
+.TP
+.BI $ var "(3 ...)"
+yields elements 3 through the end of the list
+.RE
+.PP
+Reversing the endpoints of a range returns the values in reversed order:
+.PP
+.RS
+.B a = s d r a w k c a b
+.RE
+.RS
+.B $a(5 ... 2)
+.RE
+.PP
+yeilds the list
+.PP
+.RS
+.B w a r d
+.SS Multiple assignment
+A list of variables may be specified on the left side of an assignment.
+Parentheses are mandatory around the list of variables.
+.PP
+Corresponding list elements on the right side are assigned to variables on
+the left. If the right side has more elements than there are variables on
+the left, the rightmost variable is assigned the list value of the remaining
+elements. If there are more variables than list elements, the excess variables
+are assigned the empty list.
+.PP
+Variable names may not be computed or subscripted on the left side of a
+multiple assignment.
+.SS List length
+The length of a list assigned to a variable is given by
+.PP
+.RS
+.BI $# var
+.RE
+.PP
+.SS Flattening
+A list may be flattened to a single word using the
+.B $^
+operator. This returns a word composed of the words of the given list,
+with a single space between each pair of words. As with the subscript
+operator, this applies only to a variable (not literal) list.
+.SS Free carets
+Concatenation may be written implicitly (rather than using the
+.B ^
+operator) in certain situations. If a word is followed by another word,
+.BR $ " or " `
+without intervening whitespace, then
+.B xs
 inserts a caret between them.
-.SS "Flattened Lists"
-To create a single-element list from a multi-element list,
-with the components space-separated, use
-.Ds
-.Ci $^ var
-.De
+.SS Pathname expansion
+Where a word may be treated as a pathname,
+.B xs
+expands wildcards.
 .PP
-Flattening is useful when the normal list concatenation rules need to be
-bypassed.
-For example, to append a single period at the end of
-.Cr $path ,
-use:
-.Ds
-.Cr "echo $^path."
-.De
-.SS "Wildcard Expansion"
-.I Xs
-expands wildcards in filenames if possible.
-When the characters
-.Cr "*" ,
-.Cr [
-or
-.Cr ?
-occur in an argument or command,
-.I xs
-looks at the
-argument as a pattern for matching against files.
-(Contrary to the behavior some other shells exhibit,
-.I xs
-will only perform pattern matching if a metacharacter occurs unquoted and
-literally in the input.
-Thus,
-.Ds
-.Cr "foo = '*'"
-.Cr "echo $foo"
-.De
+.RS
+.TP
+.B *
+matches zero or more characters
+.TP
+.B ?
+matches exactly one character
+.TP
+.BI [ class ]
+matches any of the characters specified by the class, following the same
+rules as those for
+.BR ed (1),
+except that class negation is denoted by
+.B ~
+since
+.B ^
+has another interpretation in
+.BR xs .
+.RE
 .PP
-will always echo just a star.
-In order for non-literal metacharacters to be expanded, an
-.Cr eval
-statement must be used in order to rescan the input.)
-.PP
-Pattern matching occurs according to the following rules:
-a
-.Cr "*"
-matches any number (including zero) of
-characters.
-A
-.Cr ?
-matches any single character, and a
-.Cr [
-followed by a
-number of characters followed by a
-.Cr ]
-matches a single character in that
-class.
-The rules for character class matching are the same as those for
-.IR ed (1),
-with the exception that character class negation is achieved
-with the tilde
-.Rc ( ~ ),
-not the caret
-.Rc ( ^ ),
-since the caret already means
-something else in
-.IR xs .
-The filename component separator, slash
-.Rc ( / ),
-must appear explicitly in patterns.
-.Cr "*"
-and
-.Cr ?
-do not match a dot character
-.Rc ( . )
-at the beginning of a filename component.
+The pathname separator,
+.BR / ,
+is never matched by
+.BR * .
+The
+.B ?
+wildcard never matches a dot at the beginning of a pathname component.
 .PP
 A tilde
-.Rc ( ~ )
-as the first character of an argument is used to refer to home directories.
-A tilde alone or followed by a slash
-.Rc ( / )
+.RB ( ~ )
+alone or followed by a slash
+.RB ( / )
 is replaced by the value of
-.Cr $home ,
-which is usually the home directory of the current user.
-A tilde followed by a username is replaced with the home directory
-of that user, according to
-.IR getpwent (3).
-.SS "Pattern Matching"
-The tilde
-.Rc ( ~ )
-operator is used in
-.I xs
-for matching strings against wildcard patterns.
-The command
-.Ds
-.Cr "~ \fIsubject\fP \fIpattern\fP \fIpattern\fP ..."
-.De
+.BR $home .
+A tilde followed by a username is replaced with the home directory path
+of that user. (See
+.BR getpwent (3).)
 .PP
-returns a true value if and only if the subject matches any of the patterns.
-The matching follows the same rules as wildcard expansion, except that slashes
-.Rc ( / )
-are not considered significant, leading dots
-.Rc ( . )
-do not have to be matched explicitly,
-and home directory expansion does not occur.
-Thus
-.Ds
-.Cr "~ foo f*"
-.De
+A quoted wildcard loses its meaning as a wildcard.
+.SS Pattern matching
+The pattern matching operator
+.RB ( ~ )
+returns true when a subject matches any of the given patterns:
 .PP
-returns zero (true), while
-.Ds
-.Cr "~ (bar baz) f*"
-.De
+.RS
+.BI ~ " subject pattern ..."
+.RE
 .PP
-returns one (false).
-The null list is matched by the null list, so
-.Ds
-.Cr "~ $foo ()"
-.De
+A subject may be a list. If composed of individual words or expressions,
+the subject list must be enclosed by parentheses.
 .PP
-checks to see whether
-.Cr $foo
-is empty or not.
-This may also be achieved
-by the test
-.Ds
-.Cr "~ $#foo 0"
-.De
+A pattern is a word which may contain wildcards:
+.RS
+.TP
+.B *
+matches zero or more characters
+.TP
+.B ?
+matches exactly one character
+.TP
+.BI [ class ]
+matches any of the characters specified by the class, following the same
+rules as those for
+.BR ed (1),
+except that class negation is denoted by
+.B ~
+since
+.B ^
+has another interpretation in
+.BR xs .
+.RE
 .PP
-Note that inside a
-.Cr ~
-command
-.I xs
-does not match patterns against file
-names, so it is not necessary to quote the characters
-.Cr "*" ,
-.Cr [
-and
-.Cr "?" .
-However,
-.I xs
-does expand the subject against filenames if it contains
-metacharacters.
-Thus, the command
-.Ds
-.Cr "~ * ?"
-.De
+Pattern wildcards are never expanded with pathnames from the filesystem.
+.SS Pattern extraction
+The pattern extraction operator
+.RB ( ~~ )
+returns the parts of each subject that match a wildcard in the patterns:
 .PP
-returns true if any of the files in the current directory have a
-single-character name.
-Note that if the
-.Cr ~
-command is given a list as its first
-argument, then a successful match against any of the elements of that
-list will cause
-.Cr ~
-to return true.
-For example:
-.Ds
-.Cr "~ (foo goo zoo) z*"
-.De
+.RS
+.BI ~~ " subject pattern ..."
+.RE
 .PP
-is true.
-.SS "Pattern Extraction"
-The double-tilde
-.Rc ( ~~ )
-operator is used in
-.I xs
-for extracting the parts of strings that match patterns.
-The command
-.Ds
-.Cr "~~ \fIsubject\fP \fIpattern\fP \fIpattern\fP ..."
-.De
+Subjects and patterns are the same as for the pattern matching operator.
+.SS Arithmetic substitution
+An infix arithmetic expression may be evaluated to produced a single word
+representing its value:
 .PP
-returns the parts of each matching subject which corresponds to the
-wildcards in the patterns.
+.RS
+.BI `( expression )
+.RE
 .PP
-Each subject is checked in order against each pattern;  if it matches
-the pattern, the parts of the subject which matched each
-.Cr "*" ,
-.Cr "?" ,
-or
-.Cr "[]"
-character range are extracted, and processing moves on to the next
-subject.  If the subject does not match, the next pattern is tried.
+The expression consists of numeric values and the infix operators
+.BR + ", " - ", " * ", " / " and " % " (modulus);"
+these obey the usual precedence rules.
 .PP
-For example, the result of the extraction operation
-.Ds
-.Cr "~~ (foo.c foo.x bar.h) *.[ch]"
-.De
+A value is either a numeric constant or a variable having a numeric value.
+Numbers may be integer or floating-point; the latter are stored with limited
+precision (usually six significant digits).
 .PP
-is the list
-.Cr "(foo c bar h)" .
+If an expression involves any floating-point value, the result will be
+floating-point.
 .PP
-When there's no match, the operator returns
-.Cr "()" .
-.SS "Arithmetic Substitution"
-A single list element can be formed from an infix arithmetical expression
-like so:
-.Ds
-.Ci "\`( " " expression " )
-.De
+Division of integers produces an integer result via truncation. Modulus
+behaves as
+.BR fmod (3)
+if either argument is floating-point.
 .PP
-The expression can use any of the 
-.Cr "+", 
-.Cr "-", 
-.Cr "*", 
-.Cr "/", 
-and 
-.Cr "%" 
-operators, and use variable substitution of the form
-.Cr "$var" .
-Variable names containing
-.Cr "+", 
-.Cr "-", 
-.Cr "*", 
-.Cr "/", 
-or
-.Cr "%" 
-are not allowed within an arithmetic expression.
+An undefined variable (a variable having value
+.BR () )
+is treated as zero within an arithmetic expression.
 .PP
-Parentheses can be used in normal infix fashion to alter order of evaluation.
-Absent parentheses, evaluation follows the usual precedence.
-.PP
-Numbers can be written as floating-point or integer, but are always decimal.
-Scientific notation (e.g. 1.23e11) will be used to print very large and
-small floating-point values, but is not allowed in literal numbers.
-.PP
-Any arithmetic operation involving floats produces a float;
-any operation with only integers produces an integer.
-.PP
-Integers have the behavior of the native platform's
-.Cr long .
-Floats have the behavior of the native platform's
-.Cr double .
-.PP
-.IR xs 's
-floats are stored with limited (typically 6 signicant digits) precision.
-.SS "Command Substitution"
-A list may be formed from the output of a command by using backquote
-substitution:
-.Ds
-.Ci "\`{" " command " }
-.De
-.PP
-returns a list formed from the standard output of the command in braces.
-The characters stored in the variable
-.Cr $ifs
-(for ``input field separator'')
-are used to split the output into list elements.
-By default,
-.Cr $ifs
-has the value space-tab-newline.
-The braces may be omitted if the command is a single word.
-Thus
-.Cr \`ls
-may be used instead of
-.Cr "\`{ls}" .
-This last feature is useful when defining functions that expand
-to useful argument lists.
-A frequent use is:
-.Ds
-.Cr "fn src { echo *.[chy] }"
-.De
-.PP
-followed by
-.Ds
-.Cr "wc \`src"
-.De
-.PP
-(This will print out a word-count of all C and Yacc source files in the
-current directory.)
-.PP
-In order to override the value of
-.Cr $ifs
-for a single command substitution, use:
-.Ds
-.Ci "\`\`" " ifs-list " { " command " }
-.De
-.PP
-.Cr $ifs
-will be temporarily ignored and the command's output will be split as
-specified by the list following the double backquote.
-For example:
-.Ds
-.Cr "\`\` :\en {cat /etc/passwd}"
-.De
-.PP
-splits up
-.Cr /etc/passwd
-into fields.
-.SS "Return Values"
-The return value of a command is obtained with the construct
-.Ds
-.Ci "<={" " command " }
-.De
-.PP
-The return value of an external program is its exit status
-(which in other shells can be found in special variables such as
-.Cr $?
-or
-.Cr $status ),
-as either a small integer or the name of signal.
-Thus
-.Ds
-.Cr "echo <={test \-f /etc/motd} <={test \-w /vmunix} <=a.out"
-.De
-.PP
-might produce the output
-.Ds
-.Cr "0 1 sigsegv+core"
-.De
-.PP
-along with any output or error messages from the programs.
-.PP
-If the
-.I command
-is a pipeline,
-.Cr <=
-lists the return value of each program.
-.PP
-.I Xs
-functions and primitives can produce ``rich return values,''
-that is, arbitrary lists as return values.
-.PP
-When return values are interpreted as truth values,
-an extension of the normal shell conventions apply.
-If any element of a list is not equal to
-.Rc `` 0 ''
-(or the empty string), that list is considered false.
-.PP
-The return value of an assignment operation is the assigned value.
-Thus,
-.Cr "b = <={a = 7}"
-assigns the same value to both
-.Cr a " and " b .
-.SS "Logical Operators"
-There are a number of operators in
-.I Xs
-which depend on the exit status of a command.
-.Ds
-.Ic command1 " && " command2
-.De
-.PP
-executes the first command and then executes the second command if and only if
-the first command has a ``true'' return value.
-.Ds
-.Ic command1 " || " command2
-.De
-.PP
-executes the first command and then executes the second command if and only if
-the first command has a ``false'' return value.
-.Ds
-.Ci ! " command"
-.De
-.PP
-inverts the truth value of the exit status of a command.
-.SS "Relational Operators"
-.I Xs
-has the usual complement of relational operators. To avoid confusion
-with redirection or assignment, the relops are spelled:
-.IR :lt ", " :le ", " :gt ", " :ge ", " :eq " and " :ne .
-The relational operators are built upon
-.I "%cmp"
-and return a boolean value.
-.SS "Input and output"
-.PP
-The standard output of a command may be redirected to a file with
-.Ds
-.Cr "command > file"
-.De
-.PP
-and the standard input may be taken from a file with
-.Ds
-.Cr "command < file"
-.De
-.PP
-File descriptors other than 0 and 1 may be specified also.
-For example, to redirect standard error to a file, use:
-.Ds
-.Cr "command >[2] file"
-.De
-.PP
-In order to duplicate a file descriptor, use
-.Ci >[ n = m ]\fR.
-Thus to redirect both standard output and standard error
-to the same file, use
-.Ds
-.Cr "command > file >[2=1]"
-.De
-.PP
-To close a file descriptor that may be open, use
-.Ci >[ n =]\fR.
-For example, to
-close file descriptor 7:
-.Ds
-.Cr "command >[7=]"
-.De
-.PP
-In order to place the output of a command at the end of an already
-existing file, use:
-.Ds
-.Cr "command >> file"
-.De
-.PP
-If the file does not exist, then it is created.
-.PP
-To open a file for reading and writing, use the
-.Cr <>
-redirection operator;
-for reading and appending, use
-.Cr <>> .
-Both of these operators use file descriptor 0 (standard input)
-by default.
-Similarly,
-.Cr ><
-truncates a file and opens it for reading and writing, and
-.Cr >><
-opens a file for reading and appending;
-these operators use file descriptor 1 by default.
-.PP
-``Here documents'' are supported as in
-.IR sh (1)
-with the use of
-.Ds
-.Cr "command << 'eof-marker'"
-.De
-.PP
-If the end-of-file marker is quoted,
-then no variable substitution occurs inside the here document.
-Otherwise, every variable is substituted
-by its space-separated-list value (see
-.BR "Flat Lists" ,
-below),
-and if a
-.Cr ^
-character follows a variable name, it is deleted.
-This allows the unambiguous use of variables adjacent to text, as in
-.Ds
-.Cr $variable^follow
-.De
-.PP
-To include a literal
-.Cr $
-in a here document created with an unquoted end-of-file marker, use
-.Cr $$ .
-.PP
-Additionally,
-.I xs
-supports ``here strings'', which are like here documents,
-except that input is taken directly from a string on the command line.
-Its use is illustrated here:
-.Ds
-.Cr "cat <<< 'this is a here string' | wc"
-.De
-.PP
-(This feature enables
-.I xs
-to export functions that use here documents.)
-.PP
-Subscripted and constructed variables are not supported in
-here documents and here strings.
+Variables having subscripted or constructed names may not be used in an
+arithmetic expression.
 .SS Pipes
-Two or more commands may be combined in a pipeline by placing the
-vertical bar
-.Rc ( \||\| )
-between them.
-The standard output (file descriptor 1)
-of the command on the left is tied to the standard input (file
-descriptor 0) of the command on the right.
-The notation
-.Ci |[ n = m ]
-indicates that file descriptor
-.I n
-of the left process is connected to
-file descriptor
-.I m
-of the right process.
-.Ci |[ n ]
-is a shorthand for
-.Ci |[ n =0]\fR.
-As an example, to pipe the standard error of a command to
-.IR wc (1),
-use:
-.Ds
-.Cr "command |[2] wc"
-.De
+The standard output of one fragment may be piped to the standard input of
+another:
 .PP
-The exit status of a pipeline is considered true if and only if every
-command in the pipeline exits true.
-.SS "Input/Output Substitution"
-Some commands, like
-.IR cmp (1)
-or
-.IR diff (1),
-take their input from named files on the command
-line, and do not use standard input.
-It is convenient sometimes to build nonlinear
-pipelines so that a command like
-.I cmp
-can read the output of two commands at once.
-.I Xs
-does it like this:
-.Ds
-.Cr "cmp <{command1} <{command2}"
-.De
+.RS
+.IB fragment1 | fragment2
+.RE
 .PP
-compares the output of the two commands.
-Note: on some systems, this form of
-redirection is implemented with pipes, and since one cannot
-.IR lseek (2)
-on a pipe, commands that use
-.I lseek
-will hang.
-For example,
-most versions of
-.I diff
-seek on their inputs.
+Other file descriptors may be connected:
 .PP
-Data can be sent down a pipe to several commands using
-.IR tee (1)
-and the output version of this notation:
-.Ds
-.Cr "echo hi there | tee >{sed 's/^/p1 /'} >{sed 's/^/p2 /'}"
-.De
-.SS "Program Fragments"
-.I Xs
-allows the intermixing of code with strings.
-A program fragment, which is a group of commands enclosed in braces
-.Rc ( { " and " } ),
-may be used anywhere a word is expected, and is treated as an indivisible unit.
-For example, a program fragment may be passed as an argument,
-stored in a variable,
-or written to a file or pipe.
-If a program fragment appears as the first word in a command,
-it is executed, and any arguments are ignored.
-Thus the following all produce the same output:
-.Ds
-.Cr "{ echo hello, world }"
-.Cr "{ echo hello, world } foo bar"
-.Cr "xs -c { echo hello, world }"
-.Cr "x = { echo hello, world }; $x"
-.Cr "echo { echo hello, world } | xs"
-.Cr "echo { echo hello, world } > foo; xs < foo"
-.De
+.RS
+.IB fragment1 |[ fd1 = fd2 ] fragment2
+.RE
 .PP
-Since program fragments in the first position in a command are executed,
-braces may be used as a grouping mechanism for commands.
-For example, to run several commands, with output from all of them redirected to
-the same file, one can do
-.Ds
-.Cr "{ date; ps agux; who } > snapshot"
-.De
+The form
 .PP
-In addition, program fragments can continue across multiple
-physical lines without explicit line continuations, so the
-above command could also be written:
-.Ds
-.Cr "{"
-.Cr "     date"
-.Cr "     ps agux"
-.Cr "     who"
-.Cr "} > snapshot"
-.De
+.RS
+.IB fragment1 |[ fd1 ] fragment2
+.RE
 .PP
-A
-.I lambda
-is a variant on a program fragment which takes arguments.
-A lambda has the form
-.Ds
-.Ci "{ | " parameters " | " commands " }"
-.De
+is identical to
+.PP
+.RS
+.IB fragment2 |[ fd1 =0] fragment2
+.RE
+.PP
+.SS Command substitution
+The backquote form creates a list from the standard output of a program
+fragment:
+.PP
+.RS
+.BI ` fragment
+.RE
+.PP
+Words are parsed from the standard output using the separators defined by
+.BR $ifs .
+.PP
+This variant backquote form binds
+.B $ifs
+to the given list of separators:
+.PP
+.RS
+.BI `` " separators fragment"
+.RE
+.SS Functions
+.B Xs
+has two forms by which a function is defined:
+.PP
+.RS
+.BI fn " name fragment"
+.RE
+.PP
+and
+.PP
+.RS
+.BI fn- name " = " fragment
+.RE
+.PP
+The former is normally used for top-level and nested definitions; the latter
+must be used when binding a function for local use. Because the latter is an
+assignment, the spaces around
+.B =
+are mandatory.
+.SS Lambdas
+A lambda is an unnamed function. In
+.BR xs ,
+a lambda is written as a program frament in which the first element may be
+a lambda list (see below). A lambda without a lambda list is a lambda with
+no arguments.
+.SS Lambda list
+A lambda list binds names to function arguments. Its form is:
+.PP
+.RS
+.BI | "name ..." |
+.RE
+.PP
+A lambda list may only appear as the first element of a fragment.
+.SS Truth values
+The values
+.BR 0 ", " '' " and " ()
+are all treated as true; everything else is false.
+.PP
+The keywords
+.BR true " and " false
+are equivalent to
+.BR "result 0" " and " "result 1" ,
+respectively.
+.SS Return values
+The value of evaluating a fragment is the return value of the last function
+or executable evaluated before leaving the fragment.
+.PP
+A specific result may be returned by:
+.PP
+.RS
+.BI result " list"
+.RE
+.SS Logical operators
+The following operators apply to truth values:
+.PP
+.RS
+.TP
+.IB value1 && value2
+True if both
+.IR value1 " and " value2
+are true.
+.TP
+.IB value1 || value2
+True if
+.I value1
+is true or if
+.I value1
+is false and
+.I value2
+is true.
+.TP
+.BI ! value
+True if
+.I value
+is false.
+.RE
 .PP
 The
-.I parameters
-are one or more variable names, to which arguments of the
-lambda are assigned while the
-.I commands
-are run.
-The first argument is assigned to the first variable,
-the second to the second, and so on.
-If there are more arguments than parameters,
-the last named variable is assigned all the remaining arguments;
-if there are fewer, the parameters for which there are no arguments
-are bound to the empty list.
+.BR && " and " ||
+operators evaluate their arguments from left to right, stopping when the
+value of the expression is determined.
+.SS Relational operators
+Numbers and strings may be compared using the relational operators:
 .PP
-Lambdas, like other program fragments, can appear anywhere in a list.
-A more complicated example in the same spirit:
-.Ds
-.Cr "{ |cmd arg| $cmd $arg } { |*| echo $* } hi"
-.De
+.RS
+.TP
+.IB value1 " :lt " value2
+True if value1 is less than value2.
+.TP
+.IB value1 " :le " value2
+True if value1 is less than or equal to value2.
+.TP
+.IB value1 " :gt " value2
+True if value1 is greater than value2.
+.TP
+.IB value1 " :ge " value2
+True if value1 is greater than or equal to value2.
+.TP
+.IB value1 " :eq " value2
+True if value1 is equal to value2.
+.TP
+.IB value1 " :ne " value2
+True if value1 is not equal to value2.
+.RE
 .PP
-This command executes a lambda which runs its first argument, named
-.Cr cmd ,
-using its second argument, named
-.Cr arg ,
-as the argument for the first.
-The first argument of this function is another lambda,
-seen previously, and the second argument is the word
-.Cr hi .
+If either argument is non-numeric, the arguments are compared according to
+the current locale's collation order.
+.SS Input and output
+Input may be redirected from a file to standard input:
 .PP
-These lambda expressions
-.Ds
-.Cr "{ |a b c| echo $c $b $a } 1 2"
-.Cr "{ |a b c| echo $c $b $a } 1 2 3 4 5"
-.De
+.RS
+.BI < "filename fragment"
+.RE
 .PP
-produce this output:
-.Ds
-.Cr "2 1"
-.Cr "3 4 5 2 1"
-.De
-.SS Functions
-A function in
-.I xs
-is introduced with the syntax
-.Ds
-.Ci fn " name" " { | " parameters " | \fIcommands\fP }"
-.De
+or
 .PP
-If the function name appears as the first word of a command,
-the commands are run, with the named parameters bound to the
-arguments to the function.
+.RS
+.IB fragment " <" filename
+.RE
 .PP
-The similarity between functions and lambdas is not coincidental.
-A function in
-.I xs
-is a variable of the form
-.Ci fn\- name\fR.
-If name for which the appropriate
-.Cr fn-
-variable exists is found in the first position of a command,
-the value of the variable is substituted for the first word.
-The above syntax for creating functions is equivalent to the
-variable assignment
-.Ds
-.Ci fn\- name " = { | " parameters " | \fIcommands\fP }"
-.De
+It is an error if the file does not exist or is not readable.
 .PP
-Functions may be deleted with the syntax
-.Ds
-.Ci fn " name"
-.De
+Output may be redirected from standard output to a file:
 .PP
-which is equivalent to the assignment
-.Ds
-.Ci fn\- name " ="
-.De
+.RS
+.IB fragment " >" filename
+.RE
 .PP
-If, as the most common case, a function variable is bound to a lambda,
-when the function is invoked, the variable
-.Cr $0
-is bound (dynamically, see below) to the name of the function.
+or
 .PP
-Lambdas are just another form of code fragment, and, as such, can be
-exported in the environment, passed as arguments, etc.
-The difference between the two forms is that lambdas bind their arguments,
-while simple brace-enclosed groups ignore theirs.
-.SS "Local Variables"
-Variable assignments may be made local to a set of commands with the
-.Cr local
-construct:
-.Ds
-.Cr "local (\fIvar\fP = \fIvalue\fP; \fIvar\fP = \fIvalue ...\fP) \
-\fIcommand\fP"
-.De
+.RS
+.BI > "filename fragment"
+.RE
 .PP
-The command may be a program fragment, so for example:
-.Ds
-.Cr "local (path = /bin /usr/bin; ifs = ) {"
-.Cr "     " ...
-.Cr "}"
-.De
+The file is created if it does not exist. If the file already exists, its
+contents are replaced. It is an error for the the file to not be writeable.
 .PP
-sets
-.Cr path
-to a minimal useful path and removes
-.Cr ifs
-for the duration of one long compound command.
+Other file descriptors may be specified:
 .PP
-Local-bound variables are exported into the environment,
-and will invoke appropriately named settor functions (see below).
-.SS "Lexically Scoped Variables"
-In addition to local variables,
-.I xs
-supports a different form of temporary variable binding,
-using let-bound, or ``lexically scoped,'' variables.
-(Lexical scoping is the form of binding used by most compiled
-programming languages, such as C or Scheme.)
-A lexically scoped variable is introduced with a
-.Cr let
-statement:
-.Ds
-.Cr "let (\fIvar\fP = \fIvalue\fP; \fIvar\fP = \fIvalue ...\fP) \fIcommand\fP"
-.De
+.RS
+.IB "fragment " >[ ofd ] filename
+.RE
 .PP
-The "= value" can be left out with same effect as "var =".
-.PP
-All references to any of the variables defined in a
-.Cr let
-statement by any code located lexically (that is, textually) within the
-.I command
-portion of the statement will refer to the let-bound variable rather than
-any environment or local-bound variable;
-the immediate text of the
-.Cr let
-statement is the complete extent of that binding.
-That is, lexically bound variables surrounding code fragments
-follow those code fragments around.
-.PP
-An example best shows the difference between
-.Cr let
 and
-.Cr local
-(also known as ``dynamic'') binding: (note that
-.Rc `` "; " ''
-is
-.IR xs 's
-default prompt.)
-.Ds
-.Cr "; x = foo"
-.Cr "; let (x = bar) {"
-.Cr "     echo $x"
-.Cr "     fn lexical { echo $x }"
-.Cr "}"
-.Cr "bar"
-.Cr "; local (x = baz) {"
-.Cr "     echo $x"
-.Cr "     fn dynamic { echo $x }"
-.Cr "}"
-.Cr "baz"
-.Cr "; lexical"
-.Cr "bar"
-.Cr "; dynamic"
-.Cr "foo"
-.Cr "; "
-.De
 .PP
-Lexically bound variables are not exported into the environment,
-and never cause the invocation of settor functions.
-Function (lambda) parameters are lexically bound to their values.
-.SS "For loops"
-The command
-.Ds
-.Cr "for \fIvar\fP \fIlist\fP { \fIcommand\fP }
-.De
+.RS
+.IB "fragment " <[ ifd ] filename
+.RE
+A file descriptor may be duplicated using the form:
 .PP
-Runs the
-.I command
-once for each element of the
-.IR list ,
-with the named variable bound lexically to each
-element of the list, in order.
-Note that if list consists of more than a single term,
-for example (a b c) it must be parenthesized.
+.RS
+.BI >[ fd1 = fd2 ]
+.RE
 .PP
-If multiple bindings are given in the
-.Cr for
-statement, the looping occurs in parallel and
-stops when all lists are exhausted.
-When one list is finished before the others,
-the corresponding variable is bound to the empty list
-for the remaining iterations.
-Thus the loop
-.Ds
-.Cr "for i (a b c); j (x y) { echo $#i $i $#j $j" }
-.De
+This causes output to
+.I fd1
+to be written instead to
+.IR fd2 .
+Thus,
 .PP
-produces the output
-.Ds
-.Cr "1 a 1 x"
-.Cr "1 b 1 y"
-.Cr "1 c 0"
-.De
-.SS "Settor Functions"
-A settor function is a variable of the form
-.Ci set- var\fR,
-which is typically bound to a lambda.
-Whenever a value is assigned to the named variable,
-the lambda is invoked with its arguments bound to the new value.
-While the settor function is running,
-the variable
-.Cr $0
-is bound to the name of the variable being assigned.
-The result of the settor function is used as the actual value in
-the assignment.
+.RS
+.IB fragment > file >[2=1] filename
+.RE
 .PP
-For example, the following settor function is used to keep
-the shell variables
-.Cr home
+causes both standard output and standard error to be written to the same file.
+.PP
+Other redirection operators have their own semantics:
+.PP
+.RS
+.TP
+.BI >> filename
+appends to an existing file; the file is created if nonexistent.
+.TP
+.BI <> filename
+opens a file for reading and writing (on standard input unless otherwise
+specified).
+.TP
+.BI <>> filename
+opens a file for reading and appending (on standard input unless otherwise
+specified).
+.TP
+.BI >< filename
+truncates a file and opens it for reading and writing (on standard output
+unless otherwise specified).
+.TP
+.BI >>< filename
+opens a files for reading and appending (on standard output unless otherwise
+specified).
+.RE
+.PP
+An open file descriptor is closed using this form:
+.PP
+.RS
+.BI >[ fd =]
+.RE
+.PP
+File descriptors must be integer constants.
+.SS Literal input
+Multiple lines of input may be read from a script using a "here document":
+.PP
+.RS
+.IB fragment << eof-marker
+.RE
+.PP
+or
+.PP
+.RS
+.IB fragment <<' eof-marker '
+.RE
+.PP
+The
+.I eof-marker
+is a word which must appear immediately following the final newline of textual
+data taken as input. The first form (with the unquoted
+.IR eof-marker )
+replaces variables within the textual data. (Only simple variables; subscripts
+and constructed names are not allowed.) A
+.B $
+can be emitted literally by writing
+.BR $$ .
+To emit the value of a variable followed immediately by a literal word, write:
+.BI $ var ^ word.
+.PP
+The second form (with the quoted
+.IR eof-marker )
+copies the textual data without substitution of any kind.
+.PP
+Text may also provide the content of a readable file via a "here string":
+.PP
+.RS
+.BI <<<' text '
+.RE
+.PP
+The
+.I text
+may span lines. No substitution is performed within a here string.
+.PP
+A here string may also be created using a variable for the content, like
+.BI <<<$ var
+.RI .
+.SS Process substitution
+.PP
+Process substitution allows for the output of a command to be read from a
+file descriptor or for data written to a file descriptor to be read by a
+command, using the forms:
+.PP
+.RS
+.BI <{ command+ }
+.RE
+.PP
 and
-.Cr HOME
-synchronized.
-.Ds
-.Cr "set-HOME = { |*|"
-.Cr "    local (set-home = )"
-.Cr "        home = $*"
-.Cr "    result $*"
-.Cr "}"
-.De
 .PP
-This settor function is called when any assignment is made to the variable
-.Cr HOME .
-It assigns the new value to the variable
-.Cr home ,
-but disables any settor function for
-.Cr home
-to prevent an infinite recursion.
-Then it returns its argument unchanged for use in the actual assignment to
-.Cr HOME .
+.RS
+.BI >{ command+ }
+.RE
 .PP
-Settor functions do not apply to lexically bound variables.
-.SS Primitives
-Primitives are internal
-.I xs
-operations that cannot or should not (for reasons of performance) be
-written in the interpreter's language.
-The set of primitives makes up the run-time library for
-.IR xs .
+The files created by process substitution may be implemented using pipes,
+which are not seekable.
 .PP
-Primitives can be used with the syntax
-.Ds
-.Ci $& name
-.De
+Multiple
+.IR command s
+may appear within the braces.
 .PP
-A primitive can be used anywhere a lambda is expected.
-The list of primitives is returned as the result of
-the primitive
-.Cr $&primitives .
+Note that the braces are an essential part of this syntax; these are not
+.BI > fragment
+and
+.BI < fragment.
+.SS Local variables
+Local variables exist only during execution of their binding form:
 .PP
-For details on specific primitives, see the section entitled
-.B PRIMITIVES
-below.
+.RS
+.BI "local (" "binding ..." ) " fragment"
+.RE
+.PP
+where
+.B binding
+is either
+.IB name " = " value
+or just name (and value is taken as
+.BR () ).
+.PP
+While bound by
+.BR local ,
+variables are accessible within the environment.
+.SS Lexical variables
+Lexical variables are bound by the form:
+.PP
+.RS
+.BI "let (" "binding ..." ) " fragment"
+.RE
+.PP
+where
+.B binding
+is either
+.IB name " = " value
+or just name (and value is taken as
+.BR () ).
+.PP
+A lexical variable is accessible to all code lexically enclosed by the
+binding form. Furthermore, a lexical variable persists across executions
+of a function which is defined within the
+.B let
+form. A lexical binding is never written to the environment.
+.SS Conditionals
+.B Xs
+has two main conditional forms:
+.PP
+.RS
+.BI if " condition fragment " else " fragment"
+.RE
+.PP
+where
+.I condition
+is a boolean expression and the
+.B else
+branch is optional, and
+.PP
+.RS
+.BI switch " var cases"
+.RE
+.PP
+where
+.I cases
+is a list of
+.IR "word fragment" ,
+each representing the code to be executed for a specific value of
+.IR var ,
+followed by a
+.I fragment
+to be executed when none of the
+.IR word s
+match
+.IR var .
+.SS Loops
+.B Xs
+has three main looping forms:
+.PP
+.RS
+.BI while " condition fragment"
+.RE
+.RS
+.BI until " condition fragment"
+.RE
+.RS
+.BI for " vars-and-values fragment"
+.RE
+.PP
+The
+.B while
+form executes
+.I fragment
+while
+.I condition
+is true.
+.PP
+The
+.B until
+form executes
+.I fragment
+until
+.I condition
+is false.
+.PP
+The
+.B for
+form executes
+.I fragment
+with variables bound to consecutive values in
+.IR vars-and-values ,
+which is a sequence of one or more
+.I var list
+forms separated by
+.BR ; .
+This continues until the longest list is exhausted; shorter lists are
+implicitly padded with
+.B ()
+to match the length of the longest list.
+.PP
+The
+.BI forever " fragment"
+form loops forever, like
+.BR "while true \fIfragment" .
+.SS Settors
+A settor function is a variable like
+.BI set- var
+.PP
+When
+.I var
+is assigned,
+.BI set- var
+is called as a function, passing the value to be assigned.
+.B $0
+is bound to the name of the variable being assigned. The result of
+the settor function is used as the assignment's value.
+.PP
+A settor is never invoked on a lexical variable.
 .SS Exceptions
 Exceptions in
-.I xs
-are used for many forms of non-structured control flow,
-notably error reporting, signals, and flow of control
-constructs such as
-.Cr escape .
+.B xs
+are used for non-lexical control transfer. An exception is passed up the
+call chain to the most recently established catcher. The catcher may handle
+the exception, retry the code which caused the exception or pass the
+exception to the next catcher.
 .PP
-Exceptions are passed up the call chain to catching routines.
-A catcher may decide to intercept an exception,
-retry the code that caused the exception,
-or pass the exception along.
-There can only be one exception raised at any time.
+An exception is a list. The first word denotes the exception type, one of:
 .PP
-Exceptions are represented by lists.
-The first word of an exception is, by convention, the type of exception
-being raised.
-The following exceptions are known:
+.RS
 .TP
-.Cr eof
-Raised by
-.Cr %parse
-when the end of input is reached.
+.B eof
+raised by the
+.B xs
+parser at end of input.
 .TP
-.Cr "error \fIsource message\fP"
-A run-time error.
-Almost all shell errors are reported with the
-.Cr error
-exception.
-The default interactive loop and the outermost level of the
-interpreter catch this exception and print the message.
-.I Source
-is the name of the routine (typically a primitive) which
-raised the error.
+.B error
+where the following words are the source (typically a descriptive name
+such as the name of the function which signalled the error) and a message.
+.B xs
+provides a last-resort catcher to print the message and restart the top loop.
 .TP
-.Cr "exit \fR[\fP\fIreturn-code\fP\fR]\fP"
-Exits
-.I xs
-with
-.Cr return-code ,
-or with
-.Cr 0
-if
-.Cr return-code
-is not specified.
+.B exit
+where the next word is an optional numeric return code (default: 0). This
+exception, when caught by
+.BR xs ,
+exits the shell with the given return code.
 .TP
-.Cr retry
-When raised from a signal catcher,
-causes the body of the
-.Cr catch
-clause to be run again.
-.B If the cause of the caught signal is not resolved, invoking
-.Cr retry
-.B will create an uninterruptible loop.
-.TP
-.Cr "signal \fIsigname\fP"
-Raised when the shell itself receives a signal,
-and the signal is listed in the variable
-.Cr signals .
-.I Signame
-is the name of the signal that was raised.
+.B retry
+when raised by a catcher, causes the body of the
+.B catch
+form to run again. Note that the catcher must have done something to clear
+the cause of the exception; otherwise
+.B retry
+will cause an infinite loop.
+.RE
 .PP
-See the builtin commands
-.Cr catch
-and
-.Cr throw
-for details on how to manipulate exceptions.
-.SH "SPECIAL VARIABLES"
-Several variables are known to
-.I xs
-and are treated specially.
-Redefining these variables can change interpreter semantics.
-Note that only dynamically bound (top-level or
-.Cr local -bound)
-variables are interpreted in this way;
-the names of lexically bound variables are unimportant.
+The
+.B catch
+form executes its body in the context of a catcher:
+.PP
+.RS
+.BI catch " catcher body"
+.RE
+.PP
+The
+.IR catcher " and " body
+are fragments.
+.SH BUILTIN VARIABLES
+These dynamic variables form a part of the programming interface to
+.BR xs .
 .TP
-.Cr *
-The argument list of
-.IR xs .
-.Cr "$1, $2,"
-etc. are the same as
-.Cr $*(1) ,
-.Cr $*(2) ,
-etc.
+.B *
+The arguments passed to
+.BR xs .
+Individual arguments may be referenced via subscripts or as
+.BR $1 ", " $2 ", " $3 ", etc."
 .TP
-.Cr $0
-Holds the value of
-.Cr argv[0]
-with which
-.I xs
-was invoked.
-Additionally,
-.Cr $0
-is set to the name of a function for the duration of
-the execution of that function, and
-.Cr $0
-is also set to the name of the
-file being interpreted for the duration of a
-.Cr "." " command."
+.B 0
+At the top level, this variable
+.RB "(i.e. " $0 )
+is the value of
+.BR xs 's
+argv[0] or the name of a sourced file. Within an executing function,
+the name of the function.
 .TP
-.Cr apid
-The process ID of the last process started in the background.
+.B apid
+The ID of the most recently started background process.
 .TP
-.Cr history
-The name of a file to which commands are appended as
-.I xs
-reads them.
-The 
-.I history
-builtin uses this file, if defined. To use an external program
-(such as
-.IR history (1)),
-delete or redefine the 
-.I xs history
-function.
-If
-.Cr history
-is not set (the default), then
-.I xs
-does not append commands to any file.
+.B history
+The pathname of the file to which
+.B xs
+appends commands read by the toplevel loop. This may be left undefined.
 .TP
-.Cr home
-The current user's home directory, used in tilde
-.Rc ( ~ )
-expansion, as the default directory for the builtin
-.Cr cd
-command, and as the directory in which
-.I xs
-looks to find its initialization file,
-.Cr .xsrc ,
-if
-.I xs
-has been started up as a login shell, and
-.Cr .xsin ,
-if
-.I xs
-is an interactive shell.
-Like
-.Cr path
-and
-.Cr PATH ,
-.Cr home
-and
-.Cr HOME
+.B home
+The path to the current user's home directory.
+.BR $home " and " $HOME
 are aliased to each other.
 .TP
-.Cr ifs
-The default input field separator, used for splitting up the output of
-backquote commands for digestion as a list.
+.B ifs
+The input field separator, used by backquote
+.RB ( ` )
+to split command output into words. The initial value is the list
+.RS
+.I "space tab newline"
+.RE
+.TP
+.B max-eval-depth
+Sets an upper bound on the size of the interpreter's evaluation stack.
+.TP
+.B noexport
+A list of dynamic variable names which
+.B xs
+will not export to the environment.
+.TP
+.B path
+A list of directories to be searched for executable programs. The current
+directory is denoted by the empty word
+.RB ( '' ).
+.BR $path " and " $PATH
+are aliased to each other, with appropriate syntactic adjustments.
+.TP
+.B pid
+The process ID of the running
+.BR xs .
+.TP
+.B prompt
+.B $prompt(1)
+is printed before reading a command.
+.B $prompt(2)
+is printed before reading a continuation line.
+The default,
+.BR "';' ''" ,
+facilitates copy-paste from a terminal session into a script file.
+.B $prompt
+may contain ANSI terminal control characters and sequences.
+.TP
+.B signals
+A list of signals trapped by
+.BR xs .
+For each signal name on
+.BR $signals ,
+.B xs
+raises a correspondingly-named exception upon trapping the signal.
+A signal's disposition is determined by an optional prefix to its name:
+.PP
+.RS
+.TP
+.B -
+ignore the signal, here and in child processes
+.TP
+.B /
+ignore the signal here, but take its default behavior in child processes
+.TP
+.BI . " (only for sigint)"
+perform normal processing (i.e. print an extra newline)
+.TP
+.I none
+default behavior
+.PP
 The initial value of
-.Cr ifs
-is space-tab-newline.
-.TP
-.Cr max-eval-depth
-This sets a limit on how many levels deep the interpreter's evaluation
-stack may become.
-.TP
-.Cr noexport
-A list of variables which
-.I xs
-will not export.
-All variables except for the ones on this list and lexically bound variables
-are exported.
-.TP
-.Cr path
-This is a list of directories to search in for commands.
-The empty string stands for the current directory.
-Note also that an assignment to
-.Cr path
-causes an automatic assignment to
-.Cr PATH ,
-and vice-versa.
-If neither
-.Cr path
-nor
-.Cr PATH
-are set at startup time,
-.Cr path
-assumes a default value suitable for your system.
-This is typically
-.Cr "/usr/ucb /usr/bin /bin ''" .
-.TP
-.Cr pid
-The process ID of the currently running
-.IR xs .
-.TP
-.Cr prompt
-This variable holds the two prompts (in list form) that
-.I xs
-prints.
-.Cr $prompt(1)
-is printed before each command is read, and
-.Cr $prompt(2)
-is printed when input is expected to continue on the next
-line.  (See
-.Cr %parse
-for details.)
-.TP
-\&
-.I xs
-sets
-.Cr $prompt
-to
-.Cr "('; ' '')"
-by default.
-The reason for this is that it enables an
-.I xs
-user to grab commands from previous lines using a
-mouse, and to present them to
-.I xs
-for re-interpretation; the semicolon
-prompt is simply ignored by
-.IR xs .
-The null
-.Cr $prompt(2)
-also has its
-justification:  an
-.I xs
-script, when typed interactively, will not leave
-.Cr $prompt(2) 's
-on the screen,
-and can therefore be grabbed by a mouse and placed
-directly into a file for use as a shell script, without further editing
-being necessary.
-.TP
-.Cr signals
-Contains a list of the signals which
-.I xs
-traps.
-Any signal name which is added to this list causes that signal
-to raise an
-.I xs
-exception.
-For example, to run some commands and make sure some cleanup routine
-is called even if the user interrupts or disconnects during the script,
-one can use the form:
-.Ds
-.Cr "local (signals = $signals sighup sigint) {"
-.Cr "     catch { |e|"
-.Cr "          cleanup"
-.Cr "          throw $e"
-.Cr "     } {"
-.Cr "          " ...
-.Cr "     }"
-.Cr "}"
-.De
-.TP
-\&
-A signal name prefixed by a hyphen
-.Rc ( - )
-causes that signal to be ignored by
-.I xs
-and all of its child processes, unless one of them resets its handler.
-A signal prefixed by a slash
-.Rc ( / )
-is ignored in the current shell, but retains default behavior in
-child processes.
-In addition, the signal
-.Cr sigint
-may be preceeded by the prefix
-.Rc ( . )
-to indicate that normal shell interrupt processing
-(i.e., the printing of an extra newline)
-occurs.
-By default
-.I xs
-starts up with the values
-.Ds
-.Cr ".sigint /sigquit /sigterm"
-.De
-.TP
-\&
-in
-.Cr $signals ;
-other values will be on the list if the shell starts up with
-some signals ignored.
+.B $signals
+is
+.RS
+.RI ".sigint /sigquit /sigterm"
+.RE
+plus any signals ignored (/) when
+.B xs
+started.
+.RE
 .PP
-The values of
-.Cr path
-and
-.Cr home
-are derived from the environment values of
-.Cr PATH
-and
-.Cr HOME
-if those values are present.
-This is for compatibility with other Unix programs, such as
-.IR sh (1).
-.Cr $PATH
-is assumed to be a colon-separated list.
-.PP
-Also for compatibility,
-.I xs
-maintains the value of the
-.Cr SHLVL
-variable, creating it with a value of
-.Cr I
-if needed and incrementing the value when a new
-.I xs
-is spawned. Unlike the other variables in this section, the
-value of
-.Cr SHLVL
-has no influence upon the behavior of the interpreter.
-.SH "SYNTACTIC SUGAR"
-.I xs
-internally rewrites much of the syntax presented thus far
-in terms of calls to shell functions.
-Most features of
-.I xs
-that resemble traditional shell features are included in this category.
-This rewriting occurs at parse time, as commands are recognized
-by the interpreter.
-The shell functions that are the results of rewriting are some
-of the hook functions documented below.
-.PP
-The following tables list all of the major rewriting which
-.I xs
-does, with the forms typically entered by the user on the left
-and their internal form on the right.
-There is no reason for the user to avoid using the right-hand side forms,
-except that they are usually less convenient.
-To see the internal form of a specific command,
-a user can run
-.I xs
-with the
-.Cr \-n
-and
-.Cr \-x
-options;
-when invoked in this way, the shell prints the internal form of its commands
-rather than executing them.
-.ta 2.3i
-.SS "Control Flow"
-.Ds
-.ft \*(Cf
-! \fIcmd\fP	%not {\fIcmd\fP}
-\fIcmd\fP &	%background {\fIcmd\fP}
-\fIcmd1\fP ; \fIcmd2\fP	%seq {\fIcmd1\fP} {\fIcmd2\fP}
-\fIcmd1\fP && \fIcmd2\fP	%and {\fIcmd1\fP} {\fIcmd2\fP}
-\fIcmd1\fP || \fIcmd2\fP	%or {\fIcmd1\fP} {\fIcmd2\fP}
-fn \fIname\fP {|\fIargs\fP| \fIcmd\fP}	fn-^\fIname\fP = {|\fIargs\fP| \
-\fIcmd\fP}
-.ft R
-.De
-.SS "Input/Output Commands"
-.Ds
-.ft \*(Cf
-\fIcmd\fP < \fIfile\fP	%open 0 \fIfile\fP {\fIcmd\fP}
-\fIcmd\fP > \fIfile\fP	%create 1 \fIfile\fP {\fIcmd\fP}
-\fIcmd\fP >[\fIn\fP] \fIfile\fP	%create \fIn\fP \fIfile\fP {\fIcmd\fP}
-\fIcmd\fP >> \fIfile\fP	%append 1 \fIfile\fP {\fIcmd\fP}
-\fIcmd\fP <> \fIfile\fP	%open-write 0 \fIfile\fP {\fIcmd\fP}
-\fIcmd\fP <>> \fIfile\fP	%open-append 0 \fIfile\fP {\fIcmd\fP}
-\fIcmd\fP >< \fIfile\fP	%open-create 1 \fIfile\fP {\fIcmd\fP}
-\fIcmd\fP >>< \fIfile\fP	%open-append 1 \fIfile\fP {\fIcmd\fP}
-\fIcmd\fP >[\fIn\fP=]	%close \fIn\fP {\fIcmd\fP}
-\fIcmd\fP >[\fIm\fP=\fIn\fP]	%dup \fIm\fP \fIn\fP {\fIcmd\fP}
-\fIcmd\fP << tag \fIinput\fP tag	%here 0 \fIinput\fP {\fIcmd\fP}
-\fIcmd\fP <<< \fIstring\fP	%here 0 \fIstring\fP {\fIcmd\fP}
-\fIcmd1\fP | \fIcmd2\fP	%pipe {\fIcmd1\fP} 1 0 {\fIcmd2\fP}
-\fIcmd1\fP |[\fIm\fP=\fIn\fP] \fIcmd2\fP	%pipe {\fIcmd1\fP} \
-\fIm\fP \fIn\fP {\fIcmd2\fP}
-\fIcmd1\fP >{ \fIcmd2\fP }	%writeto \fIvar\fP {\fIcmd2\fP} \
-{\fIcmd1\fP $\fIvar\fP}
-\fIcmd1\fP <{ \fIcmd2\fP }	%readfrom \fIvar\fP {\fIcmd2\fP} \
-{\fIcmd1\fP $\fIvar\fP}
-.ft R
-.De
-.SS "Expressions"
-.Ds
-.ft \*(Cf
-$#\fIvar\fP	<={%count $\fIvar\fP}
-$^\fIvar\fP	<={%flatten ' ' $\fIvar\fP}
-\`{\fIcmd args\fP}	<={%backquote <={%flatten '' $ifs} {\fIcmd args\fP}}
-\`\`\fIifs\fP {\fIcmd args\fP}	<={%backquote <={%flatten '' \fIifs\fP} \
-{\fIcmd args\fP}}
-.ft R
-.De
-.SS "Relational Operators"
-.Ds
-.ft \*(Cf
-\fIa\fP :lt \fIb\fP	{~ {%cmp \fIa\fP \fIb\fP} -1}
-\fIa\fP :le \fIb\fP	{~ {%cmp \fIa\fP \fIb\fP} -1 0}
-\fIa\fP :gt \fIb\fP	{~ {%cmp \fIa\fP \fIb\fP} 1}
-\fIa\fP :ge \fIb\fP	{~ {%cmp \fIa\fP \fIb\fP} 1 0}
-\fIa\fP :eq \fIb\fP	{~ {%cmp \fIa\fP \fIb\fP} 0}
-\fIa\fP :ne \fIb\fP	{~ {%cmp \fIa\fP \fIb\fP} -1 1}
-.ft R
-.De
-.SH BUILTINS
-Builtin commands are shell functions that exist at shell startup time.
-Most builtins are indistinguishable from external commands,
-except that they run in the context of the shell itself rather than
-as a child process.
-Many builtins are implemented with primitives (see above).
-.PP
-Some builtin functions have names that begin with a percent character
-.Rc ( % ).
-These are commands with some special meaning to the shell,
-or are meant for use only by users customizing the shell.
-(This distinction is somewhat fuzzy, and the decisions about which
-functions have
-.Cr % -names
-are somewhat arbitrary.)
-.PP
-All builtins can be redefined and extended by the user.
-.SS "Builtin Commands"
+.B Xs
+maintains
+.B $SHLVL
+for interoperability with other shells.
+.SH BUILTIN COMMANDS
+These commands are built into
+.BR xs ,
+and execute within the
+.B xs
+process.
 .TP
-.Cr ". \fR[\fP-einvx\fR]\fP \fI file \fR[\fPargs ...\fR]\fP"
-Reads
-.I file
-as input to
-.I xs
-and executes its contents.
-The options are a subset of the invocation options for the shell (see below).
+.BR . " [-einvx] " \fIfile " [" \fIargs... ]
+Sources
+.IR file .
+The options are a subset of those recognized by
+.BR xs;
+see Options.
 .TP
-.Cr "access \fR[\fP-n \fIname\fP\fR]\fP \fR[\fP-1e\fR]\fP \
-\fR[\fP-rwx\fR]\fP  \fR[\fP-fdcblsp\fR]\fP \fIpath ...\fP"
-Tests if the named paths are accessible according to the options presented.
-Normally,
-.Cr access
-returns zero (true) for files which are accessible and a
-printable error message (which evaluates as false, according to shell rules)
-for files which are not accessible.
-If the
-.Cr \-1
-option is used, the name of the first file which the test succeeds for is
-returned; if the test succeeds for no file, the empty list is returned.
-However, if the
-.Cr \-e
-option was used,
-.Cr access
-raises an
-.Cr error
-exception.
-If the
-.Cr \-n
-option is used, the pathname arguments are treated as a list of
-directories, and the
-.I name
-option argument is used as a file in those directories
-.Rc "(i.e., " \-n
-is used for path searching).
-.sp 1v
-The default test is whether a file exists.
-These options change the test:
-.IS
+.BR access " [" "-n " \fIname "] [-1e] [-rwx] [-fdcblsp] " \fIpath...
+Tests
+.IR path s
+for accessibility. Without the
+.BR -1 " or " -e
+options,
+.B access
+returns true for paths which are accessible as specified. A printable
+error message (which evaluates as false; see Truth Values) is returned
+for paths which are not accessible. The default test (no options) is
+identical to
+.BR -f .
+These options determine the test to apply to the paths:
+.RS
 .TP
-.Cr \-r
-Is the file readable (by the current user)?
+.B -r
+Is the file readable?
 .TP
-.Cr \-w
-Is the file writable?
+.B -w
+Is the file writeable?
 .TP
-.Cr \-x
+.B -x
 Is the file executable?
-.sp .7v
 .TP
-.Cr \-f
+.B -f
 Is the file a plain file?
 .TP
-.Cr \-d
+.B -d
 Is the file a directory?
 .TP
-.Cr \-c
+.B -c
 Is the file a character device?
 .TP
-.Cr \-b
+.B -b
 Is the file a block device?
 .TP
-.Cr \-l
+.B -l
 Is the file a symbolic link?
 .TP
-.Cr \-s
+.B -s
 Is the file a socket?
 .TP
-.Cr \-p
-Is the file a named pipe (FIFO)?
-.IE
-.TP 
-.Cr "alias \fIalias-name\fP \fIexpansion...\fP"
-Define a new function, 
-.I alias-name
-, which calls 
-.I expansion
-.
-The first command in
-.I expansion
-is replaced with its whats value
-to prevent recursion.
-This can be used to serve a somewhat similar purpose as in bash.
-For example, the following will force ls to use color,
-and make l be ls in long form, with color (due to previous alias):
-.Ds
-.Cr "alias ls ls --color=yes"
-.Cr "alias l ls -l"
-.De
+.B -p
+Is the file a named pipe?
+.RE
 .TP
-.Cr "catch \fIcatcher body\fP"
-Runs
+.BI alias " name expansion..."
+Define a function with
+.I expansion
+as its body. The first word of
+.I expansion
+is replaced with its
+.B whats
+value to prevent the recursion that would occur if
+.I name
+and the first word of
+.I expansion
+are the same.
+.TP
+.BI catch " catcher body"
+Run
 .IR body .
-If it raises an exception,
-.IR catcher
-is run and passed the exception as an argument.
+If an exception is raised, run
+.IR catcher .
+The exception is passed as an argument to
+.IR catcher .
 .TP
-.Cr "cd \fR[\fP\fIdirectory\fP\fR]\fP"
-Changes the current directory to
+.BR cd " [" \fIdirectory ]
+Set the working directory to
 .IR directory .
-With no argument,
-.Cr cd
-changes the current directory to
-.Cr "$home" .
+With no argument, this is the same as
+.BR "cd $home" .
 .TP
-.Cr "dirs \fR[\fP-c\fR]\fP"
-Displays the directory stack. (See
-.IR pushd " and " popd ".)"
-With the
-.Cr "\-c"
-option, clear the directory stack.
+.BR dirs " [" -c ]
+Show the directory stack (see BUILTIN COMMANDS pushd and popd). With
+.BR -c ,
+clear the directory stack.
 .TP
-.Cr "echo \fR[\fP-n\fR]\fP \fR[\fP--\fR]\fP \fIargs ...\fP"
-Prints its arguments to standard output, terminated by a newline.
-Arguments are separated by spaces.
-If the first argument is
-.Cr "\-n"
-no final newline is printed.
-If the first argument is
-.Cr "\-\|\-" ,
-then all other arguments are echoed literally;
-this is used for echoing a literal
-.Cr "\-n" .
+.BR echo " [" -n "] [" -- ] /fIargs...
+Print
+.I args
+to standard output, separated by spaces. The output ends with a newline unless
+suppressed by
+.BR -n .
+Arguments following
+.B --
+are taken literally.
 .TP
-.Cr "escape \fIlambda\fP"
-Run lambda with one argument, an escape block
-which when evaluated will return to the point after this escape.
-This is more formally refered to as an escape continuation.
-In fact, its behavior is a simple subset of exceptions, and is implemented
-fairly simply using catch.
-Escape is useful to replace return/break like constructs; for example
-.Ds
-.Cr "fn f { escape { |fn-return| {
-.Cr "    ...; return 0;"
-.Cr "    ..."
-.Cr "}}"
-.De
+.BI escape " lambda"
+Run
+.IR lambda ,
+a function of one argument. The argument names a function which,
+when evaluated within
+.IR lambda ,
+transfers control to just after the
+.B escape
+form. Arguments of the escape function are returned as the value of the form.
 .TP
-\&
-will exit the function with result 0 when it reaches the return. 
-.TP
-.Cr "eval \fIlist\fP"
-Concatenates the elements of
+.BI eval " list"
+Convert
 .I list
-with spaces and feeds the resulting string to
-the interpreter for rescanning and execution.
+to a word and pass it to the
+.B xs
+interpreter for parsing and execution.
 .TP
-.Cr "exec \fIcmd\fP"
-Replaces
-.I xs
-with the given command.
-If the
-.Cr exec
-contains only redirections,
-then these redirections apply to the current shell
-and the shell does not exit.
-For example,
-.Ds
-.Cr "exec {>[2] err.out}"
-.De
+.BI exec " cmd"
+Replace
+.B xs
+with
+.IR cmd .
+If
+.I cmd
+has only redirections, then apply the redirections to the current
+.BR xs .
 .TP
-\&
-places further output to standard error in the file
-.IR err.out .
-Unlike some other shells,
-.I xs
-requires that redirections in an
-.Cr exec
-be enclosed in a program fragment.
+.BR exit " [" \fIstatus ]
+Cause
+.B xs
+to exit with the given
+.IR status ,
+or with zero if
+.I status
+is not given.
 .TP
-.Cr "exit \fR[\fP\fIstatus\fP\fR]\fP"
-Causes the current shell to exit with the given exit
-.IR status .
-If no argument is given, zero (true) is used.
-(This is different from other shells, that often use the status of
-the last command executed.)
+.B false
+Identical to
+.BR "result 1" .
 .TP
-.Cr "false"
-Always returns a false (non-zero) return value.
+.BI for " binding... " fragment
+See Loops.
 .TP
+.BI forever " fragment"
+See Loops.
 .TP
-.Cr "for \fIbinding\fP ... { \fIcommand\fP }
-See the earlier description of for loops.
+.BI fork " command"
+Run
+.I command
+in a subshell.
 .TP
-.Cr "forever \fIcmd\fP"
-Runs the command repeatedly, until the shell exits or the
-command raises an exception.
-This is equivalent to a
-.Cr "while {true} {\fIcmd\fP}"
-loop except that
-.Cr forever
-does not catch any exceptions.
-.TP
-.Cr "fork \fIcmd\fP"
-Runs a command in a subshell.
-This insulates the parent shell from the effects
-of state changing operations such as
-.Cr cd
-and variable assignments.
-For example:
-.Ds
-.Cr "fork {cd ..; make}"
-.De
-.TP
-\&
-runs
-.IR make (1)
-in the parent directory
-.Rc ( .. ),
-but leaves the shell in the current directory.
-.TP
-.Cr "history \fR[\fI#\fR | -c | -d \fI#\fR | -n | -y]\fP"
-Display or modify the history list. (See the
-.I history
-variable in
-.BI "SPECIAL VARIABLES" ".)"
-With no options, the entire history list is displayed. A numeric option
-limits the display to the specified number of most recent entries.
-The
-.I -c
-option clears the history list, while
-.I -d #
-deletes the
-.IR # 'th
-history item. History recording may temporarily be turned off and on with the
-.I -n
+.BR history " [" \fI# | -c | "-d \fI#" | -n | -y ]
+Without arguments, show command history.
+.I #
+shows the most recent
+.I #
+history entries.
+.B -c
+clears the history.
+.BI -d " #"
+deletes history entry
+.IR # .
+.B -n
 and
-.I -y
-options. When history has been turned off using the
-.I -n
-option, it may only be turned back on using the
-.I -y
-option in the same shell; not in a subshell.
+.B -y
+disable and enable history recording.
 .TP
-.Cr "if \fR[\fP\fItest then-action\fR]\fP \fR[else \fPelse-action\fR]\fP"
-Evaluates the command
-.IR test .
-If the result is true, the command
-.I then
-is run and
-.Cr if
-completes.
-If the result of the test is false, the 
-.I else
-command is run.
-The else-action doesn't require braces no matter
-the number of actions, so one can write code like:
-.Ds
-.Cr "... } else if {~ $a $b} { ... }"
-.De
+.BI if " condition fragment \fR[" else " fragment\fR]"
+See Conditionals.
 .TP
-\&
-Note that:
-.Ds
-.Cr ...}
-.Cr "else if {~ $a $b} { ... }"
-.De
+.B jobs
+List background jobs.
 .TP
-\&
-with the else on a separate line, will only
-work if the if-command has parentheses wrapping its body
-and else-statements.
-.TP
-.Cr jobs
-Display background job information.
-.TP
-.Cr "limit \fR[\fP-h\fR]\fP \fI\fR[\fPresource \fR[\fPvalue\fR]\fP\fR]\fP\fP"
-Similar to the
-.IR csh (1)
-.Cr limit
-builtin, this command operates upon the
-resource limits of a process.
-With no arguments,
-.Cr limit
-prints all the current limits;
-with one argument,
-.Cr limit
-prints the named limit;
-with two arguments, it sets the named limit to the given value.
-The
-.Cr \-h
-flag displays/alters the hard
-limits.
-The resources which can be shown or altered are
-.Cr cputime ,
-.Cr filesize ,
-.Cr datasize ,
-.Cr stacksize ,
-.Cr coredumpsize
-and
-.Cr memoryuse .
-For
-example:
-.Ds
-.Cr "limit coredumpsize 0"
-.De
-.TP
-\&
-disables core dumps.
-.TP
-\&
-The limit values must either be the word
-.Rc `` unlimited ''
-or a number with an optional suffix indicating units.
-For size limits, the suffixes
-.Cr k
-(kilobytes),
-.Cr m
-(megabytes), and
-.Cr g
-(gigabytes) are recognized.
-For time limits,
-.Cr s
+.BR limit " [" -h "] [" \fIresource " [" \fIvalue ]]
+Display or alter process resource limits.
+.B -h
+for hard limits.
+.I value
+is either
+.B unlimited
+or a number. Numbers representing size allow the suffixes
+.B k
+(kilobyte),
+.B m
+(megabyte), and
+.B g
+(gigabyte). Numbers representing time allow the suffixes
+.B s
 (seconds),
-.Cr m
+.B m
 (minutes), and
-.Cr h
-(hours) are known;
-in addition, times of the form
-.Cr "\fIhh\fP:\fImm\fP:\fIss\fP"
-and
-.Cr "\fImm\fP:\fIss\fP"
-are accepted.
-See
-.IR getrlimit (2)
-for details on resource limit semantics.
+.B h
+(hours) as well as durations like
+.IR hh : mm : "ss and mm" : ss.
 .TP
-.Cr "map \fIaction\fP \fIlist\fP
-Call
+.BI map " action list"
+Apply
 .I action
-with a single argument for each element of \fIlist\fP.
-Since lists auto-expand, list
-contains the rest of the arguments to the command.
-Returns the list of results of each action.
+individually to each element of
+.IR list ;
+collect the results as
+.BR map 's
+result.
 .TP
-.Cr "omap \fIaction\fP \fIlist\fP
-Like
-.IR map ,
-but return the list of the outputs of action, in the same form as if
-`` '' action (i.e. with an empty input field separator list) were called.
+.BI omap " action list"
+Like map, but collect a list of the outputs of
+.IR action .
 .TP
-.Cr "popd"
-.I cd
-into the directory on top of the directory stack and pop the stack.
-If the stack is empty (for example, if
-.I pushd
-has not been called), then stay in the current directory.
-Also displays the remaining stack.
+.B popd
+Pop the directory stack to set the working directory, and print the new
+stack. The command is ignored if the directory stack is empty.
 .TP
-.Cr "printf \fIformat ...\fP"
-Print formatted text. Valid conversions are those of
-.IR printf (3p),
-including floating-point conversions.
-There must be a one-to-one correspondence between format specs (excluding
+.BI printf " format args..."
+Print
+.I args
+on standard output according to
+.IR format .
+Valid
+.I format
+conversions are those of
+.BR printf (3p),
+except that (1) There must a one-to-correspondence between format specs
+(excluding
 .BR %% )
-and arguments; positional argument specs, variable width and precision and
-excess arguments are all disallowed.
-Backslash escapes in the format are not interpreted by
-.IR printf .
+and arguments: positional argument specs, variable width and precision,
+and excess arguments are all disallowed. (2) Backslash escapes are not
+interpreted in
+.IR format .
 .TP
-.Cr "pushd \fR[\fP\fIdir\fP\fR]\fP"
-Add directory's absolute path onto the directory stack,
-.I cd
-into the directory and display the new stack. If
+.BR pushd " [" \fIdir ]
+Push
+.IR dir 's
+absolute path onto the directory stack, set the working directory to
 .I dir
-is not provided and the stack is at least two deep, then alternate
-between the top two directories.
+and show the new stack. If
+.I dir
+is omitted and the stack is at least two deep, then alternate between
+the two top directories.
 .TP
-.Cr "read"
-Reads from standard input and returns either the empty list (in the
-case of end-of-file) or a single element string with up to one line of
-data, including possible redirections.  This function reads one
-character at a time in order to not read more data out of a pipe than
-it should.  The terminating newline (if present) is not included in
-the returned string.
-.TP 
-.Cr "result \fIvalue ...\fP"
-Returns its arguments.
-This is
-.IR xs 's
-identity function.
+.B read
+Read from standard input and return a single word containing a line of
+text (without the newline). Return
+.B ()
+upon end-of-file.
 .TP
-\&
-While
-.Cr result
-may be used to return a lambda from a function, a closure associated
-with the function will not work. In other words,
-.I xs
-does not support upward funargs.
+.BI result " value..."
+Return
+.IR value 's.
 .TP
-.Cr "switch \fIvalue\fP \fI\fR[\fPcase1 \
-action1\fR]\fP\fP...\fI\fR[\fPdefault-action\fR]\fP\fP"
-Go through the list of cases, 
-testing if they are equal to
-.IR value .
-The matching action of the first
-case which matches is executed.
+.BR switch " \fIvalue [" "\fIcase \fIaction" "]... [" \fIdefault-action ]
+See Conditionals.
 .TP
-.Cr "throw \fIexception arg ...\fP"
-Raise the named exception, passing all of the arguments to
-.Cr throw
-to the enclosing exception handler.
+.BI throw " exception arg..."
+See Exceptions.
 .TP
-.Cr "time \fIcmd arg ... \fP"
-Prints, on the shell's standard error,
-the real, user, and system time consumed by
-executing the command.
+.BI time " command arg..."
+Execute
+.I command
+with
+.IR arg s.
+Print consumed real, user and system time to standard error.
 .TP
-.Cr "true"
-Always returns a true (zero) return value.
+.B true
+Identical to
+.BR "result 0" .
 .TP
-.Cr "umask \fI\fR[\fPmask\fR]"
-Sets the current umask (see
-.IR umask (2))
-to the octal
-.IR mask .
-If no argument is present, the current mask value is printed.
+.BR umask " [\fImask\fR]
+Set or show the umask.
 .TP
-.Cr "until \fItest body\fP"
-Identical to while, except test is negated
+.BI until " test body"
+See Loops.
 .TP
-.Cr "unwind-protect \fIbody cleanup\fP"
-Runs
-.I body
-and, when it completes or raises an exception, runs
+.BI unwind-protect " body cleanup"
+Execute
+.IR body ;
+when it completes or raises an exception, run
 .IR cleanup .
 .TP
-.Cr "var \fIvar ...\fP"
-Prints definitions of the named variables,
-suitable for being used as input to the shell.
+.BI var " var..."
+Print definition of
+.IR var (s).
 .TP
-.Cr "vars \fR[\fP-vfs\fR]\fP \fR[\fP-epi\fR]\fP"
-Prints all shell variables, functions, and settor functions
-(in a form suitable for use as shell input),
-which match the criteria specified by the options.
-.IS
+.BR vars " [" -vfs "] [" -epi ]
+Print definition of all variables which satisfy the given options:
+.RS
 .TP
-.Cr \-v
-variables (that are not functions or settor functions)
+.B -v
+variables (not functions or settors). This is the default if none of
+.BR -v ", " -f " or " -s
+is given.
 .TP
-.Cr \-f
+.B -f
 functions
 .TP
-.Cr \-s
-settor functions
-.sp .7v
+.B -s
+settors
 .TP
-.Cr \-e
-exported values
+.B -e
+exported. This is the default if none of
+.BR -e ", " -p " or " -i
+is given.
 .TP
-.Cr \-p
-private (not exported) values
+.B -p
+private (not exported)
 .TP
-.Cr \-i
-internal (predefined and builtin) values
-.sp .7v
+.B -i
+internal (predefined and builtin)
 .TP
-.Cr \-a
+.B -a
 all of the above
-.IE
+.RE
 .TP
-\&
-If none of
-.Cr \-v ,
-.Cr \-f ", or"
-.Cr \-s
-are specified,
-.Cr \-v
-is used.
-If none of
-.Cr \-e ,
-.Cr \-p ", or"
-.Cr \-i
-are specified,
-.Cr \-e
-is used.
-.TP
-.Cr "wait \fI\fR[\fPpid\fR]"
-Waits for the specified
-.IR pid ,
-which must have been started by
-.IR xs .
-If no
+.BR wait " [\fIpid\fR]
+Wait for a child process denoted by its
 .I pid
-is specified, waits for any child process to exit.
+to exit. If no
+.I pid
+is given, wait for any child process.
 .TP
-.Cr "whats \fIprogam ...\fP"
-For each named 
-.IR program ,
-prints the pathname, primitive, lambda, or code fragment which
-would be run if the program appeared as the first word of a command.
+.BI whats " command..."
+Identify
+.IR command (s)
+by pathname, primitive, or fragment.
 .TP
-.Cr "while \fItest body\fP"
-Evaluates the
-.I test
-and, if it is true, runs the
-.I body
-and repeats.
-.SS "Hook Functions"
-A subset of the
-.Cr % -named
-functions are known as ``hook functions.''
-The hook functions are called to implement some internal
-shell operations, and are available as functions in order
-that their values can be changed.
-Typically, a call to a hook function is from code generated by
-the syntactic sugar rewritings.
+.BI while " test body"
+See Loops.
+.RE
+.SH HOOK FUNCTIONS
+The following functions implement specific parts of
+.B xs
+semantics; a hook function can be rewritten to provide special behaviors.
+Hook functions are normally called as a result of
+.B xs
+translating programs into an internal form. See CANONICAL FORM.
 .TP
-.Cr "%and \fIcmd ...\fP"
-Runs the commands in order, stopping after the first one
-that has a false return value.
-Returns the result of the last command run.
+.BI %and " command..."
+Execute
+.IR command (s)
+from left to right, stopping at the command that first yields a false
+value. The false value is returned by
+.BR %and .
 .TP
-.Cr "%append \fIfd file cmd\fP"
-Runs the command with file descriptor
+.BI %append " fd file command"
+Run
+.I command
+with
 .I fd
-set up to append to the
+open in append mode on
 .IR file .
 .TP
-.Cr "%background \fIcmd\fP"
-Runs the command in the background.
-The shell variable
-.Cr apid
-contains the process ID of the background process,
-which is printed if the shell is interactive (according to
-.Cr %is-interactive ).
+.B %background " command"
+Run
+.I command
+as a background process. If
+.B xs
+is an interactive shell, print the background process ID.
 .TP
-.Cr "%backquote \fIseparator cmd\fP"
-Runs the command in a child process and returns its
-standard output as a list, separated (with the same rules used in
-.Cr %split )
-into elements according to
-.IR separator .
+.BI %backquote " separator(s) command"
+Run command as a child process, splitting standard output into words at
+any character in
+.IR separator(s) .
 .TP
-.Cr %batch-loop
-Parses commands from the current input source and
-passes the commands to the function
-.IR %dispatch ,
-which is usually a dynamically bound identifier.
-This function catches the exception
-.Cr eof
-which causes it to return.
-This function is invoked by the shell on startup and from the dot
-.Rc ( . )
-and
-.Cr eval
-commands, when the input source is not interactive.
-(See also
-.Cr %interactive-loop .)
+.BI close " fd command"
+Run
+.I command
+with the closed file descriptor
+.IR fd .
 .TP
-.Cr "%close \fIfd cmd\fP"
-Runs the command with the given file descriptor closed.
-.TP
-.Cr "%cmp \fIa b\fP"
-Compares its arguments and returns -1, 0 or 1 if
-.I a
+.BI %cmp " word1 word2"
+Compare
+.IR word1 " to " word2
+and return -1, 0 or 1 if
+.I word1
 is respectively less than, equal to or greater than
-.IR b .
-If either argument is non-numeric, then the arguments are compared
-lexicographically, honoring the locale's collation order.
+.IR word2 .
+If either argument is non-numeric, then a lexicographic comparison is
+done based upon the locale's collation order.
 .TP
-\&
-The result is not defined for list arguments, except that
-comparisons may be made against the empty list.
-The result in this case is 0 if both arguments
-are either an empty list or an empty string, and nonzero otherwise.
+.BI count " list"
+Return the number of words in
+.IR list .
 .TP
-.Cr "%count \fIlist\fP"
-Returns the number of arguments to the primitive.
-.TP
-.Cr "%create \fIfd file cmd\fP"
-Runs the command with file descriptor
+.B %create " fd file command"
+Run
+.I command
+with
 .I fd
-set up to write to the
+open for writing on
 .IR file .
 .TP
-.Cr "%dup \fInewfd oldfd cmd\fP"
-Runs the command with the file descriptor
+.BI %dup "newfd oldfd command"
+Run
+.I command
+with
 .I oldfd
-copied (via
-.IR dup (2))
-to file descriptor
+copied to
 .IR newfd .
 .TP
-.Cr "%eval-noprint \fIcmd\fP"
-Run the command.
-(Passed as the argument to
-.Cr %batch-loop
-and
-.Cr %interactive-loop .)
+.BI %exit-on-false " command"
+Run
+.IR command ;
+exit
+.B xs
+if any part of
+.I command
+(outside of conditional tests and arguments to logical operators)
+returns a false value.
 .TP
-.Cr "%eval-print \fIcmd\fP"
-Print and run the command.
-(Passed as the argument to
-.Cr %batch-loop
-and
-.Cr %interactive-loop
-when the
-.Cr \-x
-option is used.)
-.TP
-.Cr "%exec-failure \fIfile argv0 args ...\fP"
-This function, if it exists, is called in the context of a
-child process if an executable file was found but
-.IR execve (2)
-could not run it.
-If the function returns, an error message is printed and the
-shell exits, but the function can
-.Cr exec
-a program if it thinks it knows what to do.
-Note that the name of the program appears twice in the
-arguments to
-.Cr %exec-failure ,
-once as a filename and once as the first element of the
-.Cr argv
-array; in some cases the two will be identical, but in
-others the former will be a full pathname and the latter
-will just be the basename.
-Some versions of
-.I xs
-may provide a builtin version of this function to handle
-.Cr #! -style
-shell scripts if the kernel does not.
-.TP
-.Cr "%exit-on-false \fIcmd\fP"
-Runs the command, and exits if any command
-(except those executing as the tests of conditional statements)
-returns a non-zero status.
-(This function is used as an argument to 
-.Cr %batch-loop
-and
-.Cr %interactive-loop
-when the shell is invoked with the
-.Cr \-e
-option.)
-.TP
-.Cr "%flatten \fIseparator list\fP"
-Concatenate the elements of
-.I list
-into one string,
-separated by the string
+.BI %flatten " separator list"
+Concatenate the words of
+.IR list ,
+interposing
 .IR separator .
 .TP
-.Cr "%here \fIfd word ... cmd\fP"
-Runs the command with the
+.BI %here " fd word... command"
+Run command with
 .IR word s
-passed as input on file descriptor
+passed as an input file on
 .IR fd .
 .TP
-.Cr "%home \fR[\fIuser\fR]"
-Returns the home directory of the named user, or
-.Cr $home
-if there are no arguments.
+.B %not " command"
+Run command and invert the boolean sense of its result.
 .TP
-.Cr "%interactive-loop"
-Prompts,
-parses commands from the current input source and
-passes the commands to the function
-.IR %dispatch ,
-which is usually a dynamically bound identifier.
-This function catches the exception
-.Cr eof
-which causes it to return.
-This function is invoked by the shell on startup and from the dot
-.Rc ( . )
-commands, when the input source is interactive.
-(See also
-.Cr %batch-loop .)
-.TP
-.Cr "%noeval-noprint \fIcmd\fP"
-Do nothing.
-(Passed as the argument to
-.Cr %batch-loop
-and
-.Cr %interactive-loop
-when the
-.Cr \-n
-option is used.)
-.TP
-.Cr "%noeval-print \fIcmd\fP"
-Print but don't run the command.
-(Passed as the argument to
-.Cr %batch-loop
-and
-.Cr %interactive-loop
-when the
-.Cr \-x
-and
-.Cr \-n
-options are used.)
-.TP
-.Cr "%not \fIcmd\fP"
-Runs the command and returns false if its exit status was true,
-otherwise returns true.
-.TP
-.Cr "%one \fIlist\fP"
-If
+.BI %one " list"
+Return
 .I list
-is one element long,
-.Cr %one
-returns its value;
-otherwise it raises an exception.
-.Cr %one
-is used to ensure that redirection operations get passed exactly one filename.
+if it contains exactly one word; otherwise raise a "too many files in
+redirection" error.
 .TP
-.Cr "%open \fIfd file cmd\fP"
-Runs the command with
+.BI %open " fd file command"
+Run
+.I command
+with
 .I file
-open for reading on file descriptor
+open for reading on
 .IR fd .
 .TP
-.Cr "%open-append \fIfd file cmd\fP"
-Runs the command with
+.BI %open-append " fd file command"
+Run
+.I command
+with
 .I file
-open for reading and appending on file descriptor
+open for reading and appending on
 .IR fd .
 .TP
-.Cr "%open-create \fIfd file cmd\fP"
-Runs the command with
+.BI %open-create " fd file command"
+Run
+.I command
+with
 .I file
-open for reading and writing on file descriptor
+open for reading and writing on
 .IR fd .
-If the file already exists, it is truncated.
+If the file exists, truncate it.
 .TP
-.Cr "%open-write \fIfd file cmd\fP"
-Runs the command with
+.BI %open-write " fd file command"
+Run
+.I command
+with
 .I file
-open for reading and writing on file descriptor
+open for reading and writing on
 .IR fd .
 .TP
-.Cr "%openfile \fImode fd file cmd\fP"
-Runs the command with
+.B %openfile " mode fd file command"
+Run
+.I command
+with
 .I file
-opened according to
-.I mode
-on file descriptor
-.IR fd .
-The modes
-.Rc ( r ,
-.Cr w ,
-.Cr a ,
-.Cr r+ ,
-.Cr w+ ,
-and
-.Cr a+ )
-have the same meanings in
-.Cr %openfile
-as they do in
-.IR fopen (3).
-.Cr %openfile
-is invoked by the redirection hook functions:
-.Cr %append ,
-.Cr %create ,
-.Cr %open ,
-.Cr %open-append ,
-.Cr %open-create ,
-and
-.Cr %open-write .
+open on
+.I fd
+with the given
+.IR mode .
 .TP
-.Cr "%or \fIcmd ...\fP"
-Runs the commands in order, stopping after the first one
-that has a true return value.
-Returns the result of the last command run.
+.BI %or " command..."
+Execute
+.IR command (s)
+from left to right, stopping at the command that first yields a true
+value. The true value is returned by
+.BR %or .
 .TP
-.Cr "%parse \fIprompt1 prompt2\fP"
-Reads input from the current input source, printing
-.I prompt1
-before reading anything and
-.I prompt2
-before reading continued lines.
-Returns a code fragment suitable for execution.
-Raises the exception
-.Cr eof
-on end of input.
-.TP
-.Cr "%pathsearch \fIprogram\fP"
-Looks for an executable file named
+.BI %pathsearch " program"
+If
 .I program
-in the directories listed in
-.Cr $path .
-If such a file is found, it is returned;
-if one is not found, an
-.Cr error
-exception is raised.
+exists in a directory on
+.BR $path ,
+return the full path to
+.IR program .
+Otherwise raise an error.
 .TP
-.Cr "%pipe \fIcmd \fP\fR[\fP\fIoutfd infd cmd\fR] ..."
-Runs the commands, with the file descriptor
+.BR %pipe " \fIcommand1\fR [\fIoutfd infd command2\fR] ..."
+Run
+.IR command s
+with
 .I outfd
-in the left-hand process connected by a pipe to the file descriptor
+of
+.I command1
+connected via a pipe to
 .I infd
-in the right-hand process.
-If there are more than two commands,
-a multi-stage pipeline is created.
+of
+.IR command2 .
+Additional commands may be added to the pipeline.
 .TP
-.Cr "%prompt"
-Called by
-.Cr %interactive-loop
-before every call to
-.Cr %parse .
-This function allows the user to provide any actions that he or she may
-wish to have executed before being prompted (e.g., updating the value of the
-.Cr prompt
-variable to contain all or part of the current working directory).
-.TP
-.Cr "%readfrom \fIvar input cmd\fP"
-Runs
-.I cmd
-with the variable
+.BI %readfrom " var input command"
+Run command with
 .I var
-locally bound
-to the name of a file which contains the output of running
-the command
+bound to the name of a file containing the standard output produced by the
+command
 .IR input .
 .TP
-.Cr "%seq \fIcmd ...\fP"
-Runs the commands, in order.
-.TP
-.Cr "%whats \fIprogram ...\fP"
-For each named 
-.IR program ,
-returns the pathname, primitive, lambda, or code fragment which
-would be run if the program appeared as the first word of a command.
-.TP
-.Cr "%writeto \fIvar output cmd\fP"
-Runs
-.I cmd
-with the variable
-.I var
-locally bound
-to the name of a file which is used as the input for the command
-.IR output .
-.SS "Utility Functions"
-These functions are useful for people customizing the shell,
-may be used by other builtin commands,
-and probably don't make much sense to replace,
-though that is always possible.
-.TP
-.Cr "%apids"
-Returns the process IDs of all background processes that the shell
-has not yet waited for.
-.TP
-.Cr "%fsplit \fIseparator \fR[\fIargs ...\fR]"
-Splits its arguments into separate strings at every occurrence
-of any of the characters in the string
-.IR separator .
-Repeated instances of separator characters cause null strings to
-appear in the result.
-(This function is used by some builtin settor functions.)
-.TP
-.Cr "%is-interactive"
-Returns true if the current interpreter context is interactive;
-that is, if shell command input is currently coming from an
-interactive user.
-More precisely, this is true if the innermost enclosing read-eval-print
-loop is
-.Cr %interactive-loop
-rather than
-.Cr %batch-loop .
-.TP
-.Cr "%newfd"
-Returns a file descriptor that the shell thinks is not currently in use.
-.TP
-.Cr "%run \fIprogram argv0 args ...\fP"
-Run the named program, which is not searched for in
-.Cr $path ,
-with the argument vector set to the remaining arguments.
-This builtin can be used to set
-.Cr argv[0]
-(by convention, the name of the program)
-to something other than file name.
-.TP
-.Cr "%split \fIseparator \fR[\fPargs ...\fR]"
-Splits its arguments into separate strings at every occurrence
-of any of the characters in the string
-.IR separator .
-Repeated instances of separator characters are coalesced.
-Backquote substitution splits with the same rules.
-.TP
-.Cr "%var \fIvar ...\fP"
-For each named variable,
-returns a string which, if interpreted by
-.I xs
-would assign to the variable its current value.
-.SH PRIMITIVES
-Primitives exist in
-.I xs
-so that, in the presence of spoofing and redefinitions,
-there is a way to refer to built-in behaviors.
-This ability is necessary for the shell to be able to unambiguously refer
-to itself, but is also useful for users who have otherwise made their
-environment unworkable (through ill-advised redefinition) but don't want
-to kill the current shell.
-.PP
-Primitives are referenced with the
-.Ds
-.Cr "$&\fIname"
-.De
-.PP
-notation.
-In this section, the
-.Rc `` $& ''
-prefixes will be omitted when primitive names are mentioned.
-Note that, by convention, primitive names follow C identifier
-names where
-.I xs
-variable and function names often contain
-.Rc `` % ''
-and
-.Rc `` - ''
-characters.
-.PP
-The following primitives directly implement the
-builtin functions with the same names:
-.ta 1.75i 3.5i
-.Ds
-.ft \*(Cf
-access	fork	throw
-catch	if	umask
-echo	newpgrp	wait
-exec	printf	
-forever	result	
-.ft R
-.De
-.PP
-In addition, the primitive
-.Cr dot
-implements the
-.Rc `` . ''
-builtin function.
-.PP
-The
-.Cr cd
-primitive is used in the implementation of the
-.Cr cd
-builtin, but does not understand no arguments to imply
-.Cr $home .
-The
-.Cr vars
-and
-.Cr internals
-primitives are used by the implementation of the
-.Cr vars
-builtin.
-.PP
-The following primitives implement the hook functions
-of the same names, with
-.Rc `` % ''
-prefixes:
-.ta 1.75i 3.5i
-.Ds
-.ft \*(Cf
-apids	here	run
-close	home	seq
-cmp	newfd	split
-count	openfile	var
-dup	parse	whats
-flatten	pipe
-fsplit	read
-.ft R
-.De
-.PP
-The following primitives implement the similar named hook functions,
-with
-.Rc `` % ''
-prefixes and internal hyphens:
-.ta 1.75i 3.5i
-.Ds
-.ft \*(Cf
-batchloop	exitonfalse	isinteractive
-islogin
-.ft R
-.De
-.PP
-The
-.Cr background
-primitive is used to implement the
-.Cr %background
-hook function, but does not print the process ID of the
-background process or set
-.Cr $apid .
-The
-.Cr backquote
-primitive is used to implement the
-.Cr %backquote
-hook function, but returns the exit status of the child as the
-first value of its result instead of setting
-.Cr $bqstatus
-to it.
-.PP
-The following primitives implement the similarly named settor functions:
-.ta 1.75i 3.5i
-.Ds
-.ft \*(Cf
-sethistory	setnoexport	setsignals
-.ft R
-.De
-.PP
-The
-.Cr setmaxevaldepth
-primitive implements the settor function for the
-.Cr max-eval-depth
-variable, which is used to limit the depth of the interpreter's
-evaluation stack.
-.PP
-Some primitives are included in
-.I xs
-conditionally, based on compile-time configuration options.
-Those primitives, and the functions to which they are bound, are
-.ta 2i
-.Ds
-.ft \*(Cf
-execfailure	%exec-failure
-limit	limit
-readfrom	%readfrom
-time	time
-writeto	%writeto
-.ft R
-.De
-.PP
-The primitive
-.Cr resetterminal
-is present if
-.I xs
-is compiled with support for the
-.I readline
-library.
-It is used in the implementation of settor functions of the
-.Cr TERM
-and
-.Cr TERMCAP
-variables to notify the line editing packages that the terminal
-configuration has changed.
-.PP
-Several primitives are not directly associated with other function.
-They are:
-.TP
-.Cr "$&collect"
-Invokes the garbage collector.
-The garbage collector in
-.I xs
-runs rather frequently;
-there should be no reason for a user to issue this command.
-.TP
-.Cr "$&len"
-Returns the number of characters in each word provided as an argument.
-.TP
-.Cr "$&primitives"
-Returns a list of the names of xs primitives.
-.TP
-.Cr "$&random"
-Returns a random integer.
-.TP
-.Cr "$&version"
-Returns the version string of
-.IR xs .
-.TP
-.Cr "$&wid"
-Returns the number of display cells occupied by each word provided as
-an argument.
-.SH OPTIONS
-.TP
-.Cr \-c
-Run the given
-.IR command ,
-placing the rest of the arguments to
-.I xs
-in
-.Cr $* .
-.TP
-.Cr \-s
-Read commands from standard input;
-i.e., put the first argument
-to
-.I xs
-in
-.Cr $*
-rather than using it as the name of a file to source.
-.TP
-.Cr \-i
-Force
-.I xs
-to be an interactive shell after loading
-.Cr $home/.xsin .
-Normally
-.I xs
-is only interactive if it
-is run with commands coming from standard input and
-standard input is connected to a terminal.
-If
-.I xs
-also runs
-.Cr $home/.xsrc ,
-it does so before running
-.Cr $home/.xsin .
-.TP
-.Cr \-l
+.BI %seq " command..."
 Run
-.Cr $home/.xsrc
-on startup, i.e., be a login shell.
-.Cr \-l
-is implied if the name the shell was run under (that is,
-.Cr argv[0] )
-starts with a dash 
-.Rc ( - ).
+.IR command s
+in order, from left to right.
 .TP
-.Cr \-e
-Exit if any command (except those executing as the tests of
-conditional statements) returns a non-zero status.
+.BI %whats " program..."
+Return the pathname, primitive, or fragment of each
+.IR program .
 .TP
-.Cr \-v
-Echo all input to standard error.
+.BI %writeto " var output command"
+Run command with
+.I var
+bound to the name of a file containing the standard input to be consumed
+by the command
+.IR output .
+.SH UTILITY FUNCTIONS
+These functions also define
+.B xs
+behavior, but are less useful for customization:
 .TP
-.Cr \-x
-Print commands to standard error before executing them.
+.B %apids
+Return the process IDs of all background processes for which
+.B xs
+has not yet waited.
 .TP
-.Cr \-n
-Turn off execution of commands.
-This can be used for checking the syntax of scripts.
-When combined with
-.Cr \-x ,
-.I xs
-prints the entered command based on the internal (parsed) representation.
+.BI %fsplit " separator(s) arg..."
+Split each
+.I arg
+word at any
+.I separator
+character, producing a list. Repeated instances of
+.I separator
+in
+.IR arg s
+create empty words
+.RB ( '' )
+in the result.
 .TP
-.Cr \-p
-Don't initialize functions from the environment.
-This is used to help make scripts that don't break unexpectedly when
-the environment contains functions that would override commands used in
-the script.
+.B %is-interactive
+Return true if the innermost toploop is interactive.
 .TP
-.Cr \-o
-Don't open
-.Cr /dev/null
-on file descriptors 0, 1, and 2, if any of those descriptors are
-inherited closed.
+.B %newfd
+Return a file descriptor that the shell believes is not otherwise used.
 .TP
-.Cr \-d
-Don't trap
-.Cr SIGQUIT
-or
-.Cr SIGTERM .
-This is used for debugging.
-.SH HISTORY AND EDITING
-When built with the
-.I readline
-library, command and history editing is provided by the libary.
-.SH MISC NOTES
+.BI %run " program argv0 args..."
+Run
+.IR program ,
+which must be an absolute pathname, passing
+.I argv0
+as the program's name and
+.IR arg s
+as its arguments.
+.TP
+.B %split " separator arg..."
+Like
+.BR %fsplit ,
+but repeated instances in
+.IR arg s
+of a
+.I separator
+are coalesced.
+.TP
+.BI %var " var..."
+Return the definition of each
+.IR var .
+.SH PRIMITIVE FUNCTIONS
+Primitives provide the underlying behaviors for many hooks as well as other
+parts of
+.BR xs 's
+operation, and may not be redefined. By convention, primitive names begin
+with
+.B &
+and are referenced as
+.BR $& "\fIname\fR ."
 .PP
-As with any other shell scripting language,
-process forking takes up the majority of time:
-.Ds
-.Cr "x = 0; while {!~ $x 4000} { x = `($x + 1) }
-.De
+.TS
+l l l l l .
+&access	&dup	&isinteractive	&read	&time
+&apids	&echo	&islogin	&readfrom	&umask
+&background	&exec	&len	&resetterminal	&var
+&backquote	&exitonfalse	&limit	&result	&vars
+&batchloop	&flatten	&newfd	&run	&version
+&catch	&forever	&newpgrp	&seq	&wait
+&cd	&fork	&openfile	&sethistory	&whats
+&close	&fsplit	&parse	&setmaxevaldepth	&wid
+&cmp	&here	&pipe	&setnoexport	&writeto
+&collect	&home	&primitives	&setsignals
+&count	&if	&printf	&split
+&dot	&internals	&random	&throw
+.TE
+.SH TOPLOOPS
+TBCL - see Hook Functions in original manual. %eval-..., %noeval-..., %...-loop, %parse and %prompt.
+A toploop repeatedly reads a command, executes it and prints the result.
+.B Xs
+includes several toploops, one of which is selected depending upon
+.B xs
+options.
 .PP
-is several magnitudes faster than:
-.Ds
-.Cr "x = 0; while {test $x -ne 4000} { x = `($x + 1) }
-.De
+.TP
+.B %batch-loop
+This is the toploop for a non-interactive shell and for the dot
+.RB ( . )
+and
+.B eval
+commands when their input is non-interactive.
+.B %batch-loop
+returns upon catching an
+.B eof
+exception.
+.TP
+.B %interactive-loop
+This is the toploop for an interactive shell and for the dot
+.RB ( . )
+and
+.B eval
+commands when their input is interactive.
+.B %interactive-loop
+returns upon catching an
+.B eof
+exception.
+
+This is the toploop for an interactive shell and for the dot
+.RB ( . )
+and
+.B eval
+commands when their input is interactive.
+.B %interactive-loop
+returns upon catching an
+.B eof
+exception.
 .PP
-Even though xs's arithmetic code is rather slow, in this
-case the cost of fork+exec far outweighs it.
+.B Xs
+binds one of the following functions to
+.B fn-%dispatch
+for use by the toploop. The choice of function is determined by whether
+the shell is interactive and by the
+.BR -n " and " -x
+options.
 .PP
-Elaborate tricks involving stringifying closures and unstringying them
-later will probably not work. In general, trying to manipulate the scope
-of variables through similar techniques will probably not do what one expects.
+.RS
+.BI %eval-noprint " command"
+.RE
+.RS
+.BI %eval-print " command"
+.RE
+.RS
+.BI %noeval-noprint " command"
+.RE
+.RS
+.BI %noeval-print " command"
+.RE
+.PP
+These functions handle command input for the shell.
+.TP
+.BI %parse " prompt1 prompt2"
+Read input, printing
+.I prompt1
+initially and
+.I prompt2
+for continuation lines. Return a fragment suitable for execution. Raise an
+.B eof
+exception at end of input.
+.P
+.B %prompt
+This is a hook, called immediately before
+.BR %parse .
+A common use is to update the value of
+.BR $prompt .
+.SH CANONICAL FORM
+.B Xs
+rewrites surface syntax in terms of hook functions.
+.SS Control Flow
+.RS
+.TP
+.BI ! " command"
+%not {\fIcommand\fR}
+.TP
+.IB "command " &
+%background {\fIcommand\fR}
+.TP
+.IB "command1 " ; " command2"
+%seq {\fIcommand1\fR} {\fIcommand2\fR}
+.TP
+.IB "command1 " && " command2"
+%and {\fIcommand1\fR} {\fIcommand2\fR}
+.TP
+.IB "command1 " || " command2"
+%or {\fIcommand1\fR} {\fIcommand2\fR}
+.TP
+.BR fn " \fIname\fR {|\fIarg...\fR| \fIcommand\fR}
+fn-^\fIname\fR = {|\fIarg...\fR| command}
+.RE
+.SS Input/Output
+.RS
+.TP
+.IB command " <" file
+%open 0 \fIfile\fR {\fIcommand\fR}
+.TP
+.IB command " >" file
+%create 1 \fIfile\fR {\fIcommand\fR}
+.TP
+.IB command " >[\fIn\fR]" file
+%create \fIn\fR \fIfile\fR {\fIcommand\fR}
+.TP
+.IB command " >>" file
+%append 1 \fIfile\fR {\fIcommand\fR}
+.TP
+.IB command " <>" file
+%open-write 0 \fIfile\fR {\fIcommand\fR}
+.TP
+.IB command " <>>" file
+%open-append 0 \fIfile\fR {\fIcommand\fR}
+.TP
+.IB command " ><" file
+%open-create 1 \fIfile\fR {\fIcommand\fR}
+.TP
+.IB command " >><" file
+%open-append 1 \fIfile\fR {\fIcommand\fR}
+.TP
+.IB command " >[\fIn\fR=]"
+%close \fIn\fR {\fIcommand\fR}
+.TP
+.IB command " >[\fIm\fR=\fIn\fR]"
+%dup \fIm\fR \fIn\fR {\fIcommand\fR}
+.TP
+.IB command " <<" "tag input tag"
+%here 0 \fIinput\fR {\fIcommand\fR}
+.TP
+.IB command " <<<" word
+%here 0 \fIword\fR {\fIcommand\fR}
+.TP
+.IB command1 " | " command2
+%pipe {\fIcommand1\fR} 1 0 {\fIcommand2\fR}
+.TP
+.IB command1 " |[\fIm\fR=\fIn\fR] " command2
+%pipe {\fIcommand1\fR} \fIm\fR \fIn\fR {\fIcommand2\fR}
+.TP
+.IB command1 " >{" command2 }
+%writeto \fIvar\fR {\fIcommand2\fR} {\fIcommand1\fR $\fIvar\fR}
+.TP
+.IB command1 " <{" command2 }
+%readfrom \fIvar\fR {\fIcommand2\fR} {\fIcommand1\fR $\fIvar\fR}
+.RE
+.SS Expressions
+.RS
+.TP
+.BI $# var
+<={%count %\fIvar\fR}
+.TP
+.BI $^ var
+<={%flatten ' ' $\fIvar\fR}
+.TP
+.BI `{ "command arg..." }
+<={%backquote <={%flatten '' $ifs} {\fIcommand\fR \fIarg...\fR}}
+.TP
+.BI `` " ifs " { "command arg..." }
+<={%backquote <={%flatten '' \fIifs\fR} {\fIcommand\fR \fIarg...\fR}}
+.RE
+.SS Relational Operators
+.RS
+.TP
+.IB a " :lt " b
+{~ {%cmp \fIa\fR \fIb\fR} -1}
+.TP
+.IB a " :le " b
+{~ {%cmp \fIa\fR \fIb\fR} -1 0}
+.TP
+.IB a " :gt " b
+{~ {%cmp \fIa\fR \fIb\fR} 1}
+.TP
+.IB a " :ge " b
+{~ {%cmp \fIa\fR \fIb\fR} 1 0}
+.TP
+.IB a " :eq " b
+{~ {%cmp \fIa\fR \fIb\fR} 0}
+.TP
+.IB a " :ne " b
+{~ {%cmp \fIa\fR \fIb\fR} -1 1}
+.RE
+.SH EDITING
+Input editing is provided by
+.BR readline (3)
+and configured by
+.BR ~/.inputrc .
 .SH FILES
-.Cr $home/.xsrc ,
-.Cr $home/.xsin ,
-.Cr /dev/null
+These files are read and interpreted when
+.B xs
+starts:
+.RS
+.TP
+.B ~/xsrc
+is read when
+.B xs
+is a login shell.
+.TP
+.B ~/xsin
+is read when
+.B xs
+is an interactive shell.
+.RE
+.PP
+When both
+.BR ~/.xsrc " and " ~/.xsin
+are read,
+.B ~/.xsrc
+is read first.
+.PP
+Additional documentation and sample code is installed in
+.IB prefix /share/doc/xs
+.RI .
+.I Prefix
+is typically
+.BR /usr " or " /usr/local .
 .SH BUGS
-The interpreter should be properly tail recursive;
-that is, tail calls should not consume stack space.
+The interpreter does not implement tail recursion.
 .PP
-Woe betide the environment string set by some other program to
-contain either the character control-a or the sequence control-b
-followed by control-a or control-b.
+Returning a function from a function (i.e. an "upward funarg") does not work.
 .PP
-.Cr \-x
-is not nearly as useful as it should be. 
+Dead code needs to be pruned, particularly w.r.t. support for non-Linux
+platforms.
 .PP
-Too many creatures have fept in.
+Please report issues at <https://github.com/TieDyedDevil/XS>.
+.SH SOURCE
+The
+.BR git (1)
+source repository is at <https://github.com/TieDyedDevil/XS>.
+.SH PACKAGES
+.B Xs
+is packaged for Fedora. The
+.B xs
+1.1 release first appeared in Fedora 27.
+.SH AUTHORS
+.B Xs
+1.1 and later is maintained by David B. Lamkins <david@lamkins.net>.
 .PP
-Please submit issues and pull requests at
-.Cr "https://github.com/TieDyedDevil/XS" .
-.SH "SEE ALSO"
-.IR history (1),
-.IR readline (1),
-.IR es (1),
-.IR rc (1),
-.IR sh (1),
-.IR execve (2),
-.IR getrlimit (2),
-.IR fopen (3),
-.IR getpwent (3),
-.IR printf (3p)
+.B Xs
+1.0 (self-reporting as 0.1) was maintained by Frederic Koehler
+<fkfire@gmail.com>. This is where the translation to C++ occurred.
 .PP
-Paul Haahr and Byron Rakitzis,
-.I "Es \(em A shell with higher-order functions,"
-Proceedings of the Winter 1993 Usenix Conference,
-San Diego, CA.
+.B Es
+to 0.9-beta was maintained by Soren Dayton <csdayton@cs.uchicago.edu>.
+.B Es
+up through 0.84 was maintained by Paul Haar <haahr@adobe.com> and
+Byron Rakitzis <byron@netapp.com>.
 .PP
-Tom Duff,
-.I "Rc \(em A Shell for Plan 9 and UNIX Systems,"
-Unix Research System,
-10th Edition,
-Volume 2.
-(Saunders College Publishing)
+The
+.B rc
+shell for Plan 9 was written at Bell Labs by Tom Duff. The Unix port was
+written by Byron Rakitizis and maintained by Toby Goodwin.
+See <http://tobold.org/article/rc>.
