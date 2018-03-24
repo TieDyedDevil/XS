@@ -1,6 +1,10 @@
 xs 1.0 to xs 1.1
 ----------------
 
+Rewrote the man page.
+
+Added a lot of "real-world" sample code.
+
 Switched to the Meson/Ninja build system.
 
 Subscripting allows range bounds to be reversed; this returns the
