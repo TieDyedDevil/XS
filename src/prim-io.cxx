@@ -267,7 +267,6 @@ PRIM(pipe) {
 	return result;
 }
 
-#if HAVE_DEV_FD
 PRIM(readfrom) {
 	(void)binding;
 	int pid, p[2], status;
@@ -357,7 +356,6 @@ PRIM(writeto) {
 	printstatus(0, status);
 	return result;
 }
-#endif
 
 #define	BUFSIZE	4096
 
@@ -462,9 +460,7 @@ extern void initprims_io(Prim_dict& primdict) {
 	X(backquote);
 	X(newfd);
 	X(here);
-#if HAVE_DEV_FD
 	X(readfrom);
 	X(writeto);
-#endif
 	X(read);
 }

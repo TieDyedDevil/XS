@@ -23,9 +23,7 @@ class gc_cleanup {};
 #include <boost/foreach.hpp>
 #define foreach BOOST_FOREACH
 
-#ifdef HAVE_SYS_CDEFS_H
 # include <sys/cdefs.h>
-#endif
 
 /*
  * type qualifiers
@@ -35,22 +33,14 @@ class gc_cleanup {};
  * protect the rest of xs source from the dance of the includes
  */
 
-#if HAVE_UNISTD_H
 #include <unistd.h>
-#endif
 
 #include <string.h>
 #include <stddef.h>
 
-#if HAVE_MEMORY_H
 #include <memory.h>
-#endif
 
-#if HAVE_STDARG_H
 #include <stdarg.h>
-#else
-#include <varargs.h>
-#endif
 
 #include <errno.h>
 #include <setjmp.h>
@@ -76,13 +66,8 @@ class gc_cleanup {};
 #endif
 
 #if REQUIRE_DIRENT
-#if HAVE_DIRENT_H
 #include <dirent.h>
 typedef struct dirent Dirent;
-#else
-#include <sys/dir.h>
-typedef struct direct Dirent;
-#endif
 #endif
 
 #include <sys/wait.h>
@@ -108,15 +93,9 @@ typedef struct direct Dirent;
  * out of a handler
  */
 
-#if HAVE_DECL_SIGSETJMP
 # define xs_setjmp(buf) sigsetjmp(buf,1)
 # define xs_longjmp     siglongjmp
 # define xs_jmp_buf     sigjmp_buf
-#else
-# define xs_setjmp(buf) setjmp(buf)
-# define xs_longjmp     longjmp
-# define xs_jmp_buf     jmp_buf
-#endif
 
 /*
  * macros
@@ -147,13 +126,8 @@ typedef volatile sig_atomic_t Atomic;
 typedef volatile int Atomic;
 #endif
 
-#ifdef VOID_SIGNALS
 typedef void Sigresult;
 #define	SIGRESULT
-#else
-typedef int Sigresult;
-#define	SIGRESULT	0
-#endif
 
 typedef GETGROUPS_T gidset_t;
 
@@ -184,24 +158,5 @@ enum { UNREACHABLE = 0 };
  * hacks to present a standard system call interface
  */
 
-#ifdef HAVE_SETSID
-# define setpgrp(a, b) setsid()
-#else
-
-#ifdef linux
 #include "unistd.h"
 #define setpgrp(a, b)	setpgid(a, b)
-#endif
-
-#if sgi
-#define	setpgrp(a, b)	BSDsetpgrp(a,b)
-#endif
-
-#if HPUX
-#define	setpgrp(a, b)	setpgrp()
-#endif
-#endif
-
-#if !HAVE_LSTAT
-#define	lstat	stat
-#endif

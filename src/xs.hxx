@@ -350,7 +350,6 @@ extern void terminal_size();
 #define	run_noexec		 8	/* -n */
 #define	run_echoinput		16	/* -v */
 #define	run_printcmds		32	/* -x */
-#define	run_lisptrees		64	/* -L and defined(LISPTREES) */
 
 #if READLINE
 extern bool resetterminal;

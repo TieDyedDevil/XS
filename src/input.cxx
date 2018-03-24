@@ -486,10 +486,6 @@ extern Tree *parse(const char *pr1, const char *pr2) {
 		error = NULL;
 		fail("$&parse", "%s", e);
 	}
-#if LISPTREES
-	if (input->runflags & run_lisptrees)
-		eprint("%B\n", parsetree);
-#endif
 	return parsetree;
 }
 
@@ -667,9 +663,7 @@ extern bool isinteractive(void) {
  */
 
 #include <termios.h>
-#if GWINSZ_IN_SYS_IOCTL
 #include <sys/ioctl.h>
-#endif
 
 /* terminal_size -- update terminal size */
 /* This must be safe to call from a signal handler. */

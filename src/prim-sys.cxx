@@ -6,19 +6,11 @@
 #include "xs.hxx"
 #include "prim.hxx"
 
-#ifdef HAVE_SETRLIMIT
 # define BSD_LIMITS 1
-#else
-# define BSD_LIMITS 0
-#endif
 
 #if BSD_LIMITS || BUILTIN_TIME
 #include <sys/time.h>
 #include <sys/resource.h>
-#if !HAVE_WAIT3
-#include <sys/times.hxx>
-#include <limits.h>
-#endif
 #endif
 
 #include <sys/types.h>
@@ -317,8 +309,6 @@ PRIM(limit) {
 PRIM(time) {
 	(void)binding;
 
-#if HAVE_WAIT3
-
 	int pid, status;
 	time_t t0, t1;
 	struct rusage r;
@@ -345,124 +335,8 @@ PRIM(time) {
 	);
 
 	return mklist(mkstr(mkstatus(status)), NULL);
-
-#else	/* !HAVE_WAIT3 */
-
-	int pid, status;
-
-        /* do a garbage collection first to ensure reproducible results */
-	GC_gcollect();
-	pid = efork(true, false);
-	if (pid == 0) {
-		clock_t t0, t1;
-		struct tms tms;
-		static clock_t ticks = 0;
-
-		if (ticks == 0)
-			ticks = CLK_TCK;
-
-		t0 = times(&tms);
-		pid = efork(true, false);
-		if (pid == 0)
-			exit(exitstatus(eval(list, NULL,
-						evalflags | eval_inchild)));
-
-		status = ewaitfor(pid);
-		t1 = times(&tms);
-		SIGCHK();
-		printstatus(0, status);
-
-		tms.tms_cutime += ticks / 20;
-		tms.tms_cstime += ticks / 20;
-
-		eprint(
-			"%6ldr %5ld.%ldu %5ld.%lds\t%L\n",
-			(t1 - t0 + ticks / 2) / ticks,
-			tms.tms_cutime / ticks,
-			((tms.tms_cutime * 10) / ticks) % 10,
-			tms.tms_cstime / ticks,
-			((tms.tms_cstime * 10) / ticks) % 10,
-			list, " "
-		);
-		exit(status);
-	}
-	status = ewaitfor(pid);
-	SIGCHK();
-	printstatus(0, status);
-
-	return mklist(mkstr(mkstatus(status)), NULL);
-
-#endif	/* !HAVE_WAIT3 */
-
 }
 #endif	/* BUILTIN_TIME */
-
-#if !KERNEL_POUNDBANG
-PRIM(execfailure) {
-	(void)binding;
-	(void)evalflags;
-	int fd, len, argc;
-	char header[1024], *args[10], *s, *end, *file;
-
-	
-	if (list == NULL)
-		fail("$&execfailure", "usage: %%exec-failure name argv");
-
-	file = getstr(list->term);
-	fd = eopen(file, oOpen);
-	if (fd < 0) {
-		
-		return NULL;
-	}
-	len = read(fd, header, sizeof header);
-	close(fd);
-	if (len <= 2 || header[0] != '#' || header[1] != '!') {
-		
-		return NULL;
-	}
-
-	s = &header[2];
-	end = &header[len];
-	argc = 0;
-	while (argc < arraysize(args) - 1) {
-		int c;
-		while ((c = *s) == ' ' || c == '\t')
-			if (++s >= end) {
-				
-				return NULL;
-			}
-		if (c == '\n' || c == '\r')
-			break;
-		args[argc++] = s;
-		do
-			if (++s >= end) {
-				
-				return NULL;
-			}
-		while (s < end && (c = *s) != ' ' && c != '\t'
-                       && c != '\n' && c != '\r');
-		*s++ = '\0';
-		if (c == '\n' || c == '\r')
-			break;
-	}
-	if (argc == 0) {
-		
-		return NULL;
-	}
-
-	list = list->next;
-	if (list != NULL)
-		list = list->next;
-	list = mklist(mkstr(file), list);
-	while (argc != 0)
-		list = mklist(mkstr(args[--argc]), list);
-
-	Ref(List *, lp, list);
-	
-	lp = eval(lp, NULL, eval_inchild);
-	RefReturn(lp);
-}
-#endif /* !KERNEL_POUNDBANG */
 
 extern void initprims_sys(Prim_dict& primdict) {
 	X(newpgrp);
@@ -478,7 +352,4 @@ extern void initprims_sys(Prim_dict& primdict) {
 #if BUILTIN_TIME
 	X(time);
 #endif
-#if !KERNEL_POUNDBANG
-	X(execfailure);
-#endif /* !KERNEL_POUNDBANG */
 }

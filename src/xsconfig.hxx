@@ -26,9 +26,6 @@
  *		if this is on, the time builtin is included.  by default, it is
  *		on, but feel free to turn it off.  see also USE_WAIT3.
  *
- *	HAVE_DEV_FD
- *		turn this on if your system supports /dev/fd for >{} and <{}
- *
  *	DEVFD_PATH
  *		(used only if DEVFD is on.)  a format string for print() to
  *		a file path for opening file descriptor n.
@@ -74,12 +71,6 @@
  *		this is the default value for $path (and $PATH) when the shell
  *		starts up.  it is replaced by one from the environment if it
  *		exists.
- *
- *	KERNEL_POUNDBANG
- *		this value should be true when the builtin version of execve(2)
- *		understands #! headers.  if false, xs provides a builtin for
- *		running #! files.  the default is true; are there any real
- *		systems still out there that don't support it?
  *
  *	JOB_PROTECT
  *		set this to true if you want xs to perform
@@ -156,11 +147,7 @@
  *		BSD-style wait3(2) system call.  by default, it is on.
  *		if this option is false and the BUILTIN_TIME is true,
  *		the times(2) call must exist.
- *
- *	VOID_SIGNALS
- *		define this as true if signal handlers are declared with void
- *		return type; otherwise xs uses int for signal returns. */
-
+ */
 
 /*
  * platform specific options
@@ -169,13 +156,9 @@
 
 #include "config.h"
 
-#if HAVE_SIGRELSE && HAVE_SIGHOLD
 # define SYSV_SIGNALS 1
-#endif
 
-#if HAVE_LIBREADLINE
 # define READLINE 1
-#endif
 
 /* NeXT defaults */
 
@@ -329,7 +312,5 @@
 #define	GCVERBOSE		1
 #endif
 
-#if HAVE_SIGACTION
 #undef	SYSV_SIGNALS
 #define	SYSV_SIGNALS		0
-#endif

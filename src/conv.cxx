@@ -423,57 +423,6 @@ static bool Wconv(Format *f) {
 	return false;
 }
 
-
-#if LISPTREES
-static bool Bconv(Format *f) {
-	Tree *n = va_arg(f->args, Tree *);
-	if (n == NULL) {
-		fmtprint(f, "nil");
-		return false;
-	}
-	switch (n->kind) {
-#define SINGLE_CASE(kind, formatString, type)			\
-		case kind: \
-			fmtprint(f, formatString, n->u[0].type); \
-			return false;
-#define DOUBLE_CASE(kind, formatString, type)				\
-		case kind: \
-			fmtprint(f, formatString, n->u[0].type, n->u[1].type); \
-			return false;
-	SINGLE_CASE(nWord, "(word \"%s\")", s);
-	SINGLE_CASE(nQword, "(qword \"%s\")", s);
-	SINGLE_CASE(nPrim, "(prim %s)", s);
-	SINGLE_CASE(nCall, "(call %B)", p);
-	SINGLE_CASE(nThunk, "(thunk %B)", p);
-	SINGLE_CASE(nVar, "(var %B)", p);
-	DOUBLE_CASE(nAssign, "(assign %B %B)", p);
-	DOUBLE_CASE(nConcat, "(concat %B %B)", p);
-	DOUBLE_CASE(nClosure, "(%%closure %B %B)", p);
-	DOUBLE_CASE(nFor, "(for %B $B)", p);
-	DOUBLE_CASE(nLambda, "(lambda %B %B)", p);
-	DOUBLE_CASE(nLet, "(let %B %B)", p);
-	DOUBLE_CASE(nLocal, "(local %B %B)", p);
-	DOUBLE_CASE(nMatch, "(match %B %B)", p);
-	DOUBLE_CASE(nExtract, "(extract %B %B)", p);
-	DOUBLE_CASE(nRedir, "(redir %B %B)", p);
-	DOUBLE_CASE(nVarsub, "(varsub %B %B)", p);
-	DOUBLE_CASE(nPipe, "(pipe %d %d)", i);
-	case nList: {
-		fmtprint(f, "(list");
-		do {
-			assert(n->kind == nList);
-			fmtprint(f, " %B", n->u[0].p);
-		} while ((n = n->u[1].p) != NULL);
-		fmtprint(f, ")");
-		return false;
-	}
-
-	default: NOTREACHED;
-	}
-	return false;
-}
-#endif
-
 /* install the conversion routines */
 void initconv(void) {
 	fmtinstall('C', Cconv);
@@ -485,7 +434,4 @@ void initconv(void) {
 	fmtinstall('T', Tconv);
 	fmtinstall('W', Wconv);
 	fmtinstall('Z', Zconv);
-#if LISPTREES
-	fmtinstall('B', Bconv);
-#endif
 }

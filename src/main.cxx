@@ -75,9 +75,6 @@ static void usage(void) {
 "	-p	don't load functions from the environment\n"
 "	-o	don't open stdin, stdout, and stderr if they were closed\n"
 "	-d	don't ignore SIGQUIT or SIGTERM\n"
-#if LISPTREES
-"	-L	print parser results in LISP format\n"
-#endif
 	);
 	exit(1);
 }
@@ -147,9 +144,6 @@ int main(int argc, char **argv) {
 		FLAG('n', runflags |= run_noexec);
 		FLAG('v', runflags |= run_echoinput);
 		FLAG('x', runflags |= run_printcmds);
-#if LISPTREES
-		FLAG('L', runflags |= run_lisptrees);
-#endif
 		FLAG('l', loginshell = true);
 		FLAG('p', isprotected = true);
 		FLAG('o', keepclosed = true);

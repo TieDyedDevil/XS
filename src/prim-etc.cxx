@@ -594,7 +594,5 @@ extern void initprims_etc(Prim_dict& primdict) {
 #if READLINE
 	X(resetterminal);
 #endif
-#if HAVE_LIBFFI
 	X(printf);
-#endif
 }
