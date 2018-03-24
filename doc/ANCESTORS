@@ -1,0 +1,17 @@
+Ancestral Implementations
+-------------------------
+
+Xs is based on the source code for the es project, which was derived
+from rc. All of these are in the public domain.
+
+The es shell source code is currently located at:
+ftp://ftp.sys.utoronto.ca/pub/es/ .
+
+Other es information is at:
+https://wryun.github.io/es-shell/
+https://wryun.github.io/es-shell/paper.html
+https://wryun.github.io/es-shell/manpage.html
+
+Information regarding rc is at:
+http://tobold.org/article/rc
+http://static.tobold.org/rc/rc-duff.html
