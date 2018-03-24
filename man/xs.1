@@ -1,4 +1,4 @@
-.TH XS 1 "2017 - v1.1"
+.TH XS 1 "2018 - v1.2"
 .SH NAME
 xs \- extensible shell
 .SH SYNOPSIS
@@ -122,20 +122,13 @@ in {0..3} and
 in {0..7}
 .RE
 .PP
-A UTF-8 octet sequence may be denoted using one of the escape sequences:
+A UTF-8 octet sequence may be denoted using the escape sequence:
 .RS
 .TP
-.BI \eu nnnn
+.BI \eu\(aq n... \(aq
 UTF-8 character having codepoint
-.IR nnnn ,
-for
-.I n
-in {0..9, a..f, A..F}
-.TP
-.BI \eU nnnnnnnn
-UTF-8 character having codepoint
-.IR nnnnnnnn ,
-for
+.IR n... ,
+for one to six
 .I n
 in {0..9, a..f, A..F}
 .RE
@@ -145,7 +138,7 @@ does not allow scripts to contain a NUL character; thus the
 following are all invalid:
 .PP
 .RS
-.BR \e000 ", " \ex00 ", " \eu0000 " and " \eU00000000 .
+.BR \e000 ", " \ex00 " and " \eu'0' .
 .RE
 .PP
 A backslash must not be followed by a sequence of characters other than as
@@ -1899,6 +1892,26 @@ Additional documentation and sample code is installed in
 .I Prefix
 is typically
 .BR /usr " or " /usr/local .
+.SH DEPRECATIONS
+The following forms are deprecated and should not be used for new
+.B xs
+code.
+.RS
+.TP
+.BI \eu nnnn
+UTF-8 character having codepoint
+.IR nnnn ,
+for
+.I n
+in {0..9, a..f, A..F}
+.TP
+.BI \eU nnnnnnnn
+UTF-8 character having codepoint
+.IR nnnnnnnn ,
+for
+.I n
+in {0..9, a..f, A..F}
+.RE
 .SH BUGS
 The shell does not support job control.
 .PP
@@ -1910,11 +1923,6 @@ Returning a function from a function (i.e. an "upward funarg") does not work.
 reserves the octets \e001 and \e002 to annotate variables stored in
 the environment. This may present problems for interchange of variables
 with another program that stores these octets in the environment.
-.PP
-It was a bad idea to have both
-.RI \eu xxxx " and \eU" xxxxxxxx
-rather than just
-.RI \eu xxxxxx .
 .PP
 Dead code needs to be pruned, particularly w.r.t. support for non-Linux
 platforms.
