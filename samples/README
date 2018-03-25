@@ -19,8 +19,9 @@ Overview
 	_xsin			Startup file for interactive xs session
 	_xsrc			Startup file for login xs session
 	colors			Display ANSI color pallette on terminal
-	histclean		Prune older entries from ~/.xshistory
+	histclean		Prune old and broken entries from ~/.xshistory
 	lock			A smart wrapper around xlock
+	stq			A wrapper around st, used by the wm
 	sv			Pre-validate sudo for long-running commands
 	tsm			Integrate dvtm and abduco
 	web-browser		Launch a web browser
