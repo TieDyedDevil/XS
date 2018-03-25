@@ -5,20 +5,9 @@
 #include <map>
 using std::map;
 
-#ifndef NO_GC
 #include <gc/gc.h>
 #include <gc/gc_cpp.h>
 #include <gc/gc_allocator.h>
-#else /* DEBUGGING ONLY! */
-#define UseGC (void*) new int[1000] 
-#define GC_init()
-#define GC_MALLOC malloc
-#define gc_allocator std::allocator
-#define traceable_allocator std::allocator
-#define GC_gcollect()
-#define GC_disable()
-class gc_cleanup {};
-#endif
 
 #include <boost/foreach.hpp>
 #define foreach BOOST_FOREACH
@@ -120,11 +109,7 @@ typedef struct dirent Dirent;
  * types we use throughout xs
  */
 
-#if USE_SIG_ATOMIC_T
-typedef volatile sig_atomic_t Atomic;
-#else
 typedef volatile int Atomic;
-#endif
 
 typedef void Sigresult;
 #define	SIGRESULT

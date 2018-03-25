@@ -2,7 +2,6 @@
 #ifndef XS_HXX
 #define XS_HXX
 
-#include "config.h"
 #include "stdenv.hxx"
 #include <algorithm>
 #include <functional>

@@ -6,12 +6,8 @@
 #include "xs.hxx"
 #include "prim.hxx"
 
-# define BSD_LIMITS 1
-
-#if BSD_LIMITS || BUILTIN_TIME
 #include <sys/time.h>
 #include <sys/resource.h>
-#endif
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -42,10 +38,8 @@ PRIM(background) {
 	(void)binding;
 	int pid = efork(true, true);
 	if (pid == 0) {
-#if JOB_PROTECT
 		/* job control safe version: put it in a new pgroup. */
 		setpgrp(0, getpid());
-#endif
 		mvfd(eopen("/dev/null", oOpen), 0);
 		exit(exitstatus(eval(list, NULL, evalflags | eval_inchild)));
 	}
@@ -138,7 +132,6 @@ PRIM(setsignals) {
  * limit builtin -- this is too much code for what it gives you
  */
 
-#if BSD_LIMITS
 typedef struct Suffix Suffix;
 struct Suffix {
 	const char *name;
@@ -303,9 +296,7 @@ PRIM(limit) {
 	}
 	return ltrue;
 }
-#endif	/* BSD_LIMITS */
 
-#if BUILTIN_TIME
 PRIM(time) {
 	(void)binding;
 
@@ -336,7 +327,6 @@ PRIM(time) {
 
 	return mklist(mkstr(mkstatus(status)), NULL);
 }
-#endif	/* BUILTIN_TIME */
 
 extern void initprims_sys(Prim_dict& primdict) {
 	X(newpgrp);
@@ -346,10 +336,6 @@ extern void initprims_sys(Prim_dict& primdict) {
 	X(fork);
 	X(run);
 	X(setsignals);
-#if BSD_LIMITS
 	X(limit);
-#endif
-#if BUILTIN_TIME
 	X(time);
-#endif
 }

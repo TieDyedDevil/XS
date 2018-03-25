@@ -10,13 +10,8 @@
 using std::string;
 using std::set;
 
-#if PROTECT_ENV
 #define	ENV_FORMAT	"%F=%W"
 #define	ENV_DECODE	"%N"
-#else
-#define	ENV_FORMAT	"%s=%W"
-#define	ENV_DECODE	"%s"
-#endif
 
 static set<string> noexport;
 Dict vars;
@@ -71,10 +66,6 @@ extern void validatevar(const char *var) {
 		fail("xs:var", "zero-length variable name");
 	if (iscounting(var))
 		fail("xs:var", "illegal variable name (is a number): %S", var);
-#if !PROTECT_ENV
-	if (strchr(var, '=') != NULL)
-		fail("xs:var", "'=' in variable name: %S", var);
-#endif
 }
 
 /* isexported -- is a variable exported? */

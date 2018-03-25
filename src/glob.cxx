@@ -36,11 +36,7 @@ extern bool haswild(const char *s, const char *q) {
 
 /* ishiddenfile -- return ltrue if the file is a dot file to be hidden */
 static int ishiddenfile(const char *s) {
-#if SHOW_DOT_FILES
-	return *s == '.' && (!s[1] || (s[1] == '.' && !s[2]));
-#else
 	return *s == '.';
-#endif
 }
 
 /* dirmatch -- match a pattern against the contents of directory */
