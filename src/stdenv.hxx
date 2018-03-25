@@ -114,7 +114,7 @@ typedef volatile int Atomic;
 typedef void Sigresult;
 #define	SIGRESULT
 
-typedef GETGROUPS_T gidset_t;
+typedef gid_t gidset_t;
 
 /*
  * assertion checking

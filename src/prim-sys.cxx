@@ -192,13 +192,13 @@ static const Limit limits[] = {
 
 static void printlimit(const Limit *limit, bool hard) {
 	struct rlimit rlim;
-	LIMIT_T lim;
+	rlim_t lim;
 	getrlimit(limit->flag, &rlim);
 	if (hard)
 		lim = rlim.rlim_max;
 	else
 		lim = rlim.rlim_cur;
-	if (lim == (LIMIT_T) RLIM_INFINITY)
+	if (lim == (rlim_t) RLIM_INFINITY)
 		print("%-8s\tunlimited\n", limit->name);
 	else {
 		const Suffix *suf = limit->suffix;
@@ -214,8 +214,8 @@ static void printlimit(const Limit *limit, bool hard) {
 	}
 }
 
-static LIMIT_T parselimit(const Limit *limit, const char *s) {
-	LIMIT_T lim;
+static rlim_t parselimit(const Limit *limit, const char *s) {
+	rlim_t lim;
 	const Suffix *suf = limit->suffix;
 	if (streq(s, "unlimited"))
 		return RLIM_INFINITY;
@@ -281,7 +281,7 @@ PRIM(limit) {
 		if (list == NULL)
 			printlimit(lim, hard);
 		else {
-			LIMIT_T n;
+			rlim_t n;
 			struct rlimit rlim;
 			getrlimit(lim->flag, &rlim);
 			n = parselimit(lim, getstr(list->term));
