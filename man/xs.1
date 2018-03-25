@@ -80,6 +80,11 @@ sequence of non-special characters. The special characters are:
 .I "space tab newline"
 .RE
 .PP
+The empty word is denoted by
+.BR \(aq\(aq .
+.PP
+Words are indivisible and immutable.
+.SS Escapes
 A special character may escaped by preceeding it with a backslash
 .RB ( \e );
 this defeats the character's special meaning.
@@ -141,7 +146,7 @@ following are all invalid:
 .PP
 A backslash must not be followed by a sequence of characters other than as
 described above.
-.PP
+.SS Quoted words
 A sequence of characters enclosed by apostrophes
 .RB ( \(aq )
 is a word; the bounding
@@ -156,11 +161,6 @@ An apostrophe is written within a quoted word by doubling it, e.g.:
 .RE
 .PP
 All other special characters lose their meaning within a quoted word.
-.PP
-The empty word is denoted by
-.BR \(aq\(aq .
-.PP
-Words are indivisible and immutable.
 .SS Commands
 A command is a sequence of words separated by whitespace. The first word
 is always the name of an executable program on
@@ -795,7 +795,7 @@ and
 .BI >{ command+ }
 .RE
 .PP
-The files created by process substitution may be implemented using pipes,
+The files created by process substitution are implemented using pipes,
 which are not seekable.
 .PP
 Multiple
