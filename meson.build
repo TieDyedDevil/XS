@@ -56,7 +56,7 @@ project('xs', ['cpp'])
   install_man(['man/xs.1'])
   install_data(['doc/ANCESTORS', 'doc/CHANGES', 'doc/COMPILERS',
 		'doc/COPYING', 'doc/GOTCHAS', 'INSTALL', 'doc/NOTES',
-		'doc/PHILOSOPHY', 'doc/PROJECTS', 'README',
+		'doc/PHILOSOPHY', 'doc/PRIMITIVES', 'doc/PROJECTS', 'README',
 		'doc/SYSTEMD_LOCALE', 'doc/TODO', 'doc/TUTORIAL.md',
 		'doc/XS-FOR-LISPERS', 'doc/xs-1.1-original-man.1'],
 	install_dir: 'share/doc/xs')
