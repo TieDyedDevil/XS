@@ -548,8 +548,8 @@ globbing, such as:
 vi *^(mem wan)^.[ch]
 ```
 
-You can even concatenate multiple lists using `^`; `xs` will generate the cross
-product of the lists. This:
+You can even concatenate multiple lists using `^`; `xs` will generate the
+cross product of the lists. This:
 
 ```
 mv (base config alt)^-^(session client wrapper)^.^(lisp fasl) archive/

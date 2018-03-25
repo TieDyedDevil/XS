@@ -4,10 +4,10 @@ xs 1.1 to xs 1.2
 Unicode escapes are now delimited, like \u'n...'. The fixed-length forms
 \unnnn and \Unnnnnnnn are deprecated.
 
+Rewrote the man page.
+
 xs 1.0 to xs 1.1
 ----------------
-
-Rewrote the man page.
 
 Added a lot of "real-world" sample code.
 
