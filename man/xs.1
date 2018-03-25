@@ -375,8 +375,7 @@ without intervening whitespace, then
 .B xs
 inserts a caret between them.
 .SS Wildcard Patterns
-A pattern is a word which may contain wildcards:
-.RS
+A pattern is a word which may contain wildcards.
 .TP
 .B *
 matches zero or more characters
@@ -394,7 +393,6 @@ since
 .B ^
 has another interpretation in
 .BR xs .
-.RE
 .SS Pathname expansion
 Where a word may be treated as a pathname,
 .B xs
@@ -1653,33 +1651,70 @@ Return the definition of each
 .IR var .
 .SH PRIMITIVE FUNCTIONS
 Primitives provide the underlying behaviors for many hooks and builtins,
-and may not be redefined. By convention, primitive names begin
-with
-.B &
-and are referenced as
-.BR $& "\fIname\fR ."
+and may not be redefined.
 .PP
 .TS
-l l l .
-&access	&fsplit	&resetterminal
-&apids	&here	&result
-&background	&home	&run
-&backquote	&if	&seq
-&batchloop	&internals	&sethistory
-&catch	&isinteractive	&setmaxevaldepth
-&cd	&islogin	&setnoexport
-&close	&len	&setsignals
-&cmp	&limit	&split
-&collect	&newfd	&throw
-&count	&newpgrp	&time
-&dot	&openfile	&umask
-&dup	&parse	&var
-&echo	&pipe	&vars
-&exec	&primitives	&version
-&exitonfalse	&printf	&wait
-&flatten	&random	&whats
-&forever	&read	&wid
-&fork	&readfrom	&writeto
+lb | lb
+lb | l .
+Primitive	Implements
+_
+$&access	access
+$&apids	%apids
+$&background	\fIused by \fR%background
+$&backquote	\fIused by \fR%backquote
+$&batchloop	%batch-loop
+$&catch	catch
+$&cd	\fIused by \fRcd
+$&close	%close
+$&cmp	%cmp
+$&collect	\fIinvokes GC
+$&count	%count
+$&dot	.
+$&dup	%dup
+$&echo	echo
+$&exec	exec
+$&exitonfalse	%exit-on-false
+$&flatten	%flatten
+$&forever	forever
+$&fork	fork
+$&fsplit	%fsplit
+$&here	%here
+$&home	%home
+$&if	if
+$&internals	\fIused by \fRvars
+$&isinteractive	%is-interactive
+$&islogin	%is-login
+$&len	\fIcount chars in word(s)
+$&limit	limit
+$&newfd	%newfd
+$&newpgrp	newpgrp
+$&openfile	%openfile
+$&parse	%parse
+$&pipe	%pipe
+$&primitives	\fIlist xs primitives
+$&printf	printf
+$&random	\fIrandom integer
+$&read	%read
+$&readfrom	%readfrom
+$&resetterminal	\fIused to keep readline(3) in sync with terminal
+$&result	result
+$&run	%run
+$&seq	%seq
+$&sethistory	set-history
+$&setmaxevaldepth	set-max-eval-depth
+$&setnoexport	set-noexport
+$&setsignals	set-signals
+$&split	%split
+$&throw	throw
+$&time	time
+$&umask	umask
+$&var	%var
+$&vars	\fIused by \fRvars
+$&version	\fIversion info
+$&wait	wait
+$&whats	%whats
+$&wid	\fIcount character cells in word(s)
+$&writeto	%writeto
 .TE
 .SH TOPLOOPS
 A toploop repeatedly reads and executes a command and prints its result.
