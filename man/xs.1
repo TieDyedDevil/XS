@@ -253,8 +253,7 @@ combination.
 The
 .B xs
 special characters (see Words) may also appear in a variable name if
-quoted or escaped. Likewise, character escapes (octal, hex, Unicode
-and the single-letter control character escapes) may be part of a
+quoted or escaped. Likewise, character escapes (see Escapes) may be part of a
 variable name.
 .PP
 Variable names having the prefix
@@ -375,12 +374,8 @@ operator) in certain situations. If a word is followed by another word,
 without intervening whitespace, then
 .B xs
 inserts a caret between them.
-.SS Pathname expansion
-Where a word may be treated as a pathname,
-.B xs
-expands wildcards.
-.PP
-.RS
+.SS Wildcard Patterns
+A pattern is a word which may contain wildcards:
 .TP
 .B *
 matches zero or more characters
@@ -398,7 +393,10 @@ since
 .B ^
 has another interpretation in
 .BR xs .
-.RE
+.SS Pathname expansion
+Where a word may be treated as a pathname,
+.B xs
+expands wildcards.
 .PP
 The pathname separator,
 .BR / ,
@@ -430,27 +428,6 @@ returns true when a subject matches any of the given patterns:
 .PP
 A subject may be a list. If composed of individual words or expressions,
 the subject list must be enclosed by parentheses.
-.PP
-A pattern is a word which may contain wildcards:
-.RS
-.TP
-.B *
-matches zero or more characters
-.TP
-.B ?
-matches exactly one character
-.TP
-.BI [ class ]
-matches any of the characters specified by the class, following the same
-rules as those for
-.BR ed (1),
-except that class negation is denoted by
-.B ~
-since
-.B ^
-has another interpretation in
-.BR xs .
-.RE
 .PP
 Pattern wildcards are never expanded with pathnames from the filesystem.
 .SS Pattern extraction
@@ -1182,7 +1159,7 @@ With no argument, this is the same as
 .BR "cd $home" .
 .TP
 .BR dirs " [" -c ]
-Show the directory stack (see BUILTIN COMMANDS pushd and popd). With
+Show the directory stack (see pushd and popd). With
 .BR -c ,
 clear the directory stack.
 .TP
