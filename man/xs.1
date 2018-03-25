@@ -1137,14 +1137,6 @@ lb l .
 -p	Is the file a named pipe?
 .TE
 .PP
-With
-.BR -1 ", " access
-returns the first path to satisfy the test. If no path satisfies the
-test, return the empty list unless
-.BR -e
-was specified, in which case not having a satisfied test causes an
-error to be raised.
-.PP
 With the
 .BI -n " name"
 option, the
@@ -1152,6 +1144,14 @@ option, the
 are applied to
 .IR name ,
 producing a list of test results.
+.PP
+With
+.BR -1 ", " access
+returns the first path to satisfy the test. If no path satisfies the
+test, return the empty list unless
+.BR -e
+was specified, in which case not having a satisfied test causes an
+error to be raised.
 .RE
 .TP
 .BI alias " name expansion..."
@@ -1900,7 +1900,7 @@ When both
 are read,
 .B ~/.xsrc
 is read first.
-.PP
+.SH SEE ALSO
 Additional documentation and sample code is installed in
 .IB prefix /share/doc/xs
 .RI .
