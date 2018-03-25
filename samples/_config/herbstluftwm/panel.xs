@@ -997,6 +997,7 @@ fn terminate {
 	for client `{cat $clntfile} {
 		logger 2 'killing client %d' $client
 		kill $client
+		wait $client
 	}
 	rm -f $clntfile
 	for df `{cat $dispfile} {
@@ -1007,6 +1008,7 @@ fn terminate {
 	for (task pid) $taskpids {
 		logger 2 'killing pgroup %d (%s)' $pid $task
 		pkill -g $pid
+		wait $pid
 	}
 	rm -f $event
 	rm -f $trigger
