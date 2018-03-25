@@ -1667,19 +1667,26 @@ and are referenced as
 .BR $& "\fIname\fR ."
 .PP
 .TS
-l l l l l .
-&access	&dup	&isinteractive	&read	&time
-&apids	&echo	&islogin	&readfrom	&umask
-&background	&exec	&len	&resetterminal	&var
-&backquote	&exitonfalse	&limit	&result	&vars
-&batchloop	&flatten	&newfd	&run	&version
-&catch	&forever	&newpgrp	&seq	&wait
-&cd	&fork	&openfile	&sethistory	&whats
-&close	&fsplit	&parse	&setmaxevaldepth	&wid
-&cmp	&here	&pipe	&setnoexport	&writeto
-&collect	&home	&primitives	&setsignals
-&count	&if	&printf	&split
-&dot	&internals	&random	&throw
+l l l .
+&access	&fsplit	&resetterminal
+&apids	&here	&result
+&background	&home	&run
+&backquote	&if	&seq
+&batchloop	&internals	&sethistory
+&catch	&isinteractive	&setmaxevaldepth
+&cd	&islogin	&setnoexport
+&close	&len	&setsignals
+&cmp	&limit	&split
+&collect	&newfd	&throw
+&count	&newpgrp	&time
+&dot	&openfile	&umask
+&dup	&parse	&var
+&echo	&pipe	&vars
+&exec	&primitives	&version
+&exitonfalse	&printf	&wait
+&flatten	&random	&whats
+&forever	&read	&wid
+&fork	&readfrom	&writeto
 .TE
 .SH TOPLOOPS
 A toploop repeatedly reads and executes a command and prints its result.
