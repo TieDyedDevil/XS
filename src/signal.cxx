@@ -176,14 +176,6 @@ extern void initsignals(bool interactive, bool allowdumps) {
 		else if (h == SIG_DFL || h == SIG_ERR)
 			sigeffect[sig] = sig_default;
                 else sigeffect[sig] = sig_ignore;
-#if 0
-		else
-			panic(
-				"initsignals: bad incoming signal value"
-				" for %s: %x",
-				signame(sig), h
-			);
-#endif
 	}
 
 	if (interactive || sigeffect[SIGINT] == sig_default)
