@@ -1113,7 +1113,7 @@ see Options.
 Tests
 .IR path s
 for accessibility. Without the
-.BR -1 " or " -e
+.BR -1 ", " -e " and " -n
 options,
 .B access
 returns true for paths which are accessible as specified. A printable
@@ -1136,6 +1136,22 @@ lb l .
 -s	Is the file a socket?
 -p	Is the file a named pipe?
 .TE
+.PP
+With
+.BR -1 ", " access
+returns the first path to satisfy the test. If no path satisfies the
+test, return the empty list unless
+.BR -e
+was specified, in which case not having a satisfied test causes an
+error to be raised.
+.PP
+With the
+.BI -n " name"
+option, the
+.IR path s
+are applied to
+.IR name ,
+producing a list of test results.
 .RE
 .TP
 .BI alias " name expansion..."
