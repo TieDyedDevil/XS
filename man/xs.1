@@ -23,7 +23,6 @@ is a descendant of
 .BR rc "(1) and " es (1);
 the three implementations are not interoperable.
 .SH OPTIONS
-.RS
 .TP
 .BI -c " command"
 Execute the
@@ -68,7 +67,6 @@ rather than open on /dev/null.
 .TP
 .B -d
 Don't trap SIGQUIT or SIGTERM.
-.RE
 .SH LANGUAGE
 Lexically, an
 .B xs
@@ -1760,7 +1758,6 @@ A common use is to update the value of
 .B Xs
 rewrites surface syntax in terms of hook functions.
 .SS Control Flow
-.RS
 .TP
 .BI ! " command"
 %not {\fIcommand\fR}
@@ -1779,9 +1776,7 @@ rewrites surface syntax in terms of hook functions.
 .TP
 .BR fn " \fIname\fB {|\fIarg...\fB| \fIcommand\fB}
 fn-^\fIname\fR = {|\fIarg...\fR|\fI command\fR}
-.RE
 .SS Input/Output
-.RS
 .TP
 .IB command " <" file
 %open 0 \fIfile\fR {\fIcommand\fR}
@@ -1830,9 +1825,7 @@ fn-^\fIname\fR = {|\fIarg...\fR|\fI command\fR}
 .TP
 .IB command1 " <{" command2 }
 %readfrom \fIvar\fR {\fIcommand2\fR} {\fIcommand1\fR $\fIvar\fR}
-.RE
 .SS Expressions
-.RS
 .TP
 .BI $# var
 <={%count %\fIvar\fR}
@@ -1845,9 +1838,7 @@ fn-^\fIname\fR = {|\fIarg...\fR|\fI command\fR}
 .TP
 .BI \`\` " ifs " { "command arg..." }
 <={%backquote <={%flatten \(aq\(aq \fIifs\fR} {\fIcommand\fR \fIarg...\fR}}
-.RE
 .SS Relational Operators
-.RS
 .TP
 .IB a " :lt " b
 {~ {%cmp \fIa\fR \fIb\fR} -1}
@@ -1866,7 +1857,6 @@ fn-^\fIname\fR = {|\fIarg...\fR|\fI command\fR}
 .TP
 .IB a " :ne " b
 {~ {%cmp \fIa\fR \fIb\fR} -1 1}
-.RE
 .SH EDITING
 Input editing is provided by
 .BR readline (3)
