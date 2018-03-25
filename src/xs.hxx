@@ -329,9 +329,7 @@ inline void efree(void *p) {
 /* input.cxx */
 
 extern const char *prompt, *prompt2;
-#if READLINE
 extern bool continued_input;
-#endif
 extern Tree *parse(const char *esprompt1, const char *esprompt2);
 extern Tree *parsestring(const char *str);
 extern void sethistory(const char *file);
@@ -351,9 +349,7 @@ extern void terminal_size();
 #define	run_echoinput		16	/* -v */
 #define	run_printcmds		32	/* -x */
 
-#if READLINE
 extern bool resetterminal;
-#endif
 
 
 /* opt.cxx */

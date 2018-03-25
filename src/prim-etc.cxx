@@ -11,9 +11,7 @@
 #include <time.h>
 #include <stdio.h>
 
-#if READLINE
 #include <readline/readline.h>
-#endif
 
 static int isnumber(const char *s) {
 	return strspn(s, "-0123456789.") == strlen(s);
@@ -309,7 +307,6 @@ PRIM(sethistory) {
 	return list;
 }
 
-#if READLINE
 /* mark zero-width character sequences for readline() */
 const char *mzwcs(const char *prompt) {
 	if (!prompt) return prompt;
@@ -362,9 +359,6 @@ const char *mzwcs(const char *prompt) {
 	*t = '\0';
 	return (const char*)gcdup(outbuf);
 }
-#else
-const char *mzwcs(const char *prompt) {return prompt;}
-#endif
 
 PRIM(parse) {
 	(void)binding;
@@ -495,7 +489,6 @@ PRIM(setmaxevaldepth) {
 	return list;
 }
 
-#if READLINE
 PRIM(resetterminal) {
 	(void)list;
 	(void)binding;
@@ -503,7 +496,6 @@ PRIM(resetterminal) {
 	rl_reset_terminal(NULL);
 	return ltrue;
 }
-#endif
 
 static void initrandom() {
 	srandom(time(NULL));
@@ -591,8 +583,6 @@ extern void initprims_etc(Prim_dict& primdict) {
 	X(random);
 	X(len);
 	X(wid);
-#if READLINE
 	X(resetterminal);
-#endif
 	X(printf);
 }

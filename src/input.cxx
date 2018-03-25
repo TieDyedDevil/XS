@@ -31,13 +31,10 @@ bool disablehistory = false;
 static const char *history;
 static int historyfd = -1;
 
-#if READLINE
 #include <stdio.h>
 #include <readline/readline.h>
 #include <readline/history.h>
 bool continued_input = false;
-#endif
-
 
 /*
  * errors and warnings
@@ -71,7 +68,6 @@ static void warn(const char *s) {
  * history
  */
 
-#if READLINE
 static int hist_from = 0;
 
 /* No real need to use the history fd, since it
@@ -101,7 +97,6 @@ static void update_hist() {
 	read_history_range(history, hist_from, -1);
 	hist_from = l;
 }
-#endif
 
 
 
@@ -128,9 +123,7 @@ static void loghistory(const char *cmd, size_t len) {
 		}
 
 
-#if READLINE
 	update_hist();
-#endif
 	/*
 	 * Small unix hack: since read() reads only up to a newline
 	 * from a terminal, then presumably this write() will write at
@@ -138,16 +131,12 @@ static void loghistory(const char *cmd, size_t len) {
 	 */
 writeit:
 	ewrite(historyfd, cmd, len);
-#if READLINE
 	++hist_from;
-#endif
 }
 
 /* inithistory -- read the history file at startup */
 extern void inithistory(void) {
-#if READLINE
 	loghistory("", 0);
-#endif
 }
 
 /* sethistory -- change the file for the history log */
@@ -157,10 +146,8 @@ extern void sethistory(const char *file) {
 		historyfd = -1;
 	}
 	history = file;
-#if READLINE
 	hist_from = 0;
 	update_hist();
-#endif
 }
 
 int GETC() {
@@ -243,7 +230,6 @@ int Input::get() {
 	return c;
 }
 
-#if READLINE
 /* callreadline -- readline wrapper */
 static char *callreadline() {
 	char *r;
@@ -394,7 +380,6 @@ static char ** get_completions(const char *text, int start, int end) {
 	return results;
 }
 
-#endif	/* READLINE */
 
 /* fdfill -- fill input buffer by reading from a file descriptor */
 static int fdfill(Input *in) {
@@ -402,7 +387,6 @@ static int fdfill(Input *in) {
 	assert(in->buf == in->bufend);
 	assert(in->fd >= 0);
 
-#if READLINE
 	if (in->runflags & run_interactive && in->fd == 0) {
 		char *rlinebuf;
 		do {
@@ -426,9 +410,7 @@ static int fdfill(Input *in) {
 			memcpy(in->bufbegin, rlinebuf, nread - 1);
 			in->bufbegin[nread - 1] = '\n';
 		}
-	} else
-#endif
-	do {
+	} else do {
 		nread = eread(in->fd, (char *) in->bufbegin, in->buflen);
 		SIGCHK();
 	} while (nread == -1 && errno == EINTR);
@@ -469,12 +451,7 @@ extern Tree *parse(const char *pr1, const char *pr2) {
 	if (ISEOF(input))
 		throw mklist(mkstr("eof"), NULL);
 
-#if READLINE
 	prompt = (pr1 == NULL) ? "" : pr1;
-#else
-	if (pr1 != NULL)
-		eprint("%s", pr1);
-#endif
 	prompt2 = pr2;
 
 	int result = yyparse();
@@ -670,9 +647,7 @@ extern bool isinteractive(void) {
 void terminal_size(void) {
 	struct winsize ws;
 	if (ioctl(1, TIOCGWINSZ, &ws) == 0) {
-#if READLINE
 		rl_set_screen_size(ws.ws_row, ws.ws_col);
-#endif
 	}
 }
 
@@ -690,7 +665,6 @@ extern void initinput(void) {
 	   from forked children */
 	registerfd(&historyfd, true);
 
-#if READLINE
 	rl_basic_word_break_characters = " \t\n\\'`><=;|&{()}";
 	rl_completer_quote_characters = "'";
 	rl_filename_quote_characters = " \t\n\\'`=$><;|&{()}";
@@ -699,7 +673,6 @@ extern void initinput(void) {
 	rl_attempted_completion_function = get_completions;
 	rl_change_environment = 0;
 	rl_prefer_env_winsize = 0;
-#endif
 
 	/* initialize our view of the terminal size */
 	terminal_size();

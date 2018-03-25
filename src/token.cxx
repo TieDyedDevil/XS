@@ -93,12 +93,7 @@ const char adnw[] = {
 /* print_prompt2 -- called before all continuation lines */
 extern void print_prompt2(void) {
 	input->lineno++;
-#if READLINE
 	continued_input = true;
-#else
-	if ((input->runflags & run_interactive) && prompt2 != NULL)
-		eprint("%s", prompt2);
-#endif
 }
 
 /* scanerror -- called for lexical errors */
@@ -608,9 +603,7 @@ top:	while (c = GETC(), c == ' ' || c == '\t')
 }
 
 extern void inityy(void) {
-#if READLINE
 	continued_input = false;
-#endif
 	yylex_fun = yylex_normal;
 	w = NW;
 	if (bufsize > BUFMAX) {
