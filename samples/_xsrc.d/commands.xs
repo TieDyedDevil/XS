@@ -624,7 +624,6 @@ fn ulu {|*|
 						^$*^'[^;]*;' $ud} {|l|
 			let ((hex desc) = <={~~ $l *\;*\;}; uni) {
 				!~ $desc \<control\> && {
-					hex = `{printf %6s $hex|tr ' ' 0}
 					uni = <={%u $hex}
 					printf %s\tU+%s\t%s\n $uni $hex $desc
 				}
@@ -654,16 +653,16 @@ fn wallpaper {|*|
 	.c 'system'
 	%only-X
 	local (pageopt = $pageopt) {
-		let (geom; mon; monopt = '') {
+		let (geom; mon; monopt = ''; rc = 'while true {wallpaper %s;' \
+				^' sleep %s}'; re = 'while true \{wallpaper'; \
+				fn-running = {pgrep -cf 'while true' \
+					^' \{wallpaper' >/dev/null}) {
 			if {~ $* -c} {
-				let (pp = `{pgrep -f \
-					'while true \{wallpaper'}) {
-					if {!~ $pp ()} {
-						 pkill -P $pp
-					} else {
-						throw error wallpaper \
-							'not active'
-					}
+				if {running} {
+					 pkill -P `{pgrep -f $re}
+				} else {
+					throw error wallpaper \
+						'not active'
 				}
 			} else {
 				if {~ $*(1) -m} {
@@ -688,20 +687,19 @@ fn wallpaper {|*|
 						}
 					}
 				}
-				2 {	let (m = $*(1); d = $*(2); \
-						p = 'while true {wallpaper '; \
-						f = 'while true \{wallpaper') {
+				2 {	let (m = $*(1); d = $*(2)) {
 						access -d $d && {
-							pkill -f $f
+							wallpaper
 							setsid xs -c \
-							$p^$monopt^' ' \
-							^$d^'; sleep ' \
-							^`($m*60)^'}' &
+							`` '' {printf $rc \
+								$d `($m*60)} &
 						}
 					}
 				}
-				{	pkill -f 'while true \{wallpaper'
-					xsetroot -solid 'Slate Gray'
+				{	if {running} {
+						kill -- -^`{pgrep -f $re}
+						xsetroot -solid 'Slate Gray'
+					}
 				})
 			}
 		}
