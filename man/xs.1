@@ -348,10 +348,10 @@ Either end of the range may be left unspecified.
 .RS
 .TP
 .BI $ var "(... 7)"
-yields elements 1 through 7 of the list
+yields elements 1 through 7 of the list.
 .TP
 .BI $ var "(3 ...)"
-yields elements 3 through the end of the list
+yields elements 3 through the end of the list.
 .RE
 .PP
 Reversing the endpoints of a range returns the values in reversed order:
@@ -360,7 +360,7 @@ Reversing the endpoints of a range returns the values in reversed order:
 .TP
 .B a = s d r a w k c a b; $a(5 ... 2)
 yeilds the list
-.B w a r d
+.BR "w a r d" " ."
 .RE
 .SS Multiple assignment
 A list of variables may be specified on the left side of an assignment.
@@ -704,6 +704,7 @@ and
 .RS
 .IB "fragment " <[ ifd ] filename
 .RE
+.PP
 A file descriptor may be duplicated using the form:
 .PP
 .RS
@@ -768,8 +769,8 @@ or
 .PP
 The
 .I eof-marker
-is a word which must appear immediately following the final newline of textual
-data taken as input.
+is a word which must appear on a line by itself immediately following
+the final newline of textual data taken as input.
 The first form (with the unquoted
 .IR eof-marker )
 replaces variables within the textual data.
@@ -780,7 +781,7 @@ A
 can be emitted literally by writing
 .BR $$ .
 To emit the value of a variable followed immediately by a literal word, write:
-.BI $ var ^ word.
+.BI $ var ^ "word \fR."
 .PP
 The second form (with the quoted
 .IR eof-marker )
@@ -826,7 +827,7 @@ may appear within the braces.
 Note that the braces are an essential part of this syntax; these are not
 .BI > fragment
 and
-.BI < fragment.
+.BI < "fragment \fR."
 .SS Local variables
 Local variables exist only during execution of their binding form:
 .PP
@@ -969,7 +970,7 @@ are used for non-lexical control transfer.
 An exception is passed up the call chain to the most recently
 established catcher.
 The catcher may handle the exception, retry the code which caused
-the exception or pass the exception to the next catcher.
+the exception or throw the exception to the next catcher.
 .PP
 An exception is a list.
 The first word denotes the exception type, one of:
@@ -1052,7 +1053,7 @@ The input field separator, used by backquote
 to split command output into words.
 The initial value is the list
 .RS
-.I "space tab newline"
+.IR "space tab newline" " ."
 .RE
 .TP
 .B max-eval-depth
@@ -1110,9 +1111,11 @@ default behavior
 The initial value of
 .B $signals
 is
+.PP
 .RS
 .RI ".sigint /sigquit /sigterm"
 .RE
+.PP
 plus any signals ignored (/) when
 .B xs
 started.
@@ -1304,7 +1307,7 @@ List background jobs.
 Display or alter process resource limits.
 .B -h
 for hard limits.
-.I value
+.I Value
 is either
 .B unlimited
 or a number.
@@ -1495,10 +1498,10 @@ If
 .B xs
 is an interactive shell, print the background process ID.
 .TP
-.BI %backquote " separator(s) command"
+.BI %backquote " separators command"
 Run command as a child process, splitting standard output into words at
 any character in
-.IR separator(s) .
+.IR separators .
 .TP
 .BI %close " fd command"
 Run
@@ -1672,14 +1675,14 @@ Return the process IDs of all background processes for which
 .B xs
 has not yet waited.
 .TP
-.BI %fsplit " separator(s) arg..."
+.BI %fsplit " separators arg..."
 Split each
 .I arg
 word at any
-.I separator
+.I separators
 character, producing a list.
 Repeated instances of
-.I separator
+.I separators
 in
 .IR arg s
 create empty words
@@ -1704,13 +1707,13 @@ as the program's name and
 .IR arg s
 as its arguments.
 .TP
-.BI %split " separator arg..."
+.BI %split " separators arg..."
 Like
 .BR %fsplit ,
-but repeated instances in
+but repeated instances of a
+.I separators
+character in
 .IR arg s
-of a
-.I separator
 are coalesced.
 .TP
 .BI %var " var..."
