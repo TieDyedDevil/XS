@@ -1,6 +1,8 @@
 xs 1.1 to xs 1.2
 ----------------
 
+Stripped out a lot of unused code (~10% by weight).
+
 Unicode escapes are now delimited, like \u'n...'. The fixed-length forms
 \unnnn and \Unnnnnnnn are deprecated.
 
