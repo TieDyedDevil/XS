@@ -271,9 +271,7 @@ A variable is assigned a list value using the notation
 .PP
 The spaces around
 .B =
-are mandatory. Indirection (multiple
-.BR $)
-is allowed.
+are mandatory.
 .PP
 A variable becomes undefined by assigning an empty list as its value. While
 .PP
@@ -297,6 +295,9 @@ A variable's value is retrieved by writing
 before its name, like
 .BI $ var
 .RI .
+Indirection (multiple
+.BR $)
+is allowed.
 .PP
 An undefined variable yields the empty list when referenced.
 .PP
@@ -404,7 +405,7 @@ The pathname separator,
 is never matched by
 .BR * .
 The
-.B ?
+.B ?\&
 wildcard never matches a dot at the beginning of a pathname component.
 .PP
 A tilde
@@ -442,7 +443,7 @@ returns the parts of each subject that match a wildcard in the patterns:
 .PP
 Subjects and patterns are the same as for the pattern matching operator.
 .SS Arithmetic substitution
-An infix arithmetic expression may be evaluated to produced a single word
+An infix arithmetic expression may be evaluated to produce a single word
 representing its value:
 .PP
 .RS
@@ -451,9 +452,11 @@ representing its value:
 .PP
 The expression consists of numeric values and the infix operators
 .BR + ", " - ", " * ", " / " and " % " (modulus);"
-these obey the usual precedence rules.
+these obey the usual precedence rules and may be otherwise grouped
+with parentheses.
 .PP
-A value is either a numeric constant or a variable having a numeric value.
+A value is either a numeric constant or a variable reference yielding
+a numeric value.
 Numbers may be integer or floating-point; the latter are stored with limited
 precision (usually six significant digits).
 .PP
@@ -465,7 +468,7 @@ behaves as
 .BR fmod (3)
 if either argument is floating-point.
 .PP
-An undefined variable (a variable having value
+An undefined variable (a variable reference yielding value
 .BR () )
 is treated as zero within an arithmetic expression.
 .PP
@@ -546,6 +549,12 @@ A lambda list binds names to function arguments. Its form is:
 .RS
 .BI | "name ..." |
 .RE
+.PP
+Arguments are bound to
+.IR name s
+left-to-right. Excess arguments bind in a list to the last name. Excess
+names are bound to
+.BR () .
 .PP
 A lambda list may only appear as the first element of a fragment.
 .SS Truth values
