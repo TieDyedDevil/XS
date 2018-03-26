@@ -9,10 +9,12 @@ is a command interpreter for Linux.
 .B Xs
 allows programming in a functional style and has a simple, consistent syntax.
 .B Xs
-also provides a set of hooks to customize many operations. Furthermore, an
+also provides a set of hooks to customize many operations.
+Furthermore, an
 .B xs
 program is able to synthesize binding and control regimes;
-this facilitates the creation of new language syntax. It is via these
+this facilitates the creation of new language syntax.
+It is via these
 facilities that a significant portion of
 .B xs
 is implemented in
@@ -70,10 +72,12 @@ Don't trap SIGQUIT or SIGTERM.
 .SH LANGUAGE
 Lexically, an
 .B xs
-program consists of words and punctuation. (See FOOTNOTE.)
+program consists of words and punctuation.
+(See FOOTNOTE.)
 .SS Words
 In its simplest form, a word is a
-sequence of non-special characters. The special characters are:
+sequence of non-special characters.
+The special characters are:
 .PP
 .RS
 .B "# $ & \(aq ( ) ; < > \e ^ \` { | }"
@@ -152,7 +156,8 @@ A sequence of characters enclosed by apostrophes
 .RB ( \(aq )
 is a word; the bounding
 .B \(aq
-are not part of the word. We refer to this form as a
+are not part of the word.
+We refer to this form as a
 .IR "quoted word" .
 .PP
 An apostrophe is written within a quoted word by doubling it, e.g.,
@@ -163,18 +168,22 @@ An apostrophe is written within a quoted word by doubling it, e.g.,
 .PP
 All other special characters lose their meaning within a quoted word.
 .SS Commands
-A command is a sequence of words separated by whitespace. The first word
+A command is a sequence of words separated by whitespace.
+The first word
 is always the name of an executable program on
 .BR $path ,
 an
 .B xs
-function, or a lambda (defined below). Subsequent words are arguments; these
-are subject to evaluation, expansion and substitution. Because the arguments
+function, or a lambda (defined below).
+Subsequent words are arguments; these
+are subject to evaluation, expansion and substitution.
+Because the arguments
 are passed as a list, any argument that yields
 .B ()
 will "disappear" (see Lists).
 .SS Command separator
-A command must occupy one logical line. Commands are separated by
+A command must occupy one logical line.
+Commands are separated by
 newlines or semicolons
 .RB ( ; ).
 .SS Program fragments
@@ -188,13 +197,16 @@ commands enclosed in braces:
 A fragment may span multiple physical lines.
 .PP
 The value of a fragment is the result code returned by the last
-command executed. An empty fragment
+command executed.
+An empty fragment
 .RB ( {} )
-has a result of zero. A fragment containing a pipeline returns a list of
+has a result of zero.
+A fragment containing a pipeline returns a list of
 results: one for each function or executable in the pipeline.
 .PP
 A fragment appearing as a parameter of a function or executable is
-treated as a single word. Fragments are indivisible and immutable.
+treated as a single word.
+Fragments are indivisible and immutable.
 .PP
 The braces may be elided if the command is a single word having no arguments.
 .SS Comments
@@ -207,12 +219,14 @@ with a backslash
 .RB ( \e ).
 The backslash and the immediately following newline are read as a space.
 .SS Lists
-A list is a space-separated sequence of words. The empty list is denoted by
+A list is a space-separated sequence of words.
+The empty list is denoted by
 .BR () .
 All lists are flat in
 .BR xs ;
 balanced parentheses may be written for grouping, but they do not create
-a tree. Thus
+a tree.
+Thus
 .PP
 .RS
 .B this is a list of seven words
@@ -232,7 +246,8 @@ line continuation characters.
 Lists may be joined using the concatenation operator, caret
 .BR ( ^ ).
 .PP
-A list of length one is a word. Concatenating two words creates a new word.
+A list of length one is a word.
+Concatenating two words creates a new word.
 .PP
 When either list has length greater than one, the result of concatenation is
 the cross product of the lists.
@@ -248,13 +263,14 @@ hyphen
 .RB ( - )
 and underscore
 .RB ( _ )
-may be used in variable names. These characters may appear in any order or
-combination.
+may be used in variable names.
+These characters may appear in any order or combination.
 .PP
 The
 .B xs
 special characters (see Words) may also appear in a variable name if
-quoted or escaped. Likewise, character escapes (see Escapes) may be part of a
+quoted or escaped.
+Likewise, character escapes (see Escapes) may be part of a
 variable name.
 .PP
 Variable names having the prefix
@@ -273,7 +289,8 @@ The spaces around
 .B =
 are mandatory.
 .PP
-A variable becomes undefined by assigning an empty list as its value. While
+A variable becomes undefined by assigning an empty list as its value.
+While
 .PP
 .RS
 .IB var " = ()"
@@ -301,16 +318,18 @@ is allowed.
 .PP
 An undefined variable yields the empty list when referenced.
 .PP
-A variable name may be constructed at runtime. Parentheses must enclose
-expressions used to construct a name.
+A variable name may be constructed at runtime.
+Parentheses must enclose expressions used to construct a name.
 .SS Subscripted reference
-Specific list elements may be selected via subscripting. This takes the form
+Specific list elements may be selected via subscripting.
+This takes the form
 .PP
 .RS
 .BI $ var ( subscripts )
 .RE
 .PP
-List elements are indexed starting at one. A subscript less than 1 is an error.
+List elements are indexed starting at one.
+A subscript less than 1 is an error.
 A subscript greater than the number of list elements yields the empty list.
 .PP
 .RS
@@ -348,9 +367,11 @@ A list of variables may be specified on the left side of an assignment.
 Parentheses are mandatory around the list of variables.
 .PP
 Corresponding list elements on the right side are assigned to variables on
-the left. If the right side has more elements than there are variables on
+the left.
+If the right side has more elements than there are variables on
 the left, the rightmost variable is assigned the list value of the remaining
-elements. If there are more variables than list elements, the excess variables
+elements.
+If there are more variables than list elements, the excess variables
 are assigned the empty list.
 .PP
 Variable names may not be computed or subscripted on the left side of a
@@ -365,13 +386,16 @@ The length of a list assigned to a variable is given by
 .SS Flattening
 A list may be flattened to a single word using the
 .B $^
-operator. This yields a word composed of the words of the given list,
-with a single space between each pair of words. As with the subscript
+operator.
+This yields a word composed of the words of the given list,
+with a single space between each pair of words.
+As with the subscript
 operator, this applies only to a variable (not literal) list.
 .SS Free carets
 Concatenation may be written implicitly (rather than using the
 .B ^
-operator) in certain situations. If a word is followed by another word,
+operator) in certain situations.
+If a word is followed by another word,
 .BR $ " or " \`
 without intervening whitespace, then
 .B xs
@@ -415,7 +439,8 @@ alone or followed by a slash
 is replaced by the value of
 .BR $home .
 A tilde followed by a username is replaced with the home directory path
-of that user. (See
+of that user.
+(See
 .BR getpwent (3).)
 .PP
 A quoted wildcard loses its meaning as a wildcard.
@@ -428,7 +453,8 @@ returns true when a subject matches any of the given patterns:
 .BI ~ " subject pattern ..."
 .RE
 .PP
-A subject may be a list. If composed of individual words or expressions,
+A subject may be a list.
+If composed of individual words or expressions,
 the subject list must be enclosed by parentheses.
 .PP
 Pattern wildcards are never expanded with pathnames from the filesystem.
@@ -463,8 +489,8 @@ precision (usually six significant digits).
 If an expression involves any floating-point value, the result will be
 floating-point.
 .PP
-Division of integers produces an integer result via truncation. Modulus
-behaves as
+Division of integers produces an integer result via truncation.
+Modulus behaves as
 .BR fmod (3)
 if either argument is floating-point.
 .PP
@@ -533,18 +559,20 @@ and
 .RE
 .PP
 The former is normally used for top-level and nested definitions; the latter
-must be used when binding a function for local use. Because the latter is an
-assignment, the spaces around
+must be used when binding a function for local use.
+Because the latter is an assignment, the spaces around
 .B =
 are mandatory.
 .SS Lambdas
-A lambda is an unnamed function. In
+A lambda is an unnamed function.
+In
 .BR xs ,
 a lambda is written as a program frament in which the first element may be
-a lambda list (see below). A lambda without a lambda list is a lambda with
-no arguments.
+a lambda list (see below).
+A lambda without a lambda list is a lambda with no arguments.
 .SS Lambda list
-A lambda list binds names to function arguments. Its form is:
+A lambda list binds names to function arguments.
+Its form is:
 .PP
 .RS
 .BI | "name ..." |
@@ -552,8 +580,9 @@ A lambda list binds names to function arguments. Its form is:
 .PP
 Arguments are bound to
 .IR name s
-left-to-right. Excess arguments bind in a list to the last name. Excess
-names are bound to
+left-to-right.
+Excess arguments bind in a list to the last name.
+Excess names are bound to
 .BR () .
 .PP
 A lambda list may only appear as the first element of a fragment.
@@ -660,8 +689,9 @@ or
 .BI > "filename fragment"
 .RE
 .PP
-The file is created if it does not exist. If the file already exists, its
-contents are replaced. It is an error for the the file to not be writeable.
+The file is created if it does not exist.
+If the file already exists, its contents are replaced.
+It is an error for the the file to not be writeable.
 .PP
 Other file descriptors may be specified:
 .PP
@@ -739,10 +769,13 @@ or
 The
 .I eof-marker
 is a word which must appear immediately following the final newline of textual
-data taken as input. The first form (with the unquoted
+data taken as input.
+The first form (with the unquoted
 .IR eof-marker )
-replaces variables within the textual data. (Only simple variables;
-indirection, subscripts and constructed names are not allowed.) A
+replaces variables within the textual data.
+(Only simple variables; indirection, subscripts and constructed names
+are not allowed.)
+A
 .B $
 can be emitted literally by writing
 .BR $$ .
@@ -761,7 +794,8 @@ Text may also provide the content of a readable file via a "here string":
 .PP
 The
 .I text
-may span lines. No substitution is performed within a here string.
+may span lines.
+No substitution is performed within a here string.
 .PP
 A here string may also be created using a variable for the content, like
 .BI <<<$ var
@@ -829,10 +863,12 @@ Multiple bindings are separated by
 .BR ; .
 .PP
 A lexical variable is accessible to all code lexically enclosed by the
-binding form. Furthermore, a lexical variable persists across executions
+binding form.
+Furthermore, a lexical variable persists across executions
 of a function which is defined within the
 .B let
-form. A lexical binding is never written to the environment.
+form.
+A lexical binding is never written to the environment.
 .SS Conditionals
 .B Xs
 has two main conditional forms:
@@ -922,19 +958,21 @@ is assigned,
 .BI set- var
 is called as a function, passing the value to be assigned.
 .B $0
-is bound to the name of the variable being assigned. The result of
-the settor function is used as the assignment's value.
+is bound to the name of the variable being assigned.
+The result of the settor function is used as the assignment's value.
 .PP
 A settor is never invoked on a lexical variable.
 .SS Exceptions
 Exceptions in
 .B xs
-are used for non-lexical control transfer. An exception is passed up the
-call chain to the most recently established catcher. The catcher may handle
-the exception, retry the code which caused the exception or pass the
-exception to the next catcher.
+are used for non-lexical control transfer.
+An exception is passed up the call chain to the most recently
+established catcher.
+The catcher may handle the exception, retry the code which caused
+the exception or pass the exception to the next catcher.
 .PP
-An exception is a list. The first word denotes the exception type, one of:
+An exception is a list.
+The first word denotes the exception type, one of:
 .PP
 .RS
 .TP
@@ -950,15 +988,16 @@ such as the name of the function which signalled the error) and a message.
 provides a last-resort catcher to print the message and restart the top loop.
 .TP
 .B exit
-where the next word is an optional numeric return code (default: 0). This
-exception, when caught by
+where the next word is an optional numeric return code (default: 0).
+This exception, when caught by
 .BR xs ,
 exits the shell with the given return code.
 .TP
 .B retry
 when raised by a catcher, causes the body of the
 .B catch
-form to run again. Note that the catcher must have done something to clear
+form to run again.
+Note that the catcher must have done something to clear
 the cause of the exception; otherwise
 .B retry
 will cause an infinite loop.
@@ -990,8 +1029,8 @@ At the top level, this variable
 .RB "(i.e., " $0 )
 is the value of
 .BR xs 's
-argv[0] or the name of a sourced file. Within an executing function,
-the name of the function.
+argv[0] or the name of a sourced file.
+Within an executing function, the name of the function.
 .TP
 .B apid
 The ID of the most recently started background process.
@@ -999,7 +1038,8 @@ The ID of the most recently started background process.
 .B history
 The pathname of the file to which
 .B xs
-appends commands read by the toplevel loop. This may be left undefined.
+appends commands read by the toplevel loop.
+This may be left undefined.
 .TP
 .B home
 The path to the current user's home directory.
@@ -1009,7 +1049,8 @@ are aliased to each other.
 .B ifs
 The input field separator, used by backquote
 .RB ( \` )
-to split command output into words. The initial value is the list
+to split command output into words.
+The initial value is the list
 .RS
 .I "space tab newline"
 .RE
@@ -1023,8 +1064,8 @@ A list of dynamic variable names which
 will not export to the environment.
 .TP
 .B path
-A list of directories to be searched for executable programs. The current
-directory is denoted by the empty word
+A list of directories to be searched for executable programs.
+The current directory is denoted by the empty word
 .RB ( \(aq\(aq ).
 .BR $path " and " $PATH
 are aliased to each other, with appropriate syntactic adjustments.
@@ -1098,14 +1139,15 @@ see Options.
 .BR access " [" "-n " \fIname "] [-1e] [-rwx] [-fdcblsp] " \fIpath...
 Tests
 .IR path s
-for accessibility. Without the
+for accessibility.
+Without the
 .BR -1 ", " -e " and " -n
 options,
 .B access
-returns true for paths which are accessible as specified. A printable
-error message (which evaluates as false; see Truth Values) is returned
-for paths which are not accessible. The default test (no options) is
-identical to
+returns true for paths which are accessible as specified.
+A printable error message (which evaluates as false; see Truth Values)
+is returned for paths which are not accessible.
+The default test (no options) is identical to
 .BR -f .
 These options determine the test to apply to the paths:
 .RS
@@ -1133,8 +1175,8 @@ producing a list of test results.
 .PP
 With
 .BR -1 ", " access
-returns the first path to satisfy the test. If no path satisfies the
-test, return the empty list unless
+returns the first path to satisfy the test.
+If no path satisfies the test, return the empty list unless
 .BR -e
 was specified, in which case not having a satisfied test causes an
 error to be raised.
@@ -1143,7 +1185,8 @@ error to be raised.
 .BI alias " name expansion..."
 Define a function with
 .I expansion
-as its body. The first word of
+as its body.
+The first word of
 .I expansion
 is replaced with its
 .B whats
@@ -1168,15 +1211,16 @@ With no argument, this is the same as
 .BR "cd $home" .
 .TP
 .BR dirs " [" -c ]
-Show the directory stack (see pushd and popd). With
+Show the directory stack (see pushd and popd).
+With
 .BR -c ,
 clear the directory stack.
 .TP
 .BR echo " [" -n "] [" -- ] " \fIargs..."
 Print
 .I args
-to standard output, separated by spaces. The output ends with a newline unless
-suppressed by
+to standard output, separated by spaces.
+The output ends with a newline unless suppressed by
 .BR -n .
 Arguments following
 .B --
@@ -1185,12 +1229,13 @@ are taken literally.
 .BI escape " lambda"
 Run
 .IR lambda ,
-a function of one argument. The argument names a function which,
-when evaluated within
+a function of one argument.
+The argument names a function which, when evaluated within
 .IR lambda ,
 transfers control to just after the
 .B escape
-form. Arguments of the escape function are returned as the value of the form.
+form.
+Arguments of the escape function are returned as the value of the form.
 .TP
 .BI eval " list"
 Convert
@@ -1262,13 +1307,15 @@ for hard limits.
 .I value
 is either
 .B unlimited
-or a number. Numbers representing size allow the suffixes
+or a number.
+Numbers representing size allow the suffixes
 .B k
 (kilobyte),
 .B m
 (megabyte), and
 .B g
-(gigabyte). Numbers representing time allow the suffixes
+(gigabyte).
+Numbers representing time allow the suffixes
 .B s
 (seconds),
 .B m
@@ -1292,7 +1339,8 @@ Like map, but collect a list of the outputs of
 .TP
 .B popd
 Pop the directory stack to set the working directory, and print the new
-stack. The command is ignored if the directory stack is empty.
+stack.
+The command is ignored if the directory stack is empty.
 .TP
 .BI printf " format args..."
 Print
@@ -1316,14 +1364,16 @@ Push
 .IR dir 's
 absolute path onto the directory stack, set the working directory to
 .I dir
-and show the new stack. If
+and show the new stack.
+If
 .I dir
 is omitted and the stack is at least two deep, then alternate between
 the two top directories.
 .TP
 .B read
 Read from standard input and return a single word containing a line of
-text (without the newline). Return
+text (without the newline).
+Return
 .B ()
 upon end-of-file.
 .TP
@@ -1369,7 +1419,8 @@ Print definition of all variables which satisfy the given options:
 .RS
 .TP
 .B -v
-variables (not functions or settors). This is the default if none of
+variables (not functions or settors).
+This is the default if none of
 .BR -v ", " -f " or " -s
 is given.
 .TP
@@ -1380,7 +1431,8 @@ functions
 settors
 .TP
 .B -e
-exported. This is the default if none of
+exported.
+This is the default if none of
 .BR -e ", " -p " or " -i
 is given.
 .TP
@@ -1397,7 +1449,8 @@ all of the above
 .BR wait " [\fIpid\fR]
 Wait for a child process denoted by its
 .I pid
-to exit. If no
+to exit.
+If no
 .I pid
 is given, wait for any child process.
 .TP
@@ -1415,13 +1468,15 @@ The following functions implement specific parts of
 semantics; a hook function can be rewritten to provide special behaviors.
 Hook functions are normally called as a result of
 .B xs
-translating programs into an internal form. See CANONICAL FORM.
+translating programs into an internal form.
+See CANONICAL FORM.
 .TP
 .BI %and " command..."
 Execute
 .IR command (s)
 from left to right, stopping at the command that first yields a false
-value. The false value is returned by
+value.
+The false value is returned by
 .BR %and .
 .TP
 .BI %append " fd file command"
@@ -1435,7 +1490,8 @@ open in append mode on
 .BI %background " command"
 Run
 .I command
-as a background process. If
+as a background process.
+If
 .B xs
 is an interactive shell, print the background process ID.
 .TP
@@ -1558,7 +1614,8 @@ with the given
 Execute
 .IR command (s)
 from left to right, stopping at the command that first yields a true
-value. The true value is returned by
+value.
+The true value is returned by
 .BR %or .
 .TP
 .BI %pathsearch " program"
@@ -1620,7 +1677,8 @@ Split each
 .I arg
 word at any
 .I separator
-character, producing a list. Repeated instances of
+character, producing a list.
+Repeated instances of
 .I separator
 in
 .IR arg s
@@ -1757,8 +1815,9 @@ exception.
 .B Xs
 binds one of the following functions to
 .B fn-%dispatch
-for use by the toploop. The choice of function is determined by whether
-the shell is interactive and by the
+for use by the toploop.
+The choice of function is determined by whether the shell is interactive
+and by the
 .BR -n " and " -x
 options.
 .PP
@@ -1782,7 +1841,9 @@ Read input after printing
 .I prompt1
 initially and
 .I prompt2
-for continuation lines. Return a fragment suitable for execution. Raise an
+for continuation lines.
+Return a fragment suitable for execution.
+Raise an
 .B eof
 exception at end of input.
 .P
@@ -1958,7 +2019,8 @@ Returning a function from a function (i.e., an "upward funarg") does not work.
 .PP
 .B Xs
 reserves the octets \e001 and \e002 to annotate variables stored in
-the environment. This may present problems for interchange of variables
+the environment.
+This may present problems for interchange of variables
 with another program that stores these octets in the environment.
 .PP
 Please report issues at <https://github.com/TieDyedDevil/XS>.
@@ -1968,7 +2030,8 @@ The
 source repository is at <https://github.com/TieDyedDevil/XS>.
 .SH PACKAGES
 .B Xs
-is packaged for Fedora. The
+is packaged for Fedora.
+The
 .B xs
 1.1 release first appeared in Fedora 27.
 .SH AUTHORS
@@ -1987,10 +2050,12 @@ Byron Rakitzis <byron@netapp.com>.
 .PP
 The
 .B rc
-shell for Plan 9 was written at Bell Labs by Tom Duff. The Unix port was
+shell for Plan 9 was written at Bell Labs by Tom Duff.
+The Unix port was
 written by Byron Rakitizis and maintained by Toby Goodwin.
 See <http://tobold.org/article/rc>.
 .PP
 Other contributors may be found in the CHANGES file and in the commit log.
 .SH FOOTNOTE
-Yes, and of course whitespace. Some things should be left unsaid.
+Yes, and of course whitespace.
+Some things should be left unsaid.
