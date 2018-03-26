@@ -2,7 +2,7 @@ This is a list of more ambitious projects related to `xs`. Feel free to
 contact me if you'd like to take on one of these:
 
 * Create a source-level debugger for `xs`. Use hooks where possible;
-  otherwise modify the source code (see, for example,
+  otherwise alter the source code in-place (see, for example,
   `samples/_xsrc.d/annotate.xs`). Functionality should include
   breakpoints, traps for errors and signals, stack crawls, variable
   inspection and modification (both lexical and environment variables),

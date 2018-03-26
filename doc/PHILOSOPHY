@@ -9,8 +9,8 @@ I'll evaluate requests to change the language.
 In short: I intend to keep the language definition as stable as
 possible. That means: Unless the language is demonstrably "broken"
 (i.e.: there's an `xs` program that crashes the shell or behaves in a
-manner that's inconsistent with what the manual says `xs` should do)
-or there's a really ill-advised design decision, there will be no
+manner that's inconsistent with what the manual says `xs` should do,
+or there's a really ill-advised design decision), there will be no
 changes. In other words: the `xs` language is "frozen".
 
 On the plus side, this means that you should never have to worry about
