@@ -10,6 +10,7 @@ fn virts {|*|
 	.a 'shutdown VM'
 	.a 'reboot VM'
 	.a 'reset VM'
+	.a 'clone VM'
 	.a 'title VM TITLE...'
 	.a 'manage'
 	.c 'system'
@@ -24,6 +25,7 @@ fn virts {|*|
 	shutdown {virsh shutdown $*(2)}
 	reboot {virsh reboot $*(2)}
 	reset {virsh reset $*(2)}
+	clone {virt-clone --original $*(2) --auto-clone}
 	title {virsh desc $*(2) --live --config --title --new-desc $*(3 ...)}
 	manage {setsid virt-manager >[2]/dev/null &}
 	{throw error virts 'command?'}
