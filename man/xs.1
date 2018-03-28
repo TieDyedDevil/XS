@@ -2,8 +2,8 @@
 .SH NAME
 xs \- extensible shell
 .SH SYNOPSIS
-.BR xs " [" -c " \fICOMMAND\fP] [" -silevxnpod ]
-.RI [ SCRIPT " [" ARGUMENTS ]]
+.BR xs " [" -silevxnpod ]
+.RB [ -c " \fICOMMAND\fP | [" \fISCRIPT " [" \fIARGUMENTS ]]
 .SH DESCRIPTION
 .B Xs
 is a command interpreter for Linux.
@@ -25,10 +25,6 @@ is a descendant of
 .BR rc "(1) and " es (1);
 the three implementations are not interoperable.
 .SH OPTIONS
-.TP
-.BI -c " command"
-Execute the
-.IR command .
 .TP
 .B -s
 Read commands from standard input; pass the first argument to
@@ -69,6 +65,10 @@ rather than open on /dev/null.
 .TP
 .B -d
 Don't trap SIGQUIT or SIGTERM.
+.TP
+.BI -c " command"
+Execute the
+.IR command .
 .SH LANGUAGE
 Lexically, an
 .B xs
