@@ -162,7 +162,7 @@ We refer to this form as a
 An apostrophe is written within a quoted word by doubling it, e.g.,
 .PP
 .RS
-.B \(aqSam\(aq\(aqs word\(aq
+.BR "\(aqSam\(aq\(aqs word\(aq" " ."
 .RE
 .PP
 All other special characters lose their meaning within a quoted word.
@@ -190,7 +190,7 @@ A program fragment (henceforth fragment) is a sequence of zero or more
 commands enclosed in braces:
 .PP
 .RS
-.BI { command* }
+.BI { command* } " \fR."
 .RE
 .PP
 A fragment may span multiple physical lines.
@@ -281,7 +281,7 @@ have special meaning; see Functions and Settors, respectively.
 A variable is assigned a list value using the notation
 .PP
 .RS
-.IB var " = " list
+.IB var " = " list " \fR."
 .RE
 .PP
 The spaces around
@@ -298,7 +298,7 @@ While
 is valid, the preferred form is
 .PP
 .RS
-.IB var " ="
+.IB var " =" " \fR."
 .RE
 .PP
 The value of an assignment is its assigned value.
@@ -324,7 +324,7 @@ Specific list elements may be selected via subscripting.
 This takes the form
 .PP
 .RS
-.BI $ var ( subscripts )
+.BI $ var ( subscripts ) " \fR."
 .RE
 .PP
 List elements are indexed starting at one.
@@ -335,11 +335,11 @@ A subscript greater than the number of list elements yields the empty list.
 .TP
 .B a = w x y z; echo $a(2 3 4 4 3)
 prints
-.B x y z z y
+.BR "x y z z y" " ."
 .RE
 .PP
 Subscripts may be specified as ranges by separating the range endpoints with
-.BR ... " ."
+.BR ...\& " ."
 The range operator must be separated from its arguments by spaces.
 .PP
 Either end of the range may be left unspecified.
@@ -379,7 +379,7 @@ multiple assignment.
 The length of a list assigned to a variable is given by
 .PP
 .RS
-.BI $# var
+.BI $# var " \fR."
 .RE
 .PP
 .SS Flattening
@@ -449,7 +449,7 @@ The pattern matching operator
 returns true when a subject matches any of the given patterns:
 .PP
 .RS
-.BI ~ " subject pattern ..."
+.BI ~ " subject pattern ..." " \fR."
 .RE
 .PP
 A subject may be a list.
@@ -463,7 +463,7 @@ The pattern extraction operator
 returns the parts of each subject that match a wildcard in the patterns:
 .PP
 .RS
-.BI ~~ " subject pattern ..."
+.BI ~~ " subject pattern ..." " \fR."
 .RE
 .PP
 Subjects and patterns are the same as for the pattern matching operator.
@@ -472,7 +472,7 @@ An infix arithmetic expression may be evaluated to produce a single word
 representing its value:
 .PP
 .RS
-.BI \`( expression )
+.BI \`( expression ) " \fR."
 .RE
 .PP
 The expression consists of numeric values and the infix operators
@@ -504,13 +504,13 @@ The standard output of one fragment may be piped to the standard input of
 another:
 .PP
 .RS
-.IB fragment1 " | " fragment2
+.IB fragment1 " | " fragment2 " \fR."
 .RE
 .PP
 Other file descriptors may be connected:
 .PP
 .RS
-.IB fragment1 " |[\fIfd1\fB=\fIfd2\fB] " fragment2
+.IB fragment1 " |[\fIfd1\fB=\fIfd2\fB] " fragment2 " \fR."
 .RE
 .PP
 The form
@@ -522,7 +522,7 @@ The form
 is identical to
 .PP
 .RS
-.IB fragment2 " |[\fIfd1\fB=0] " fragment2
+.IB fragment2 " |[\fIfd1\fB=0] " fragment2 " \fR."
 .RE
 .PP
 .SS Command substitution
@@ -530,7 +530,7 @@ The backquote form creates a list from the standard output of a program
 fragment:
 .PP
 .RS
-.BI \` fragment
+.BI \` fragment " \fR."
 .RE
 .PP
 Words are parsed from the standard output using the separators defined by
@@ -541,7 +541,7 @@ This variant backquote form binds
 to the given list of separators:
 .PP
 .RS
-.BI \`\` " separators fragment"
+.BI \`\` " separators fragment" " \fR."
 .RE
 .SS Functions
 .B Xs
@@ -554,7 +554,7 @@ has two forms by which a function is defined:
 and
 .PP
 .RS
-.BI fn- name " = " fragment
+.BI fn- name " = " fragment " \fR."
 .RE
 .PP
 The former is normally used for top-level and nested definitions; the latter
@@ -574,7 +574,7 @@ A lambda list binds names to function arguments.
 Its form is:
 .PP
 .RS
-.BI | "name ..." |
+.BI | "name ..." | " \fR."
 .RE
 .PP
 Arguments are bound to
@@ -604,7 +604,7 @@ or executable evaluated before leaving the fragment.
 A specific result may be returned by:
 .PP
 .RS
-.BI result " list"
+.BI result " list" " \fR."
 .RE
 .SS Logical operators
 The following operators apply to truth values:
@@ -671,7 +671,7 @@ Input may be redirected from a file to standard input:
 or
 .PP
 .RS
-.IB fragment " <" filename
+.IB fragment " <" filename " \fR."
 .RE
 .PP
 It is an error if the file does not exist or is not readable.
@@ -685,7 +685,7 @@ Output may be redirected from standard output to a file:
 or
 .PP
 .RS
-.BI > "filename fragment"
+.BI > "filename fragment" " \fR."
 .RE
 .PP
 The file is created if it does not exist.
@@ -701,13 +701,13 @@ Other file descriptors may be specified:
 and
 .PP
 .RS
-.IB "fragment " <[ ifd ] filename
+.IB "fragment " <[ ifd ] filename " \fR."
 .RE
 .PP
 A file descriptor may be duplicated using the form:
 .PP
 .RS
-.BI >[ fd1 = fd2 ]
+.BI >[ fd1 = fd2 ] " \fR."
 .RE
 .PP
 This causes output to
@@ -749,7 +749,7 @@ specified).
 An open file descriptor is closed using this form:
 .PP
 .RS
-.BI >[ fd =]
+.BI >[ fd =] " \fR."
 .RE
 .PP
 File descriptors must be integer constants.
@@ -763,7 +763,7 @@ Multiple lines of input may be read from a script using a "here document":
 or
 .PP
 .RS
-.IB fragment " <<\(aq" eof-marker \(aq
+.IB fragment " <<\(aq" eof-marker \(aq " \fR."
 .RE
 .PP
 The
@@ -789,7 +789,7 @@ copies the textual data without substitution of any kind.
 Text may also provide the content of a readable file via a "here string":
 .PP
 .RS
-.BI <<<\(aq text \(aq
+.BI <<<\(aq text \(aq " \fR."
 .RE
 .PP
 The
@@ -813,7 +813,7 @@ command, using the forms:
 and
 .PP
 .RS
-.BI >{ command+ }
+.BI >{ command+ } " \fR."
 .RE
 .PP
 The files created by process substitution are implemented using pipes,
@@ -1008,7 +1008,7 @@ The
 form executes its body in the context of a catcher:
 .PP
 .RS
-.BI catch " catcher body"
+.BI catch " catcher body" " \fR."
 .RE
 .PP
 The
