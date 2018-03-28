@@ -113,14 +113,14 @@ A character octet may be denoted by its hexadecimal or octal code point:
 .RS
 .TP
 .BI \ex nn
-character octet
+Character octet
 .IR nn ,
 for
 .I n
 in {0..0, a..f, A..F}
 .TP
 .BI \e mnn
-character octet
+Character octet
 .IR mnn ,
 for
 .I m
@@ -403,13 +403,13 @@ inserts a caret between them.
 A pattern is a word which may contain wildcards.
 .TP
 .B *
-matches zero or more characters
+Matches zero or more characters
 .TP
 .B ?
-matches exactly one character
+Matches exactly one character
 .TP
 .BI [ class ]
-matches any of the characters specified by the class, following the same
+Matches any of the characters specified by the class, following the same
 rules as those for
 .BR ed (1),
 except that class negation is denoted by
@@ -727,22 +727,22 @@ Other redirection operators have their own semantics:
 .RS
 .TP
 .BI >> filename
-appends to an existing file; the file is created if nonexistent.
+Append to an existing file; the file is created if nonexistent.
 .TP
 .BI <> filename
-opens a file for reading and writing (on standard input unless otherwise
+Open a file for reading and writing (on standard input unless otherwise
 specified).
 .TP
 .BI <>> filename
-opens a file for reading and appending (on standard input unless otherwise
+Open a file for reading and appending (on standard input unless otherwise
 specified).
 .TP
 .BI >< filename
-truncates a file and opens it for reading and writing (on standard output
+Truncate a file and open it for reading and writing (on standard output
 unless otherwise specified).
 .TP
 .BI >>< filename
-opens a files for reading and appending (on standard output unless otherwise
+Open a file for reading and appending (on standard output unless otherwise
 specified).
 .RE
 .PP
@@ -977,24 +977,24 @@ The first word denotes the exception type, one of:
 .RS
 .TP
 .B eof
-raised by the
+Raised by the
 .B xs
 parser at end of input.
 .TP
 .B error
-where the following words are the source (typically a descriptive name
+The following words are the source (typically a descriptive name
 such as the name of the function which signalled the error) and a message.
 .B xs
 provides a last-resort catcher to print the message and restart the top loop.
 .TP
 .B exit
-where the next word is an optional numeric return code (default: 0).
+The next word is an optional numeric return code (default: 0).
 This exception, when caught by
 .BR xs ,
 exits the shell with the given return code.
 .TP
 .B retry
-when raised by a catcher, causes the body of the
+When raised by a catcher, this causes the body of the
 .B catch
 form to run again.
 Note that the catcher must have done something to clear
@@ -1096,16 +1096,16 @@ A signal's disposition is determined by an optional prefix to its name:
 .RS
 .TP
 .B -
-ignore the signal, here and in child processes
+Ignore the signal, here and in child processes
 .TP
 .B /
-ignore the signal here, but take its default behavior in child processes
+Ignore the signal here, but take its default behavior in child processes
 .TP
 .BI . " (only for sigint)"
-perform normal processing (i.e., print an extra newline)
+Perform normal processing (i.e., print an extra newline)
 .TP
 .I none
-default behavior
+Default behavior
 .PP
 The initial value of
 .B $signals
