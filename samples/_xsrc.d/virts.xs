@@ -10,6 +10,10 @@ fn virts {|*|
 	.a 'shutdown VM'
 	.a 'reboot VM'
 	.a 'reset VM'
+	.a 'destroy VM'
+	.a 'dumpxml VM  # to stdout'
+	.a 'define XMLFILE'
+	.a 'undefine VM'
 	.a 'clone VM'
 	.a 'title VM TITLE...'
 	.a 'manage'
@@ -25,6 +29,10 @@ fn virts {|*|
 	shutdown {virsh shutdown $*(2)}
 	reboot {virsh reboot $*(2)}
 	reset {virsh reset $*(2)}
+	destroy {virsh destroy $*(2)}
+	dumpxml {virsh dumpxml $*(2)}
+	define {virsh define $*(2)}
+	undefine {virsh undefine $*(2) --remove-all-storage --nvram}
 	clone {virt-clone --original $*(2) --auto-clone}
 	title {virsh desc $*(2) --live --config --title --new-desc $*(3 ...)}
 	manage {setsid virt-manager >[2]/dev/null &}
