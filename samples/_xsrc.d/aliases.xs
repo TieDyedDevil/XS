@@ -55,9 +55,14 @@ fn vars {|*|
 	%_vars $* | less -RFXi
 }
 fn varss {|*|
-	.d 'List environment w/o objects and arrays'
+	.d 'List environment w/o objects, arrays and xs utility vars'
 	.c 'alias'
-	%_vars $* | grep -av '^'\xff | less -RFXi
+	%_vars $* | grep -av -e '^'\xff \
+		-e '^''_[ns]@[0-9]\+'' ' \
+		-e '^''_p[12abrt]@[0-9]\+'' ' \
+		-e '^prompt ' \
+		-e '^_o[abp] ' \
+		-e '^libloc ' | less -RFXi
 }
 fn worms {|*|
 	.d 'Display worms'
