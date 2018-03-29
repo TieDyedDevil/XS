@@ -16,6 +16,10 @@ fn virts {|*|
 	.a 'undefine VM'
 	.a 'clone VM'
 	.a 'title VM TITLE...'
+	.a 'pool-list'
+	.a 'vol-list POOL'
+	.a 'vol-dumpxml POOL VOL  # to stdout'
+	.a 'vol-create POOL XMLFILE'
 	.a 'manage'
 	.c 'system'
 	switch <={%argify $*(1)} (
@@ -35,6 +39,10 @@ fn virts {|*|
 	undefine {virsh undefine $*(2) --remove-all-storage --nvram}
 	clone {virt-clone --original $*(2) --auto-clone}
 	title {virsh desc $*(2) --live --config --title --new-desc $*(3 ...)}
+	pool-list {virsh pool-list --all}
+	vol-list {virsh vol-list $*(2)}
+	vol-dumpxml {virsh vol-dumpxml --pool $*(2 3)}
+	vol-create {virsh vol-create $*(2 3)}
 	manage {setsid virt-manager >[2]/dev/null &}
 	{throw error virts 'command?'}
 	)
