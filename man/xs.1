@@ -1102,8 +1102,9 @@ Ignore the signal, here and in child processes.
 .B /
 Ignore the signal here, but take its default behavior in child processes.
 .TP
-.BI . " (only for sigint)"
-Perform normal processing (i.e., print an extra newline).
+.BI . " (for sigint and sigwinch)"
+Perform normal processing (i.e., print an extra newline upon receipt of
+sigint; note the new window size upon receipt of sigwinch).
 .TP
 .I none
 Default behavior.
@@ -1113,7 +1114,7 @@ The initial value of
 is
 .PP
 .RS
-.RI ".sigint /sigquit /sigterm"
+.RI ".sigint /sigquit /sigterm .sigwinch"
 .RE
 .PP
 plus any signals ignored (/) when
