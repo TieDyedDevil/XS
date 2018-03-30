@@ -705,6 +705,12 @@ fn wallpaper {|*|
 		}
 	}
 }
+fn weather {|*|
+	.d 'Show weather and forecast.'
+	.a '[LOCATION]'
+	.c 'system'
+	let (loc = <={%flatten + $*}) {curl wttr.in/$loc\?2nq}
+}
 fn where {
 	.d 'Summarize user, host, tty, shell pid and working directory'
 	.c 'system'
