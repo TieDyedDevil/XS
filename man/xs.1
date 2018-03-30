@@ -3,7 +3,7 @@
 xs \- extensible shell
 .SH SYNOPSIS
 .BR xs " [" -silevxnpod ]
-.RB [ -c " \fICOMMAND\fP | [" \fISCRIPT " [" \fIARGUMENTS ]]
+.RB [ -c " \fIFRAGMENT\fP | [" \fISCRIPT " [" \fIARGUMENTS ]]
 .SH DESCRIPTION
 .B Xs
 is a command interpreter for Linux.
@@ -65,9 +65,10 @@ rather than open on /dev/null.
 .B -d
 Don't trap SIGQUIT or SIGTERM.
 .TP
-.BI -c " command"
+.BI -c " FRAGMENT"
 Execute the
-.IR command .
+.IR FRAGMENT .
+(See Program fragments, below.)
 .SH LANGUAGE
 Lexically, an
 .B xs
