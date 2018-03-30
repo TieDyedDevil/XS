@@ -709,7 +709,7 @@ fn weather {|*|
 	.d 'Show weather and forecast.'
 	.a '[LOCATION]'
 	.c 'system'
-	let (loc = <={%flatten + $*}) {curl wttr.in/$loc\?2nq|less -eRFX}
+	let (loc = <={%flatten + $*}) {curl -sS wttr.in/$loc\?2nq|less -eRFX}
 }
 fn where {
 	.d 'Summarize user, host, tty, shell pid and working directory'
