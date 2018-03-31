@@ -858,13 +858,17 @@ where
 .B binding
 is either
 .IB name " = " value
-or just name (and value is taken as
+or just
+.I name
+(and
+.I value
+is taken as
 .BR () ).
 Multiple bindings are separated by
 .BR ; .
 .PP
-A lexical variable is accessible to all code lexically enclosed by the
-binding form.
+A lexical variable is accessible only within
+.IR fragment .
 Furthermore, a lexical variable persists across executions
 of a function which is defined within the
 .B let
