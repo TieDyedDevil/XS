@@ -832,7 +832,7 @@ and
 Local variables exist only during execution of their binding form:
 .PP
 .RS
-.BI "local (" "binding ..." ) " fragment"
+.BI "local (" "binding ..." ) " fragment \fR,"
 .RE
 .PP
 where
@@ -851,7 +851,7 @@ variables are accessible within the environment.
 Lexical variables are bound by the form:
 .PP
 .RS
-.BI "let (" "binding ..." ) " fragment"
+.BI "let (" "binding ..." ) " fragment \fR,"
 .RE
 .PP
 where
@@ -879,7 +879,7 @@ A lexical binding is never written to the environment.
 has two main conditional forms:
 .PP
 .RS
-.BI if " condition fragment " else " fragment"
+.BI if " condition fragment " else " fragment \fR,"
 .RE
 .PP
 where
@@ -889,7 +889,7 @@ is a boolean expression and the
 branch is optional, and
 .PP
 .RS
-.BI switch " var cases"
+.BI switch " var cases \fR,"
 .RE
 .PP
 where
