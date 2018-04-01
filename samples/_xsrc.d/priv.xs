@@ -42,6 +42,10 @@ fn powertop {|*|
 	.c 'priv'
 	sudo /usr/sbin/powertop $*
 }
+fn radeontop {|*|
+	.c 'priv'
+	sudo /usr/sbin/radeontop $*
+}
 fn remake {
 	.d 'Remake K source projects as needed'
 	.c 'priv'
