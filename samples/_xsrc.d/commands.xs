@@ -670,7 +670,8 @@ fn wallpaper {|*|
 					monopt = $*(1 2); monopt = $^monopt
 					* = $*(3 ...)
 					geom = `{grep \^$mon <{xrandr}| \
-						cut -d' ' -f3}
+						grep -o '[0-9]\+x[0-9]\+' \
+							^'+[0-9]\++[0-9]\+'}
 				}
 				!~ $geom () && pageopt = -page $geom
 				switch $#* (
