@@ -2,19 +2,15 @@ fn pacer {|*|
 	.d 'Hourly stretch reminder'
 	.a '[off]'
 	.c 'system'
-	let (pspid = ~/.pacer-startup.pid) {
+	let (pspid = ~/.pacer.pid) {
 		if {~ $* off} {
 			if {access -f $pspid} {
-				echo 'Stopped during initial wait'
 				pkill -g `{cat $pspid}
+				echo 'Stopped'
 				rm -f $pspid
-			} else {
-				echo 'Stopped during operation'
-				let (pacer_pid = `{pgrep -f \
-						'notify-send pacer'}) {
-					!~ $pacer_pid () && pkill -g $pacer_pid
-				}
 			}
+		} else if {{access -f $pspid} && {kill -0 `{cat $pspid}}} {
+			echo 'Running'
 		} else {
 			let (minute; initwait; lead = 10) {
 				minute = `{date +%M}
@@ -25,9 +21,11 @@ fn pacer {|*|
 				let (fn-work = {sleep `(60*(60-$lead))}; \
 					fn-prompt = {notify-send pacer \
 						'Time to stretch!'}; \
-					fn-pause = {sleep `(60*$lead)}) {
-					{while true {prompt; pause; work}}
+					fn-pause = {sleep `(60*$lead)}; \
+					fn-go = {osd .; osd ''''; osd .}) {
+					{while true {prompt; pause; go; work}}
 				} &
+				echo $apid > $pspid
 			} &
 			echo $apid > $pspid
 		}
