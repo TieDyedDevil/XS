@@ -70,13 +70,18 @@ project('xs', ['cpp'])
   install_data(['samples/_xslib.d/attr.xs', 'samples/_xslib.d/subs.xs',
 		'samples/_xslib.d/util.xs'],
 	install_dir: 'share/doc/xs/samples/_xslib.d')
-  install_data(['samples/_xsrc.d/aliases.xs', 'samples/_xsrc.d/annotate.xs',
-		'samples/_xsrc.d/commands.xs', 'samples/_xsrc.d/console.xs',
-		'samples/_xsrc.d/env.xs', 'samples/_xsrc.d/help.xs',
+  install_data(['samples/_xsrc.d/aliases.xs', 'samples/_xsrc.d/amusement.xs',
+		'samples/_xsrc.d/annotate.xs', 'samples/_xsrc.d/console.xs',
+		'samples/_xsrc.d/daemons.xs', 'samples/_xsrc.d/directory.xs',
+		'samples/_xsrc.d/env.xs', 'samples/_xsrc.d/file.xs',
+		'samples/_xsrc.d/game.xs', 'samples/_xsrc.d/help.xs',
 		'samples/_xsrc.d/herbstluftwm.xs', 'samples/_xsrc.d/media.xs',
 		'samples/_xsrc.d/pacer.xs', 'samples/_xsrc.d/priv.xs',
-		'samples/_xsrc.d/prompt.xs', 'samples/_xsrc.d/touchscreen.xs',
-		'samples/_xsrc.d/virts.xs', 'samples/_xsrc.d/web.xs'],
+		'samples/_xsrc.d/process.xs', 'samples/_xsrc.d/prompt.xs',
+		'samples/_xsrc.d/system.xs', 'samples/_xsrc.d/touchscreen.xs',
+		'samples/_xsrc.d/unicode.xs', 'samples/_xsrc.d/virts.xs',
+		'samples/_xsrc.d/web.xs', 'samples/_xsrc.d/wm.xs',
+		'samples/_xsrc.d/xs.xs'],
 	install_dir: 'share/doc/xs/samples/_xsrc.d')
   install_data(['samples/_xsuser.d/prompt-config.xs'],
 	install_dir: 'share/doc/xs/samples/_xsuser.d')
