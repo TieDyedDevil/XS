@@ -9,7 +9,8 @@ fn pacer {|*|
 				echo 'Stopped'
 				rm -f $pspid
 			}
-		} else if {{access -f $pspid} && {kill -0 `{cat $pspid}}} {
+		} else if {{access -f $pspid} \
+				&& {kill -0 `{cat $pspid} >[2]/dev/null}} {
 			echo 'Running'
 		} else {
 			let (minute; initwait; lead = 5) {
