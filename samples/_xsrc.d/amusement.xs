@@ -1,3 +1,13 @@
+fn aquarium {|*|
+	.d 'Aquarium in root window'
+	.a '[off]'
+	.c 'amusement'
+	if {~ $* off} {
+		pkill xfishtank
+	} else {
+		pgrep -c xfishtank >/dev/null || {xfishtank -i 0.05 -r 0.1 &}
+	}
+}
 fn cookie {
 	.d 'Fortune'
 	.c 'amusement'
