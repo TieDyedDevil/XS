@@ -145,8 +145,9 @@ fn xcolors {|*|
 		let (fn-render = {|f r g b d|
 				printf `{.af $f}
 				printf \e'[48;2;%d;%d;%dm %03d %03d %03d ' \
-					^'%30s '^`.an^\n $r $g $b $r $g $b \
-					<={%argify $d}}) {
+					^'(%02x%02x%02x) %30s '^`.an^\n \
+					$r $g $b $r $g $b \
+					$r $g $b <={%argify $d}}) {
 			if {{~ $* ()} || {eval $*}} {
 				render 0 $r $g $b $d
 				render 7 $r $g $b $d
