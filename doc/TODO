@@ -2,5 +2,6 @@
 - Improve the readline experience:
   - Make quoting during completion match what the user would type.
   - Alter completion behavior depending upon command prefix.
+  - Repaint prompt and partial input after printing PID of terminated job.
 - Fix crashes found by fuzzer.
 - Add unit tests.
