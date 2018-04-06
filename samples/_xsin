@@ -15,7 +15,6 @@ if {~ `tty *tty1} {
 } else {
 	stty start undef stop undef
 	%is-login && {
-		~ `tty /dev/tty* && vtfbfit
 		.as; cookie; .an; echo
 		if {~ `tty /dev/tty*} {
 			on; echo; net; echo; thermal; battery; load; echo
