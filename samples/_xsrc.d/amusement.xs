@@ -5,7 +5,8 @@ fn aquarium {|*|
 	if {~ $* off} {
 		pkill xfishtank
 	} else {
-		pgrep -c xfishtank >/dev/null || {xfishtank -i 0.05 -r 0.1 &}
+		pgrep -c xfishtank >/dev/null || {xfishtank -b 43 -f 23 \
+							-i 0.05 -r 0.1 &}
 	}
 }
 fn cookie {
