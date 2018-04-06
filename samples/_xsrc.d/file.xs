@@ -60,7 +60,7 @@ fn list {|*|
 					patch diff md markdown fs forth
 					4th forth adb ada ads ada gpr ada
 					rs rust rst rest p pascal py python
-					js javascript es rc)} \
+					js javascript es rc hs haskell)} \
 			) {
 			if {~ $*(1) -s} {
 				syn = $*(2)
