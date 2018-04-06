@@ -26,7 +26,8 @@ fn help {|*|
 			2 {vars -f|grep '{\.c '''''^$*(2) \
 				| ext | sed 's/^fn-[^ ]\+/\n&\n/g' \
 				| grep -e '^\({\.\(a\|c\|\d\|r\)\|fn-\)' \
-				| sed 's/fn-\([^ ]\+\)/'^`.as^'; \1'^`.an^'/g' \
+				| sed 's/fn-\([^ ]\+\)/' \
+					^<=.%as^'; \1'^<=.%an^'/g' \
 				| fmt }
 			)
 		} else if {~ $#* 1} {
@@ -77,18 +78,18 @@ fn luc {|*|
 	.c 'help'
 	let (al = <={%args $*}; fn-sf) {
 		if {~ $al -l} {fn-sf = %asort} else {fn-sf = sort}
-		printf `.as^'@ ~/.xs*'^`.an^\n
+		printf <=.%as^'@ ~/.xs*'^<=.%an^\n
 		vars -f | grep -o '^fn-[^ ]\+' | cut -d- -f2- | grep '^[a-z]' \
 			| sf | column -c `{tput cols}
-		printf `.as^'@ ~/bin'^`.an^\n
+		printf <=.%as^'@ ~/bin'^<=.%an^\n
 		find -L ~/bin -mindepth 1 -maxdepth 1 -type f -executable \
 			| sf | xargs -n1 basename | column -c `{tput cols}
 		if {~ $al -s} {
-			printf `.as^'@ /usr/local/bin'^`.an^\n
+			printf <=.%as^'@ /usr/local/bin'^<=.%an^\n
 			ls /usr/local/bin | sf | column -c `{tput cols}
 			optbins = `{find /opt -type d -name bin}
 			for d $optbins {
-				printf `.as^'@ '^$d^`.an^\n
+				printf <=.%as^'@ '^$d^<=.%an^\n
 				ls $d | sf | column -c `{tput cols}
 			}
 		}

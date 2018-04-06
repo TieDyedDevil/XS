@@ -72,7 +72,7 @@ fn m {|*|
 		mpc > $mi
 		if {!grep -o '^ERROR: .*$' $mi} {
 			~ `{cat $mi|wc -l} 3 && \
-			printf '%s|  '^`.as^'%s'^`.an^'  |%s %s'\n \
+			printf '%s|  '^<=.%as^'%s'^<=.%an^'  |%s %s'\n \
 				`` \n {cat $mi|head -1|cut -d\| -f1} \
 				`` \n {cat $mi|head -1|cut -d\| -f2|cut -c3-} \
 				`` \n {cat $mi|tail -n+2|head -1|xargs echo \
