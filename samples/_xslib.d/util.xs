@@ -762,3 +762,10 @@ fn %with-application-keypad {|cmd|
 	printf \e\=
 	unwind-protect {$cmd} {printf \e\>}
 }
+
+fn %active-displays-info {
+	# Print <name>\t<geometry> for each active display; one per line.
+	xrandr|grep '^[^ ]\+ connected'|grep -o '^[^ ]\+.*[0-9]\+x[0-9]\+' \
+			^'+[0-9]\++[0-9]\+'|sed 's/ primary//' \
+		|cut -d' ' -f1,3|tr ' ' \t
+}
