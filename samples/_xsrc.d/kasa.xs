@@ -64,6 +64,7 @@ fn kasa {
 	.d 'Control TP-Link Kasa plugs'
 	.c 'system'
 	.r 'kasatoken kasadevices kasaquery kasaplug'
+	access -f ~/.config/k-kasa/token || throw error kasa 'token?'
 	let (k = a b c d e f g h i j k l m n o p q r s t u v w x y z; i; m) {
 	local (srv; did) {
 		i = 1
