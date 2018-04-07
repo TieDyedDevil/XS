@@ -1,9 +1,10 @@
-#! /usr/bin/env xs
 
 fn kasatoken {|kasa_user kasa_passwd|
 	.d 'Aquire a fresh Kasa token'
 	.a 'KASA_USERNAME KASA_PASSWORD'
 	.r 'kasadevices kasaquery kasaplug kasa'
+	.c 'iot'
+	~ $kasa_passwd () && throw error kasatoken 'user passwd'
 	uuid = `{uuidgen -r}
 	msg = '{"method":"login","params":{"appType":"Kasa_Android",' \
 		^'"cloudPassword":"%s","cloudUserName":"%s",' \
@@ -17,6 +18,8 @@ fn kasatoken {|kasa_user kasa_passwd|
 fn kasadevices {
 	.d 'Print JSON list of Kasa devices'
 	.r 'kasatoken kasaquery kasaplug kasa'
+	.c 'iot'
+	access -f ~/.config/k-kasa/token || throw error kasadevices 'no token'
 	curl -s --request POST https://wap.tplinkcloud.com\?token\= \
 		^`{cat ~/.config/k-kasa/token} \
 		--data '{"method":"getDeviceList"}' \
@@ -35,6 +38,8 @@ fn kasaquery {|server device|
 	.d 'Print JSON state of Kasa device'
 	.a 'SERVER_URL DEVICE_ID'
 	.r 'kasatoken kasadevices kasaplug kasa'
+	.c 'iot'
+	~ $device () && throw error kasaquery 'server device'
 	let (msg = '{"method":"passthrough","params":{"deviceId":"%s",' \
 		^'"requestData":"{\"system\":{\"get_sysinfo\":null}}}"}}') {
 		curl -s --request POST $server/\?token\= \
@@ -49,6 +54,8 @@ fn kasaplug {|server device state|
 	.d 'Change state of Kasa plug; print JSON result'
 	.a 'SERVER_URL DEVICE_ID 1|0'
 	.r 'kasatoken kasadevices kasaquery kasa'
+	.c 'iot'
+	~ $state () && throw error kasaplug 'server device state'
 	let (msg = '{"method":"passthrough","params":{"deviceId":"%s",' \
 		^'"requestData":"{\"system\":{\"set_relay_state\":' \
 		^'{\"state\":%s}}}"}}') {
@@ -62,9 +69,8 @@ fn kasaplug {|server device state|
 
 fn kasa {
 	.d 'Control TP-Link Kasa plugs'
-	.c 'system'
 	.r 'kasatoken kasadevices kasaquery kasaplug'
-	access -f ~/.config/k-kasa/token || throw error kasa 'token?'
+	.c 'iot'
 	let (k = a b c d e f g h i j k l m n o p q r s t u v w x y z; i; m) {
 	local (srv; did) {
 		i = 1
