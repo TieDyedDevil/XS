@@ -6,7 +6,7 @@
 	LC_ALL = en_US.UTF-8
 	LANG = $LC_ALL
 	SHLVL = `($SHLVL-1)
-	printf 'locale: %s'\n $LC_ALL
+	printf 'Locale: %s'\n $LC_ALL
 	exec xs -l
 }
 # end locale hack
