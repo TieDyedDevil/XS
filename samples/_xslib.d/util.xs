@@ -454,16 +454,17 @@ fn %read-char {
 
 fn %menu {|*|
 	# Present a menu. The argument list is a header followed by
-	# a list of <key, title, action> tuples. Keystrokes are
-	# processed immediately. The menu remains active until an
-	# action invokes `break`.
-	let (hdr; l; mt; ma; key; title; action; c; a; none = <=%gensym) {
+	# a list of <key, title, action, disposition> tuples.
+	# The action does not have access to lexical variables.
+	# Disposition is either C (continue after action) or B (break
+	# after action). Keystrokes are processed immediately.
+	let (hdr; l; mt; ma; key; title; action; cb; c; a; none = <=%gensym) {
 		hdr = $*(1); * = $*(2 ...)
 		ma = <=%mkobj
 		while {!~ $* ()} {
-			(key title action) = $*(1 2 3); * = $*(4 ...)
+			(key title action cb) = $*(1 2 3 4); * = $*(5 ...)
 			mt = $mt $key $title
-			%objset $ma $key $action
+			%objset $ma $key $action $cb
 		}
 		escape {|fn-break|
 			while true {
@@ -478,10 +479,11 @@ fn %menu {|*|
 					c = <=%read-char
 					{~ $c ()} && redisplay
 					{~ $c \x04} && break
-					a = <={%objget $ma $c $none}
+					(a cb) = <={%objget $ma $c $none}
 					printf \n
 					if {!~ $a $none} {
 						$a
+						~ $cb B && break
 					} else {
 						printf What\?\n
 					}
