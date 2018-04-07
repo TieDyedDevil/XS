@@ -71,23 +71,29 @@ fn kasa {
 	.d 'Control TP-Link Kasa plugs'
 	.r 'kasatoken kasadevices kasaquery kasaplug'
 	.c 'iot'
-	let (k = a b c d e f g h i j k l m n o p q r s t u v w x y z; i; m) {
-	local (srv; did) {
+	access -f ~/.config/k-kasa/token || throw error kasa 'no token'
+	let (k = a b c d e f g h i j k l m n o p q r s t u v w x y z; i) {
+	local (srv; did; m) {
+		m =
 		i = 1
 		for (dev name server id) `` \n {kasadevices \
-			|jq -r '.result.deviceList[]' \
-				^'|.deviceName,.alias,' \
-				^'.appServerUrl,.deviceId'} {
+				|jq -r '.result.deviceList[]' \
+					^'|.deviceName,.alias,' \
+					^'.appServerUrl,.deviceId'} {
 			m = $m $k($i) "$dev"\ "$name" \
 				'{(srv did) = '$server^' '$id^'}' B
 			i = `($i+1)
 		}
+		while {!~ $m ()} {
 		%menu 'Select device' $m
 		!~ $did () && %menu $srv^' '$did \
+			0 Another\ device {srv =; did =} B \
 			1 Query {kasaquery $srv $did \
 				| @kasa-sysinfo \
 				| jq '{relay_state,on_time,active_mode}'} C \
 			2 Turn\ On {kasaplug $srv $did 1|jq .result} C \
-			3 Turn\ Off {kasaplug $srv $did 0|jq .result} C
+			3 Turn\ Off {kasaplug $srv $did 0|jq .result} C \
+			. Exit {m =} B
+		}
 	}}
 }
