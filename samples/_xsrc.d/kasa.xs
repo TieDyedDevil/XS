@@ -23,6 +23,14 @@ fn kasadevices {
 		--header 'Content-Type: application/json'
 }
 
+fn @kasa-sysinfo {|json|
+	jq .result.responseData.system.get_sysinfo
+}
+
+fn @kasa-unquote {|json|
+	sed 's/\\"/"/g'|sed 's/"{/{/'|sed 's/}"/}/'
+}
+
 fn kasaquery {|server device|
 	.d 'Print JSON state of Kasa device'
 	.a 'SERVER_URL DEVICE_ID'
@@ -30,9 +38,10 @@ fn kasaquery {|server device|
 	let (msg = '{"method":"passthrough","params":{"deviceId":"%s",' \
 		^'"requestData":"{\"system\":{\"get_sysinfo\":null}}}"}}') {
 		curl -s --request POST $server/\?token\= \
-				^`{cat ~/.config/k-kasa/token} \
-			--data `` '' {printf $msg $device} \
-			--header 'Content-Type: application/json'
+					^`{cat ~/.config/k-kasa/token} \
+				--data `` '' {printf $msg $device} \
+				--header 'Content-Type: application/json' \
+			| @kasa-unquote
 	}
 }
 
@@ -44,9 +53,10 @@ fn kasaplug {|server device state|
 		^'"requestData":"{\"system\":{\"set_relay_state\":' \
 		^'{\"state\":%s}}}"}}') {
 		curl -s --request POST $server/\?token\= \
-				^`{cat ~/.config/k-kasa/token} \
-			--data `` '' {printf $msg $device $state} \
-			--header 'Content-Type: application/json' | jq .
+					^`{cat ~/.config/k-kasa/token} \
+				--data `` '' {printf $msg $device $state} \
+				--header 'Content-Type: application/json' \
+			| @kasa-unquote
 	}
 }
 
@@ -54,18 +64,23 @@ fn kasa {
 	.d 'Control TP-Link Kasa plugs'
 	.c 'system'
 	.r 'kasatoken kasadevices kasaquery kasaplug'
-	let (k = 'a'; m) {local (srv; did) {
+	let (k = a b c d e f g h i j k l m n o p q r s t u v w x y z; i; m) {
+	local (srv; did) {
+		i = 1
 		for (dev name server id) `` \n {kasadevices \
 			|jq -r '.result.deviceList[]' \
 				^'|.deviceName,.alias,' \
 				^'.appServerUrl,.deviceId'} {
-			m = $m $k "$dev"\ "$name" \
+			m = $m $k($i) "$dev"\ "$name" \
 				'{(srv did) = '$server^' '$id^'}' B
+			i = `($i+1)
 		}
 		%menu 'Select device' $m
 		!~ $did () && %menu $srv^' '$did \
-			1 Query {kasaquery $srv $did; echo} C \
-			2 Turn\ On {kasaplug $srv $did 1 >/dev/null} C \
-			3 Turn\ Off {kasaplug $srv $did 0 >/dev/null} C
+			1 Query {kasaquery $srv $did \
+				| @kasa-sysinfo \
+				| jq '{relay_state,on_time,active_mode}'} C \
+			2 Turn\ On {kasaplug $srv $did 1|jq .result} C \
+			3 Turn\ Off {kasaplug $srv $did 0|jq .result} C
 	}}
 }
