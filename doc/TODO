@@ -1,3 +1,15 @@
+- Define and run the following function; type any character. Doing so
+  breaks the shell's emission of newline upon sigint. Fix this!
+    fn bar {
+        escape {|fn-out|
+           echo here
+           escape {|fn-foo|
+               %read-char
+               out
+               echo nope
+           }
+        }
+    }
 - Add job control (SIGTSTP, fg, bg, disown).
 - Improve the readline experience:
   - Make quoting during completion match what the user would type.
