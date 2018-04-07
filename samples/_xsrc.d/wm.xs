@@ -118,6 +118,7 @@ fn wallpaper {|*|
 						!~ $f () && {
 							display -window root \
 								$pageopt $f
+							echo $f >~/.wallpaper
 						}
 					}
 				}
