@@ -161,6 +161,14 @@
 #    1′
 #    2″
 #    1′
+%aset pr 39 \u'26af' \u'26ae'
+#    1⚯
+#    2⚮
+#    1⚯
+%aset pr 40 \u'22b8' \u'22b7'
+#    1⊸
+#    2⊷
+#    1⊸
 
 # Mark the largest index that'll work in a pty.
-%aset pr pmax 38
+%aset pr pmax 40
