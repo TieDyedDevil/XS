@@ -773,9 +773,11 @@ fn io () {
 fn load () {
 	la1m = `{cat /proc/loadavg|cut -d' ' -f1}
 	cpus = `nproc
-	if {$la1m :gt `($cpus*$load_threshold_multiplier)} {
+	load_threshold = `($cpus*$load_threshold_multiplier)
+	if {$la1m :gt $load_threshold} {
 		logger 2 'High loadavg'
-		alert_if_fullscreen '1-minute load average > %d' $cpus
+		alert_if_fullscreen '1-minute load average > %.2f' \
+			$load_threshold
 		result true
 	} else {result false}
 }
