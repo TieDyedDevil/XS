@@ -382,7 +382,7 @@ fn vs {|name type parms|
 	switch $type (
 	int {
 		# parms: lo hi r-lo r-hi
-		echo $($name)|grep -q '^[0-9]\+$' || throw error $PGM \
+		echo $($name)|grep -q '^-\?[0-9]\+$' || throw error $PGM \
 			`{var $name} '(integer value expected)'
 		if {{$($name) :lt $parms(1)} || {$($name) :gt $parms(2)}} {
 			throw error $PGM `{var $name} \
@@ -436,8 +436,8 @@ vs fan_margin_desktop_C int 0 50 10 50
 vs fan_margin_mobile_C int 0 50 10 50
 vs load_threshold_multiplier float 0.0 5.0 0.5 2.0
 vs io_active_% pct 50 95
-vs temperature_margin_desktop_C int 0 50 10 50
-vs temperature_margin_mobile_C int 0 50 10 50
+vs temperature_margin_desktop_C int -10 50 -5 20
+vs temperature_margin_mobile_C int 0 50 10 20
 vs swap_usage_% pct 5 25
 vs enable_track bool
 vs enable_clock bool
