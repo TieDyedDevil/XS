@@ -262,6 +262,7 @@ disk_full_% = 85
 fan_margin_desktop_C = 50
 fan_margin_mobile_C = 40
 io_active_% = 70
+load_threshold_multiplier = 1.0
 temperature_margin_desktop_C = 25
 temperature_margin_mobile_C = 15
 swap_usage_% = 5
@@ -392,6 +393,19 @@ fn vs {|name type parms|
 				<={%argify `{var $name}} $parms(3 4)
 		}
 	}
+	float {
+		# parms: lo hi r-lo r-hi
+		echo $($name)|grep -q '^[0-9]\+\.[0-9]\+$' || throw error $PGM \
+			`{var $name} '(floating-point value expected)'
+		if {{$($name) :lt $parms(1)} || {$($name) :gt $parms(2)}} {
+			throw error $PGM `{var $name} \
+				'(not in range '^$parms(1)^'..'^$parms(2)^')'
+		}
+		if {{$($name) :lt $parms(3)} || {$($name) :gt $parms(4)}} {
+			logger 0 '%s (outside recommended range %d..%d)' \
+				<={%argify `{var $name}} $parms(3 4)
+		}
+	}
 	pct {
 		# parms: r-lo r-hi
 		vs $name int 0 100 $parms
@@ -420,6 +434,7 @@ vs battery_low_% pct 10 30
 vs disk_full_% pct 65 95
 vs fan_margin_desktop_C int 0 50 10 50
 vs fan_margin_mobile_C int 0 50 10 50
+vs load_threshold_multiplier float 0.0 5.0 0.5 2.0
 vs io_active_% pct 50 95
 vs temperature_margin_desktop_C int 0 50 10 50
 vs temperature_margin_mobile_C int 0 50 10 50
@@ -758,7 +773,7 @@ fn io () {
 fn load () {
 	la1m = `{cat /proc/loadavg|cut -d' ' -f1}
 	cpus = `nproc
-	if {$la1m :gt $cpus} {
+	if {$la1m :gt `($cpus*$load_threshold_multiplier)} {
 		logger 2 'High loadavg'
 		alert_if_fullscreen '1-minute load average > %d' $cpus
 		result true
