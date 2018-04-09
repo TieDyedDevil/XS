@@ -501,7 +501,7 @@ private $clntfile
 
 # Start client on additional monitor
 if {!~ $monitor 0} {
-	mkfifo $display
+	access -p $display || mkfifo $display
 	private $display
 	tail -f /dev/null >$display &
 	client = $pid
@@ -523,7 +523,7 @@ logger 1 'server on monitor %d: %d' $monitor $pid
 echo $pid >$pidfile
 
 # Start a client for the server's display
-mkfifo $display
+access -p $display || mkfifo $display
 private $display
 tail -f /dev/null >$display &
 client = $apid
@@ -577,17 +577,17 @@ osd_cat_opts = -f $osd_font -s 5 -c $alrfg -d $osd_dwell_s -w -l 1
 
 # Create the status-lights trigger fifo
 trigger = $tmpfile_base^-trigger
-mkfifo $trigger
+access -p $trigger || mkfifo $trigger
 private $trigger
 
 # Create the display event fifo
 event = $tmpfile_base^-event
-mkfifo $event
+access -p $event || mkfifo $event
 private $event
 
 # Create the OSD message fifo
 osdmsg = $tmpfile_base^-osdmsg
-mkfifo $osdmsg
+access -p $osdmsg || mkfifo $osdmsg
 private $osdmsg
 
 # Write fifo summary info
