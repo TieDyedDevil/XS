@@ -1011,7 +1011,8 @@ fn terminate {
 	logger 1 'terminate'
 	rm -f $pidfile
 	logger 2 'killing secondary clients'
-	pkill -s <={%flatten , `{cat $clntfile}}
+	clientlist = <={%flatten , `{cat $clntfile}}
+	!~ $clientlist '' && pkill -s $clientlist
 	rm -f $clntfile
 	rm -f $taskfile
 	logger 2 'killing server and primary client'
