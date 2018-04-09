@@ -4,7 +4,9 @@ fn bell {|*|
 	.c 'wm'
 	%only-X
 	switch <={%argify $*} (
-		off {pacmd unload-module module-x11-bell}
+		off {if {pacmd list-modules|grep -q module-x11-bell} {
+				pacmd unload-module module-x11-bell
+		}}
 		on {pacmd load-module module-x11-bell sample=x11-bell \
 			display=:0.0}
 		{
