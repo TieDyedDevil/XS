@@ -259,11 +259,11 @@ osd_dwell_s = 2
 battery_low_% = 10
 battery_critical_% = 5
 disk_full_% = 85
-fan_margin_desktop_C = 50
-fan_margin_mobile_C = 40
+fan_margin_desktop_C = 40
+fan_margin_mobile_C = 30
 io_active_% = 70
 load_threshold_multiplier = 1.0
-temperature_margin_desktop_C = 25
+temperature_margin_desktop_C = 0
 temperature_margin_mobile_C = 15
 swap_usage_% = 5
 
