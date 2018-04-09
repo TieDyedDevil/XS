@@ -29,6 +29,8 @@ fn prs {|*|
 				if {!~ $pids ()} {
 					for pid $pids {
 						!~ $#pids 1 && echo '========'
+						ps -o command= -p $pid
+						echo
 						prtstat $pid
 					} | less -iFX
 				} else {
