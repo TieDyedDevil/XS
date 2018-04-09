@@ -167,7 +167,7 @@ let (i = 0) {
 # theme
 hc attr theme.tiling.reset 1
 hc attr theme.floating.reset 1
-hc attr theme.active.color '#3366dd'
+hc attr theme.active.color '#4499ee'
 hc attr theme.normal.color '#666666'
 hc attr theme.urgent.color orange
 hc attr theme.inner_width 1
