@@ -504,10 +504,10 @@ if {!~ $monitor 0} {
 	mkfifo $display
 	private $display
 	tail -f /dev/null >$display &
-	client = $apid
+	client = $pid
 	echo $display >>$dispfile
 	echo $client >>$clntfile
-	logger 1 'client on other monitor %d: %d; %d' $monitor $client $pid
+	logger 1 'client on other monitor %d: %d' $monitor $client
 	exec dzen2 <$display $dzen2_opts
 	# CLIENT ENDS HERE
 }
@@ -528,7 +528,6 @@ private $display
 tail -f /dev/null >$display &
 client = $apid
 echo $display >>$dispfile
-echo $client >>$clntfile
 dzen2 <$display $dzen2_opts &
 logger 1 'client on server monitor %d: %d; %d' $monitor $client $apid
 
@@ -1011,26 +1010,12 @@ fn drawright {|text|
 fn terminate {
 	logger 1 'terminate'
 	rm -f $pidfile
-	for client `{cat $clntfile} {
-		logger 2 'killing client %d' $client
-		kill $client
-		wait $client
-	}
+	logger 2 'killing secondary clients'
+	pkill -s <={%flatten , `{cat $clntfile}}
 	rm -f $clntfile
-	for df `{cat $dispfile} {
-		logger 2 'removing display fifo %s' $df
-		rm -f $df
-	}
-	rm -f $dispfile
-	for (task pid) $taskpids {
-		logger 2 'killing pgroup %d (%s)' $pid $task
-		pkill -g $pid
-	}
-	rm -f $event
-	rm -f $trigger
-	rm -f $osdmsg
 	rm -f $taskfile
-	rm -f $fifofile
+	logger 2 'killing server and primary client'
+	pkill -s $pid
 	exit
 }
 
