@@ -84,6 +84,7 @@ fn kasa {
 				'{(srv did) = '$server^' '$id^'}' B
 			i = `($i+1)
 		}
+		m = $m . Exit {m =} B
 		while {!~ $m ()} {
 		%menu 'Select device' $m
 		!~ $did () && %menu $srv^' '$did \
