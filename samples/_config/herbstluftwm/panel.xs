@@ -60,15 +60,15 @@
 #     for selected, unfocused and urgent tags.
 #   frame_border_active_color [#404040]
 #     Used as the background color for unfocused tags.
-#   frame_bg_normal_color [#402070]
+#   frame_bg_normal_color [#604090]
 #     Used as the background color for unfocused tags on an unfocused monitor.
-#   frame_bg_active_color [#407020]
+#   frame_bg_active_color [#609040]
 #     Used as the background color for an focused tag on an unfocused monitor.
 #     Used as the foreground color for unfocused tags on an unfocused monitor.
-#   window_border_normal_color [#666666]
+#   window_border_normal_color [#888888]
 #     Used as the foreground color for unfocused tags and the track and
 #     clock text.
-#   window_border_active_color [#3366dd]
+#   window_border_active_color [#4499ee]
 #     Used as the background color for the selected tag.
 #   window_border_urgent_color [orange]
 #     Used as the background color for urgent tags.
