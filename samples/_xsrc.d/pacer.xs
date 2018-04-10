@@ -12,7 +12,7 @@ fn pacer {|*|
 		} else if {{access -f $pspid} \
 				&& {kill -0 `{cat $pspid} >[2]/dev/null}} {
 			echo 'Running'
-		} else {
+		} else setsid xs -c {
 			let (minute; initwait; lead = 5) {
 				minute = `{date +%M}
 				initwait = `(60-$lead-$minute)
