@@ -142,3 +142,8 @@ fn wallpaper {|*|
 		}
 	}
 }
+fn xdpi {
+	.d 'X display info'
+	.c 'wm'
+	{xrdb -query|grep 'Xft\.dpi'|tr \t ' '; xdriinfo}|column -s: -t
+}
