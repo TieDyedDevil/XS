@@ -440,15 +440,27 @@ fn %asort {
 }
 
 fn %read-char {
-	# Read one character from stdin.
-	let (c) {
+	# Read one UTF-8 character from stdin.
+	let (c; oc; r) {
 		unwind-protect {
 			stty -icanon
 			c = `{dd bs=1 count=1 >[2]/dev/null}
+			oc = `{%ord $c}
+			if {$oc :le 127} {
+				r = $c
+			} else if {$oc :ge 248} {
+				throw error %read-char 'Invalid UTF-8'
+			} else if {$oc :ge 240} {
+				r = $c ^ `{dd bs=1 count=3 >[2]/dev/null}
+			} else if {$oc :ge 224} {
+				r = $c ^ `{dd bs=1 count=2 >[2]/dev/null}
+			} else if {$oc :ge 112} {
+				r = $c ^ `{dd bs=1 count=1 >[2]/dev/null}
+			}
 		} {
 			stty icanon
 		}
-		result $c
+		result $r
 	}
 }
 
@@ -770,4 +782,9 @@ fn %active-displays-info {
 	xrandr|grep '^[^ ]\+ connected'|grep -o '^[^ ]\+.*[0-9]\+x[0-9]\+' \
 			^'+[0-9]\++[0-9]\+'|sed 's/ primary//' \
 		|cut -d' ' -f1,3|tr ' ' \t
+}
+
+fn %ord {|*|
+	# Print decimal ordinal values of bytes in given word(s).
+	hexdump -v -e '1/1 " %d"' <{echo -n $*}
 }
