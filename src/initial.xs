@@ -664,12 +664,12 @@ let (dlist = .) {
 		for d $dlist {echo -- $d}
 	}
 	fn popd {
-		{!~ $dlist .} && let (pop; dir) {
+		{!~ $dlist .} && let (pop) {
 			(pop dlist) = $dlist
-			(dir dlist) = $dlist
-			echo $dir $dlist
-			cd $dir
+			for d $dlist {echo -- $d}
 			~ $dlist () && dlist = .
+			cd $dlist(1)
+			~ $#dlist 1 && dlist = .
 		}
 	}
 	fn dirs {|*|

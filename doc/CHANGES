@@ -8,6 +8,8 @@ Unicode escapes are now delimited, like \u'n...'. The fixed-length forms
 
 Rewrote the man page.
 
+Reworked `pushd`, `popd` and `dirs` commands.
+
 xs 1.0 to xs 1.1
 ----------------
 
