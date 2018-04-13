@@ -657,11 +657,11 @@ let (dlist = .) {
 			&& {dir = $dlist(2); dlist = $dlist(1 3 ...)}
 		~ $#dir 0 && dir = `/bin/pwd
 
-		dir = `{fork {cd $dir; pwd}} # Canonicalize the path
+		dir = `` \n {fork {cd $dir; pwd}} # Canonicalize the path
 
 		!~ $dir $dlist(1) && dlist = $dir $dlist
 		cd $dir
-		echo $dlist
+		for d $dlist {echo -- $d}
 	}
 	fn popd {
 		{!~ $dlist .} && let (pop; dir) {
@@ -674,7 +674,7 @@ let (dlist = .) {
 	}
 	fn dirs {|*|
 		~ $* -c && dlist = .
-		~ $dlist . || echo $dlist
+		~ $dlist . || for d $dlist {echo -- $d}
 	}
 }
 
