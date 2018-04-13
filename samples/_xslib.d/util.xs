@@ -444,7 +444,7 @@ fn %read-char {
 	let (c; oc; r) {
 		unwind-protect {
 			stty -icanon
-			c = `{dd bs=1 count=1 >[2]/dev/null}
+			c = `` '' {dd bs=1 count=1 >[2]/dev/null}
 			oc = `{%ord $c}
 			if {$oc :le 127} {
 				r = $c
