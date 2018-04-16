@@ -306,6 +306,8 @@ logstamp = false
 # other& -----/      |                                 ; poll/sleep ( 3s)
 # inbox& ----/       |                                 ; poll/sleep (30s)
 #                    \---> event| event-loop           ; wait
+# watchdog&                            |               ; poll/sleep (90s)
+#                                      |
 #       [SERVER]                   ... |
 #                                 /   / \              ; poll/merge/demux
 #                                /   |   |
@@ -1062,6 +1064,17 @@ fn track {
 	}
 }
 
+# Start the watchdog
+while true {
+	for (task tpid) $taskpids {
+		kill -0 $tpid || logger 0 'Task %s (%d) is missing' $task $tpid
+	}
+	sleep 90
+} >[1=2] &
+watchdog = $apid
+tcnt = $#taskpids; tcnt = `($tcnt/2)
+logger 0 'Start watchdog (%d) on %d tasks' $watchdog $tcnt
+
 # Run the server
 logger 1 'starting: %s; %s; %s; %s; %s; %s; %s' \
 	<={%argify `{var enable_track}} \
@@ -1072,7 +1085,8 @@ logger 1 'starting: %s; %s; %s; %s; %s; %s; %s' \
 	<={%argify `{var enable_cpubar}} \
 	<={%argify `{var enable_inbox}}
 
-let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; r1; r2; r3) {
+let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; r1; r2; r3; \
+		ec = 0; watchdog_check = 100) {
 	tags = `` \n {drawtags $monitor}
 	sep = '|'
 	title = `title
@@ -1122,6 +1136,12 @@ let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; r1; r2; r3) {
 					echo $tags $out >$client
 				}
 			}
+		}
+		ec = `$(ec+1)
+		if {~ `($ec%$watchdog_check) 0} {
+			ec = 0
+			kill -0 $watchdog || \
+				logger 0 'watchdog (%d) stopped' $watchdog
 		}
 	}
 }
