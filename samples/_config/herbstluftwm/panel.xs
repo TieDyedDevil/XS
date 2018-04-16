@@ -497,6 +497,9 @@ private $dispfile
 clntfile = $tmpfile_base^.clients
 rm -f $clntfile
 private $clntfile
+watchdogfile = $tmpfile_base^.watchdog
+rm -f $watchdogfile
+private $watchdogfile
 
 # ========================================================================
 #                              C L I E N T
@@ -1012,6 +1015,7 @@ fn drawright {|text|
 fn terminate {
 	logger 1 'terminate'
 	rm -f $pidfile
+	rm -f $watchdogfile
 	logger 2 'killing secondary clients'
 	clientlist = <={%flatten , `{cat $clntfile}}
 	!~ $clientlist '' && pkill -s $clientlist
@@ -1072,6 +1076,7 @@ while true {
 	sleep 90
 } >[1=2] &
 watchdog = $apid
+echo $watchdog >$watchdogfile
 tcnt = $#taskpids; tcnt = `($tcnt/2)
 logger 0 'Start watchdog (%d) on %d tasks' $watchdog $tcnt
 
