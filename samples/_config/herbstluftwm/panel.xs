@@ -140,6 +140,8 @@ wm_wbu_color = `{herbstclient get window_border_urgent_color}
 panel_fg_color = '#f0f0f0'
 panel_status_bg_color = '#003000'
 panel_status_fg_color = '#00d000'
+panel_watchdog_bg_color = '#c0c000'
+panel_watchdog_fg_color = '#202000'
 panel_alert_bg_color = '#400000'
 panel_alert_fg_color = '#f00000'
 cpu_fg_color = SkyBlue1
@@ -164,6 +166,8 @@ omufg = $wm_fga_color
 omubg = $wm_fgn_color
 stsbg = $panel_status_bg_color
 stsfg = $panel_status_fg_color
+wdgbg = $panel_watchdog_bg_color
+wdgfg = $panel_watchdog_fg_color
 alrbg = $panel_alert_bg_color
 alrfg = $panel_alert_fg_color
 sepbg = $bgcolor
@@ -545,6 +549,8 @@ logger 2 'palette: %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s' \
 	<={%argify `{var panel_fg_color}} \
 	<={%argify `{var panel_status_bg_color}} \
 	<={%argify `{var panel_status_fg_color}} \
+	<={%argify `{var panel_watchdog_bg_color}} \
+	<={%argify `{var panel_watchdog_fg_color}} \
 	<={%argify `{var panel_alert_bg_color}} \
 	<={%argify `{var panel_alert_fg_color}} \
 	<={%argify `{var wm_fbn_color}} \
@@ -569,6 +575,7 @@ om_default_attr = `{attr $omdbg $omdfg}
 om_unfocused_attr = `{attr $omubg $omufg}
 status_marker_attr = `{attr $stsbg $stsfg}
 status_indicator_attr = `{attr $stsbg $stsfg}
+watchdog_indicator_attr = `{attr $wdgbg $wdgfg}
 alert_marker_attr = `{attr $alrbg $alrfg}
 alert_indicator_attr = `{attr $alrbg $alrfg}
 separator_attr_f = `{attr $sepbg $sepfg_f}
@@ -968,6 +975,7 @@ if $enable_inbox {
 }
 
 # Draw the three panel regions
+fault = false
 fn drawtags {|m|
 	escape {|fn-return| {
 		for t `{herbstclient tag_status $m >[2]/dev/null} {
@@ -986,6 +994,9 @@ fn drawtags {|m|
 				)
 				printf \ %s\n $n
 			}
+		}
+		if $fault {
+			printf $default_attr^' '^$watchdog_indicator_attr^'¤'
 		}
 		if {~ `{hc attr monitors.$m.lock_tag} true} {
 			printf $default_attr^' ^c('^`($panel_height_px/2)^')'
@@ -1071,7 +1082,10 @@ fn track {
 # Start the watchdog
 while true {
 	for (task tpid) $taskpids {
-		kill -0 $tpid || logger 0 'Task %s (%d) is missing' $task $tpid
+		kill -0 $tpid >[2]/dev/null || {
+			logger 0 'Task %s (%d) is missing' $task $tpid
+			echo fault >$event
+		}
 	}
 	sleep 90
 } >[1=2] &
@@ -1120,6 +1134,7 @@ let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; r1; r2; r3; \
 				redraw {}
 				quit_panel {terminate}
 				reload {terminate}
+				fault {fault = true}
 				{}
 			)
 			r1 = ' '$lights $cpubar
@@ -1145,8 +1160,10 @@ let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; r1; r2; r3; \
 		ec = `$(ec+1)
 		if {~ `($ec%$watchdog_check) 0} {
 			ec = 0
-			kill -0 $watchdog || \
+			kill -0 $watchdog >[2]/dev/null || {
 				logger 0 'watchdog (%d) stopped' $watchdog
+				fault = true
+			}
 		}
 	}
 }
