@@ -225,19 +225,26 @@ Status indicators
   W WiFi connection active
   Z screensaver is enabled
   " host is virtualized
+
+Transient indicators
+  <slashed circle on yellow background>       watchdog failed
+  <filled gray circle on default background>  tab locked on monitor
 '
 
 ~ $1 legend && {
 	if {{!~ $2 nocolor} && {{~ $2 color} || {test -t 1}}} {
 		tag_samples
 		awk <<<$indicator_info -f <{cat <<'FORMAT'
-BEGIN {color = 7}
+BEGIN {color = 7; pass = 0}
 /^Alert/ {system("tput -Tansi setaf 7"); system("tput -Tansi smul");
  print $0; system("tput -Tansi sgr0"); color = 1; next}
 /^Status/ {system("tput -Tansi setaf 7"); system("tput -Tansi smul");
  print $0; system("tput -Tansi sgr0"); color = 2; next}
-{system("tput -Tansi setaf " color); printf "%s", substr($0, 1, 3);
- system("tput -Tansi setaf 7"); print substr($0, 4)}
+/^Transient/ {system("tput -Tansi setaf 7"); system("tput -Tansi smul");
+ print $0; system("tput -Tansi sgr0"); color = 2; pass = 1; next}
+{if (pass) {print} else
+ {system("tput -Tansi setaf " color); printf "%s", substr($0, 1, 3);
+  system("tput -Tansi setaf 7"); print substr($0, 4)}}
 FORMAT
 		}
 	} else {cat <<<$indicator_info}
@@ -998,7 +1005,7 @@ fn drawtags {|m|
 			}
 		}
 		if $fault {
-			printf $default_attr^' '^$watchdog_indicator_attr^'¤'
+			printf $default_attr^' '^$watchdog_indicator_attr^'Ø'
 		}
 		if {~ `{hc attr monitors.$m.lock_tag} true} {
 			printf $default_attr^' ^c('^`($panel_height_px/2)^')'
