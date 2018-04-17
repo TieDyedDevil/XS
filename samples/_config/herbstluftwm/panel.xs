@@ -16,7 +16,7 @@
 # Parameters:
 #
 # Normal invocation accepts a monitor ID (default: 0). This starts a server
-# and client on the first monitor and only a client on subsequent monitors.
+# and client on monitor 0 and only a client on other monitors.
 #
 # Pass `legend` to list a description of the tag colors and indicator labels.
 # The `legend` display assumes a TrueColor terminal; colors (including the
@@ -36,9 +36,11 @@
 # in-process recovery from improper termination of previous session.
 #
 # The panel is divided into three regions. The left region contains tag
-# indicators, alert and status indicators, a CPU load bar and (only on the
-# active monitor) the title of the focused window. The center region shows
-# info for the track being played by mpd. The right region shows a clock.
+# indicators, alert and status indicators, transient indicators for a
+# watchdog fault and for a monitor displaying a locked tag, a CPU load bar
+# and (only on the active monitor) the title of the focused window. The
+# center region shows info for the track being played by mpd. The right
+# region shows a clock.
 #
 # Inbox status requires a valid inbox.fetchmailrc file in the same
 # directory as this script; see fetchmail(1). The fetchmail configuration
@@ -310,7 +312,7 @@ logstamp = false
 # other& -----/      |                                 ; poll/sleep ( 3s)
 # inbox& ----/       |                                 ; poll/sleep (30s)
 #                    \---> event| event-loop           ; wait
-# watchdog&                            |               ; poll/sleep (90s)
+# watchdog& ---------/                 |               ; poll/sleep (90s)
 #                                      |
 #       [SERVER]                   ... |
 #                                 /   / \              ; poll/merge/demux
