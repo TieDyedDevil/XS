@@ -4,7 +4,51 @@
 #  * xs 1.1; https://github.com/TieDyedDevil/XS (or Fedora 27 distro).
 #  * Linux with usual tools packages (coreutils, gawk, grep, sed, ...).
 #  * The additional tools listed just below the ARCHITECTURE diagram.
+
+# Purpose: Display a panel for herbstluftwm.
 #
+# Goals: low power consumption (given the constraints of being written in a
+# shell language); good visual integration with wm; focus attention on the
+# most important elements.
+#
+# Non-goals: pointer integration; keyboard control; configurability beyond
+# that already provided; support for "light" themes; non-Linux OS support.
+
+# Parameters:
+#  Normal invocation accepts a monitor ID (default: 0). This starts a server
+#  and client for monitor 0 and only a client for other monitors.
+#
+#  Pass `legend` to list a description of the tag colors and indicator labels.
+#  The `legend` display assumes a TrueColor terminal; colors (including the
+#  entire tags section) are suppressed when output is to a pipe. Add `color`
+#  as a second parameter to force color output to a pipe or `nocolor` to
+#  suppress color output to a terminal.
+
+# Overview:
+#  The panel is divided into three regions. The left region contains tag
+#  indicators, alert and status indicators, transient indicators for a
+#  watchdog fault and for a monitor displaying a locked tag, a CPU load bar
+#  and (only on the active monitor) the title of the focused window. The
+#  center region shows info for the track being played by mpd. The right
+#  region shows a clock.
+#
+#  Inbox status requires a valid inbox.fetchmailrc file in the same
+#  directory as this script; see fetchmail(1). The fetchmail configuration
+#  *must* specify `no idle` and *should* specify `timeout 15`.
+#
+#  Alerts are displayed as short messages on the OSD if triggered when the
+#  panel on the active monitor is concealed by a focused fullscreen window.
+#  The battery-critical alert is always displayed on the OSD regardless of
+#  whether the focused window is fullscreen.
+#
+#  With the exception of the tag indicators and title, panel content may
+#  be enabled selectively, whether for cosmetic or functional preference
+#  or to further reduce the panel's already low CPU load.
+
+# Configuration:
+#  Selected configuration settings may be altered by ~/.panel.xs .
+
+# Shutdown:
 #  The wm, upon receipt of the quit hook, simply exits. This doesn't give
 #  the panel a chance to clean up; the residue will interfere with the
 #  proper startup of subsequent panels. To shut down the panel cleanly,
@@ -13,50 +57,9 @@
 #    sleep 1
 #    herbstclient quit
 
-# Parameters:
-#
-# Normal invocation accepts a monitor ID (default: 0). This starts a server
-# and client on monitor 0 and only a client on other monitors.
-#
-# Pass `legend` to list a description of the tag colors and indicator labels.
-# The `legend` display assumes a TrueColor terminal; colors (including the
-# entire tags section) are suppressed when output is to a pipe. Add `color`
-# as a second parameter to force color output to a pipe or `nocolor` to
-# suppress color output to a terminal.
-
-# Purpose: Display a panel for herbstluftwm.
-#
-# Goals: low power consumption (given the constraints of being written in a
-# shell language); good visual integration with wm; focus attention on the
-# most important elements; properly clean up resources upon normal
-# termination.
-#
-# Non-goals: pointer integration; keyboard control; configurability beyond
-# that already provided; support for "light" themes; non-Linux OS support;
-# in-process recovery from improper termination of previous session.
-#
-# The panel is divided into three regions. The left region contains tag
-# indicators, alert and status indicators, transient indicators for a
-# watchdog fault and for a monitor displaying a locked tag, a CPU load bar
-# and (only on the active monitor) the title of the focused window. The
-# center region shows info for the track being played by mpd. The right
-# region shows a clock.
-#
-# Inbox status requires a valid inbox.fetchmailrc file in the same
-# directory as this script; see fetchmail(1). The fetchmail configuration
-# *must* specify `no idle` and *should* specify `timeout 15`.
-#
-# Alerts are displayed as short messages on the OSD if triggered when the
-# panel on the active monitor is concealed by a focused fullscreen window.
-# The battery-critical alert is always displayed on the OSD regardless of
-# whether the focused window is fullscreen.
-#
-# With the exception of the tag indicators and title, panel content may
-# be enabled selectively, whether for cosmetic or functional preference
-# or to further reduce the panel's already low CPU load.
-#
-# The panel "borrows" some of the colors defined by the wm. Note that the
-# wm's default colors are not ideal; try the colors noted in brackets:
+# Colors:
+#  The panel "borrows" some of the colors defined by the wm. Note that the
+#  wm's default colors are not ideal; try the colors noted in brackets:
 #   frame_border_normal_color [#101010]
 #     Used as the primary background color. Used as the foreground color
 #     for selected, unfocused and urgent tags.
@@ -75,7 +78,9 @@
 #   window_border_urgent_color [orange]
 #     Used as the background color for urgent tags.
 #
-# Additional panel colors are hardwired and presume a "dark" wm theme.
+#  Additional panel colors are hardwired and presume a "dark" wm theme.
+
+# Author: David B. Lamkins <david@lamkins.net>
 
 # ========================================================================
 #                  L I B R A R Y   F U N C T I O N S
