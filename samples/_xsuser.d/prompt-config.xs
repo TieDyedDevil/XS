@@ -169,6 +169,18 @@
 #    1⊸
 #    2⊷
 #    1⊸
+%aset pr 41 \u'269e' \u'269f'
+#    1⚞
+#    2⚟
+#    1⚞
+%aset pr 42 \u'1f657' \u'1f652'
+#    1🙗
+#    2🙒
+#    1🙗
+%aset pr 43 \u'a669' \u'a66d'
+#    1ꙩ
+#    2ꙭ
+#    1ꙩ
 
 # Mark the largest index that'll work in a pty.
-%aset pr pmax 40
+%aset pr pmax 43
