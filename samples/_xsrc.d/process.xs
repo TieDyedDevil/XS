@@ -54,6 +54,18 @@ fn pu {|*|
 	.r 'pt'
 	%view-with-header 1 <{.pu $*} pu
 }
+fn tg {|*|
+	.d 'List top %CPU processes exceeding threshold'
+	.a '[%CPU_THRESHOLD]  # default 0.0'
+	.c 'process'
+	let (thr = $*) {
+		~ $* () && thr = 0.0
+		%with-quit {
+			watch -n1 -p 'ps -eo pcpu,pmem,cputime,pid,user,comm' \
+				^' -k pcpu | awk ''$1=="%CPU" || $1>'$thr^''''
+		}
+	}
+}
 fn topc {
 	.d 'List top %CPU processes'
 	.c 'process'
