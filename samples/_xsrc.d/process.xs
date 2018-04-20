@@ -61,8 +61,8 @@ fn tg {|*|
 	let (thr = $*) {
 		~ $* () && thr = 0.0
 		%with-quit {
-			watch -n1 -p 'ps -eo pcpu,pmem,cputime,pid,user,comm' \
-				^' -k pcpu | awk ''$1=="%CPU" || $1>'$thr^''''
+			watch -n1 -p 'ps -eo %cpu,%mem,cputime,pid,user,args' \
+				^' -k %cpu | awk ''$1=="%CPU" || $1>'$thr^''''
 		}
 	}
 }
