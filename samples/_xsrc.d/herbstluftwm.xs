@@ -1,7 +1,7 @@
 fn 3up {
 	.d '3 frames'
 	.c 'wm'
-	.r 'barre boc dual em hc mons osd quad updres wmb'
+	.r 'barre boc dual em hc mons osd quad r updres wmb'
 	%only-X
 	herbstclient load '(split horizontal:0.333333:1 (clients vertical:0)
 		(split horizontal:0.500000:1
@@ -10,14 +10,14 @@ fn 3up {
 fn bari {
 	.d 'Status bar indicator description'
 	.c 'wm'
-	.r '3up barre boc dual em hc mons osd quad updres wmb'
+	.r '3up barre boc dual em hc mons osd quad r updres wmb'
 	%only-X
 	~/.config/herbstluftwm/panel.xs legend color|less -RFXi
 }
 fn barre {
 	.d 'Status bar restart'
 	.c 'wm'
-	.r '3up bari boc dual em hc mons osd quad updres wmb'
+	.r '3up bari boc dual em hc mons osd quad r updres wmb'
 	%only-X
 	let (hc = herbstclient) {
 		hc emit_hook quit_panel
@@ -28,7 +28,7 @@ fn boc {|*|
 	.d 'Bell on completion'
 	.a 'COMMAND'
 	.c 'wm'
-	.r '3up bari barre dual em hc mons osd quad updres wmb'
+	.r '3up bari barre dual em hc mons osd quad r updres wmb'
 	%only-X
 	unwind-protect {$*} {printf %c \a}
 }
@@ -36,7 +36,7 @@ fn dual {|*|
 	.d 'Divide focused monitor'
 	.a 'horizontal|vertical'
 	.c 'wm'
-	.r '3up bari barre boc em hc mons osd quad updres wmb'
+	.r '3up bari barre boc em hc mons osd quad r updres wmb'
 	%only-X
 	let ((xo yo w h) = `{hc monitor_rect}; \
 			ml = `{hc list_monitors|cut -d' ' -f2}) {
@@ -64,7 +64,7 @@ fn em {|*|
 	.a 'internal|external  # first and second in xrandr list'
 	.a 'both [internal|external]  # primary: default = external'
 	.c 'wm'
-	.r '3up bari barre boc dual hc mons osd quad updres wmb'
+	.r '3up bari barre boc dual hc mons osd quad r updres wmb'
 	%only-X
 	let (p; hc = herbstclient; \
 		mnl = `{xrandr|grep '^[^ ]\+ connected' \
@@ -105,7 +105,7 @@ fn hc {|*|
 	.d 'herbstclient'
 	.a 'herbstclient_ARGS'
 	.c 'wm'
-	.r '3up bari barre boc dual em mons osd quad updres wmb'
+	.r '3up bari barre boc dual em mons osd quad r updres wmb'
 	%only-X
 	herbstclient $*
 }
@@ -114,7 +114,7 @@ fn mons {|rects|
 	.a 'WxH+X+Y ...  # define logical monitors'
 	.a '(none)  # list physical and logical monitors'
 	.c 'wm'
-	.r '3up bari barre boc dual em hc osd quad updres wmb'
+	.r '3up bari barre boc dual em hc osd quad r updres wmb'
 	%only-X
 	if {!~ $rects ()} {
 		for r $rects {
@@ -166,7 +166,7 @@ fn osd {|msg|
 	.d 'Display message on OSD'
 	.a 'MESSAGE...'
 	.c 'wm'
-	.r '3up bari barre boc dual em hc mons quad updres wmb'
+	.r '3up bari barre boc dual em hc mons quad r updres wmb'
 	%only-X
 	let (fl = /tmp/panel.fifos) {
 		for f `{access -f $fl && cat $fl} {
@@ -177,7 +177,7 @@ fn osd {|msg|
 fn quad {
 	.d 'Divide focused monitor'
 	.c 'wm'
-	.r '3up bari barre boc dual em hc mons osd updres wmb'
+	.r '3up bari barre boc dual em hc mons osd r updres wmb'
 	%only-X
 	let ((xo yo w h) = `{hc monitor_rect}; \
 			ml = `{hc list_monitors|cut -d' ' -f2}) {
@@ -198,10 +198,16 @@ fn quad {
 	}
 	barre
 }
+fn r {
+	.d 'Remove all frames'
+	.c 'wm'
+	.r '3up bari barre boc dual em hc mons osd quad updres wmb'
+	herbstclient load '(clients vertical:0)'
+}
 fn updres {
 	.d 'Use primary display resolution'
 	.c 'wm'
-	.r '3up bari barre boc dual em hc mons osd quad wmb'
+	.r '3up bari barre boc dual em hc mons osd quad r wmb'
 	%only-X
 	.adapt-resolution
 	barre
@@ -213,7 +219,7 @@ END
 fn wmb {
 	.d 'List WM bindings'
 	.c 'wm'
-	.r '3up bari barre boc dual em hc mons osd quad updres'
+	.r '3up bari barre boc dual em hc mons osd quad r updres'
 	%only-X
 	herbstclient list_keybinds|sed 's/'\t'/ /g'|sed 's/ /'\t'/' \
 		|column -t -s\t|less -FXSi
