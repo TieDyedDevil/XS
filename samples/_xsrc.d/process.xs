@@ -56,12 +56,14 @@ fn pu {|*|
 }
 fn tg {|*|
 	.d 'List top %CPU processes exceeding threshold'
-	.a '[%CPU_THRESHOLD]  # default 0.0'
+	.a '[-d SECONDS] [%CPU_THRESHOLD]  # default 0.0'
 	.c 'process'
-	let (thr = $*) {
+	let (thr = $*; d = 1) {
+		~ $*(1) -d && { d = $*(2); * = $*(3 ...) }
 		~ $* () && thr = 0.0
 		%with-quit {
-			watch -n1 -p 'ps -eo %cpu,%mem,cputime,pid,user,args' \
+			watch -n $d -p \
+				'ps -eo %cpu,%mem,cputime,pid,user,args' \
 				^' -k %cpu | awk ''$1=="%CPU" || $1>'$thr^''''
 		}
 	}
