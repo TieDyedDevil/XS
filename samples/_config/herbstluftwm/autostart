@@ -37,7 +37,7 @@ hc keybind $Mod^-Shift-q spawn quitwm  # ~/.local/bin/quitwm
 hc keybind $Mod^-Shift-r reload
 hc keybind $Mod^-Control-c close
 hc keybind $Mod^-Return spawn stq  # ~/.local/bin/stq
-hc keybind $Mod^-e spawn dmenu_run
+hc keybind $Mod^-e spawn dmr  # ~/.local/bin/dmr
 
 # motions summarized
 #

@@ -86,9 +86,9 @@ project('xs', ['cpp'])
   install_data(['samples/_xsuser.d/prompt-config.xs'],
 	install_dir: 'share/doc/xs/samples/_xsuser.d')
   install_data(['samples/_xsin', 'samples/_xsrc', 'samples/colors',
-		'samples/histclean', 'samples/lock', 'samples/stq',
-		'samples/sv', 'samples/tsm', 'samples/web-browser',
-		'samples/README'],
+		'samples/dmr', 'samples/histclean', 'samples/lock',
+		'samples/stq', 'samples/sv', 'samples/tsm',
+		'samples/web-browser', 'samples/README'],
 	install_dir: 'share/doc/xs/samples')
 
 run_target('check',
