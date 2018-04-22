@@ -251,7 +251,7 @@ BEGIN {color = 7; pass = 0}
  {system("tput -Tansi setaf " color); printf "%s", substr($0, 1, 3);
   system("tput -Tansi setaf 7"); print substr($0, 4)}}
 FORMAT
-		}
+		} | sed 's/</'^<=.%ai^'/' | sed 's/>/'^<=.%an^'/'
 	} else {cat <<<$indicator_info}
 	exit
 }
