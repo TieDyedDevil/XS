@@ -680,8 +680,14 @@ fn alert_if_fullscreen {|fmt args|
 }
 
 # Send alert events
-fn battery () {
-	logger 3 \*B
+alertproc = \?
+fn ap_enter {|*|
+	logger 3 \*$*
+	alertproc = $*
+}
+
+fn battery {
+	ap_enter B
 	BAT = /sys/class/power_supply/BAT
 	AC = /sys/class/power_supply/AC
 	let (w = false; cap = 0; chg = 0; v) {
@@ -710,8 +716,8 @@ fn battery () {
 	}
 }
 
-fn disk () {
-	logger 3 \*D
+fn disk {
+	ap_enter D
 	VOLUMES = / /boot /boot/efi /home /run /tmp /var /opt
 	utilizations = `{df | less -n +2 | grep -w -e^$VOLUMES^\$ | tr -d % \
 		| awk '{print $5 "\t" $6}'}
@@ -749,8 +755,8 @@ fn get_curtemp {
 }
 
 nofans_logged = false
-fn fan () {
-	logger 3 \*F
+fn fan {
+	ap_enter F
 	speeds = `{sensors >[2]/dev/null|grep fan|cut -d: -f2|awk '{print $1}'}
 	if {~ $speeds ()} {
 		if {! $nofans_logged} {
@@ -775,8 +781,8 @@ fn fan () {
 	}
 }
 
-fn io () {
-	logger 3 \*I
+fn io {
+	ap_enter I
 	blkdevs = `{lsblk -dln -o name}
 	iobusy = false
 	%with-read-lines \
@@ -799,8 +805,8 @@ fn io () {
 	}
 }
 
-fn load () {
-	logger 3 \*L
+fn load {
+	ap_enter L
 	la1m = `{cat /proc/loadavg|cut -d' ' -f1}
 	cpus = `nproc
 	load_threshold = `($cpus*$load_threshold_multiplier)
@@ -812,8 +818,8 @@ fn load () {
 	} else {result false}
 }
 
-fn swap () {
-	logger 3 \*S
+fn swap {
+	ap_enter S
 	swapping = `{
 tail -n +2 /proc/swaps | awk '
 BEGIN { tot = 0; use = 0 }
@@ -828,8 +834,8 @@ END { print ((use * 100 / tot) > '^$swap_usage_%^') }
 	} else {result false}
 }
 
-fn temperature () {
-	logger 3 \*T
+fn temperature {
+	ap_enter T
 	if {<=get_curtemp :gt $TEMPERATURE_THRESHOLD} {
 		logger 2 'Hot'
 		alert_if_fullscreen 'Temperature > %dC' $TEMPERATURE_THRESHOLD
@@ -847,7 +853,8 @@ if $enable_alerts {
 	post_alert_event &
 	while true {
 		catch {|e|
-			logger 0 'alert loop exception: %s' <={%argify $e}
+			logger 0 'alert loop exception (%c): %s' \
+				$alertproc <={%argify $e}
 		} {
 			if <=battery {b = B} else {b = $_a}
 			if <=disk {d = D} else {d = $_a}
