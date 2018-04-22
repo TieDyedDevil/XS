@@ -98,14 +98,15 @@ Other escapes denote control characters:
 .PP
 .RS
 .TS
+tab(@);
 lb l .
-\ea	alert (bell)
-\eb	backspace
-\ee	escape
-\ef	form feed
-\en	newline
-\er	return
-\et	tab
+\ea@alert (bell)
+\eb@backspace
+\ee@escape
+\ef@form feed
+\en@newline
+\er@return
+\et@tab
 .TE
 .RE
 .PP
@@ -1178,17 +1179,18 @@ The default test (no options) is identical to
 These options determine the test to apply to the paths:
 .RS
 .TS
+tab(@);
 lb l .
--r	Is the file readable?
--w	Is the file writeable?
--x	Is the file executable?
--f	Is the file a plain file?
--d	Is the file a directory?
--c	Is the file a character device?
--b	Is the file a block device?
--l	Is the file a symbolic link?
--s	Is the file a socket?
--p	Is the file a named pipe?
+-r@Is the file readable?
+-w@Is the file writeable?
+-x@Is the file executable?
+-f@Is the file a plain file?
+-d@Is the file a directory?
+-c@Is the file a character device?
+-b@Is the file a block device?
+-l@Is the file a symbolic link?
+-s@Is the file a socket?
+-p@Is the file a named pipe?
 .TE
 .PP
 With the
@@ -1746,67 +1748,68 @@ Return the definition of each
 Primitives provide the underlying behaviors for many hooks and builtins,
 and may not be redefined.
 .TS
+tab(@);
 lb | lb
 lb | l .
-Primitive	Implements
+Primitive@Implements
 _
-$&access	access
-$&apids	%apids
-$&background	\fIused by \fR%background
-$&backquote	\fIused by \fR%backquote
-$&batchloop	%batch-loop
-$&catch	catch
-$&cd	\fIused by \fRcd
-$&close	%close
-$&cmp	%cmp
-$&collect	\fIinvokes GC
-$&count	%count
-$&dot	.
-$&dup	%dup
-$&echo	echo
-$&exec	exec
-$&exitonfalse	%exit-on-false
-$&flatten	%flatten
-$&forever	forever
-$&fork	fork
-$&fsplit	%fsplit
-$&here	%here
-$&home	%home
-$&if	if
-$&internals	\fIused by \fRvars
-$&isinteractive	%is-interactive
-$&islogin	%is-login
-$&len	\fIcount chars in word(s)
-$&limit	limit
-$&newfd	%newfd
-$&newpgrp	newpgrp
-$&openfile	%openfile
-$&parse	%parse
-$&pipe	%pipe
-$&primitives	\fIlist xs primitives
-$&printf	printf
-$&random	\fIrandom integer
-$&read	%read
-$&readfrom	%readfrom
-$&resetterminal	\fIused to keep readline(3) in sync with terminal
-$&result	result
-$&run	%run
-$&seq	%seq
-$&sethistory	set-history
-$&setmaxevaldepth	set-max-eval-depth
-$&setnoexport	set-noexport
-$&setsignals	set-signals
-$&split	%split
-$&throw	throw
-$&time	time
-$&umask	umask
-$&var	%var
-$&vars	\fIused by \fRvars
-$&version	\fIversion info
-$&wait	wait
-$&whats	%whats
-$&wid	\fIcount character cells in word(s)
-$&writeto	%writeto
+$&access@access
+$&apids@%apids
+$&background@\fIused by \fR%background
+$&backquote@\fIused by \fR%backquote
+$&batchloop@%batch-loop
+$&catch@catch
+$&cd@\fIused by \fRcd
+$&close@%close
+$&cmp@%cmp
+$&collect@\fIinvokes GC
+$&count@%count
+$&dot@.
+$&dup@%dup
+$&echo@echo
+$&exec@exec
+$&exitonfalse@%exit-on-false
+$&flatten@%flatten
+$&forever@forever
+$&fork@fork
+$&fsplit@%fsplit
+$&here@%here
+$&home@%home
+$&if@if
+$&internals@\fIused by \fRvars
+$&isinteractive@%is-interactive
+$&islogin@%is-login
+$&len@\fIcount chars in word(s)
+$&limit@limit
+$&newfd@%newfd
+$&newpgrp@newpgrp
+$&openfile@%openfile
+$&parse@%parse
+$&pipe@%pipe
+$&primitives@\fIlist xs primitives
+$&printf@printf
+$&random@\fIrandom integer
+$&read@%read
+$&readfrom@%readfrom
+$&resetterminal@\fIused to keep readline(3) in sync with terminal
+$&result@result
+$&run@%run
+$&seq@%seq
+$&sethistory@set-history
+$&setmaxevaldepth@set-max-eval-depth
+$&setnoexport@set-noexport
+$&setsignals@set-signals
+$&split@%split
+$&throw@throw
+$&time@time
+$&umask@umask
+$&var@%var
+$&vars@\fIused by \fRvars
+$&version@\fIversion info
+$&wait@wait
+$&whats@%whats
+$&wid@\fIcount character cells in word(s)
+$&writeto@%writeto
 .TE
 .SH TOPLOOPS
 A toploop repeatedly reads and executes a command and prints its result.
