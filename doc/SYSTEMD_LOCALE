@@ -9,7 +9,7 @@ to include the following code at the top of your ~/.xsrc file.
 
 	-- begin ~/.xsrc --
 	~ $LC_ALL () && {
-		LC_ALL = en_US.UTF-8
+		LC_ALL = en_US.UTF-8 # or UTF-8 for your region
 		LANG = $LC_ALL
 		SHLVL = `($SHLVL-1)
 		exec xs -l

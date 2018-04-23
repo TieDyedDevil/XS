@@ -4,11 +4,14 @@ xs 1.1 to xs 1.2
 Stripped out a lot of unused code (~10% by weight).
 
 Unicode escapes are now delimited, like \u'n...'. The fixed-length forms
-\unnnn and \Unnnnnnnn are deprecated.
+\unnnn and \Unnnnnnnn are deprecated, but will remain available through
+all of the xs 1.x releases.
 
 Rewrote the man page.
 
-Reworked `pushd`, `popd` and `dirs` commands.
+Reworked `pushd`, `popd` and `dirs` commands. The `pushd` command is no
+longer broken by paths which contain spaces. The directory list is now
+laid out vertically.
 
 xs 1.0 to xs 1.1
 ----------------

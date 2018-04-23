@@ -7,3 +7,9 @@ contact me if you'd like to take on one of these:
   breakpoints, traps for errors and signals, stack crawls, variable
   inspection and modification (both lexical and environment variables),
   source listing, etc.
+
+* Find a way to introspect stack frames. This will be required for a
+  source-level debugger, but will also be useful on its own (e.g. for
+  isolating errors). At the very least, it'd be nice to have a reliable
+  way to identify the current function; `$0` does what it promises, but
+  it's not particularly useful.
