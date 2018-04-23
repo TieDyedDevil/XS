@@ -117,15 +117,17 @@ lb l .
 A character octet may be denoted by its hexadecimal or octal code point:
 .PP
 .RS
-.TP
-.BI \ex nn
+.TS
+tab(@);
+l lx .
+\fB\ex\fInn@T{
 Character octet
 .IR nn ,
 for
 .I n
 in {0..0, a..f, A..F}
-.TP
-.BI \e mnn
+T}
+\fB\e\fImnn@T{
 Character octet
 .IR mnn ,
 for
@@ -133,17 +135,23 @@ for
 in {0..3} and
 .I n
 in {0..7}
+T}
+.TE
 .RE
 .PP
 A UTF-8 octet sequence may be denoted using the escape sequence:
 .RS
-.TP
-.BI \eu\(aq n... \(aq
+.TS
+tab(@);
+l lx .
+\fB\eu\(aq\fIn...\fB\(aq@T{
 UTF-8 character having codepoint
 .IR n... ,
 for one to six
 .I n
 in {0..9, a..f, A..F}
+T}
+.TE
 .RE
 .PP
 .B Xs
