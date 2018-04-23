@@ -1898,105 +1898,121 @@ A common use is to update the value of
 .B Xs
 rewrites surface syntax in terms of hook functions.
 .SS Control Flow
-.TP
-.BI ! " command"
+.TS
+tab(@);
+l lx .
+\fB! \fIcommand@T{
 %not {\fIcommand\fR}
-.TP
-.IB "command " &
+T}
+\fIcommand \fB&@T{
 %background {\fIcommand\fR}
-.TP
-.IB "command1 " ; " command2"
+T}
+\fIcommand1 \fB; \fIcommand2@T{
 %seq {\fIcommand1\fR} {\fIcommand2\fR}
-.TP
-.IB "command1 " && " command2"
+T}
+\fIcommand1 \fB&& \fIcommand2@T{
 %and {\fIcommand1\fR} {\fIcommand2\fR}
-.TP
-.IB "command1 " || " command2"
+T}
+\fIcommand1 \fB|| \fIcommand2@T{
 %or {\fIcommand1\fR} {\fIcommand2\fR}
-.TP
-.BR fn " \fIname\fB {|\fIarg...\fB| \fIcommand\fB}
+T}
+\fBfn \fIname\fB {|\fIarg...\fB| \fIcommand\fB}@T{
 fn-^\fIname\fR = {|\fIarg...\fR|\fI command\fR}
+T}
+.TE
 .SS Input/Output
-.TP
-.IB command " <" file
+.TS
+tab(@);
+l lx .
+\fIcommand \fB< \fIfile@T{
 %open 0 \fIfile\fR {\fIcommand\fR}
-.TP
-.IB command " >" file
+T}
+\fIcommand \fB> \fIfile@T{
 %create 1 \fIfile\fR {\fIcommand\fR}
-.TP
-.IB command " >[\fIn\fB]" file
+T}
+\fIcommand \fB>[\fIn\fB] \fIfile@T{
 %create \fIn\fR \fIfile\fR {\fIcommand\fR}
-.TP
-.IB command " >>" file
+T}
+\fIcommand \fB>> \fIfile@T{
 %append 1 \fIfile\fR {\fIcommand\fR}
-.TP
-.IB command " <>" file
+T}
+\fIcommand \fB<> \fIfile@T{
 %open-write 0 \fIfile\fR {\fIcommand\fR}
-.TP
-.IB command " <>>" file
+T}
+\fIcommand \fB<>> \fIfile@T{
 %open-append 0 \fIfile\fR {\fIcommand\fR}
-.TP
-.IB command " ><" file
+T}
+\fIcommand \fB>< \fIfile@T{
 %open-create 1 \fIfile\fR {\fIcommand\fR}
-.TP
-.IB command " >><" file
+T}
+\fIcommand \fB>>< \fIfile@T{
 %open-append 1 \fIfile\fR {\fIcommand\fR}
-.TP
-.IB command " >[\fIn\fB=]"
+T}
+\fIcommand \fB>[\fIn\fB=]@T{
 %close \fIn\fR {\fIcommand\fR}
-.TP
-.IB command " >[\fIm\fB=\fIn\fB]"
+T}
+\fIcommand \fB>[\fIm\fB=\fIn\fB]@T{
 %dup \fIm\fR \fIn\fR {\fIcommand\fR}
-.TP
-.IB command " <<" "tag input tag"
+T}
+\fIcommand \fB<< \fItag input tag@T{
 %here 0 \fIinput\fR {\fIcommand\fR}
-.TP
-.IB command " <<<" word
+T}
+\fIcommand \fB<<< \fIword@T{
 %here 0 \fIword\fR {\fIcommand\fR}
-.TP
-.IB command1 " | " command2
+T}
+\fIcommand1 \fB| \fIcommand2@T{
 %pipe {\fIcommand1\fR} 1 0 {\fIcommand2\fR}
-.TP
-.IB command1 " |[\fIm\fB=\fIn\fB] " command2
+T}
+\fIcommand1 \fB|[\fIm\fB=\fIn\fB] \fIcommand2@T{
 %pipe {\fIcommand1\fR} \fIm\fR \fIn\fR {\fIcommand2\fR}
-.TP
-.IB command1 " >{" command2 }
+T}
+\fIcommand1 \fB>{ \fIcommand2 \fB}@T{
 %writeto \fIvar\fR {\fIcommand2\fR} {\fIcommand1\fR $\fIvar\fR}
-.TP
-.IB command1 " <{" command2 }
+T}
+\fIcommand1 \fB<{ \fIcommand2 \fB}@T{
 %readfrom \fIvar\fR {\fIcommand2\fR} {\fIcommand1\fR $\fIvar\fR}
+T}
+.TE
 .SS Expressions
-.TP
-.BI $# var
+.TS
+tab(@);
+l lx .
+\fB$#\fIvar@T{
 <={%count %\fIvar\fR}
-.TP
-.BI $^ var
+T}
+\fB$^\fIvar@T{
 <={%flatten \(aq \(aq $\fIvar\fR}
-.TP
-.BI \`{ "command arg..." }
+T}
+\fB\`{ \fIcommand arg... \fB}@T{
 <={%backquote <={%flatten \(aq\(aq $ifs} {\fIcommand\fR \fIarg...\fR}}
-.TP
-.BI \`\` " ifs " { "command arg..." }
-<={%backquote <={%flatten \(aq\(aq \fIifs\fR} {\fIcommand\fR \fIarg...\fR}}
+T}
+\fB\`\` \fIifs \fB{ \fIcommand arg... \fB}@T{
+<={%backquote <={%flatten \(aq\(aq \fIifs\fR} {\:\fIcommand\fR \fIarg...\fR}}
+T}
+.TE
 .SS Relational Operators
-.TP
-.IB a " :lt " b
+.TS
+tab(@);
+l lx .
+\fIa \fB:lt \fIb@T{
 {~ {%cmp \fIa\fR \fIb\fR} -1}
-.TP
-.IB a " :le " b
+T}
+\fIa \fB:le \fIb@T{
 {~ {%cmp \fIa\fR \fIb\fR} -1 0}
-.TP
-.IB a " :gt " b
+T}
+\fIa \fB:gt \fIb@T{
 {~ {%cmp \fIa\fR \fIb\fR} 1}
-.TP
-.IB a " :ge " b
+T}
+\fIa \fB:ge \fIb@T{
 {~ {%cmp \fIa\fR \fIb\fR} 1 0}
-.TP
-.IB a " :eq " b
+T}
+\fIa \fB:eq \fIb@T{
 {~ {%cmp \fIa\fR \fIb\fR} 0}
-.TP
-.IB a " :ne " b
+T}
+\fIa \fB:ne \fIb@T{
 {~ {%cmp \fIa\fR \fIb\fR} -1 1}
+T}
+.TE
 .SH EDITING
 Input editing is provided by
 .BR readline (3)
