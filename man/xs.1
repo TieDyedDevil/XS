@@ -24,51 +24,55 @@ is a descendant of
 .BR rc "(1) and " es (1);
 the three implementations are not interoperable.
 .SH OPTIONS
-.TP
-.B -s
+.TS
+tab(@);
+lb lx .
+-s@T{
 Read commands from standard input; pass the first argument to
 .B xs
 rather than taking the argument as the name of a file to source.
-.TP
-.B -i
+T}
+-i@T{
 Force
 .B xs
 to be an interactive shell even if commands do not come from standard input
 via a terminal.
-.TP
-.B -l
+T}
+-l@T{
 Cause
 .B xs
 to be a login shell, as if it had been invoked as
 .BR -xs .
-.TP
-.B -e
+T}
+-e@T{
 Exit if any command (apart from those appearing as tests in conditional forms
 or as arguments to logical operators) returns a false status.
-.TP
-.B -v
+T}
+-v@T{
 Echo input to standard error.
-.TP
-.B -x
+}
+-x@T{
 Print commands to standard error.
-.TP
-.B -n
+T}
+-n@T{
 Disable command execution.
-.TP
-.B -p
+T}
+-p@T{
 Don't initialize functions from the environment.
-.TP
-.B -o
+T}
+-o@T{
 If any of file descriptors 0, 1 or 2 are inherited closed, leave them closed
 rather than open on /dev/null.
-.TP
-.B -d
+T}
+-d@T{
 Don't trap SIGQUIT or SIGTERM.
-.TP
-.BI -c " FRAGMENT"
+T}
+-c \fIFRAGMENT@T{
 Execute the
 .IR FRAGMENT .
 (See Program fragments, below.)
+T}
+.TE
 .SH LANGUAGE
 Lexically, an
 .B xs
