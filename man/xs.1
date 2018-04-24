@@ -2044,20 +2044,24 @@ The following forms are deprecated and should not be used for new
 .B xs
 code.
 .RS
-.TP
-.BI \eu nnnn
+.TS
+tab(@);
+r lx .
+\fB\eu\fInnnn@T{
 UTF-8 character having codepoint
 .IR nnnn ,
 for
 .I n
 in {0..9, a..f, A..F}
-.TP
-.BI \eU nnnnnnnn
+T}
+\fB\eU\fInnnnnnnn@T{
 UTF-8 character having codepoint
 .IR nnnnnnnn ,
 for
 .I n
 in {0..9, a..f, A..F}
+T}
+.TE
 .RE
 .SH BUGS
 The shell does not support job control.
