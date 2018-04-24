@@ -1456,35 +1456,27 @@ Print definition of
 .TP
 .BR vars " [" -vfs "] [" -epi ]
 Print definition of all variables which satisfy the given options:
-.RS
-.TP
-.B -v
+.TS
+tab(@);
+l lx .
+-v@T{
 variables (not functions or settors).
 This is the default if none of
 .BR -v ", " -f " or " -s
 is given.
-.TP
-.B -f
-functions
-.TP
-.B -s
-settors
-.TP
-.B -e
+T}
+-f@functions
+-s@settors
+-e@T{
 exported.
 This is the default if none of
 .BR -e ", " -p " or " -i
 is given.
-.TP
-.B -p
-private (not exported)
-.TP
-.B -i
-internal (predefined and builtin)
-.TP
-.B -a
-all of the above
-.RE
+T}
+-p@private (not exported)
+-i@internal (predefined and builtin)
+-a@all of the above
+.TE
 .TP
 .BR wait " [\fIpid\fR]
 Wait for a child process denoted by its
