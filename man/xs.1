@@ -904,7 +904,8 @@ Furthermore, a lexical variable persists across executions
 of a function which is defined within the
 .B let
 form.
-A lexical binding is never written to the environment.
+A lexical binding is stored as a closure in the environment.
+The binding is not accessible as an environment variable.
 .SS Conditionals
 .B Xs
 has two main conditional forms:
