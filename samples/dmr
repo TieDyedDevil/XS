@@ -1,3 +1,13 @@
 #! /usr/bin/env xs
 
-exec dmenu_run >/dev/null >[2]/dev/null
+uc_dir = ~/.local/dmr.uc
+mkdir -p $uc_dir
+if {{test ~/.xsuser.d -nt $uc_dir} || {test ~/.xsrc.d -nt $uc_dir}} {
+	rm -f $uc_dir/*
+#	for f `{vars -f|grep -o '^fn-[^ ]\+'|cut -d- -f2-|grep '^[a-z]'} {
+#		touch $uc_dir/$f
+#		chmod +x $uc_dir/$f
+#	}
+}
+
+local (path = $path $uc_dir) {exec dmenu_run >/dev/null >[2]/dev/null}
