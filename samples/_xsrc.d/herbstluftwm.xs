@@ -12,7 +12,7 @@ fn bari {
 	.c 'wm'
 	.r '3up barre boc dual em hc mons osd quad r updres wmb'
 	%only-X
-	~/.config/herbstluftwm/panel.xs legend color|less -RFXi
+	%with-terminal {~/.config/herbstluftwm/panel.xs legend color|less -RXi}
 }
 fn barre {
 	.d 'Status bar restart'
@@ -221,6 +221,6 @@ fn wmb {
 	.c 'wm'
 	.r '3up bari barre boc dual em hc mons osd quad r updres'
 	%only-X
-	herbstclient list_keybinds|sed 's/'\t'/ /g'|sed 's/ /'\t'/' \
-		|column -t -s\t|less -FXSi
+	%with-terminal {herbstclient list_keybinds|sed 's/'\t'/ /g'| \
+		sed 's/ /'\t'/'|column -t -s\t|less -XSi}
 }

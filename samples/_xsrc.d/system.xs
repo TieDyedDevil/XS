@@ -1,7 +1,7 @@
 fn astat {
 	.d 'Display a status screen'
 	.c 'system'
-	%with-quit {
+	%with-terminal %with-quit {
 		watch -t -p -c -n1 \
 			'xs -c ''d;load;thermal;vol;played playing'''
 	}
@@ -68,11 +68,9 @@ fn net {|*|
 fn oc {
 	.d 'Onscreen clock'
 	.c 'system'
-	%with-quit {
-		%without-cursor {
-			watch -t -n 1 -p -c banner \\' '^\`date +%T\`\; \
-							cal -n 3 --color=always
-		}
+	%with-terminal %with-quit %without-cursor {
+		watch -t -n 1 -p -c banner \\' '^\`date +%T\`\; \
+						cal -n 3 --color=always
 	}
 }
 fn on {

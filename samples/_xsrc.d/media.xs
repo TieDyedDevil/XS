@@ -148,7 +148,8 @@ fn ncmpcpp {
 	.a '[ncmpcpp_OPTIONS]'
 	.c 'media'
 	.r 'b mpc n played s'
-	%preserving-title %with-application-keypad /usr/local/bin/ncmpcpp
+	%with-terminal %preserving-title %with-application-keypad \
+		/usr/local/bin/ncmpcpp
 }
 fn noise {|*|
 	.d 'Audio noise generator'
@@ -173,7 +174,7 @@ fn noise {|*|
 fn p {
 	.d 'Pulse Audio mixer'
 	.c 'media'
-	%preserving-title pamixer
+	%with-terminal %preserving-title pamixer
 }
 fn played {|*|
 	.d 'List recently-played tracks'
