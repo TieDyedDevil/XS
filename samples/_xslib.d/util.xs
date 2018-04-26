@@ -788,3 +788,10 @@ fn %ord {|*|
 	# Print decimal ordinal values of bytes in given word(s).
 	hexdump -v -e '1/1 " %d"' <{echo -n $*}
 }
+
+fn %with-terminal {|cmd|
+	# Run command, spawning a terminal if necessary.
+	local (DISPLAY = :0) {
+		if {tty -s} {$cmd} else {st xs -c {$cmd}}
+	}
+}

@@ -19,8 +19,8 @@ if {!~ $DISPLAY ()} {
 	exit
 } else {
 	if {~ $#* 0} {
-		w3m -X $prx -v
+		%with-terminal w3m -X $prx -v
 	} else {
-		w3m -X $prx $*
+		%with-terminal w3m -X $prx $*
 	}
 }
