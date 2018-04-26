@@ -4,6 +4,12 @@ fn atop {|*|
 	.c 'priv'
 	%with-terminal sudo /usr/bin/atop $*
 }
+fn ftop {|*|
+	.d 'Show progress of open files'
+	.a '[ftop_OPTIONS]'
+	.c 'priv'
+	%with-terminal sudo /usr/bin/ftop $*
+}
 fn iotop {|*|
 	.c 'priv'
 	%with-terminal sudo /usr/sbin/iotop $*

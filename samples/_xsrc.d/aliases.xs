@@ -15,6 +15,12 @@ fn calc {|*|
 	.c 'alias'
 	~ $#* 0 || nickle -e $*
 }
+fn htop {|*|
+	.d 'Interactive process viewer'
+	.a '[htop_OPTIONS]'
+	.c 'alias'
+	%with-terminal /usr/bin/htop $*
+}
 %cfn {%have mandelbulber} mb {|*|
 	.c 'alias'
 	mandelbulber $*
@@ -32,4 +38,10 @@ fn sysmon {
 	.d 'View Monitorix stats'
 	.c 'alias'
 	web http://localhost:8080/monitorix
+}
+fn top {|*|
+	.d 'Display processes'
+	.a '[top_OPTIONS]'
+	.c 'alias'
+	%with-terminal /usr/bin/top $*
 }
