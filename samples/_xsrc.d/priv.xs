@@ -2,19 +2,19 @@ fn atop {|*|
 	.d 'Advanced system & process monitor'
 	.a '[atop_OPTIONS]'
 	.c 'priv'
-	sudo /usr/bin/atop $*
+	%with-terminal sudo /usr/bin/atop $*
 }
 fn iotop {|*|
 	.c 'priv'
-	sudo /usr/sbin/iotop $*
+	%with-terminal sudo /usr/sbin/iotop $*
 }
 fn iptraf-ng {|*|
 	.c 'priv'
-	sudo /usr/sbin/iptraf-ng $*
+	%with-terminal sudo /usr/sbin/iptraf-ng $*
 }
 fn nethogs {|*|
 	.c 'priv'
-	sudo /usr/sbin/nethogs $*
+	%with-terminal sudo /usr/sbin/nethogs $*
 }
 fn panel {|*|
 	.d 'Query/set Intel backlight intensity'
@@ -40,7 +40,7 @@ fn panel {|*|
 }
 fn powertop {|*|
 	.c 'priv'
-	sudo /usr/sbin/powertop $*
+	%with-terminal sudo /usr/sbin/powertop $*
 }
 %cfn {!~ <={access -1n radeontop $path} ()} radeontop {|*|
 	.c 'priv'
@@ -60,7 +60,7 @@ fn svis {|*|
 }
 fn tiptop {|*|
 	.c 'priv'
-	sudo /usr/bin/tiptop $*
+	%with-terminal sudo /usr/bin/tiptop $*
 }
 fn upgrade {
 	.d 'Upgrade Fedora packages'
@@ -70,5 +70,5 @@ fn upgrade {
 }
 fn wavemon {|*|
 	.c 'priv'
-	sudo /usr/bin/wavemon $*
+	%with-terminal sudo /usr/bin/wavemon $*
 }

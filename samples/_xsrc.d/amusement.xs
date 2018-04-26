@@ -27,7 +27,7 @@ fn worms {|*|
 	.d 'Display worms'
 	.a '[worms_OPTIONS]'
 	.c 'amusement'
-	%with-quit {
+	%with-terminal %with-quit {
 		/usr/bin/worms -n 7 -d 50 $*
 	}
 }
