@@ -134,5 +134,5 @@ fn ffl-help {
 fn fsl-help {
 	.d 'Forth Scientific Library algorithm list'
 	.c 'help'
-	list /usr/share/gforth/site-forth/fsl/status.txt
+	%with-terminal list /usr/share/gforth/site-forth/fsl/status.txt
 }
