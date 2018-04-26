@@ -82,6 +82,11 @@ fn open {|*|
 	.c 'system'
 	xdg-open $*
 }
+fn stt {
+	.d 'Tabbed terminal'
+	.c 'system'
+	/usr/local/bin/tabbed st -w
+}
 fn swapflush {
 	.d 'Flush swapfile(s)'
 	.c 'system'
