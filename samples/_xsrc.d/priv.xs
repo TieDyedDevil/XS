@@ -42,7 +42,7 @@ fn powertop {|*|
 	.c 'priv'
 	sudo /usr/sbin/powertop $*
 }
-fn radeontop {|*|
+%cfn {!~ <={access -1n radeontop $path} ()} radeontop {|*|
 	.c 'priv'
 	%with-terminal sudo /usr/sbin/radeontop $*
 }
