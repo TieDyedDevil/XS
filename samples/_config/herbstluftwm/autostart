@@ -123,6 +123,9 @@ hc keybind $Mod^-Shift-BackSpace   cycle_monitor -1
 # bury pointer
 hc keybind $Mod^-b spawn xdotool mousemove 5000 5000
 
+# Report battery state
+hc keybind $Mod^-Shift-b spawn notify-send Battery <={%flatten ' ' `battery}
+
 # media keys
 hc keybind XF86AudioPlay spawn mpc -q toggle
 hc keybind $Mod^-n spawn mpc -q toggle
