@@ -76,6 +76,7 @@ fn luc {|*|
 	.a '-l  # sort by length, then name'
 	.a '-s  # list commands on system paths'
 	.c 'help'
+	%with-terminal { \
 	let (al = <={%args $*}; fn-sf) {
 		if {~ $al -l} {fn-sf = %asort} else {fn-sf = sort}
 		printf <=.%as^'@ ~/.xs*'^<=.%an^\n
@@ -93,7 +94,7 @@ fn luc {|*|
 				ls $d | sf | column -c `{tput cols}
 			}
 		}
-	} | less -irFX
+	} | less -irFX }
 }
 
 ## Online documentation

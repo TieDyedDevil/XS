@@ -1,9 +1,21 @@
 fn b {
 	.d 'Stop playing track'
 	.c 'media'
-	.r 'm mpc n ncmpcpp played s'
+	.r 'equalizer m mpc n ncmpcpp played s'
 	mpc -q pause
 	m
+}
+fn bluetoothctl {
+	.d 'Bluetooth control'
+	.c 'media'
+	%with-terminal /usr/bin/bluetoothctl
+}
+fn equalizer {
+	.d 'Pulse Audio equalizer'
+	.c 'media'
+	.r 'b m mpc n ncmpcpp played s'
+	%only-X
+	pulseaudio-equalizer-gtk
 }
 fn gallery {|*|
 	.d 'Random slideshow'
@@ -64,7 +76,7 @@ fn m {|*|
 	.d 'Show currently playing track'
 	.a '[-w]'
 	.c 'media'
-	.r 'b mpc n ncmpcpp played s'
+	.r 'b equalizer mpc n ncmpcpp played s'
 	if {~ $* -w} {
 		%with-quit {
 			watch -x -p -t -n1 -c xs -c 'm >[2]/dev/null|head -1'}}
@@ -105,7 +117,7 @@ fn midi {|*|
 fn mpc {|*|
 	.d 'Music player'
 	.c 'media'
-	.r 'b m n ncmpcpp played s'
+	.r 'b equalizer m n ncmpcpp played s'
 	/usr/bin/mpc -f '%artist% - %album% - %track%#|  %title%' $*
 }
 fn mpv {|*|
@@ -139,7 +151,7 @@ fn mpvl {|*|
 fn n {
 	.d 'Play next track'
 	.c 'media'
-	.r 'b mpc n ncmpcpp played s'
+	.r 'b equalizer mpc n ncmpcpp played s'
 	if {~ `mpc \[playing\]} {mpc -q next} else {mpc -q play}
 	m
 }
@@ -147,7 +159,7 @@ fn ncmpcpp {
 	.d 'MPD client'
 	.a '[ncmpcpp_OPTIONS]'
 	.c 'media'
-	.r 'b mpc n played s'
+	.r 'b equalizer mpc n played s'
 	%with-terminal %preserving-title %with-application-keypad \
 		/usr/local/bin/ncmpcpp
 }
@@ -181,7 +193,7 @@ fn played {|*|
 	.a '[-w]'
 	.a '[playing]  # include current track'
 	.c 'media'
-	.r 'b m mpc n ncmpcpp s'
+	.r 'b equalizer m mpc n ncmpcpp s'
 	if {~ $*(1) -w} {
 		%with-quit {
 			watch -t -n5 xs -c \
@@ -200,7 +212,7 @@ fn s {|*|
 	.a '[MM:]SS  # absolute time'
 	.a 'N%  # absolute percent'
 	.c 'media'
-	.r 'b m mpc n ncmpcpp played'
+	.r 'b equalizer m mpc n ncmpcpp played'
 	if {~ $#* 0} {
 		.usage s
 	} else {
