@@ -69,7 +69,7 @@ fn image {|*|
 	} else if {~ $DISPLAY () && ~ `consoletype pty} {
 		mpv --image-display-duration inf --really-quiet $*
 	} else {
-		sxiv -qfb $*
+		xembed -e sxiv -qfb $*
 	}
 }
 fn m {|*|
