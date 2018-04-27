@@ -1,0 +1,3 @@
+#! /usr/bin/env xs
+
+notify-send Battery <={%flatten ' ' `battery}
