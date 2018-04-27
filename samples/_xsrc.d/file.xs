@@ -170,5 +170,8 @@ fn vman {|*|
 fn zathura {|*|
 	.d 'Document viewer'
 	.c 'file'
-	setsid xembed -e /usr/bin/zathura $* >/dev/null >[2=1] &
+	local (embed) {
+		!~ $XEMBED () && embed = -e $XEMBED
+		setsid /usr/bin/zathura $embed $* >/dev/null >[2=1] &
+	}
 }
