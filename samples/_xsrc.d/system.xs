@@ -65,6 +65,11 @@ fn net {|*|
 		nmcli --fields name,type,device connection show $flag
 	}
 }
+fn nmtui {
+	.d 'Network Manager text UI'
+	.c 'system'
+	%with-terminal /usr/bin/nmtui
+}
 fn oc {
 	.d 'Onscreen clock'
 	.c 'system'
