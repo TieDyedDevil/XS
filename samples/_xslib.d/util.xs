@@ -538,10 +538,10 @@ fn %list-menu {|*|
 fn %without-echo {|cmd|
 	# Disable terminal echo while evaluating cmd.
 	unwind-protect {
-		stty -echo
+		stty -F /dev/tty -echo
 		$cmd
 	} {
-		stty echo
+		stty -F /dev/tty echo
 	}
 }
 
