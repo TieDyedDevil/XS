@@ -440,25 +440,28 @@ fn %asort {
 }
 
 fn %read-char {
-	# Read one UTF-8 character from stdin.
+	# Read one UTF-8 character from tty.
 	let (c; oc; r) {
 		unwind-protect {
-			stty -icanon
-			c = `` '' {dd bs=1 count=1 >[2]/dev/null}
+			stty -F /dev/tty -icanon
+			c = `` '' {dd if=/dev/tty bs=1 count=1 >[2]/dev/null}
 			oc = `{%ord $c}
 			if {$oc :le 127} {
 				r = $c
 			} else if {$oc :ge 248} {
 				throw error %read-char 'Invalid UTF-8'
 			} else if {$oc :ge 240} {
-				r = $c ^ `{dd bs=1 count=3 >[2]/dev/null}
+				r = $c ^ `{dd if=/dev/tty bs=1 count=3 \
+						>[2]/dev/null}
 			} else if {$oc :ge 224} {
-				r = $c ^ `{dd bs=1 count=2 >[2]/dev/null}
+				r = $c ^ `{dd if=/dev/tty bs=1 count=2 \
+						>[2]/dev/null}
 			} else if {$oc :ge 112} {
-				r = $c ^ `{dd bs=1 count=1 >[2]/dev/null}
+				r = $c ^ `{dd if=/dev/tty bs=1 count=1 \
+						>[2]/dev/null}
 			}
 		} {
-			stty icanon
+			stty -F /dev/tty icanon
 		}
 		result $r
 	}
