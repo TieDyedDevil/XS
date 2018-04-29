@@ -1,18 +1,22 @@
 #! /usr/local/bin/xs --
 
-# Presentation program
-#
-# A markup command begins each line:
-#
-# .h Header text (one line)
-# .s Subheader text (one line)
-# .f Footer text (one line)
-# .i indent amount
-# .p Paragraph text (end with a completely blank line)
-# .b Block (literal, nowrap) text (end with a completely blank line)
-# .^ Page break; pause for key
+pgm = $0
 
-~ $#* 0 && throw error slider file?
+~ $1 --help && {
+	cat <<'EOF'
+A markup command begins each line:
+.h Header text (one line)
+.s Subheader text (one line)
+.f Footer text (one line)
+.i indent amount (number of leading blanks)
+.p Paragraph text (end with a completely blank line)
+.b Block (literal, nowrap) text (end with a completely blank line)
+.^ Page break; pause for key
+EOF
+	exit 1
+}
+
+~ $#* 0 && throw error `{basename $pgm} 'file?'
 
 rows = `{tput lines}
 cols = `{tput cols}
@@ -80,7 +84,7 @@ let (header; subheader; footer; indent = ''; text = ''; pn = 1; rc) {
 	}
 
 	%without-cursor \
-	%with-read-lines $* {|line|
+	%with-read-lines $1 {|line|
 		let ((w1 lr) = <={~~ $line *\ * *}) {
 			switch $w1 (
 			'.h' {header = $lr}
