@@ -17,6 +17,7 @@ A markup command begins each line of FILE:
 .w line width (0 to use terminal width)
 .p Paragraph text (end with a completely blank line)
 .b Block (literal, nowrap) text (end with a completely blank line)
+.v vertical space amount
 .^ Page break; pause for key
 
 Navigation
@@ -28,13 +29,19 @@ EOF
 	exit 1
 }
 
-~ $#* 0 && throw error `{basename $pgm} 'file [START_PAGE]'
+~ $#* 0 && throw error `{basename $pgm} 'FILE [START_PAGE]'
 
 let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 		 pn = 1; indent = ''; sindent = ''; text = '') {
 
 	fn indent {|n|
-		for i `{seq $n} {printf ' '}
+		~ $n () && n = 0
+		result <={%argify `` '' {for i `{seq $n} {printf ' '}}}
+	}
+
+	fn spacedown {|n|
+		~ $n () && n = 0
+		for _ `{seq $n} {printf \n; rc = `($rc+1)}
 	}
 
 	fn fill {|t|
@@ -65,9 +72,11 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 						printf '%s%s'\n $indent $lr
 						rc = `($rc+1)
 					} else if {~ $w1 .i} {
-						indent = ' '$lr
+						indent = <={indent $lr}
 					} else if {~ $w1 .j} {
-						sindent = ' '$lr
+						sindent = <={indent $lr}
+					} else if {~ $w1 .v} {
+						spacedown $lr
 					} else if {~ $w1 .w} {
 						width = $lr
 						~ $width 0 && \
@@ -127,11 +136,12 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 			'.h' {header = $lr}
 			'.s' {subheader = $lr}
 			'.f' {footer = $lr}
-			'.i' {text = $text^\n.i^`` '' {indent $lr}^\n}
-			'.j' {text = $text^\n.j^`` '' {indent $lr}^\n}
+			'.i' {text = $text^\n.i' '^<={%argify $lr}^\n}
+			'.j' {text = $text^\n.j' '^<={%argify $lr}^\n}
 			'.w' {text = $text^\n.w' '^<={%argify $lr}^\n}
 			'.p' {text = $text^' '^$lr}
 			'.b' {text = $text^\n.b' '^$lr\n}
+			'.v' {text = $text^\n.v' '^<={%argify $lr}^\n}
 			'.^' {if {$start :gt $pn} {
 					text = ''
 					pn = `($pn+1)
