@@ -1,0 +1,91 @@
+#! /usr/local/bin/xs --
+
+# Presentation program
+#
+# A markup command begins each line:
+#
+# .h Header text (one line)
+# .s Subheader text (one line)
+# .f Footer text (one line)
+# .i indent amount
+# .p Paragraph text (end paragraph with a completely blank line)
+# .b Block (literal, nowrap) text
+# .^ Page break; pause for key
+
+~ $#* 0 && throw error slider file?
+
+rows = `{tput lines}
+cols = `{tput cols}
+
+let (header; subheader; footer; indent = ''; text = ''; pn = 1; rc) {
+	fn indent {|n|
+		for i `{seq $n} {printf ' '}
+	}
+
+	fn fill {|t|
+		printf $indent
+		let (wl = <={%split ' ' $t}; wc; \
+				cw = <={$&wid $indent}) {
+			for w $wl {
+				wc = <={$&wid $w}
+				if {`($wc+$cw) :ge $cols} {
+					printf \n%s $indent
+					cw = <={$&wid $indent}
+					rc = `($rc+1)
+				}
+				printf '%s ' $w
+				cw = `($cw+$wc+1)
+			}
+		}
+		printf \n\n
+		rc = `($rc+2)
+	}
+
+	fn render {|pars|
+		let (pt = <={%split \n $pars}) {
+			for t $pt {
+				let ((w1 lr) = <={~~ $t *\ *}) {
+					if {~ $w1 .b} {
+						printf ' %s'\n $lr
+						rc = `($rc+1)
+					} else {
+						fill $t
+					}
+				}
+			}
+		}
+	}
+
+	fn showpage {
+		clear
+		printf %s%s%s\n <=.%ab <={%argify $header} <=.%an
+		printf %s%s%s\n <=.%ai <={%argify $subheader} <=.%an
+		printf \n
+		rc = 5
+		render $text
+		while {$rc :lt $rows} {
+			printf \n
+			rc = `($rc+1)
+		}
+		printf '%s[%3d] %s%s'\n <=.%ad $pn <={%argify $footer} <=.%an
+		pn = `($pn+1)
+		text = ''
+		%without-echo %read-char
+	}
+
+	%without-cursor \
+	%with-read-lines $* {|line|
+		let ((w1 lr) = <={~~ $line *\ * *}) {
+			switch $w1 (
+			'.h' {header = $lr}
+			'.s' {subheader = $lr}
+			'.f' {footer = $lr}
+			'.i' {indent = `` '' {indent $lr}}
+			'.p' {text = $text^' '^$lr}
+			'.b' {text = $text^\n.b^$indent^$lr}
+			'.^' {showpage}
+			{text = $text^\n}
+			)
+		}
+	}
+}
