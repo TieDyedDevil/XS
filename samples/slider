@@ -13,6 +13,7 @@ A markup command begins each line of FILE:
 .s Subheader text (one line)
 .f Footer text (one line)
 .i indent amount (number of leading blanks)
+.w line width (0 or empty to use terminal width)
 .p Paragraph text (end with a completely blank line)
 .b Block (literal, nowrap) text (end with a completely blank line)
 .^ Page break; pause for key
@@ -28,10 +29,9 @@ EOF
 
 ~ $#* 0 && throw error `{basename $pgm} 'file [START_PAGE]'
 
-rows = `{tput lines}
-cols = `{tput cols}
+let (header; subheader; footer; rows; cols; rc; \
+		 pn = 1; indent = ''; width =; text = '') {
 
-let (header; subheader; footer; indent = ''; text = ''; pn = 1; rc) {
 	fn indent {|n|
 		for i `{seq $n} {printf ' '}
 	}
@@ -61,8 +61,10 @@ let (header; subheader; footer; indent = ''; text = ''; pn = 1; rc) {
 				let ((w1 lr) = <={~~ $t *\ *}) {
 					if {~ $w1 .b} {
 						ob = true
-						printf ' %s'\n $lr
+						printf '%s%s'\n $indent $lr
 						rc = `($rc+1)
+					} else if {~ $w1 .i} {
+						indent = ' '$lr
 					} else {
 						if $ob {
 							printf \n
@@ -76,17 +78,26 @@ let (header; subheader; footer; indent = ''; text = ''; pn = 1; rc) {
 		}
 	}
 
+	fn redraw {|page|
+		indent = ''
+		text = ''
+		width = `{tput cols}
+		exec $pgm $file $page
+	}
+
 	fn waitkey {
 		let (kc) {escape {|fn-done| {while (true) {
 			kc = <={%without-echo %read-char}
-			if {~ $kc \b \x7f p b k l \`} {exec $pgm $file `($pn-1)}
-			if {~ $kc r} {exec $pgm $file $pn}
+			if {~ $kc \b \x7f p b k l \`} {redraw `($pn-1)}
+			if {~ $kc r} {redraw $pn}
 			if {~ $kc ' ' \n n f j h \t} {done}
 			if {~ $kc q .} {exit}
 		}}}}
 	}
 
 	fn showpage {
+		rows = `{tput lines}
+		if {~ $width 0} {cols = $width} else {cols = `{tput cols}}
 		clear
 		printf %s%s%s\n <=.%ab <={%argify $header} <=.%an
 		printf %s%s%s\n <=.%ai <={%argify $subheader} <=.%an
@@ -106,27 +117,22 @@ let (header; subheader; footer; indent = ''; text = ''; pn = 1; rc) {
 	%without-cursor \
 	%with-read-lines $file {|line|
 		let ((w1 lr) = <={~~ $line *\ * *}) {
-			if {$start :gt $pn} {
-				switch $w1 (
-				'.h' {header = $lr}
-				'.s' {subheader = $lr}
-				'.f' {footer = $lr}
-				'.i' {indent = `` '' {indent $lr}}
-				'.^' {pn = `($pn+1)}
-				{}
-				)
-			} else {
-				switch $w1 (
-				'.h' {header = $lr}
-				'.s' {subheader = $lr}
-				'.f' {footer = $lr}
-				'.i' {indent = `` '' {indent $lr}}
-				'.p' {text = $text^' '^$lr}
-				'.b' {text = $text^\n.b^$indent^$lr}
-				'.^' {showpage}
-				{text = $text^\n}
-				)
-			}
+			switch $w1 (
+			'.h' {header = $lr}
+			'.s' {subheader = $lr}
+			'.f' {footer = $lr}
+			'.i' {text = $text^\n.i^`` '' {indent $lr}^\n}
+			'.w' {width = $lr}
+			'.p' {text = $text^' '^$lr}
+			'.b' {text = $text^\n.b' '^$lr\n}
+			'.^' {if {$start :gt $pn} {
+					text = ''
+					pn = `($pn+1)
+				} else {
+					showpage
+				}}
+			{text = $text^\n}
+			)
 		}
 	}
 }
