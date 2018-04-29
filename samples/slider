@@ -5,8 +5,10 @@ file = $1
 start = $2; ~ $start () && start = 1
 
 ~ $1 --help && {
-	cat <<'EOF'
-A markup command begins each line:
+	cat <<EOF
+usage: $pgm FILE [START_PAGE]
+
+A markup command begins each line of FILE:
 .h Header text (one line)
 .s Subheader text (one line)
 .f Footer text (one line)
@@ -16,9 +18,10 @@ A markup command begins each line:
 .^ Page break; pause for key
 
 Navigation
-  next slide:     n <space> <enter>
-  previous slide: p <backspace> <delete>
-  exit:           q . <esc>
+  next slide:     n f j h <tab> <space> <enter>
+  previous slide: p b k l ` <backspace> <delete>
+  redraw:         r
+  exit:           q .
 EOF
 	exit 1
 }
@@ -76,9 +79,10 @@ let (header; subheader; footer; indent = ''; text = ''; pn = 1; rc) {
 	fn waitkey {
 		let (kc) {escape {|fn-done| {while (true) {
 			kc = <={%without-echo %read-char}
-			if {~ $kc \b \x7f p} {exec $pgm $file `($pn-1)}
-			if {~ $kc q . \e} {exit}
-			if {~ $kc ' ' \n n} {done}
+			if {~ $kc \b \x7f p b k l \`} {exec $pgm $file `($pn-1)}
+			if {~ $kc r} {exec $pgm $file $pn}
+			if {~ $kc ' ' \n n f j h \t} {done}
+			if {~ $kc q .} {exit}
 		}}}}
 	}
 
@@ -103,7 +107,14 @@ let (header; subheader; footer; indent = ''; text = ''; pn = 1; rc) {
 	%with-read-lines $file {|line|
 		let ((w1 lr) = <={~~ $line *\ * *}) {
 			if {$start :gt $pn} {
-				~ $w1 '.^' && pn = `($pn+1)
+				switch $w1 (
+				'.h' {header = $lr}
+				'.s' {subheader = $lr}
+				'.f' {footer = $lr}
+				'.i' {indent = `` '' {indent $lr}}
+				'.^' {pn = `($pn+1)}
+				{}
+				)
 			} else {
 				switch $w1 (
 				'.h' {header = $lr}
