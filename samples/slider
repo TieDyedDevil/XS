@@ -1,6 +1,8 @@
 #! /usr/local/bin/xs --
 
 pgm = $0
+file = $1
+start = $2; ~ $start () && start = 1
 
 ~ $1 --help && {
 	cat <<'EOF'
@@ -12,11 +14,16 @@ A markup command begins each line:
 .p Paragraph text (end with a completely blank line)
 .b Block (literal, nowrap) text (end with a completely blank line)
 .^ Page break; pause for key
+
+Navigation
+  next slide:     n <space> <enter>
+  previous slide: p <backspace> <delete>
+  exit:           q . <esc>
 EOF
 	exit 1
 }
 
-~ $#* 0 && throw error `{basename $pgm} 'file?'
+~ $#* 0 && throw error `{basename $pgm} 'file [START_PAGE]'
 
 rows = `{tput lines}
 cols = `{tput cols}
@@ -66,6 +73,15 @@ let (header; subheader; footer; indent = ''; text = ''; pn = 1; rc) {
 		}
 	}
 
+	fn waitkey {
+		let (kc) {escape {|fn-done| {while (true) {
+			kc = <={%without-echo %read-char}
+			if {~ $kc \b \x7f p} {exec $pgm $file `($pn-1)}
+			if {~ $kc q . \e} {exit}
+			if {~ $kc ' ' \n n} {done}
+		}}}}
+	}
+
 	fn showpage {
 		clear
 		printf %s%s%s\n <=.%ab <={%argify $header} <=.%an
@@ -78,24 +94,28 @@ let (header; subheader; footer; indent = ''; text = ''; pn = 1; rc) {
 			rc = `($rc+1)
 		}
 		printf '%s[%3d] %s%s'\n <=.%ad $pn <={%argify $footer} <=.%an
+		waitkey
 		pn = `($pn+1)
 		text = ''
-		%without-echo %read-char
 	}
 
 	%without-cursor \
-	%with-read-lines $1 {|line|
+	%with-read-lines $file {|line|
 		let ((w1 lr) = <={~~ $line *\ * *}) {
-			switch $w1 (
-			'.h' {header = $lr}
-			'.s' {subheader = $lr}
-			'.f' {footer = $lr}
-			'.i' {indent = `` '' {indent $lr}}
-			'.p' {text = $text^' '^$lr}
-			'.b' {text = $text^\n.b^$indent^$lr}
-			'.^' {showpage}
-			{text = $text^\n}
-			)
+			if {$start :gt $pn} {
+				~ $w1 '.^' && pn = `($pn+1)
+			} else {
+				switch $w1 (
+				'.h' {header = $lr}
+				'.s' {subheader = $lr}
+				'.f' {footer = $lr}
+				'.i' {indent = `` '' {indent $lr}}
+				'.p' {text = $text^' '^$lr}
+				'.b' {text = $text^\n.b^$indent^$lr}
+				'.^' {showpage}
+				{text = $text^\n}
+				)
+			}
 		}
 	}
 }
