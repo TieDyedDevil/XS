@@ -8,8 +8,8 @@
 # .s Subheader text (one line)
 # .f Footer text (one line)
 # .i indent amount
-# .p Paragraph text (end paragraph with a completely blank line)
-# .b Block (literal, nowrap) text
+# .p Paragraph text (end with a completely blank line)
+# .b Block (literal, nowrap) text (end with a completely blank line)
 # .^ Page break; pause for key
 
 ~ $#* 0 && throw error slider file?
@@ -42,13 +42,19 @@ let (header; subheader; footer; indent = ''; text = ''; pn = 1; rc) {
 	}
 
 	fn render {|pars|
-		let (pt = <={%split \n $pars}) {
+		let (pt = <={%split \n $pars}; ob = false) {
 			for t $pt {
 				let ((w1 lr) = <={~~ $t *\ *}) {
 					if {~ $w1 .b} {
+						ob = true
 						printf ' %s'\n $lr
 						rc = `($rc+1)
 					} else {
+						if $ob {
+							printf \n
+							rc = `($rc+1)
+							ob = false
+						}
 						fill $t
 					}
 				}
