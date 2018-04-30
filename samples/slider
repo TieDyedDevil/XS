@@ -9,30 +9,32 @@ start = $2; ~ $start () && start = 1
 	less -RFXi <<EOF
 usage: $name FILE [START_PAGE]
 
+Present textual slides with markup.
+
 A markup request begins each line of FILE:
-.h Header text (one line)
-.s Subheader text (one line)
-.f Footer text (one line)
-.i Indent amount (number of leading blanks)
-.j Subsequent indent amount (additional leading blanks on subsequent lines)
-.w Line width (includes indents; 0 to use terminal width)
-.p Paragraph (fill, wrap) text
-.c Continued text (follows previous word with no intervening space)
-.pb Styled paragraph text (bold)
-.pd Styled paragraph text (dim)
-.ph Styled paragraph text (highlight)
-.pi Styled paragraph text (italic)
-.pu Styled paragraph text (underline)
-.pR Colored paragraph text (red)
-.pG Colored paragraph text (green)
-.pY Colored paragraph text (yellow)
-.pB Colored paragraph text (blue)
-.pM Colored paragraph text (magenta)
-.pC Colored paragraph text (cyan)
-.b Block (literal, nowrap) text
-. Terminate a paragraph or block (text ignored)
-.v Vertical space amount (number of lines)
-.^ Show slide; pause for key
+  .h Header text (one line)
+  .s Subheader text (one line)
+  .f Footer text (one line)
+  .i Indent amount (number of leading blanks)
+  .j Subsequent indent amount (additional leading blanks on subsequent lines)
+  .w Line width (includes indents; 0 to use terminal width)
+  .p Paragraph (fill, wrap) text
+  .c Continued text (follows previous word with no intervening space)
+  .pb Styled paragraph text (bold)
+  .pd Styled paragraph text (dim)
+  .ph Styled paragraph text (highlight)
+  .pi Styled paragraph text (italic)
+  .pu Styled paragraph text (underline)
+  .pR Colored paragraph text (red)
+  .pG Colored paragraph text (green)
+  .pY Colored paragraph text (yellow)
+  .pB Colored paragraph text (blue)
+  .pM Colored paragraph text (magenta)
+  .pC Colored paragraph text (cyan)
+  .b Block (literal, nowrap) text
+  . Terminate a paragraph or block (text ignored)
+  .v Vertical space amount (number of lines)
+  .^ Show slide; pause for key
 
   Text unrecognized as a request is silently ignored.
   The .h, .s, .f, .i, .j and .w requests remain as set until changed.
@@ -55,11 +57,6 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 	fn indent {|n|
 		~ $n () && n = 0
 		result <={%argify `` '' {for i `{seq $n} {printf ' '}}}
-	}
-
-	fn spacedown {|n|
-		~ $n () && n = 0
-		for _ `{seq $n} {printf \n; rc = `($rc+1)}
 	}
 
 	fn style {|style text|
@@ -92,6 +89,11 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 		}
 		printf \n\n
 		rc = `($rc+2)
+	}
+
+	fn spacedown {|n|
+		~ $n () && n = 0
+		for _ `{seq $n} {printf \n; rc = `($rc+1)}
 	}
 
 	fn render {|pars|
