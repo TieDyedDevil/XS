@@ -12,17 +12,23 @@ A markup command begins each line of FILE:
 .h Header text (one line)
 .s Subheader text (one line)
 .f Footer text (one line)
-.i indent amount (number of leading blanks)
-.j subsequent indent amount (additional leading blanks on subsequent lines)
-.w line width (0 to use terminal width)
+.i Indent amount (number of leading blanks)
+.j Subsequent indent amount (additional leading blanks on subsequent lines)
+.w Line width (0 to use terminal width)
 .p Paragraph text (end with a completely blank line)
+.c Continued text follows previous word with no intervening space
+.ab Bold paragraph text
+.ad Dim paragraph text
+.ah Highlighted paragraph text
+.ai Italic paragraph text
+.au Underlined paragraph text
 .b Block (literal, nowrap) text (end with a completely blank line)
-.v vertical space amount
+.v Vertical space amount
 .^ Page break; pause for key
 
 Navigation
-  next slide:     n f j h <tab> <space> <enter>
-  previous slide: p b k l ` <backspace> <delete>
+  next slide:     n f j h <tab> <space>     <enter>
+  previous slide: p b k l `     <backspace> <delete>
   redraw:         r
   exit:           q .
 EOF
@@ -44,13 +50,21 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 		for _ `{seq $n} {printf \n; rc = `($rc+1)}
 	}
 
+	fn style {|style text|
+		result $style^$text^<=.%an
+	}
+
 	fn fill {|t|
 		printf $indent
 		let (wl = <={%split ' ' $t}; wc; \
 				cw = <={$&wid $indent}) {
 			for w $wl {
 				# This catch is here because of an xs bug.
-				wc = <={catch {result 1} {result <={$&wid $w}}}
+				wc = <={catch {
+					result 1
+				} {
+					result <={$&wid `` '' {printf %s $w \
+								|%strip-csi}}}}
 				if {`($wc+$cw) :ge $width} {
 					printf \n%s $indent^$sindent
 					cw = <={$&wid $indent^$sindent}
@@ -141,6 +155,12 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 			'.j' {text = $text^\n.j' '^<={%argify $lr}^\n}
 			'.w' {text = $text^\n.w' '^<={%argify $lr}^\n}
 			'.p' {text = $text^' '^$lr}
+			'.c' {text = $text^$lr}
+			'.ab' {text = $text^' '^<={style <=.%ab $lr}}
+			'.ad' {text = $text^' '^<={style <=.%ad $lr}}
+			'.ah' {text = $text^' '^<={style <=.%ah $lr}}
+			'.ai' {text = $text^' '^<={style <=.%ai $lr}}
+			'.au' {text = $text^' '^<={style <=.%au $lr}}
 			'.b' {text = $text^\n.b' '^$lr\n}
 			'.v' {text = $text^\n.v' '^<={%argify $lr}^\n}
 			'.^' {if {$start :gt $pn} {
