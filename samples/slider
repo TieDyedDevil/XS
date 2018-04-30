@@ -36,6 +36,7 @@ A markup request begins each line of FILE:
   .v Vertical space amount (number of lines)
   .^ Show slide; pause for key
 
+  Markup requests must begin in the first column.
   Text unrecognized as a request is silently ignored.
   The .h, .s, .f, .i, .j and .w requests remain as set until changed.
   Yes, there is no way to combine attributes and colors.
