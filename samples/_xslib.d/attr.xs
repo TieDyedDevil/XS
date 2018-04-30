@@ -42,10 +42,10 @@ fn .af {|n|
 	# 0=black; 1=red; 2=green; 3=yellow; 4=blue; 5=magenta; 6=cyan; 7=white
 	tput setaf $n
 }
-fn .%af {
+fn .%af {|n|
 	# Return terminal attribute foreground.
 	# 0=black; 1=red; 2=green; 3=yellow; 4=blue; 5=magenta; 6=cyan; 7=white
-	result <={%argify `.af}
+	result <={%argify `{.af $n}}
 }
 fn .an {
 	# Set terminal attribute normal.

@@ -5,8 +5,9 @@ file = $1
 start = $2; ~ $start () && start = 1
 
 ~ $1 --help && {
+	name = `{basename $pgm}
 	cat <<EOF
-usage: $pgm FILE [START_PAGE]
+usage: $name FILE [START_PAGE]
 
 A markup command begins each line of FILE:
 .h Header text (one line)
@@ -22,11 +23,20 @@ A markup command begins each line of FILE:
 .ah Highlighted paragraph text
 .ai Italic paragraph text
 .au Underlined paragraph text
+.aR Colored paragraph text (red)
+.aG Colored paragraph text (green)
+.aY Colored paragraph text (yellow)
+.aB Colored paragraph text (blue)
+.aM Colored paragraph text (magenta)
+.aC Colored paragraph text (cyan)
 .b Block (literal, nowrap) text (end with a completely blank line)
 .v Vertical space amount
 .^ Page break; pause for key
 
-Navigation
+  The .h, .s, .f, .i, .j and .w requests remain as set until changed.
+  Yes, there is no way to combine attributes and colors.
+
+Navigation keys
   next slide:     n f j h <tab> <space>     <enter>
   previous slide: p b k l `     <backspace> <delete>
   redraw:         r
@@ -52,6 +62,10 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 
 	fn style {|style text|
 		result $style^$text^<=.%an
+	}
+
+	fn color {|n text|
+		result <={.%af $n}^$text^<={.%af 7}
 	}
 
 	fn fill {|t|
@@ -144,8 +158,7 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 		text = ''
 	}
 
-	%without-cursor \
-	%with-read-lines $file {|line|
+	%without-cursor %with-read-lines $file {|line|
 		let ((w1 lr) = <={~~ $line *\ * *}) {
 			switch $w1 (
 			'.h' {header = $lr}
@@ -161,6 +174,12 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 			'.ah' {text = $text^' '^<={style <=.%ah $lr}}
 			'.ai' {text = $text^' '^<={style <=.%ai $lr}}
 			'.au' {text = $text^' '^<={style <=.%au $lr}}
+			'.aR' {text = $text^' '^<={color 1 $lr}}
+			'.aG' {text = $text^' '^<={color 2 $lr}}
+			'.aY' {text = $text^' '^<={color 3 $lr}}
+			'.aB' {text = $text^' '^<={color 4 $lr}}
+			'.aM' {text = $text^' '^<={color 5 $lr}}
+			'.aC' {text = $text^' '^<={color 6 $lr}}
 			'.b' {text = $text^\n.b' '^$lr\n}
 			'.v' {text = $text^\n.v' '^<={%argify $lr}^\n}
 			'.^' {if {$start :gt $pn} {
