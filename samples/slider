@@ -9,14 +9,14 @@ start = $2; ~ $start () && start = 1
 	cat <<EOF
 usage: $name FILE [START_PAGE]
 
-A markup command begins each line of FILE:
+A markup request begins each line of FILE:
 .h Header text (one line)
 .s Subheader text (one line)
 .f Footer text (one line)
 .i Indent amount (number of leading blanks)
 .j Subsequent indent amount (additional leading blanks on subsequent lines)
 .w Line width (0 to use terminal width)
-.p Paragraph text (end with a completely blank line)
+.p Paragraph text
 .c Continued text follows previous word with no intervening space
 .ab Bold paragraph text
 .ad Dim paragraph text
@@ -29,10 +29,12 @@ A markup command begins each line of FILE:
 .aB Colored paragraph text (blue)
 .aM Colored paragraph text (magenta)
 .aC Colored paragraph text (cyan)
-.b Block (literal, nowrap) text (end with a completely blank line)
+.b Block (literal, nowrap) text
+. Terminate a paragraph or block (text ignored)
 .v Vertical space amount
 .^ Page break; pause for key
 
+  Text unrecognized as a request is silently ignored.
   The .h, .s, .f, .i, .j and .w requests remain as set until changed.
   Yes, there is no way to combine attributes and colors.
 
@@ -188,7 +190,8 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 				} else {
 					showpage
 				}}
-			{text = $text^\n}
+			'.' {text = $text^\n}
+			{}
 			)
 		}
 	}
