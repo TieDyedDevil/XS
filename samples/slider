@@ -32,7 +32,7 @@ A markup request begins each line of FILE:
 .b Block (literal, nowrap) text
 . Terminate a paragraph or block (text ignored)
 .v Vertical space amount
-.^ Page break; pause for key
+.^ Show slide; pause for key
 
   Text unrecognized as a request is silently ignored.
   The .h, .s, .f, .i, .j and .w requests remain as set until changed.
