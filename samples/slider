@@ -20,6 +20,7 @@ A markup request begins each line of FILE:
   .w Line width (includes indents; 0 to use terminal width)
   .v Vertical space amount (number of lines)
   .p Paragraph (fill, wrap) text
+  .pp Paragraph plain text (same as .p)
   .pb Paragraph styled text (bold)
   .pd Paragraph styled text (dim)
   .ph Paragraph styled text (highlight)
@@ -32,6 +33,7 @@ A markup request begins each line of FILE:
   .pM Paragraph colored text (magenta)
   .pC Paragraph colored text (cyan)
   .c Continued text (follows previous word with no intervening space)
+  .cp Continued plain text (same as .c)
   .cb Continued styled text (bold)
   .cd Continued styled text (dim)
   .ch Continued styled text (highlight)
@@ -44,6 +46,18 @@ A markup request begins each line of FILE:
   .cM Continued colored text (magenta)
   .cC Continued colored text (cyan)
   .b Block (literal, nowrap) text
+  .bp Block plain text (same as .b)
+  .bb Block styled text (bold)
+  .bd Block styled text (dim)
+  .bh Block styled text (highlight)
+  .bi Block styled text (italic)
+  .bu Block styled text (underline)
+  .bR Block colored text (red)
+  .bG Block colored text (green)
+  .bY Block colored text (yellow)
+  .bB Block colored text (blue)
+  .bM Block colored text (magenta)
+  .bC Block colored text (cyan)
   . Terminate a paragraph or block (text ignored)
   .^ Show slide; pause for key
 
@@ -114,7 +128,8 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 		let (pt = <={%split \n $pars}; ob = false) {
 			for t $pt {
 				let ((w1 lr) = <={~~ $t *\ *}) {
-					if {~ $w1 .b} {
+					if {~ $w1 .b .bp .bb .bd .bh .bi .bu \
+					.bR .bG .bY .bB .bM .bC} {
 						ob = true
 						printf '%s%s'\n $indent $lr
 						rc = `($rc+1)
@@ -207,9 +222,22 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 				'.i' {update .i $lr}
 				'.j' {update .j $lr}
 				'.w' {update .w $lr}
-				'.b' {update .b $lr}
 				'.v' {update .v $lr}
+				'.b' {update .b $lr}
+				'.bp' {update .bp $lr}
+				'.bb' {update .bb <={style <=.%ab $lr}}
+				'.bd' {update .bd <={style <=.%ad $lr}}
+				'.bh' {update .bh <={style <=.%ah $lr}}
+				'.bi' {update .bi <={style <=.%ai $lr}}
+				'.bu' {update .bu <={style <=.%au $lr}}
+				'.bR' {update .bR <={color 1 $lr}}
+				'.bG' {update .bG <={color 2 $lr}}
+				'.bY' {update .bY <={color 3 $lr}}
+				'.bB' {update .bB <={color 4 $lr}}
+				'.bM' {update .bM <={color 5 $lr}}
+				'.bC' {update .bC <={color 6 $lr}}
 				'.p' {addtext ' '^$lr}
+				'.pp' {addtext ' '^$lr}
 				'.pb' {addtext ' '^<={style <=.%ab $lr}}
 				'.pd' {addtext ' '^<={style <=.%ad $lr}}
 				'.ph' {addtext ' '^<={style <=.%ah $lr}}
@@ -222,6 +250,7 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 				'.pM' {addtext ' '^<={color 5 $lr}}
 				'.pC' {addtext ' '^<={color 6 $lr}}
 				'.c' {addtext $lr}
+				'.cp' {addtext $lr}
 				'.cb' {addtext <={style <=.%ab $lr}}
 				'.cd' {addtext <={style <=.%ad $lr}}
 				'.ch' {addtext <={style <=.%ah $lr}}
