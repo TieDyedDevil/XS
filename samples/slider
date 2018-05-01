@@ -139,8 +139,8 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 		}
 	}
 
-	fn track {|pars|
-		let (pt = <={%split \n $pars}; ob = false) {
+	fn track {
+		let (pt = <={%split \n $text}; ob = false) {
 			for t $pt {
 				let ((w1 lr) = <={~~ $t *\ *}) {
 					if {~ $w1 .i} {
@@ -155,6 +155,8 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 				}
 			}
 		}
+		text = ''
+		pn = `($pn+1)
 	}
 
 	fn redraw {|page| exec $pgm $file $page}
@@ -191,51 +193,52 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 
 	fn update {|req val| addtext \n$req' '^<={%argify $val}^\n}
 
-	%without-cursor %with-read-lines $file {|line|
-		let ((w1 lr) = <={~~ $line *\ * *}) {
-			switch $w1 (
-			'.h' {header = $lr}
-			'.s' {subheader = $lr}
-			'.f' {footer = $lr}
-			'.i' {update .i $lr}
-			'.j' {update .j $lr}
-			'.w' {update .w $lr}
-			'.b' {update .b $lr}
-			'.v' {update .v $lr}
-			'.p' {addtext ' '^$lr}
-			'.pb' {addtext ' '^<={style <=.%ab $lr}}
-			'.pd' {addtext ' '^<={style <=.%ad $lr}}
-			'.ph' {addtext ' '^<={style <=.%ah $lr}}
-			'.pi' {addtext ' '^<={style <=.%ai $lr}}
-			'.pu' {addtext ' '^<={style <=.%au $lr}}
-			'.pR' {addtext ' '^<={color 1 $lr}}
-			'.pG' {addtext ' '^<={color 2 $lr}}
-			'.pY' {addtext ' '^<={color 3 $lr}}
-			'.pB' {addtext ' '^<={color 4 $lr}}
-			'.pM' {addtext ' '^<={color 5 $lr}}
-			'.pC' {addtext ' '^<={color 6 $lr}}
-			'.c' {addtext $lr}
-			'.cb' {addtext <={style <=.%ab $lr}}
-			'.cd' {addtext <={style <=.%ad $lr}}
-			'.ch' {addtext <={style <=.%ah $lr}}
-			'.ci' {addtext <={style <=.%ai $lr}}
-			'.cu' {addtext <={style <=.%au $lr}}
-			'.cR' {addtext <={color 1 $lr}}
-			'.cG' {addtext <={color 2 $lr}}
-			'.cY' {addtext <={color 3 $lr}}
-			'.cB' {addtext <={color 4 $lr}}
-			'.cM' {addtext <={color 5 $lr}}
-			'.cC' {addtext <={color 6 $lr}}
-			'.' {addtext \n}
-			'.^' {if {$start :gt $pn} {
-					track $text
-					text = ''
-					pn = `($pn+1)
-				} else {
-					showpage
-				}}
-			{}
-			)
+	%without-cursor {
+		%with-read-lines $file {|line|
+			let ((w1 lr) = <={~~ $line *\ * *}) {
+				switch $w1 (
+				'.h' {header = $lr}
+				'.s' {subheader = $lr}
+				'.f' {footer = $lr}
+				'.i' {update .i $lr}
+				'.j' {update .j $lr}
+				'.w' {update .w $lr}
+				'.b' {update .b $lr}
+				'.v' {update .v $lr}
+				'.p' {addtext ' '^$lr}
+				'.pb' {addtext ' '^<={style <=.%ab $lr}}
+				'.pd' {addtext ' '^<={style <=.%ad $lr}}
+				'.ph' {addtext ' '^<={style <=.%ah $lr}}
+				'.pi' {addtext ' '^<={style <=.%ai $lr}}
+				'.pu' {addtext ' '^<={style <=.%au $lr}}
+				'.pR' {addtext ' '^<={color 1 $lr}}
+				'.pG' {addtext ' '^<={color 2 $lr}}
+				'.pY' {addtext ' '^<={color 3 $lr}}
+				'.pB' {addtext ' '^<={color 4 $lr}}
+				'.pM' {addtext ' '^<={color 5 $lr}}
+				'.pC' {addtext ' '^<={color 6 $lr}}
+				'.c' {addtext $lr}
+				'.cb' {addtext <={style <=.%ab $lr}}
+				'.cd' {addtext <={style <=.%ad $lr}}
+				'.ch' {addtext <={style <=.%ah $lr}}
+				'.ci' {addtext <={style <=.%ai $lr}}
+				'.cu' {addtext <={style <=.%au $lr}}
+				'.cR' {addtext <={color 1 $lr}}
+				'.cG' {addtext <={color 2 $lr}}
+				'.cY' {addtext <={color 3 $lr}}
+				'.cB' {addtext <={color 4 $lr}}
+				'.cM' {addtext <={color 5 $lr}}
+				'.cC' {addtext <={color 6 $lr}}
+				'.' {addtext \n}
+				'.^' {if {$start :gt $pn} {
+						track
+					} else {
+						showpage
+					}}
+				{}
+				)
+			}
 		}
+		redraw `($pn-1)
 	}
 }
