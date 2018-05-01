@@ -18,18 +18,19 @@ A markup request begins each line of FILE:
   .i Indent amount (number of leading blanks)
   .j Subsequent indent amount (additional leading blanks on subsequent lines)
   .w Line width (includes indents; 0 to use terminal width)
+  .v Vertical space amount (number of lines)
   .p Paragraph (fill, wrap) text
-  .pb Styled paragraph text (bold)
-  .pd Styled paragraph text (dim)
-  .ph Styled paragraph text (highlight)
-  .pi Styled paragraph text (italic)
-  .pu Styled paragraph text (underline)
-  .pR Colored paragraph text (red)
-  .pG Colored paragraph text (green)
-  .pY Colored paragraph text (yellow)
-  .pB Colored paragraph text (blue)
-  .pM Colored paragraph text (magenta)
-  .pC Colored paragraph text (cyan)
+  .pb Paragraph styled text (bold)
+  .pd Paragraph styled text (dim)
+  .ph Paragraph styled text (highlight)
+  .pi Paragraph styled text (italic)
+  .pu Paragraph styled text (underline)
+  .pR Paragraph colored text (red)
+  .pG Paragraph colored text (green)
+  .pY Paragraph colored text (yellow)
+  .pB Paragraph colored text (blue)
+  .pM Paragraph colored text (magenta)
+  .pC Paragraph colored text (cyan)
   .c Continued text (follows previous word with no intervening space)
   .cb Continued styled text (bold)
   .cd Continued styled text (dim)
@@ -44,7 +45,6 @@ A markup request begins each line of FILE:
   .cC Continued colored text (cyan)
   .b Block (literal, nowrap) text
   . Terminate a paragraph or block (text ignored)
-  .v Vertical space amount (number of lines)
   .^ Show slide; pause for key
 
   Markup requests must begin in the first column.
