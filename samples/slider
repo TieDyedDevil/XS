@@ -139,6 +139,24 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 		}
 	}
 
+	fn track {|pars|
+		let (pt = <={%split \n $pars}; ob = false) {
+			for t $pt {
+				let ((w1 lr) = <={~~ $t *\ *}) {
+					if {~ $w1 .i} {
+						indent = <={indent $lr}
+					} else if {~ $w1 .j} {
+						sindent = <={indent $lr}
+					} else if {~ $w1 .w} {
+						width = $lr
+						~ $width 0 && \
+							width = `{tput cols}
+					}
+				}
+			}
+		}
+	}
+
 	fn redraw {|page|
 		indent = ''
 		text = ''
@@ -213,6 +231,7 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 			'.v' {addtext \n.v' '^<={%argify $lr}^\n}
 			'.' {addtext \n}
 			'.^' {if {$start :gt $pn} {
+					track $text
 					text = ''
 					pn = `($pn+1)
 				} else {
