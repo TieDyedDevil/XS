@@ -69,7 +69,10 @@ fn image {|*|
 	} else if {~ $DISPLAY () && ~ `consoletype pty} {
 		mpv --image-display-duration inf --really-quiet $*
 	} else {
-		xembed -e sxiv -qfb $*
+		let (embed) {
+			{!~ $XEMBED ()} && embed = -e $XEMBED
+			sxiv -qfb $embed $* &
+		}
 	}
 }
 fn m {|*|
