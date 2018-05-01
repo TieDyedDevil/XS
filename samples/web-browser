@@ -15,8 +15,11 @@ npf = ~/.local/noproxy
 }
 
 if {!~ $DISPLAY ()} {
-	setsid chromium-browser --new-window $prx $* >/dev/null >[2=1] &
-	exit
+	if {~ $XEMBED ()} {
+		setsid chromium-browser --new-window $prx $* >/dev/null >[2=1] &
+	} else {
+		surf -e $XEMBED $* >/dev/null >[2=1] &
+	}
 } else {
 	if {~ $#* 0} {
 		%with-terminal w3m -X $prx -v
