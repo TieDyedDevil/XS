@@ -103,9 +103,11 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 		rc = `($rc+2)
 	}
 
+	fn cutpage {if {$rc :ge $rows} {throw error cutpage}}
+
 	fn spacedown {|n|
 		~ $n () && n = 0
-		for _ `{seq $n} {printf \n; rc = `($rc+1)}
+		for _ `{seq $n} {printf \n; rc = `($rc+1); cutpage}
 	}
 
 	fn render {|pars|
@@ -116,6 +118,7 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 						ob = true
 						printf '%s%s'\n $indent $lr
 						rc = `($rc+1)
+						cutpage
 					} else if {~ $w1 .i} {
 						indent = <={indent $lr}
 					} else if {~ $w1 .j} {
@@ -129,8 +132,9 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 					} else {
 						if $ob {
 							printf \n
-							rc = `($rc+1)
 							ob = false
+							rc = `($rc+1)
+							cutpage
 						}
 						fill $t
 					}
@@ -178,7 +182,7 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 		printf %s%s%s\n <=.%ai <={%argify $subheader} <=.%an
 		printf \n
 		rc = 5
-		render $text
+		catch {|e| ~ $e cutpage || throw $e} {render $text}
 		while {$rc :lt $rows} {
 			printf \n
 			rc = `($rc+1)
