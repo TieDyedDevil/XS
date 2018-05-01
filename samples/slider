@@ -19,7 +19,6 @@ A markup request begins each line of FILE:
   .j Subsequent indent amount (additional leading blanks on subsequent lines)
   .w Line width (includes indents; 0 to use terminal width)
   .p Paragraph (fill, wrap) text
-  .c Continued text (follows previous word with no intervening space)
   .pb Styled paragraph text (bold)
   .pd Styled paragraph text (dim)
   .ph Styled paragraph text (highlight)
@@ -31,6 +30,18 @@ A markup request begins each line of FILE:
   .pB Colored paragraph text (blue)
   .pM Colored paragraph text (magenta)
   .pC Colored paragraph text (cyan)
+  .c Continued text (follows previous word with no intervening space)
+  .cb Continued styled text (bold)
+  .cd Continued styled text (dim)
+  .ch Continued styled text (highlight)
+  .ci Continued styled text (italic)
+  .cu Continued styled text (underline)
+  .cR Continued colored text (red)
+  .cG Continued colored text (green)
+  .cY Continued colored text (yellow)
+  .cB Continued colored text (blue)
+  .cM Continued colored text (magenta)
+  .cC Continued colored text (cyan)
   .b Block (literal, nowrap) text
   . Terminate a paragraph or block (text ignored)
   .v Vertical space amount (number of lines)
@@ -173,7 +184,6 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 			'.j' {text = $text^\n.j' '^<={%argify $lr}^\n}
 			'.w' {text = $text^\n.w' '^<={%argify $lr}^\n}
 			'.p' {text = $text^' '^$lr}
-			'.c' {text = $text^$lr}
 			'.pb' {text = $text^' '^<={style <=.%ab $lr}}
 			'.pd' {text = $text^' '^<={style <=.%ad $lr}}
 			'.ph' {text = $text^' '^<={style <=.%ah $lr}}
@@ -185,6 +195,18 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 			'.pB' {text = $text^' '^<={color 4 $lr}}
 			'.pM' {text = $text^' '^<={color 5 $lr}}
 			'.pC' {text = $text^' '^<={color 6 $lr}}
+			'.c' {text = $text^$lr}
+			'.cb' {text = $text^<={style <=.%ab $lr}}
+			'.cd' {text = $text^<={style <=.%ad $lr}}
+			'.ch' {text = $text^<={style <=.%ah $lr}}
+			'.ci' {text = $text^<={style <=.%ai $lr}}
+			'.cu' {text = $text^<={style <=.%au $lr}}
+			'.cR' {text = $text^<={color 1 $lr}}
+			'.cG' {text = $text^<={color 2 $lr}}
+			'.cY' {text = $text^<={color 3 $lr}}
+			'.cB' {text = $text^<={color 4 $lr}}
+			'.cM' {text = $text^<={color 5 $lr}}
+			'.cC' {text = $text^<={color 6 $lr}}
 			'.b' {text = $text^\n.b' '^$lr\n}
 			'.v' {text = $text^\n.v' '^<={%argify $lr}^\n}
 			'.^' {if {$start :gt $pn} {
