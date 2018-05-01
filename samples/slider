@@ -227,7 +227,7 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 			'.cB' {addtext <={color 4 $lr}}
 			'.cM' {addtext <={color 5 $lr}}
 			'.cC' {addtext <={color 6 $lr}}
-			'.b' {addtext \n.b' '^$lr\n}
+			'.b' {addtext \n.b' '^<={%argify $lr}^\n}
 			'.v' {addtext \n.v' '^<={%argify $lr}^\n}
 			'.' {addtext \n}
 			'.^' {if {$start :gt $pn} {
