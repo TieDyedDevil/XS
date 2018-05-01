@@ -157,12 +157,7 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 		}
 	}
 
-	fn redraw {|page|
-		indent = ''
-		text = ''
-		width = `{tput cols}
-		exec $pgm $file $page
-	}
+	fn redraw {|page| exec $pgm $file $page}
 
 	fn waitkey {
 		let (kc) {escape {|fn-done| {while (true) {
@@ -194,15 +189,19 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 
 	fn addtext {|new| text = $text^$new}
 
+	fn update {|req val| addtext \n$req' '^<={%argify $val}^\n}
+
 	%without-cursor %with-read-lines $file {|line|
 		let ((w1 lr) = <={~~ $line *\ * *}) {
 			switch $w1 (
 			'.h' {header = $lr}
 			'.s' {subheader = $lr}
 			'.f' {footer = $lr}
-			'.i' {addtext \n.i' '^<={%argify $lr}^\n}
-			'.j' {addtext \n.j' '^<={%argify $lr}^\n}
-			'.w' {addtext \n.w' '^<={%argify $lr}^\n}
+			'.i' {update .i $lr}
+			'.j' {update .j $lr}
+			'.w' {update .w $lr}
+			'.b' {update .b $lr}
+			'.v' {update .v $lr}
 			'.p' {addtext ' '^$lr}
 			'.pb' {addtext ' '^<={style <=.%ab $lr}}
 			'.pd' {addtext ' '^<={style <=.%ad $lr}}
@@ -227,8 +226,6 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 			'.cB' {addtext <={color 4 $lr}}
 			'.cM' {addtext <={color 5 $lr}}
 			'.cC' {addtext <={color 6 $lr}}
-			'.b' {addtext \n.b' '^<={%argify $lr}^\n}
-			'.v' {addtext \n.v' '^<={%argify $lr}^\n}
 			'.' {addtext \n}
 			'.^' {if {$start :gt $pn} {
 					track $text
