@@ -174,48 +174,50 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 		text = ''
 	}
 
+	fn addtext {|new| text = $text^$new}
+
 	%without-cursor %with-read-lines $file {|line|
 		let ((w1 lr) = <={~~ $line *\ * *}) {
 			switch $w1 (
 			'.h' {header = $lr}
 			'.s' {subheader = $lr}
 			'.f' {footer = $lr}
-			'.i' {text = $text^\n.i' '^<={%argify $lr}^\n}
-			'.j' {text = $text^\n.j' '^<={%argify $lr}^\n}
-			'.w' {text = $text^\n.w' '^<={%argify $lr}^\n}
-			'.p' {text = $text^' '^$lr}
-			'.pb' {text = $text^' '^<={style <=.%ab $lr}}
-			'.pd' {text = $text^' '^<={style <=.%ad $lr}}
-			'.ph' {text = $text^' '^<={style <=.%ah $lr}}
-			'.pi' {text = $text^' '^<={style <=.%ai $lr}}
-			'.pu' {text = $text^' '^<={style <=.%au $lr}}
-			'.pR' {text = $text^' '^<={color 1 $lr}}
-			'.pG' {text = $text^' '^<={color 2 $lr}}
-			'.pY' {text = $text^' '^<={color 3 $lr}}
-			'.pB' {text = $text^' '^<={color 4 $lr}}
-			'.pM' {text = $text^' '^<={color 5 $lr}}
-			'.pC' {text = $text^' '^<={color 6 $lr}}
-			'.c' {text = $text^$lr}
-			'.cb' {text = $text^<={style <=.%ab $lr}}
-			'.cd' {text = $text^<={style <=.%ad $lr}}
-			'.ch' {text = $text^<={style <=.%ah $lr}}
-			'.ci' {text = $text^<={style <=.%ai $lr}}
-			'.cu' {text = $text^<={style <=.%au $lr}}
-			'.cR' {text = $text^<={color 1 $lr}}
-			'.cG' {text = $text^<={color 2 $lr}}
-			'.cY' {text = $text^<={color 3 $lr}}
-			'.cB' {text = $text^<={color 4 $lr}}
-			'.cM' {text = $text^<={color 5 $lr}}
-			'.cC' {text = $text^<={color 6 $lr}}
-			'.b' {text = $text^\n.b' '^$lr\n}
-			'.v' {text = $text^\n.v' '^<={%argify $lr}^\n}
+			'.i' {addtext \n.i' '^<={%argify $lr}^\n}
+			'.j' {addtext \n.j' '^<={%argify $lr}^\n}
+			'.w' {addtext \n.w' '^<={%argify $lr}^\n}
+			'.p' {addtext ' '^$lr}
+			'.pb' {addtext ' '^<={style <=.%ab $lr}}
+			'.pd' {addtext ' '^<={style <=.%ad $lr}}
+			'.ph' {addtext ' '^<={style <=.%ah $lr}}
+			'.pi' {addtext ' '^<={style <=.%ai $lr}}
+			'.pu' {addtext ' '^<={style <=.%au $lr}}
+			'.pR' {addtext ' '^<={color 1 $lr}}
+			'.pG' {addtext ' '^<={color 2 $lr}}
+			'.pY' {addtext ' '^<={color 3 $lr}}
+			'.pB' {addtext ' '^<={color 4 $lr}}
+			'.pM' {addtext ' '^<={color 5 $lr}}
+			'.pC' {addtext ' '^<={color 6 $lr}}
+			'.c' {addtext $lr}
+			'.cb' {addtext <={style <=.%ab $lr}}
+			'.cd' {addtext <={style <=.%ad $lr}}
+			'.ch' {addtext <={style <=.%ah $lr}}
+			'.ci' {addtext <={style <=.%ai $lr}}
+			'.cu' {addtext <={style <=.%au $lr}}
+			'.cR' {addtext <={color 1 $lr}}
+			'.cG' {addtext <={color 2 $lr}}
+			'.cY' {addtext <={color 3 $lr}}
+			'.cB' {addtext <={color 4 $lr}}
+			'.cM' {addtext <={color 5 $lr}}
+			'.cC' {addtext <={color 6 $lr}}
+			'.b' {addtext \n.b' '^$lr\n}
+			'.v' {addtext \n.v' '^<={%argify $lr}^\n}
+			'.' {addtext \n}
 			'.^' {if {$start :gt $pn} {
 					text = ''
 					pn = `($pn+1)
 				} else {
 					showpage
 				}}
-			'.' {text = $text^\n}
 			{}
 			)
 		}
