@@ -162,9 +162,11 @@ fn vman {|*|
 	if {~ $#* 0} {
 		.usage vman
 	} else {
-		%with-suffixed-tempfile f .ps {
-			{man -Tps $* >$f} && {/usr/bin/zathura $f >/dev/null}
-		}
+		%with-suffixed-tempfile f .ps {let (embed) {
+			!~ $XEMBED () && embed = -e $XEMBED
+			man -Tps $* >$f && /usr/bin/zathura $embed $f \
+							>/dev/null >[2=1]
+		}}
 	}
 }
 fn zathura {|*|
