@@ -139,6 +139,18 @@ fn mdv {|*|
 			-no-proxy -o confirm_qq=0 -o document_root=`pwd
 	}
 }
+fn qpdec {|*|
+	.d 'Decode quoted-printable text file'
+	.a 'FILE'
+	.c 'file'
+	cat $*|perl -MMIME::QuotedPrint=decode_qp -e 'print decode_qp join"",<>'
+}
+fn qpenc {|*|
+	.d 'Encode text file as quoted-printable'
+	.a 'FILE'
+	.c 'file'
+	cat $*|perl -MMIME::QuotedPrint=encode_qp -e 'print encode_qp join"",<>'
+}
 fn unzipd {|*|
 	.d 'Unzip into a directory named after the archive'
 	.a 'ZIP_FILE'
