@@ -88,10 +88,10 @@ fn wallpaper {|*|
 	.c 'wm'
 	%only-X
 	local (pageopt = $pageopt) {
-		let (geom; mon; monopt = ''; rc = 'while true {wallpaper %s;' \
-				^' sleep %s}'; re = 'while true \{wallpaper'; \
-				fn-running = {pgrep -cf 'while true' \
-					^' \{wallpaper' >/dev/null}) {
+		let (geom; mon; monopt = ''; \
+		rc = 'while true {wallpaper %s %s; sleep %s}'; \
+		re = 'while true \{wallpaper'; \
+		fn-running = {pgrep -cf 'while true \{wallpaper' >/dev/null}) {
 			if {~ $* -c} {
 				if {running} {
 					 pkill -P `{pgrep -f $re}
@@ -129,6 +129,7 @@ fn wallpaper {|*|
 							wallpaper
 							setsid xs -c \
 							`` '' {printf $rc \
+								$monopt \
 								$d `($m*60)} &
 						}
 					}
