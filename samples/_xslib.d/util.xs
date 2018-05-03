@@ -738,7 +738,7 @@ fn %withrgb {|bghex fghex text|
 				`{%rgbhex $hex|sed -E 's/\#(..)(..)(..)/' \
 					^'0x\1 0x\2 0x\3/'}}) { \
 		printf \e'[48;2;%03d;%03d;%03dm'\e'[38;2;%03d;%03d;%03dm%s' \
-			`{hrgb2d $bghex} `{hrgb2d $fghex} <={%argify $text}
+			`{hrgb2d $bghex} `{hrgb2d $fghex} $^text
 	}
 }
 
@@ -748,7 +748,7 @@ fn %rgbhex {|color|
 		printf %s $color
 	} else {
 		printf '#%02x%02x%02x' \
-			`{grep -wi '\W'^$color^'$' /usr/share/X11/rgb.txt \
+			`{grep -wi '\W'^$^color^'$' /usr/share/X11/rgb.txt \
 				|cut -c1-11}
 	}
 }
