@@ -3,7 +3,7 @@ fn arrs {|*|
 	.a '[FILTER]'
 	.c 'xs'
 	vars | grep -a \377^'[^[]\+\[' | tr -d \377 | sort -V \
-		| grep \^^<={%argify $*}^.\* | column -c `{tput cols} \
+		| grep \^^$^*^.\* | column -c `{tput cols} \
 		| less -iFX
 }
 fn objs {|*|
@@ -18,7 +18,7 @@ fn objs {|*|
 			# 00: names; 01: objects
 		cat $tf^01 | sed 's/^objid:[^ ]\+ = /{/' | sed 's/ \?obj$/}/' \
 			> $tf^05 # objects rewritten as {key:value ...}
-		paste $tf^00 $tf^05 | grep \^^<={%argify $*}^.\* \
+		paste $tf^00 $tf^05 | grep \^^$^*^.\* \
 			| column -c `{tput cols} | less -iFXS
 		rm -f $tf^??
 	}

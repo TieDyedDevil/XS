@@ -3,7 +3,7 @@ fn bell {|*|
 	.a 'on|off'
 	.c 'wm'
 	%only-X
-	switch <={%argify $*} (
+	switch $^* (
 		off {if {pacmd list-modules|grep -q module-x11-bell} {
 				pacmd unload-module module-x11-bell
 		}}

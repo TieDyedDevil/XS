@@ -155,7 +155,7 @@ fn xcolors {|*|
 				printf \e'[48;2;%d;%d;%dm %03d %03d %03d ' \
 					^'(%02x%02x%02x) %30s '^`.an^\n \
 					$r $g $b $r $g $b \
-					$r $g $b <={%argify $d}}) {
+					$r $g $b $^d}) {
 			if {{~ $* ()} || {eval $*}} {
 				render 0 $r $g $b $d
 				render 7 $r $g $b $d
