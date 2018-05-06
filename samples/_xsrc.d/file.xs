@@ -44,12 +44,15 @@ fn list {|*|
 	if {~ $#* 0} {
 		.usage list
 	} else if {~ $* -l} {
-		ls /usr/local/share/vis/lexers/*.lua | grep -v lexer\\\.lua \
+		ls ~/.config/vis/lexers/*.lua \
+			/usr/local/share/vis/lexers/*.lua \
+			| grep -v lexer\\\.lua \
 			| xargs -I\{\} basename \{\} | sed s/\.lua\$// \
-			| column -c `{tput cols} | less -iFX
+			| sort | uniq | column -c `{tput cols} | less -iFX
 	} else {
 		let (syn; \
-			lpath = /usr/local/share/vis/lexers; \
+			lpath = ~/.config/vis/lexers \
+				/usr/local/share/vis/lexers; \
 			fallback = false; \
 			fn-canon = {|ext|
 				%with-dict {|d|
@@ -74,7 +77,8 @@ fn list {|*|
 					{throw error list 'file?'}
 				syn = `{echo $*|sed 's/^.*\.\([^.]\+\)$/\1/'}
 				syn = <={canon $syn}
-				{~ $syn () || !access -f $lpath/^$syn^.lua} && {
+				{~ $syn () || \
+				 !~ <={access -f $lpath/^$syn^.lua} 0} && {
 					syn = `{file -L $* | cut -d: -f2 \
 						| awk '
 /^ a .*\/env [^ ]+ script/ {print $3; next}
@@ -85,7 +89,8 @@ fn list {|*|
 ' \
 						| tr '[[:upper:]]' '[[:lower:]]'}
 					syn = <={canon $syn}
-					access -f $lpath/^$syn^.lua || syn = ()
+					~ <={access -f $lpath/^$syn^.lua} 0 \
+						|| syn = ()
 				}
 				if {~ $syn ()} {
 					if $fallback {syn = null} \
