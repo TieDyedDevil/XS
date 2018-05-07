@@ -87,11 +87,12 @@ fn wallpaper {|*|
 	.a '(none)  # restore root window'
 	.c 'wm'
 	%only-X
-	local (pageopt = $pageopt) {
-		let (geom; mon; monopt = ''; \
-		rc = 'while true {wallpaper %s %s; sleep %s}'; \
-		re = 'while true \{wallpaper'; \
-		fn-running = {pgrep -cf 'while true \{wallpaper' >/dev/null}) {
+	local (pageopt = $pageopt) {let (monopt = '') {
+		let (geom; mon; re = 'while true \{wallpaper'; \
+		fn-running = {pgrep -cf 'while true \{wallpaper' >/dev/null}; \
+		fn-cycle = {|d m|setsid >[2]/dev/null xs -c \
+			`` '' {printf 'while true {wallpaper %s %s; sleep %s}' \
+					$monopt $d `($m*60)} &}) {
 			if {~ $* -c} {
 				if {running} {
 					 pkill -P `{pgrep -f $re}
@@ -127,10 +128,7 @@ fn wallpaper {|*|
 				2 {	let (m = $*(1); d = $*(2)) {
 						access -d $d && {
 							wallpaper
-							setsid xs -c \
-							`` '' {printf $rc \
-								$monopt \
-								$d `($m*60)} &
+							cycle $d $m
 						}
 					}
 				}
@@ -141,7 +139,7 @@ fn wallpaper {|*|
 				})
 			}
 		}
-	}
+	}}
 }
 fn xdpi {
 	.d 'X display info'
