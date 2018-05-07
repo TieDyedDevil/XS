@@ -1099,7 +1099,7 @@ fn track {
 		} else if {grep -qwF '[paused]' <<<$info} {
 			echo
 		} else {
-			head -1 <<<$info|iconv -tlatin1//translit
+			head -1 <<<$info|iconv -tascii//translit
 		}
 	}
 }
@@ -1163,7 +1163,7 @@ let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; r1; r2; r3; \
 				{}
 			)
 			r1 = ' '$lights $cpubar
-			r2 = `{echo $title|iconv -tlatin1//translit}
+			r2 = `{echo $title|iconv -tascii//translit}
 			r3 = `{if $enable_track {drawcenter $track}} \
 				`{if $enable_clock {drawright $clock}}
 		}
