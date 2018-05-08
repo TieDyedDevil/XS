@@ -73,8 +73,8 @@ fn list {|*|
 					fallback = true
 					* = $*(2 ...)
 				}
-				{~ $#* 1 && access -- $*} || \
-					{throw error list 'file?'}
+				{~ $#* 1 && access -- $* && !access -d -- $*} \
+					|| {throw error list 'file?'}
 				syn = `{echo $*|sed 's/^.*\.\([^.]\+\)$/\1/'}
 				syn = <={canon $syn}
 				{~ $syn () || \
