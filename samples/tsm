@@ -281,8 +281,8 @@ EOF
 
 fn @attach_session {
 	@prevent_nesting
-	{result <=@session_exists} || @fail $SESSION does not exist
 	@clean
+	{result <=@session_exists} || @fail $SESSION does not exist
 	@update_metadata
 	@restart_status_updater
 	abduco -e $DET -a $SESSION |[3] @rewrite_abduco_message
