@@ -798,3 +798,10 @@ fn %with-terminal {|cmd|
 		if {tty -s} {$cmd} else {st xs -c {$cmd}}
 	}
 }
+
+fn %with-tabbed-terminal {|cmd|
+	# Run command, spawning a tabbed terminal if necessary.
+	local (DISPLAY = :0) {
+		if {tty -s} {$cmd} else {tabbed -c -r 2 st -w '' xs -c {$cmd}}
+	}
+}
