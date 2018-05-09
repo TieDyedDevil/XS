@@ -27,3 +27,5 @@ if {!~ $DISPLAY ()} {
 		%with-terminal w3m -X $prx $*
 	}
 }
+
+true
