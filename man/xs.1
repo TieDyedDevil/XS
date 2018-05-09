@@ -1189,8 +1189,8 @@ options,
 returns true for paths which are accessible as specified.
 A printable error message (which evaluates as false; see Truth Values)
 is returned for paths which are not accessible.
-The default test (no options) is identical to
-.BR -f .
+The default test (no options) returns true if a file exists, regardless
+of mode or type.
 These options determine the test to apply to the paths:
 .RS
 .TS
