@@ -60,10 +60,10 @@ fn net {|*|
 	.d 'Network status'
 	.a '[-a]'
 	.c 'system'
-	let (flag) {
+	%with-terminal {let (flag) {
 		if {!~ $* -a} {flag = --active}
 		nmcli --fields name,type,device connection show $flag
-	}
+	}}
 }
 fn nmtui {
 	.d 'Network Manager text UI'
