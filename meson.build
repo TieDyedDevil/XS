@@ -87,7 +87,7 @@ project('xs', ['cpp'])
 	install_dir: 'share/doc/xs/samples/_xsuser.d')
   install_data(['samples/_xsin', 'samples/_xsrc', 'samples/colors',
 		'samples/dmr', 'samples/histclean', 'samples/lock',
-		'samples/slider', 'samples/stq', 'samples/sv', 'samples/tsm',
+		'samples/slider', 'samples/sv', 'samples/tsm',
 		'samples/web-browser', 'samples/README'],
 	install_dir: 'share/doc/xs/samples')
 

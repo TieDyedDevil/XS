@@ -36,7 +36,8 @@ Mod = Mod4   # Use the super key as the main modifier
 hc keybind $Mod^-Shift-q spawn quitwm  # ~/.local/bin/quitwm
 hc keybind $Mod^-Shift-r reload
 hc keybind $Mod^-Control-c close
-hc keybind $Mod^-Return spawn stq  # ~/.local/bin/stq
+hc keybind $Mod^-Return silent spawn st
+hc keybind $Mod^-Shift-Return silent spawn tabbed -c st -w
 hc keybind $Mod^-e spawn dmr  # ~/.local/bin/dmr
 
 # motions summarized
@@ -124,7 +125,7 @@ hc keybind $Mod^-Shift-BackSpace   cycle_monitor -1
 hc keybind $Mod^-b spawn xdotool mousemove 5000 5000
 
 # Report battery state
-hc keybind $Mod^-Shift-b spawn nsb
+hc keybind $Mod^-Shift-b spawn nsb  # ~/.local/bin/nsb
 
 # media keys
 hc keybind XF86AudioPlay spawn mpc -q toggle
@@ -142,7 +143,7 @@ hc keybind XF86Sleep spawn lock
 hc keybind Shift-XF86Sleep spawn lock -t
 
 # wallpaper
-hc keybind $Mod^-w spawn next-wallpaper
+hc keybind $Mod^-w spawn xs -c 'wallpaper -c'
 
 # --------------------
 # mouse

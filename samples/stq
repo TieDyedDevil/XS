@@ -1,3 +1,0 @@
-#! /usr/local/bin/xs --
-
-exec st >[2]/dev/null
