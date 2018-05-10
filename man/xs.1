@@ -1186,26 +1186,32 @@ Without the
 .BR -1 ", " -e " and " -n
 options,
 .B access
-returns true for paths which are accessible as specified.
+returns true for
+.IR path s
+which are accessible as specified.
 A printable error message (which evaluates as false; see Truth Values)
-is returned for paths which are not accessible.
-The default test (no options) returns true if a file exists, regardless
-of mode or type.
-These options determine the test to apply to the paths:
+is returned for
+.IR path s
+which are not accessible.
+The default test (no options) returns true if a
+.I path
+exists, regardless of mode or type.
+These options determine the test to apply to the
+.IR path s:
 .RS
 .TS
 tab(@);
 lb l .
--r@Is the file readable?
--w@Is the file writeable?
--x@Is the file executable?
--f@Is the file a plain file?
--d@Is the file a directory?
--c@Is the file a character device?
--b@Is the file a block device?
--l@Is the file a symbolic link?
--s@Is the file a socket?
--p@Is the file a named pipe?
+-r@Is the path readable?
+-w@Is the path writeable?
+-x@Is the path executable?
+-f@Is the path a plain file?
+-d@Is the path a directory?
+-c@Is the path a character device?
+-b@Is the path a block device?
+-l@Is the path a symbolic link?
+-s@Is the path a socket?
+-p@Is the path a named pipe?
 .TE
 .PP
 With the
@@ -1218,8 +1224,12 @@ producing a list of test results.
 .PP
 With
 .BR -1 ", " access
-returns the first path to satisfy the test.
-If no path satisfies the test, return the empty list unless
+returns the first
+.I path
+to satisfy the test.
+If no
+.I path
+satisfies the test, return the empty list unless
 .BR -e
 was specified, in which case not having a satisfied test causes an
 error to be raised.
