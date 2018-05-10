@@ -221,6 +221,8 @@ fn wmb {
 	.c 'wm'
 	.r '3up bari barre boc dual em hc mons osd quad r updres'
 	%only-X
-	%with-terminal {herbstclient list_keybinds|sed 's/'\t'/ /g'| \
+	%with-terminal {herbstclient list_keybinds| \
+		sed 's/\([^ '\t']\+ \+\)\+[^ '\t']\+/''&''/'| \
+		sed 's/'\t'/ /g'| \
 		sed 's/ /'\t'/'|column -t -s\t|less -XSi}
 }
