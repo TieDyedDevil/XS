@@ -29,7 +29,7 @@ fn import-abook {|*|
 	if {~ $#* 0} {
 		.usage import-abook
 	} else {
-		access -- ~/.abook/addressbook \
+		access -f ~/.abook/addressbook \
 			&& mv ~/.abook/addressbook ~/.abook/addressbook-OLD
 		abook --convert --infile $* --informat vcard \
 			--outformat abook --outfile ~/.abook/addressbook
@@ -73,7 +73,7 @@ fn list {|*|
 					fallback = true
 					* = $*(2 ...)
 				}
-				{~ $#* 1 && access -- $* && !access -d -- $*} \
+				{~ $#* 1 && access -f $*} \
 					|| {throw error list 'file?'}
 				syn = `{echo $*|sed 's/^.*\.\([^.]\+\)$/\1/'}
 				syn = <={canon $syn}
@@ -98,7 +98,7 @@ fn list {|*|
 						'specify -s SYNTAX or -f'}
 				}
 			}
-			access -- $* || {throw error list 'file?'}
+			access -f $* || {throw error list 'file?'}
 			if {file $*|grep -q 'CR line terminators'} {
 				vis-highlight $syn <{cat $*|tr \r \n}
 			} else {
