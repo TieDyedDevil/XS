@@ -32,7 +32,7 @@ fn htop {|*|
 fn mutt {|*|
 	.c 'alias'
 	# mutt won't override st colors
-	%with-terminal env TERM=st /usr/bin/mutt $*
+	%with-tabbed-terminal env TERM=st /usr/bin/mutt $*
 }
 fn sysmon {
 	.d 'View Monitorix stats'
