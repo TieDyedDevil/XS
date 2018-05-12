@@ -13,6 +13,8 @@ Reworked `pushd`, `popd` and `dirs` commands. The `pushd` command is no
 longer broken by paths which contain spaces. The directory list is now
 laid out vertically.
 
+Reworked locale initialization to ensure that `$&wid` works as designed.
+
 xs 1.0 to xs 1.1
 ----------------
 
