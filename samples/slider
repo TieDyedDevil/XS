@@ -98,12 +98,8 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 		let (wl = <={%split ' ' $t}; wc; \
 				cw = <={$&wid $indent}) {
 			for w $wl {
-				# This catch is here because of an xs bug.
-				wc = <={catch {
-					result 1
-				} {
-					result <={$&wid `` '' {printf %s $w \
-								|%strip-csi}}}}
+				wc = <={$&wid `` '' {printf %s $w \
+							|%strip-csi}}
 				if {`($wc+$cw) :ge $width} {
 					printf \n%s $indent^$sindent
 					cw = <={$&wid $indent^$sindent}
