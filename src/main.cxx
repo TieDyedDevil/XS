@@ -2,6 +2,7 @@
 
 #include "xs.hxx"
 #include <stdio.h>
+#include <locale.h>
 
 extern int optind;
 extern char *optarg;
@@ -178,6 +179,7 @@ getopt_done:
 	av = argv;
 
 	try {
+		uselocale(newlocale(LC_ALL_MASK, "", (locale_t)0));
 		initinput();
 		initprims();
 
