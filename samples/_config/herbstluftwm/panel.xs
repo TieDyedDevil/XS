@@ -186,7 +186,7 @@ cpubar_meter = $cpu_fg_color
 cpubar_background = $cpu_bg_color
 
 fn tag_samples {
-	echo `{tput -Tansi smul}^'Tag colors'^`{tput -Tansi sgr0}
+	echo `{tput -Tansi smul}^'Tag indicators'^`{tput -Tansi sgr0}
 	%withrgb $dflbg $dflfg ' 1 '; tput -Tansi sgr0; \
 		echo ' unoccupied, unfocused tag'
 	%withrgb $occbg $occfg ' 2 '; tput -Tansi sgr0; \
