@@ -175,6 +175,8 @@ stsbg = $panel_status_bg_color
 stsfg = $panel_status_fg_color
 wdgbg = $panel_watchdog_bg_color
 wdgfg = $panel_watchdog_fg_color
+lckbg = $fgcolor
+lckfg = $dflbg
 alrbg = $panel_alert_bg_color
 alrfg = $panel_alert_fg_color
 sepbg = $bgcolor
@@ -199,6 +201,14 @@ fn tag_samples {
 		echo ' focused tag on unfocused monitor'
 	%withrgb $urgbg $urgfg ' 7 '; tput -Tansi sgr0; \
 		echo ' tag with urgent notification'
+}
+
+fn transient_samples {
+	echo `{tput -Tansi smul}^'Transient indicators'^`{tput -Tansi sgr0}
+	printf '  '; %withrgb $wdgbg $wdgfg 'Ø'; tput -Tansi sgr0; \
+		echo ' watchdog failed'
+	printf '  '; %withrgb $lckbg $lckfg '|'; tput -Tansi sgr0; \
+		echo ' tab locked on monitor'
 }
 
 # ========================================================================
@@ -230,15 +240,13 @@ Status indicators
   W WiFi connection active
   Z screensaver is enabled
   " host is virtualized
-
-Transient indicators
-  <slashed circle on yellow background>       watchdog failed
-  <filled gray circle on default background>  tab locked on monitor
 '
 
 ~ $1 legend && {
 	if {{!~ $2 nocolor} && {{~ $2 color} || {test -t 1}}} {
 		tag_samples
+		printf \n
+		transient_samples
 		awk <<<$indicator_info -f <{cat <<'FORMAT'
 BEGIN {color = 7; pass = 0}
 /^Alert/ {system("tput -Tansi setaf 7"); system("tput -Tansi smul");
@@ -590,6 +598,7 @@ om_unfocused_attr = `{attr $omubg $omufg}
 status_marker_attr = `{attr $stsbg $stsfg}
 status_indicator_attr = `{attr $stsbg $stsfg}
 watchdog_indicator_attr = `{attr $wdgbg $wdgfg}
+lock_indicator_attr = `{attr $fgcolor $dflbg}
 alert_marker_attr = `{attr $alrbg $alrfg}
 alert_indicator_attr = `{attr $alrbg $alrfg}
 separator_attr_f = `{attr $sepbg $sepfg_f}
@@ -1024,7 +1033,7 @@ fn drawtags {|m|
 			printf $default_attr^' '^$watchdog_indicator_attr^'Ø'
 		}
 		if {~ `{hc attr monitors.$m.lock_tag} true} {
-			printf $default_attr^' ^c('^`($panel_height_px/2)^')'
+			printf $default_attr^' '^$lock_indicator_attr^'|'
 		}
 		printf $normal_attr
 	}}
