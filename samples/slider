@@ -193,12 +193,21 @@ let (header; subheader; footer; rows; rc; width = `{tput cols}; \
 		printf %s%s%s\n <=.%ai <={%argify $subheader} <=.%an
 		printf \n
 		rc = 5
-		catch {|e| ~ $e cutpage || throw $e} {render $text}
-		while {$rc :lt $rows} {
-			printf \n
-			rc = `($rc+1)
+		let (trunc = ' ') {
+			catch {|e|
+				if {~ $e cutpage} {
+					trunc = '.'
+				} else {throw $e}
+			} {
+				render $text
+			}
+			while {$rc :lt $rows} {
+				printf \n
+				rc = `($rc+1)
+			}
+			printf '%s[%c%3d] %s%s'\n \
+				<=.%ad $trunc $pn <={%argify $footer} <=.%an
 		}
-		printf '%s[%3d] %s%s'\n <=.%ad $pn <={%argify $footer} <=.%an
 		waitkey
 		pn = `($pn+1)
 		text = ''
