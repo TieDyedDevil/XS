@@ -127,6 +127,26 @@ fn valgrind-help {
 }
 
 # Local web documents
+fn clips-user {
+	.d 'CLIPS user guide'
+	.c 'help'
+	web /usr/share/doc/clips-doc/html/ug.htm
+}
+fn clips-basic-programming {
+	.d 'CLIPS basic programming guide'
+	.c 'help'
+	web /usr/share/doc/clips-doc/html/bpg.htm
+}
+fn clips-advanced-programming {
+	.d 'CLIPS advanced programming guide'
+	.c 'help'
+	web /usr/share/doc/clips-doc/html/bpg.htm
+}
+fn clips-interfaces {
+	.d 'CLIPS interfaces guide'
+	.c 'help'
+	web /usr/share/doc/clips-doc/html/ig.htm
+}
 fn ffl-help {
 	.d 'Forth Foundation Library documentation'
 	.c 'help'
