@@ -149,6 +149,8 @@ panel_status_bg_color = '#003000'
 panel_status_fg_color = '#00d000'
 panel_watchdog_bg_color = '#c0c000'
 panel_watchdog_fg_color = '#202000'
+panel_lock_bg_color = '#909090'
+panel_lock_fg_color = '#303030'
 panel_alert_bg_color = '#400000'
 panel_alert_fg_color = '#f00000'
 cpu_fg_color = SkyBlue1
@@ -175,8 +177,8 @@ stsbg = $panel_status_bg_color
 stsfg = $panel_status_fg_color
 wdgbg = $panel_watchdog_bg_color
 wdgfg = $panel_watchdog_fg_color
-lckbg = $fgcolor
-lckfg = $dflbg
+lckbg = $panel_lock_bg_color
+lckfg = $panel_lock_fg_color
 alrbg = $panel_alert_bg_color
 alrfg = $panel_alert_fg_color
 sepbg = $bgcolor
@@ -203,11 +205,14 @@ fn tag_samples {
 		echo ' tag with urgent notification'
 }
 
+tiwdf = Ø
+tilck = ×
+
 fn transient_samples {
 	echo `{tput -Tansi smul}^'Transient indicators'^`{tput -Tansi sgr0}
-	printf '  '; %withrgb $wdgbg $wdgfg 'Ø'; tput -Tansi sgr0; \
+	printf '  '; %withrgb $wdgbg $wdgfg $tiwdf; tput -Tansi sgr0; \
 		echo ' watchdog failed'
-	printf '  '; %withrgb $lckbg $lckfg '|'; tput -Tansi sgr0; \
+	printf '  '; %withrgb $lckbg $lckfg $tilck; tput -Tansi sgr0; \
 		echo ' tab locked on monitor'
 }
 
@@ -598,7 +603,7 @@ om_unfocused_attr = `{attr $omubg $omufg}
 status_marker_attr = `{attr $stsbg $stsfg}
 status_indicator_attr = `{attr $stsbg $stsfg}
 watchdog_indicator_attr = `{attr $wdgbg $wdgfg}
-lock_indicator_attr = `{attr $fgcolor $dflbg}
+lock_indicator_attr = `{attr $lckbg $lckfg}
 alert_marker_attr = `{attr $alrbg $alrfg}
 alert_indicator_attr = `{attr $alrbg $alrfg}
 separator_attr_f = `{attr $sepbg $sepfg_f}
@@ -1030,10 +1035,10 @@ fn drawtags {|m|
 			}
 		}
 		if $fault {
-			printf $default_attr^' '^$watchdog_indicator_attr^'Ø'
+			printf $default_attr^' '$watchdog_indicator_attr$tiwdf
 		}
 		if {~ `{hc attr monitors.$m.lock_tag} true} {
-			printf $default_attr^' '^$lock_indicator_attr^'|'
+			printf $default_attr^' '$lock_indicator_attr$tilck
 		}
 		printf $normal_attr
 	}}
