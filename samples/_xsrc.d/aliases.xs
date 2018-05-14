@@ -9,6 +9,12 @@ fn c {
 	.c 'alias'
 	clear
 }
+fn dict {|*|
+	.d 'Dictionary'
+	.a '[dict_OPTIONS]'
+	.c 'alias'
+	/usr/bin/dict $* | less -iRFX
+}
 fn calc {|*|
 	.d 'Evaluate arithmetic expression'
 	.a 'nickle_EXPRESSION'
@@ -44,4 +50,10 @@ fn top {|*|
 	.a '[top_OPTIONS]'
 	.c 'alias'
 	%with-terminal /usr/bin/top $*
+}
+fn wn {|*|
+	.d 'Wordnet'
+	.a '[wn_OPTIONS]'
+	.c 'alias'
+	/usr/bin/wn $* | less -iFX
 }
