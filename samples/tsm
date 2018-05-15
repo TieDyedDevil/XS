@@ -81,7 +81,7 @@ SCROLL =
 FLAG =
 SESSION =
 DET_OVERRIDE = false
-catch {|e| echo $e(3 ...); usage} {
+catch {|e| echo $e(3 ...); @usage} {
 ARGS = <={%parse-args <={%args $ARGS} \& (
 	-D {@optreq $optopt $optval; WDIR = $optval}
 	-e {@optreq $optopt $optval; DET = \^^$optval; DET_OVERRIDE = true}
