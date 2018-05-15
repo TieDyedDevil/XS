@@ -17,7 +17,7 @@ fn pof {|*|
 	.d 'List process'' open files'
 	.a 'pgrep_OPTS'
 	.c 'process'
-	lsof -p `{pgrep $*|tr \n ,|head -c-1} | less -iRFX
+	lsof -p `{pgrep $*|tr \n ,|head -c-1} | less -iFXS
 }
 fn prs {|*|
 	.d 'Display process info'
