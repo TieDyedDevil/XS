@@ -328,7 +328,7 @@ fn @list_sessions {|*|
 		{|SESS|
 			(d1 d2 d3 s _) = <={~~ $SESS *\ *\ *\ *@*}
 			p = $d1 $d2 $d3 $s
-			flag = <={%argify `{@session_flag $s|cut -d' ' -f4}}
+			flag = <={%argify `{@session_flag $s}}
 			~ $flag '' && flag = ' '
 			printf '%3s %2s %5s '^$flag^' '^`.as^'%s'^`.an $p
 			(_ _ _ s h) = <={~~ $SESS *\ *\ *\ *@*}
