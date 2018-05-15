@@ -96,6 +96,12 @@ fn luc {|*|
 		}
 	} | less -irFX }
 }
+fn man {|*|
+	.d 'Display man page'
+	.a 'man_OPTIONS'
+	.c 'help'
+	%with-terminal {env COLUMNS=80 /usr/bin/man $*}
+}
 
 ## Online documentation
 fn boost-help {
