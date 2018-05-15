@@ -17,7 +17,13 @@ fn pof {|*|
 	.d 'List process'' open files'
 	.a 'pgrep_OPTS'
 	.c 'process'
-	lsof -p `{pgrep $*|tr \n ,|head -c-1} | less -iFXS
+	let (pl = `{pgrep $*|tr \n ,|head -c-1}) {
+		if {~ $pl ()} {
+			throw error pof 'no match'
+		} else {
+			lsof -p $pl | less -iFXS
+		}
+	}
 }
 fn prs {|*|
 	.d 'Display process info'
