@@ -305,7 +305,7 @@ fn @interactive {
 }
 
 fn @session_flag {|*|
-	abduco </dev/tty >[2]/dev/null|tail -n+2|cut -f1,4|cut -c1,7-| \
+	abduco >[2]/dev/null|tail -n+2|cut -f1,4|cut -c1,7-| \
 		grep -w $^*|cut -c1
 }
 
