@@ -187,10 +187,15 @@ sepfg_u = $omubg
 cpubar_meter = $cpu_fg_color
 cpubar_background = $cpu_bg_color
 
+# When true, don't display unoccupied, unfocused tags.
+compact_tags = false
+
 fn tag_samples {
 	echo `{tput -Tansi smul}^'Tag indicators'^`{tput -Tansi sgr0}
-	%withrgb $dflbg $dflfg ' 1 '; tput -Tansi sgr0; \
-		echo ' unoccupied, unfocused tag'
+	if {!$compact_tags} {
+		%withrgb $dflbg $dflfg ' 1 '; tput -Tansi sgr0; \
+			echo ' unoccupied, unfocused tag'
+	}
 	%withrgb $occbg $occfg ' 2 '; tput -Tansi sgr0; \
 		echo ' occupied, unfocused tag'
 	%withrgb $selbg $selfg ' 3 '; tput -Tansi sgr0; \
@@ -1021,7 +1026,8 @@ fn drawtags {|m|
 			let ((f n) = `{cut --output-delimiter=' ' -c1,2- \
 						<<<$t}) {
 				switch <={%argify $f} (
-					'.' {printf $default_attr}
+					'.' {!$compact_tags && \
+						printf $default_attr}
 					':' {printf $occupied_attr}
 					'+' {printf $unfocused_attr}
 					'#' {printf $selected_attr}
@@ -1031,7 +1037,7 @@ fn drawtags {|m|
 					'' {printf ''; return}
 					{printf $default_attr}
 				)
-				printf \ %s\n $n
+				!$compact_tags || !~ $f '.' && printf \ %s\n $n
 			}
 		}
 		if $fault {
