@@ -57,6 +57,11 @@
 #    sleep 1
 #    herbstclient quit
 
+# WM hooks:
+#  In addition to the usual WM hooks, these are recognized:
+#    bar compact
+#    bar normal
+
 # Colors:
 #  The panel "borrows" some of the colors defined by the wm. Note that the
 #  wm's default colors are not ideal; try the colors noted in brackets:
@@ -1124,6 +1129,14 @@ fn track {
 	}
 }
 
+fn bar_control {|*|
+	switch $* (
+	compact {compact_tags = true}
+	normal {compact_tags = false}
+	{}
+	)
+}
+
 # Start the watchdog
 while true {
 	for (task tpid) $taskpids {
@@ -1180,6 +1193,7 @@ let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; r1; r2; r3; \
 				quit_panel {terminate}
 				reload {terminate}
 				fault {fault = true}
+				bar {bar_control <={%argify $p1}}
 				{}
 			)
 			r1 = ' '$lights $cpubar
