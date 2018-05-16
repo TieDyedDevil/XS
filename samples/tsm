@@ -322,8 +322,8 @@ fn @list_sessions {|*|
 	}
 	if {$w1 :gt 0} {
 		{$w1 :lt 4} && {w1 = 4}
-		printf 'Created at   F Name%'^`($w1-2)^'s' \
-			^'Mod Det Scroll Initial wdir'\n ' '
+		printf 'Created-at   F Name%'^`($w1-2)^'s' \
+			^'Mod Det Scroll Initial-wdir'\n ' '
 		%with-read-lines <{ls -lt --time-style='+%b %d %H:%M' \
 				$HOME/.abduco|tail -n+2 |cut -d' ' -f6-|$*} \
 		{|SESS|
