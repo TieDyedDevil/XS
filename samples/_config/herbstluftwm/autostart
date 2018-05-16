@@ -108,6 +108,10 @@ hc keybind $Mod^-grave  use_previous
 hc keybind $Mod^-t           chain + lock_tag + emit_hook redraw
 hc keybind $Mod^-Shift-t     chain + unlock_tag + emit_hook redraw
 
+# tag compaction
+hc keybind $Mod^-Control-t        emit_hook bar compact
+hc keybind $Mod^-Control-Shift-t  emit_hook bar normal
+
 # layout
 hc keybind $Mod^-r remove
 hc keybind $Mod^-space cycle_layout 1
