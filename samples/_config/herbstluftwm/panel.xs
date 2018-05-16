@@ -197,10 +197,8 @@ compact_tags = false
 
 fn tag_samples {
 	echo `{tput -Tansi smul}^'Tag indicators'^`{tput -Tansi sgr0}
-	if {!$compact_tags} {
-		%withrgb $dflbg $dflfg ' 1 '; tput -Tansi sgr0; \
-			echo ' unoccupied, unfocused tag'
-	}
+	%withrgb $dflbg $dflfg ' 1 '; tput -Tansi sgr0; \
+		echo ' unoccupied, unfocused tag'
 	%withrgb $occbg $occfg ' 2 '; tput -Tansi sgr0; \
 		echo ' occupied, unfocused tag'
 	%withrgb $selbg $selfg ' 3 '; tput -Tansi sgr0; \
