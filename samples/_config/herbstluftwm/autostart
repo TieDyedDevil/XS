@@ -205,7 +205,7 @@ hc set frame_padding 0
 hc set smart_window_surroundings 0
 hc set smart_frame_surroundings 1
 hc set mouse_recenter_gap 0
-hc set tree_style '╾│ ├└╼─┐'
+hc set tree_style '@| |`>-+'
 hc set swap_monitors_to_get_tag 0
 hc set focus_crosses_monitor_boundaries 0
 
