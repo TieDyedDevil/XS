@@ -32,6 +32,11 @@
 #  center region shows info for the track being played by mpd. The right
 #  region shows a clock.
 #
+#  If the tag indicators would occupy "too much" of the monitor's width,
+#  then the panel will automatically suppress display of unfocussed,
+#  unoccupied tags. This adjustment is made when the panel is started.
+#  Tag compaction may be controlled manually using a hook (see below).
+#
 #  Inbox status requires a valid inbox.fetchmailrc file in the same
 #  directory as this script; see fetchmail(1). The fetchmail configuration
 #  *must* specify `no idle` and *should* specify `timeout 15`.
