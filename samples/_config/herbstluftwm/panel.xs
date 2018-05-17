@@ -37,6 +37,9 @@
 #  unoccupied tags. This adjustment is made when the panel is started.
 #  Tag compaction may be controlled manually using a hook (see below).
 #
+#  When presenting compacted tags, the panel also hides the CPU load bar
+#  and selects a shorter format for the clock.
+#
 #  Inbox status requires a valid inbox.fetchmailrc file in the same
 #  directory as this script; see fetchmail(1). The fetchmail configuration
 #  *must* specify `no idle` and *should* specify `timeout 15`.
@@ -299,6 +302,7 @@ show_status_placeholders = false
 
 trackfmt = '%title%'               # mpc(1)
 clockfmt = '%a %Y-%m-%d %H:%M %Z'  # date(1); one-minute resolution
+clock_compact_fields = 1,3
 
 osd_font = '-*-liberation mono-bold-r-*-*-*-420-*-*-*-*-iso10646-1'  # XLFD
 osd_offset_px = 50
@@ -1088,10 +1092,14 @@ fn drawcenter {|text|
 	}
 }
 
-fn drawright {|text|
-	let (w = `{xftwidth $font <={%argify \
-				`{sed 's/\^..([^)]*)//g' <<<$text}}}; \
-		t = <={%argify $text}; pad = 15) {
+fn drawright {|text monitor|
+	let (w; t = <={%argify $text}; pad = 15) {
+			if {~ <={%aref compact_tags $monitor} true} {
+				t = `` \n {echo $t \
+					|cut -d' ' -f$clock_compact_fields}
+			}
+			w = `{xftwidth $font <={%argify \
+				`{sed 's/\^..([^)]*)//g' <<<$t}}}
 			printf '^p(_RIGHT)^p(-%d)%s'\n `($w+$pad) $t
 	}
 }
@@ -1229,24 +1237,33 @@ let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; r1; r2; r3; \
 				quit_panel {terminate}
 				reload {terminate}
 				fault {fault = true}
-				bar {bar_control `focused_monitor <={%argify $p1}}
+				bar {bar_control \
+					`focused_monitor <={%argify $p1}}
 				{}
 			)
-			r1 = ' '$lights $cpubar
+			r1 = ' '$lights
 			r2 = `{echo $title|iconv -tascii//translit}
-			r3 = `{if $enable_track {drawcenter $track}} \
-				`{if $enable_clock {drawright $clock}}
+			r3 = `{if $enable_track {drawcenter $track}}
 		}
 		for client `{cat $dispfile} {
-			let ((_ _ m) = <={~~ $client *-*-*}; tags; out) {
+			let ((_ _ m) = <={~~ $client *-*-*}; \
+							tags; r1c; r4; out) {
 				tags = `` \n {drawtags $m}
 				if {!~ $tags ()} {
-					if {~ `focused_monitor $m} {
-						out = $r1 $separator_attr_f \
-							$sep $r2 $r3
+					if {!~ <={%aref compact_tags $m} true} {
+						r1c = $r1 $cpubar
 					} else {
-						out = $r1 $separator_attr_u \
-							$sep $r3
+						r1c = $r1
+					}
+					if $enable_clock {
+						r4 = `{drawright $clock $m}
+					}
+					if {~ `focused_monitor $m} {
+						out = $r1c $separator_attr_f \
+							$sep $r2 $r3 $r4
+					} else {
+						out = $r1c $separator_attr_u \
+							$sep $r3 $r4
 					}
 					echo $tags $out >$client
 				}
