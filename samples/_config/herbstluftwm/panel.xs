@@ -567,8 +567,8 @@ logger 1 'server on monitor %d: %d' $monitor $pid
 echo $pid >$pidfile
 
 # Compact the tag list if it would occupy more than 20% of the monitor width.
-let (tw = `{xftwidth $font `{herbstclient tag_status $monitor \
-		|sed 's/\t./ /g'| sed 's/ /  /g'}}; \
+let (tw = `{xftwidth $font `` \n {herbstclient tag_status $monitor \
+		|sed 's/\t./ /g'|sed 's/ /  /g'}}; \
 	mw = `{herbstclient list_monitors|grep '^'^$monitor^':' \
 		|cut -d' ' -f2|cut -dx -f1}) {
 	$tw :gt `($mw * 0.2) && compact_tags = true
@@ -1054,7 +1054,7 @@ fn drawtags {|m|
 		if $fault {
 			printf $default_attr^' '$watchdog_indicator_attr$tiwdf
 		}
-		if {~ `{hc attr monitors.$m.lock_tag} true} {
+		if {~ `{herbstclient attr monitors.$m.lock_tag} true} {
 			printf $default_attr^' '$lock_indicator_attr$tilck
 		}
 		printf $normal_attr
