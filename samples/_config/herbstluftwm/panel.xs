@@ -135,6 +135,14 @@ fn %round {|float|
 	# ½ rounds up.
 	result <={%trunc `($float+.5)}
 }
+fn %aset {|name index value|
+	# Emulate indexed assignment.
+	\xff^$name[$index] = $value
+}
+fn %aref {|name index|
+	# Emulate indexed retrieval.
+	result $(\xff^$name[$index])
+}
 
 # ========================================================================
 #                             C O L O R S
@@ -191,9 +199,6 @@ sepfg_f = $selbg
 sepfg_u = $omubg
 cpubar_meter = $cpu_fg_color
 cpubar_background = $cpu_bg_color
-
-# When true, don't display unoccupied, unfocused tags.
-compact_tags = false
 
 fn tag_samples {
 	echo `{tput -Tansi smul}^'Tag indicators'^`{tput -Tansi sgr0}
@@ -539,6 +544,21 @@ private $clntfile
 watchdogfile = $tmpfile_base^.watchdog
 rm -f $watchdogfile
 private $watchdogfile
+compactfile = $tmpfile_base^.compact
+rm -f $compactfile
+private $compactfile
+
+# Compact the tag list if it would occupy more than 18% of the monitor width.
+let (tw = `{xftwidth $font `` \n {herbstclient tag_status $monitor \
+		|sed 's/\t./ /g'|sed 's/ /  /g'}}; \
+	mw = `{herbstclient list_monitors|grep '^'^$monitor^':' \
+		|cut -d' ' -f2|cut -dx -f1}) {
+	if {$tw :gt `($mw * 0.18)} {
+		echo $monitor true
+	} else {
+		echo $monitor false
+	} >> $compactfile
+}
 
 # ========================================================================
 #                              C L I E N T
@@ -565,14 +585,6 @@ if {!~ $monitor 0} {
 # Identify the server
 logger 1 'server on monitor %d: %d' $monitor $pid
 echo $pid >$pidfile
-
-# Compact the tag list if it would occupy more than 18% of the monitor width.
-let (tw = `{xftwidth $font `` \n {herbstclient tag_status $monitor \
-		|sed 's/\t./ /g'|sed 's/ /  /g'}}; \
-	mw = `{herbstclient list_monitors|grep '^'^$monitor^':' \
-		|cut -d' ' -f2|cut -dx -f1}) {
-	$tw :gt `($mw * 0.18) && compact_tags = true
-}
 
 # Start a client for the server's display
 access -p $display || mkfifo $display
@@ -1035,7 +1047,8 @@ fn drawtags {|m|
 	escape {|fn-return| {
 		for t `{herbstclient tag_status $m >[2]/dev/null} {
 			let ((f n) = `{cut --output-delimiter=' ' -c1,2- \
-						<<<$t}) {
+						<<<$t}; \
+				compact_tags = <={%aref compact_tags $m}) {
 				switch <={%argify $f} (
 					'.' {!$compact_tags && \
 						printf $default_attr}
@@ -1083,6 +1096,7 @@ fn terminate {
 	logger 1 'terminate'
 	rm -f $pidfile
 	rm -f $watchdogfile
+	rm -f $compactfile
 	logger 2 'killing secondary clients'
 	clientlist = <={%flatten , `{cat $clntfile}}
 	!~ $clientlist '' && pkill -s $clientlist
@@ -1135,10 +1149,10 @@ fn track {
 	}
 }
 
-fn bar_control {|*|
-	switch $* (
-	compact {compact_tags = true}
-	normal {compact_tags = false}
+fn bar_control {|monitor control|
+	switch $control (
+	compact {%aset compact_tags $monitor true}
+	normal {%aset compact_tags $monitor false}
 	{}
 	)
 }
@@ -1167,6 +1181,17 @@ logger 1 'starting: %s; %s; %s; %s; %s; %s; %s' \
 	<={%argify `{var enable_other_status}} \
 	<={%argify `{var enable_cpubar}} \
 	<={%argify `{var enable_inbox}}
+
+%with-read-lines $compactfile {|l|
+	let ((m c) = <={~~ $l *\ *}) {
+		switch $c (
+			true {bar_control $m compact}
+			false {bar_control $m normal}
+			{}
+		)
+	}
+}
+rm -f $compactfile
 
 let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; r1; r2; r3; \
 		ec = 0; watchdog_check = 100) {
@@ -1199,7 +1224,7 @@ let (sep; title; track; lights; at = ''; st = ''; cpubar; clock; r1; r2; r3; \
 				quit_panel {terminate}
 				reload {terminate}
 				fault {fault = true}
-				bar {bar_control <={%argify $p1}}
+				bar {bar_control `focused_monitor <={%argify $p1}}
 				{}
 			)
 			r1 = ' '$lights $cpubar
