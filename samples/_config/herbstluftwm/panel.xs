@@ -566,12 +566,12 @@ if {!~ $monitor 0} {
 logger 1 'server on monitor %d: %d' $monitor $pid
 echo $pid >$pidfile
 
-# Compact the tag list if it would occupy more than 20% of the monitor width.
+# Compact the tag list if it would occupy more than 18% of the monitor width.
 let (tw = `{xftwidth $font `` \n {herbstclient tag_status $monitor \
 		|sed 's/\t./ /g'|sed 's/ /  /g'}}; \
 	mw = `{herbstclient list_monitors|grep '^'^$monitor^':' \
 		|cut -d' ' -f2|cut -dx -f1}) {
-	$tw :gt `($mw * 0.2) && compact_tags = true
+	$tw :gt `($mw * 0.18) && compact_tags = true
 }
 
 # Start a client for the server's display
