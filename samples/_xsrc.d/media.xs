@@ -35,7 +35,7 @@ fn equalizer {|*|
 					gains = `{tail -n+11 $cf|head -15}
 					tail -n+5 $cf|head -1
 					for g $gains; b $bands {
-						printf '%s @ %s'\n $g $b
+						printf '%+4.1f @ %5d'\n $g $b
 					}
 				}
 			} else {
