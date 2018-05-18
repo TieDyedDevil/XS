@@ -70,14 +70,17 @@ T}
 -c \fIFRAGMENT@T{
 Execute the
 .IR FRAGMENT .
-(See Program fragments, below.)
+(See
+.BR "Program fragments" ,
+below.)
 T}
 .TE
 .SH LANGUAGE
 Lexically, an
 .B xs
 program consists of words and punctuation.
-(See FOOTNOTE.)
+(See
+.BR FOOTNOTE .)
 .SS Words
 In its simplest form, a word is a
 sequence of non-special characters.
@@ -193,7 +196,8 @@ are subject to evaluation, expansion and substitution.
 Because the arguments
 are passed as a list, any argument that yields
 .B ()
-will "disappear" (see Lists).
+will "disappear" (see
+.BR Lists ).
 .SS Command separator
 A command must occupy one logical line.
 Commands are separated by
@@ -281,16 +285,20 @@ These characters may appear in any order or combination.
 .PP
 The
 .B xs
-special characters (see Words) may also appear in a variable name if
-quoted or escaped.
-Likewise, character escapes (see Escapes) may be part of a
-variable name.
+special characters (see
+.BR Words )
+may also appear in a variable name if quoted or escaped.
+Likewise, character escapes (see
+.BR Escapes )
+may be part of a variable name.
 .PP
 Variable names having the prefix
 .B fn-
 or
 .B var-
-have special meaning; see Functions and Settors, respectively.
+have special meaning; see
+.BR Functions " and " Settors ,
+respectively.
 .SS Assignment
 A variable is assigned a list value using the notation
 .PP
@@ -1178,7 +1186,8 @@ Sources
 .IR file .
 The options are a subset of those recognized by
 .BR xs;
-see Options.
+see
+.BR Options .
 .TP
 .BR access " [" "-n " \fIname "] [-1e] [-rwx] [-fdcblsp] " \fIpath...
 Tests
@@ -1191,7 +1200,8 @@ options,
 returns true for
 .IR path s
 which are accessible as specified.
-A printable error message (which evaluates as false; see Truth Values)
+A printable error message (which evaluates as false; see
+.BR "Truth Values" )
 is returned for
 .IR path s
 which are not accessible.
@@ -1266,7 +1276,8 @@ With no argument, this is the same as
 .BR "cd $home" .
 .TP
 .BR dirs " [" -c ]
-Show the directory stack (see pushd and popd).
+Show the directory stack (see
+.BR pushd " and " popd ).
 With
 .BR -c ,
 clear the directory stack.
@@ -1323,10 +1334,12 @@ Identical to
 .BR "result 1" .
 .TP
 .BI for " binding... " fragment
-See Loops.
+See
+.BR Loops .
 .TP
 .BI forever " fragment"
-See Loops.
+See
+.BR Loops .
 .TP
 .BI fork " command"
 Run
@@ -1350,7 +1363,8 @@ and
 disable and enable history recording.
 .TP
 .BI if " condition fragment \fR[" else " fragment\fR]"
-See Conditionals.
+See
+.BR Conditionals .
 .TP
 .B jobs
 List background jobs.
@@ -1437,10 +1451,12 @@ Return
 .IR value s.
 .TP
 .BR switch " \fIvalue [" "\fIcase \fIaction" "]... [" \fIdefault-action ]
-See Conditionals.
+See
+.BR Conditionals .
 .TP
 .BI throw " exception arg..."
-See Exceptions.
+See
+.BR Exceptions .
 .TP
 .BI time " command arg..."
 Execute
@@ -1457,7 +1473,8 @@ Identical to
 Set or show the umask.
 .TP
 .BI until " test body"
-See Loops.
+See
+.BR Loops .
 .TP
 .BI unwind-protect " body cleanup"
 Execute
@@ -1507,7 +1524,8 @@ Identify
 by pathname, primitive, or fragment.
 .TP
 .BI while " test body"
-See Loops.
+See
+.BR Loops .
 .RE
 .SH HOOK FUNCTIONS
 The following functions implement specific parts of
@@ -1516,7 +1534,8 @@ semantics; a hook function can be rewritten to provide special behaviors.
 Hook functions are normally called as a result of
 .B xs
 translating programs into an internal form.
-See CANONICAL FORM.
+See
+.BR "CANONICAL FORM" .
 .TP
 .BI %and " command..."
 Execute
