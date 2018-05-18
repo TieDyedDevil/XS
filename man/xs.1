@@ -498,8 +498,6 @@ A value is either a numeric constant or a variable reference yielding
 a numeric value.
 Numbers may be integer or floating-point; the latter are stored with limited
 precision (usually six significant digits).
-Variable names in an expression may not be spelled using the characters
-which denote the arithmetic operators.
 .PP
 If an expression involves any floating-point value, the result will be
 floating-point.
@@ -515,6 +513,8 @@ is treated as zero within an arithmetic expression.
 .PP
 Variables having subscripted or constructed names may not be used in an
 arithmetic expression.
+Variable names in an expression may not be spelled using the characters
+which denote the arithmetic operators.
 .SS Pipes
 The standard output of one fragment may be piped to the standard input of
 another:
