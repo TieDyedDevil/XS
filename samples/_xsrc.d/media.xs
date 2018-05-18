@@ -10,12 +10,39 @@ fn bluetoothctl {
 	.c 'media'
 	%with-terminal /usr/bin/bluetoothctl
 }
-fn equalizer {
+fn equalizer {|*|
 	.d 'Pulse Audio equalizer'
+	.a '[enable|disable|toggle|status|curve]'
+	.a '(none)  # open UI'
 	.c 'media'
 	.r 'b m mpc n ncmpcpp played s'
 	%only-X
-	pulseaudio-equalizer-gtk
+	if {!~ $* ()} {
+		let (fn-filter = {grep '^Equalizer \(status\|control\):'}) {
+			if {~ $* <={%prefixes enable}} {
+				pulseaudio-equalizer enable | filter
+			} else if {~ $* <={%prefixes disable}} {
+				pulseaudio-equalizer disable | filter
+			} else if {~ $* <={%prefixes toggle}} {
+				pulseaudio-equalizer toggle | filter
+			} else if {~ $* <={%prefixes status}} {
+				pulseaudio-equalizer status | filter
+			} else if {~ $* <={%prefixes curve}} {
+				let (bands; gains; cf = ~/.config/pulse/equalizerrc) {
+					bands = `{tail -n+11 $cf|tail -n+16}
+					gains = `{tail -n+11 $cf|head -15}
+					tail -n+5 $cf|head -1
+					for g $gains; b $bands {
+						printf '%s @ %s'\n $g $b
+					}
+				}
+			} else {
+				.usage equalizer
+			}
+		}
+	} else {
+		pulseaudio-equalizer-gtk >/dev/null >[2]/dev/null &
+	}
 }
 fn gallery {|*|
 	.d 'Random slideshow'
