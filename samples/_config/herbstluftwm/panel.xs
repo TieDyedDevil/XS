@@ -269,7 +269,9 @@ Status indicators
 '
 
 ~ $1 legend && {
-	if {{!~ $2 nocolor} && {{~ $2 color} || {test -t 1}}} {
+	if {{!~ $2 nocolor} \
+	&& {!~ $TERM (dvtm xterm)^*} \
+	&& {{~ $2 color} || {test -t 1}}} {
 		tag_samples
 		printf \n
 		transient_samples
