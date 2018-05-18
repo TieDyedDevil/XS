@@ -126,6 +126,7 @@ fn mons {|rects|
 		barre
 	} else {
 		let (xrinfo; rect; size; w; h; diag; f; xres; dpi; pm; _) {
+			echo Physical
 			for m `{xrandr|grep '^[^ ]\+ connected .* [0-9]\+mm' \
 					|cut -d' ' -f1} {
 				xrinfo = `{xrandr|grep -o \^^$m^' .*[0-9]\+mm'}
@@ -154,12 +155,14 @@ fn mons {|rects|
 				pm = `{xrandr|grep \^$m|grep -o primary}
 				echo $m $rect $size $diag^" $dpi^ppi $pm
 			}
-			echo -- '--'
+			echo -- --
+			echo Virtual
 			herbstclient list_monitors|sed 's/ with [^[]\+//' \
 				|sed 's/\[FOCUS\] \[LOCKED\]/ 🖵  🔒/' \
 				|sed 's/\[FOCUS\]/ 🖵/' \
 				|sed 's/\[LOCKED\]/ '^\u'a0'^' 🔒/'
-		} |column -t -R2,3,4,5
+		} |column -t -R2,3,4,5|sed 's/^\(Physical\|Virtual\).*$/' \
+						^<=.%ai^'&'^<=.%an^'/'
 	}
 }
 fn osd {|msg|
