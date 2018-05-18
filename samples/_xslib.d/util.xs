@@ -805,3 +805,11 @@ fn %with-tabbed-terminal {|cmd|
 		if {tty -s} {$cmd} else {tabbed -c -r 2 st -w '' xs -c {$cmd}}
 	}
 }
+
+fn %wait-file-deleted {|path|
+	# Ensure that path is an ordinary file, then wait for its deletion.
+	access -f $path || ~ <={access -1 $path} () || throw error \
+		%wait-file-deleted $path^' is not an ordinary file'
+	touch $path
+	inotifywait -e delete_self $path >/dev/null >[2=1]
+}
