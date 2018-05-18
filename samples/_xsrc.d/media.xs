@@ -18,7 +18,8 @@ fn equalizer {|*|
 	.r 'b m mpc n ncmpcpp played s'
 	%only-X
 	if {!~ $* ()} {
-		let (fn-filter = {grep '^Equalizer \(status\|control\):'}) {
+		let (fn-filter = {grep '^Equalizer status:'|grep -o '\[.*\]' \
+					|tr -d '[]'}) {
 			if {~ $* <={%prefixes enable}} {
 				pulseaudio-equalizer enable | filter
 			} else if {~ $* <={%prefixes disable}} {
@@ -28,7 +29,8 @@ fn equalizer {|*|
 			} else if {~ $* <={%prefixes status}} {
 				pulseaudio-equalizer status | filter
 			} else if {~ $* <={%prefixes curve}} {
-				let (bands; gains; cf = ~/.config/pulse/equalizerrc) {
+				let (bands; gains; \
+				cf = ~/.config/pulse/equalizerrc) {
 					bands = `{tail -n+11 $cf|tail -n+16}
 					gains = `{tail -n+11 $cf|head -15}
 					tail -n+5 $cf|head -1
