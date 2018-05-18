@@ -75,5 +75,8 @@ fn weather {|*|
 	.d 'Show weather and forecast.'
 	.a '[LOCATION]'
 	.c 'web'
-	let (loc = <={%flatten + $*}) {curl -sS wttr.in/$loc\?2nq|less -eRFX}
+	let (loc = <={%flatten + $*}; n = '') {
+		`{tput cols} :lt 126 && n = n
+		curl -sS wttr.in/$loc\?2q$n|head -n-2|less -eRFX
+	}
 }
