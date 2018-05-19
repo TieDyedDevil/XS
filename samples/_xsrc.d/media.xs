@@ -12,39 +12,37 @@ fn bluetoothctl {
 }
 fn equalizer {|*|
 	.d 'Pulse Audio equalizer'
-	.a '[enable|disable|toggle|status|curve|presets|load PRESET#]'
-	.a '(none)  # open UI'
+	.a '[enable|disable|toggle|status|curve|presets|load PRESET#|adjust]'
 	.c 'media'
 	.r 'b m mpc n ncmpcpp played s'
 	%only-X
-	if {!~ $* ()} {
-		let (fn-filter = {grep '^Equalizer status:'|grep -o '\[.*\]' \
-					|tr -d '[]'}; \
-		cf = ~/.config/pulse/equalizerrc; \
-		pd = ~/.config/pulse/presets) {
-			if {~ $* <={%prefixes enable}} {
-				pulseaudio-equalizer enable | filter
-			} else if {~ $* <={%prefixes disable}} {
-				pulseaudio-equalizer disable | filter
-			} else if {~ $* <={%prefixes toggle}} {
-				pulseaudio-equalizer toggle | filter
-			} else if {~ $* <={%prefixes status}} {
-				pulseaudio-equalizer status | filter
-			} else if {~ $* <={%prefixes curve}} {
-				let (bands; gains) {
-					bands = `{tail -n+11 $cf|tail -n+16}
-					gains = `{tail -n+11 $cf|head -15}
-					tail -n+5 $cf|head -1
-					for g $gains; b $bands {
-						printf '%+4.1f @ %5d'\n $g $b
-					}
+	let (fn-filter = {grep '^Equalizer status:'|grep -o '\[.*\]' \
+				|tr -d '[]'}; \
+	cf = ~/.config/pulse/equalizerrc; \
+	pd = ~/.config/pulse/presets) {
+		if {~ $* <={%prefixes enable}} {
+			pulseaudio-equalizer enable | filter
+		} else if {~ $* <={%prefixes disable}} {
+			pulseaudio-equalizer disable | filter
+		} else if {~ $* <={%prefixes toggle}} {
+			pulseaudio-equalizer toggle | filter
+		} else if {~ $* <={%prefixes status}} {
+			pulseaudio-equalizer status | filter
+		} else if {~ $* <={%prefixes curve}} {
+			let (bands; gains) {
+				bands = `{tail -n+11 $cf|tail -n+16}
+				gains = `{tail -n+11 $cf|head -15}
+				tail -n+5 $cf|head -1
+				for g $gains; b $bands {
+					printf '%+4.1f @ %''6d'\n $g $b
 				}
-			} else if {~ $* <={%prefixes presets}} {
-				ls $pd^/*.preset|xargs -d\n -n1 basename \
-					|sed 's/.preset//'|nl
-			} else if {~ $*(1) <={%prefixes load}} {
-				let (pfl = `` \n {ls $pd^/*.preset}) {
-					ed -s $pfl($*(2)) <<EOF
+			}
+		} else if {~ $* <={%prefixes presets}} {
+			ls $pd^/*.preset|xargs -d\n -n1 basename \
+				|sed 's/.preset//'|nl
+		} else if {~ $*(1) <={%prefixes load}} {
+			let (pfl = `` \n {ls $pd^/*.preset}) {
+				ed -s $pfl($*(2)) <<EOF
 5a
 0
 0
@@ -54,13 +52,81 @@ fn equalizer {|*|
 w $cf
 q
 EOF
-				}
-			} else {
-				.usage equalizer
 			}
+		} else if {~ $* <={%prefixes adjust}} {
+			let (bands; b; h; gains; tf) {
+			let (fn-u = {|v| let (g) {
+				g = $gains(`($b+1))
+				switch $v (
+				+ {g = `{echo $g|sed 's/-//'}}
+				- {g = `{echo $g|sed 's/^.\../-&/'}}
+				{if {~ $h 1} {
+					g = `{echo $g|sed 's/\(-\?\).\(\..\)/' \
+							^'\1'^$v^'\2/'}
+				} else {
+					g = `{echo $g|sed 's/\(-\?.\.\)./' \
+							^'\1'^$v^'/'}
+				}}
+				)
+				gains = $gains(1 ... $b) $g $gains(`($b+2) ...)
+				printf $v
+			}}; fn-rep = {|*|
+				tput civis
+				tput cup `($bands+1) 0
+				tput ed
+				printf %s <={%argify $*}
+				tput cup $b $h
+				tput cnorm
+			}; fn-load = {
+				clear
+				equalizer curve
+				gains = gains `{tail -n+11 $cf|head -15}
+				bands = 15
+				b = 1
+				h = 1
+				tput cup $b $h
+			}; fn-update = {
+				tf = `mktemp
+				head -10 $cf > $tf
+				for g $gains(2 ...) {echo $g >> $tf}
+				tail -n+26 $cf >> $tf
+				mv $tf $cf
+				equalizer disable >/dev/null
+				equalizer enable >/dev/null
+			}) {
+			load
+			escape {|fn-break| %without-echo {while true {
+				switch <=%read-char (
+				h {h = 1; rep}
+				j {{$b :lt $bands && b = `($b+1)}; rep}
+				k {{$b :gt 1 && b = `($b-1)}; rep}
+				l {h = 3; rep}
+				0 {u 0; rep}
+				1 {u 1; rep}
+				2 {u 2; rep}
+				3 {u 3; rep}
+				4 {u 4; rep}
+				5 {u 5; rep}
+				6 {u 6; rep}
+				7 {u 7; rep}
+				8 {u 8; rep}
+				9 {u 9; rep}
+				+ {tput cup $b 0; u +; rep}
+				- {tput cup $b 0; u -; rep}
+				q {tput cup `($bands+1) 0; break}
+				s {rep save not yet implemented}
+				n {rep new not yet implemented}
+				r {rep revert not yet implemented}
+				u {update; rep updated}
+				z {load; rep cancelled edits}
+				D {rep $gains}
+				{printf \a}
+				)
+				printf `{tput cup $b $h}
+			}}}}}
+		} else {
+			.usage equalizer
 		}
-	} else {
-		pulseaudio-equalizer-gtk >/dev/null >[2]/dev/null &
 	}
 }
 fn gallery {|*|
