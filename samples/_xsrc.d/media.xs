@@ -34,7 +34,7 @@ fn equalizer {|*|
 				gains = `{tail -n+11 $cf|head -15}
 				tail -n+5 $cf|head -1
 				for g $gains; b $bands {
-					printf '%+4.1f @ %''6d'\n $g $b
+					printf '%+4.1f dB @ %''6d Hz'\n $g $b
 				}
 			}
 		} else if {~ $* <={%prefixes presets}} {
@@ -168,7 +168,7 @@ EOF
 					^'n: save as new preset'\n \
 					^'t: toggle active; v: redraw; q: quit'
 				}
-				{printf \a}
+				{rep '? for help'}
 				)
 				printf `{tput cup $b $h}
 			}}}}
