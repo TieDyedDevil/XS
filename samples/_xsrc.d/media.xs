@@ -161,7 +161,7 @@ EOF
 				t {rep `{equalizer toggle}}
 				v {redraw}
 				z {load; rep cancelled edits}
-				\? {rep 'hjkl: move; 01234567899+-: set; ' \
+				\? {rep 'hjkl: move; 0123456789+-: set; ' \
 					^'u: update active; z: cancel edits'\n \
 					^'r: revert from preset; ' \
 					^'s: save to preset; ' \
