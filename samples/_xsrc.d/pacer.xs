@@ -13,12 +13,12 @@ fn pacer {|*|
 				&& {kill -0 `{cat $pspid} >[2]/dev/null}} {
 			echo 'Running'
 		} else setsid xs -c {
-			let (minute; initwait; lead = 5) {
-				minute = `{date +%M}
+			let (minute; second; initwait; lead = 3) {
+				(minute second) = `{date +%M\ %S}
 				initwait = `(60-$lead-$minute)
-				~ $initwait -* && initwait = `(60+$initwait)
+				~ $initwait -* 0 && initwait = `(60+$initwait)
 				echo First in $initwait minutes
-				sleep `(60*$initwait)
+				sleep `(60*$initwait-$second)
 				let (fn-work = {sleep `(60*(60-$lead))}; \
 					fn-prompt = {notify-send pacer \
 						'Time to stretch!'}; \
