@@ -134,6 +134,7 @@ EOF
 				equalizer curve
 			}) {
 			load
+			rep '? for help'
 			escape {|fn-break| while true {
 				switch <=getc (
 				h {h = 1; rep}
