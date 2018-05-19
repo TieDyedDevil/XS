@@ -18,6 +18,11 @@ fn cookie {
 		fortune -n 200 -s $subjects
 	}
 }
+fn rain {
+	.d 'Rain'
+	.c 'amusement'
+	%with-terminal %with-quit /usr/bin/rain -d 100
+}
 fn wisepony {
 	.d 'Wise pony'
 	.c 'amusement'
