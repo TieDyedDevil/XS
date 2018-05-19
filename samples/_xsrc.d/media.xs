@@ -112,6 +112,8 @@ EOF
 w $cf
 q
 EOF
+				equalizer disable >/dev/null
+				equalizer enable >/dev/null
 				clear
 				equalizer curve
 				gains = gains `{tail -n+11 $cf|head -15}
