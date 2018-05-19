@@ -12,14 +12,16 @@ fn bluetoothctl {
 }
 fn equalizer {|*|
 	.d 'Pulse Audio equalizer'
-	.a '[enable|disable|toggle|status|curve]'
+	.a '[enable|disable|toggle|status|curve|presets|load PRESET#]'
 	.a '(none)  # open UI'
 	.c 'media'
 	.r 'b m mpc n ncmpcpp played s'
 	%only-X
 	if {!~ $* ()} {
 		let (fn-filter = {grep '^Equalizer status:'|grep -o '\[.*\]' \
-					|tr -d '[]'}) {
+					|tr -d '[]'}; \
+		cf = ~/.config/pulse/equalizerrc; \
+		pd = ~/.config/pulse/presets) {
 			if {~ $* <={%prefixes enable}} {
 				pulseaudio-equalizer enable | filter
 			} else if {~ $* <={%prefixes disable}} {
@@ -29,14 +31,29 @@ fn equalizer {|*|
 			} else if {~ $* <={%prefixes status}} {
 				pulseaudio-equalizer status | filter
 			} else if {~ $* <={%prefixes curve}} {
-				let (bands; gains; \
-				cf = ~/.config/pulse/equalizerrc) {
+				let (bands; gains) {
 					bands = `{tail -n+11 $cf|tail -n+16}
 					gains = `{tail -n+11 $cf|head -15}
 					tail -n+5 $cf|head -1
 					for g $gains; b $bands {
 						printf '%+4.1f @ %5d'\n $g $b
 					}
+				}
+			} else if {~ $* <={%prefixes presets}} {
+				ls $pd^/*.preset|xargs -d\n -n1 basename \
+					|sed 's/.preset//'|nl
+			} else if {~ $*(1) <={%prefixes load}} {
+				let (pfl = `` \n {ls $pd^/*.preset}) {
+					ed -s $pfl($*(2)) <<EOF
+5a
+0
+0
+-10
+10
+.
+w $cf
+q
+EOF
 				}
 			} else {
 				.usage equalizer
