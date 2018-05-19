@@ -54,7 +54,7 @@ q
 EOF
 			}
 		} else if {~ $* <={%prefixes adjust}} {
-			let (bands; b; h; gains; tf) {
+			let (bands; b; h; gains; tf; pf) {
 			let (fn-u = {|v| let (g) {
 				g = $gains(`($b+1))
 				switch $v (
@@ -93,10 +93,47 @@ EOF
 				mv $tf $cf
 				equalizer disable >/dev/null
 				equalizer enable >/dev/null
+			}; fn-save = {
+				pf = $pd/^`` \n {tail -n+5 $cf|head -1}^'.preset'
+				ed -s $cf <<EOF
+6,9d
+w $pf
+q
+EOF
+			}; fn-revert = {
+				pf = $pd/^`` \n {tail -n+5 $cf|head -1}^'.preset'
+				ed -s $pf <<EOF
+5a
+0
+0
+-10
+10
+.
+w $cf
+q
+EOF
+				clear
+				equalizer curve
+				gains = gains `{tail -n+11 $cf|head -15}
+			}; fn-new = {
+				tput cup `($bands+1) 0
+				tput ed
+				printf 'new preset name: '
+				pf = $pd/^<=read^'.preset'
+				ed -s $cf <<EOF
+6,9d
+w $pf
+q
+EOF
+			}; fn-getc = {
+				%without-echo {result <=%read-char}
+			}; fn-redraw = {
+				clear
+				equalizer curve
 			}) {
 			load
-			escape {|fn-break| %without-echo {while true {
-				switch <=%read-char (
+			escape {|fn-break| while true {
+				switch <=getc (
 				h {h = 1; rep}
 				j {{$b :lt $bands && b = `($b+1)}; rep}
 				k {{$b :gt 1 && b = `($b-1)}; rep}
@@ -114,16 +151,23 @@ EOF
 				+ {tput cup $b 0; u +; rep}
 				- {tput cup $b 0; u -; rep}
 				q {tput cup `($bands+1) 0; break}
-				s {rep save not yet implemented}
-				n {rep new not yet implemented}
-				r {rep revert not yet implemented}
-				u {update; rep updated}
+				s {save; rep saved as $pf}
+				n {new; rep saved as $pf}
+				r {revert; rep reverted to $pf}
+				u {update; rep updated active}
+				v {redraw}
 				z {load; rep cancelled edits}
-				D {rep $gains}
+				\? {rep 'hjkl: move; 01234567899+-: set; ' \
+					^'u: update active; z: cancel edits'\n \
+					^'r: revert from preset; ' \
+					^'s: save to preset; ' \
+					^'n: save as new preset'\n \
+					^'v: redraw; q: quit'
+				}
 				{printf \a}
 				)
 				printf `{tput cup $b $h}
-			}}}}}
+			}}}}
 		} else {
 			.usage equalizer
 		}
