@@ -158,6 +158,7 @@ EOF
 				n {new; rep saved as $pf}
 				r {revert; rep reverted to $pf}
 				u {update; rep updated active}
+				t {rep `{equalizer toggle}}
 				v {redraw}
 				z {load; rep cancelled edits}
 				\? {rep 'hjkl: move; 01234567899+-: set; ' \
@@ -165,7 +166,7 @@ EOF
 					^'r: revert from preset; ' \
 					^'s: save to preset; ' \
 					^'n: save as new preset'\n \
-					^'v: redraw; q: quit'
+					^'t: toggle active; v: redraw; q: quit'
 				}
 				{printf \a}
 				)
