@@ -29,9 +29,10 @@ fn equalizer {|*|
 		} else if {~ $* <={%prefixes status}} {
 			pulseaudio-equalizer status | filter
 		} else if {~ $* <={%prefixes curve}} {
-			let (bands; gains) {
-				bands = `{tail -n+11 $cf|tail -n+16}
-				gains = `{tail -n+11 $cf|head -15}
+			let (bc; bands; gains) {
+				bc = `{tail -n+10 $cf|head -1}
+				bands = `{tail -n+11 $cf|tail -n+`($bc+1)}
+				gains = `{tail -n+11 $cf|head -$bc}
 				tail -n+5 $cf|head -1
 				for g $gains; b $bands {
 					printf '%+4.1f dB @ %''6d Hz'\n $g $b
@@ -80,8 +81,8 @@ EOF
 			}; fn-load = {
 				clear
 				equalizer curve
-				gains = gains `{tail -n+11 $cf|head -15}
-				bands = 15
+				bands = `{tail -n+10 $cf|head -1}
+				gains = gains `{tail -n+11 $cf|head -$bands}
 				b = 1
 				h = 1
 				tput cup $b $h
@@ -89,7 +90,7 @@ EOF
 				tf = `mktemp
 				head -10 $cf > $tf
 				for g $gains(2 ...) {echo $g >> $tf}
-				tail -n+26 $cf >> $tf
+				tail -n+`($bands+10+1) $cf >> $tf
 				mv $tf $cf
 				equalizer disable >/dev/null
 				equalizer enable >/dev/null
@@ -116,7 +117,7 @@ EOF
 				equalizer enable >/dev/null
 				clear
 				equalizer curve
-				gains = gains `{tail -n+11 $cf|head -15}
+				gains = gains `{tail -n+11 $cf|head -$bands}
 			}; fn-new = {
 				tput cup `($bands+1) 0
 				tput ed
