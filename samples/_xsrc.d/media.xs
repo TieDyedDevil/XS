@@ -15,7 +15,6 @@ fn equalizer {|*|
 	.a '[enable|disable|toggle|status|curve|presets|load PRESET#|adjust]'
 	.c 'media'
 	.r 'b m mpc n ncmpcpp played s'
-	%only-X
 	let (fn-filter = {grep '^Equalizer status:'|grep -o '\[.*\]' \
 				|tr -d '[]'}; \
 	cf = ~/.config/pulse/equalizerrc; \
@@ -95,14 +94,16 @@ EOF
 				equalizer disable >/dev/null
 				equalizer enable >/dev/null
 			}; fn-save = {
-				pf = $pd/^`` \n {tail -n+5 $cf|head -1}^'.preset'
+				pf = $pd/^`` \n {tail -n+5 $cf \
+							|head -1}^'.preset'
 				ed -s $cf <<EOF
 6,9d
 w $pf
 q
 EOF
 			}; fn-revert = {
-				pf = $pd/^`` \n {tail -n+5 $cf|head -1}^'.preset'
+				pf = $pd/^`` \n {tail -n+5 $cf \
+							|head -1}^'.preset'
 				ed -s $pf <<EOF
 5a
 0
@@ -153,6 +154,7 @@ EOF
 				8 {u 8; rep}
 				9 {u 9; rep}
 				+ {tput cup $b 0; u +; rep}
+				\= {tput cup $b 0; u +; rep}
 				- {tput cup $b 0; u -; rep}
 				q {tput cup `($bands+1) 0; break}
 				s {save; rep saved as $pf}
