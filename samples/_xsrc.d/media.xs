@@ -40,7 +40,7 @@ fn equalizer {|*|
 		} else if {~ $* <={%prefixes presets}} {
 			ls $pd^/*.preset|xargs -d\n -n1 basename \
 				|sed 's/.preset//'|nl
-		} else if {~ $*(1) <={%prefixes load}} {
+		} else if {{~ $#* 2} && {~ $*(1) <={%prefixes load}}} {
 			let (pfl = `` \n {ls $pd^/*.preset}) {
 				ed -s $pfl($*(2)) <<EOF
 5a
@@ -54,7 +54,7 @@ q
 EOF
 			}
 		} else if {~ $* <={%prefixes adjust}} {
-			let (bands; b; h; gains; tf; pf) {
+			let (bands; b; h; gains; tf; name; pf) {
 			let (fn-u = {|v| let (g) {
 				g = $gains(`($b+1))
 				switch $v (
@@ -123,12 +123,21 @@ EOF
 				tput cup `($bands+1) 0
 				tput ed
 				printf 'new preset name: '
-				pf = $pd/^<=read^'.preset'
-				ed -s $cf <<EOF
+				name = <=read
+				pf = $pd/$name^'.preset'
+				if {access -f $pf} {
+					result $name^' exists; not changed'
+				} else {
+					ed -s $cf <<EOF
+5c
+$name
+.
 6,9d
 w $pf
 q
 EOF
+					result saved as $pf
+				}
 			}; fn-getc = {
 				%without-echo {result <=%read-char}
 			}; fn-redraw = {
@@ -158,7 +167,7 @@ EOF
 				- {tput cup $b 0; u -; rep}
 				q {tput cup `($bands+1) 0; break}
 				s {save; rep saved as $pf}
-				n {new; rep saved as $pf}
+				n {rep <=new}
 				r {revert; rep reverted to $pf}
 				u {update; rep updated active}
 				t {rep `{equalizer toggle}}
