@@ -13,6 +13,7 @@ fn bluetoothctl {
 fn equalizer {|*|
 	.d 'Pulse Audio equalizer'
 	.a '[enable|disable|toggle|status|curve|presets|load PRESET#|adjust]'
+	.a '[judge PRESET#... # 2 to 9 presets]'
 	.c 'media'
 	.r 'b m mpc n ncmpcpp played s'
 	let (fn-filter = {grep '^Equalizer status:'|grep -o '\[.*\]' \
@@ -53,6 +54,18 @@ w $cf
 q
 EOF
 			}
+		} else if {~ $#* <={%range 3-10} && ~ $* <={%prefixes judge}} {
+			* = $*(2 ...)
+			escape {|fn-break| while true {
+				printf '1-%d? ' $#*
+				let (i = <=%read-char) {
+					echo
+					~ $i q && break
+					if {~ $i <={%range 1-$#*}} {
+						equalizer load $*($i)
+					}
+				}
+			}}
 		} else if {~ $* <={%prefixes adjust}} {
 			let (bands; b; h; gains; tf; name; pf) {
 			let (fn-u = {|v| let (g) {
