@@ -75,7 +75,7 @@ EOF
 				tput civis
 				tput cup `($bands+1) 0
 				tput ed
-				printf %s <={%argify $*}
+				printf %s%s%s <=.%ah <={%argify $*} <=.%ahe
 				tput cup $b $h
 				tput cnorm
 			}; fn-load = {
