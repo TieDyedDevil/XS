@@ -143,6 +143,7 @@ hc keybind XF86AudioRaiseVolume spawn pactl set-sink-volume @DEFAULT_SINK@ +1dB
 hc keybind XF86AudioLowerVolume spawn pactl set-sink-volume @DEFAULT_SINK@ -1dB
 hc keybind XF86AudioMute spawn pactl set-sink-mute @DEFAULT_SINK@ toggle
 hc keybind XF86AudioMicMute spawn pactl set-source-mute @DEFAULT_SOURCE@ toggle
+hc keybind $Mod^-a spawn xs -c 'equalizer toggle'
 hc keybind XF86Sleep spawn lock
 hc keybind Shift-XF86Sleep spawn lock -t
 
