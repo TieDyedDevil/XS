@@ -70,7 +70,13 @@ EOF
 				)
 				gains = $gains(1 ... $b) $g $gains(`($b+2) ...)
 				printf $v
-			}}; fn-rep = {|*|
+			}}; fn-flat = {
+				g = $gains(`($b+1))
+				gains = $gains(1 ... $b) 0.0 $gains(`($b+2) ...)
+				tput cup $b 0
+				printf +0.0
+				tput cup $b $h
+			}; fn-rep = {|*|
 				tput civis
 				tput cup `($bands+1) 0
 				tput ed
@@ -165,6 +171,7 @@ EOF
 				+ {tput cup $b 0; u +; rep}
 				\= {tput cup $b 0; u +; rep}
 				- {tput cup $b 0; u -; rep}
+				f {flat}
 				q {tput cup `($bands+1) 0; break}
 				s {save; rep saved as $pf}
 				n {rep <=new}
@@ -173,7 +180,7 @@ EOF
 				t {rep `{equalizer toggle}}
 				v {redraw}
 				z {load; rep cancelled edits}
-				\? {rep 'hjkl: move; 0123456789+-: set; ' \
+				\? {rep 'hjkl: move; 0123456789+-f: set; ' \
 					^'u: update active; z: cancel edits'\n \
 					^'r: revert from preset; ' \
 					^'s: save to preset; ' \
