@@ -16,6 +16,12 @@ fn intel_gpu_time {|*|
 	.c 'priv'
 	sudo /usr/bin/intel_gpu_time $*
 }
+fn intel_gpu_top {|*|
+	.d 'Show Intel GPU tasks'
+	.a '[intel_gpu_top_OPTIONS]'
+	.c 'priv'
+	sudo /usr/bin/intel_gpu_top $*
+}
 fn iotop {|*|
 	.c 'priv'
 	%with-terminal sudo /usr/sbin/iotop $*
