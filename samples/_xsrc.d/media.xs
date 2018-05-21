@@ -57,11 +57,15 @@ EOF
 		} else if {~ $#* <={%range 3-10} && ~ $* <={%prefixes judge}} {
 			* = $*(2 ...)
 			escape {|fn-break| while true {
-				printf '1-%d,t,q? ' $#*
+				printf '1-%d,s,t,q? ' $#*
 				let (i = <=%read-char) {
 					echo
 					~ $i q && break
 					~ $i t && equalizer toggle >/dev/null
+					~ $i s && {
+						equalizer curve
+						equalizer status
+					}
 					if {~ $i <={%range 1-$#*}} {
 						equalizer load $*($i)
 						equalizer disable >/dev/null
