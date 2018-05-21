@@ -10,6 +10,12 @@ fn ftop {|*|
 	.c 'priv'
 	%with-terminal sudo /usr/bin/ftop $*
 }
+fn intel_gpu_time {|*|
+	.d 'Show CPU and GPU utilization of command'
+	.a 'COMMAND'
+	.c 'priv'
+	sudo /usr/bin/intel_gpu_time $*
+}
 fn iotop {|*|
 	.c 'priv'
 	%with-terminal sudo /usr/sbin/iotop $*
