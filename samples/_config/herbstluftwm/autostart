@@ -150,6 +150,9 @@ hc keybind Shift-XF86Sleep spawn lock -t
 # wallpaper
 hc keybind $Mod^-w spawn xs -c 'wallpaper -c'
 
+# screen capture
+hc keybind $Mod^-s        spawn scrot -m
+
 # --------------------
 # mouse
 hc mouseunbind --all
