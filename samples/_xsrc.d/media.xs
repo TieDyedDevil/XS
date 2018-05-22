@@ -55,9 +55,8 @@ q
 EOF
 			# It's intentional to NOT activate the preset we just
 			# loaded. We just imported a new configuration file;
-			# neither the editing buffer nor the active settings
-			# change. The user gets to to determine an appropriate
-			# workflow.
+			# the active settings do not change. The user gets to
+			# determine an appropriate workflow.
 			}
 		} else if {~ $#* <={%range 3-10} && ~ $* <={%prefixes judge}} {
 			* = $*(2 ...)
