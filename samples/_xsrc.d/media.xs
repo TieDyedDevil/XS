@@ -53,6 +53,11 @@ fn equalizer {|*|
 w $cf
 q
 EOF
+			# It's intentional to NOT activate the preset we just
+			# loaded. We just imported a new configuration file;
+			# neither the editing buffer nor the active settings
+			# change. The user gets to to determine an appropriate
+			# workflow.
 			}
 		} else if {~ $#* <={%range 3-10} && ~ $* <={%prefixes judge}} {
 			* = $*(2 ...)
@@ -162,7 +167,7 @@ $name
 w $pf
 q
 EOF
-					result saved as $pf
+					result active saved as $pf
 				}
 			}; fn-getc = {
 				%without-echo {result <=%read-char}
@@ -193,7 +198,7 @@ EOF
 				- {tput cup $b 0; u -; rep}
 				f {flat}
 				q {tput cup `($bands+1) 0; break}
-				s {save; rep saved as $pf}
+				s {save; rep active saved as $pf}
 				n {rep <=new}
 				r {revert; rep reverted to $pf}
 				u {update; rep updated active}
