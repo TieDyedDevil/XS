@@ -611,23 +611,23 @@ if $show_alert_placeholders {_a = '.'} else {_a = ''}
 if $show_status_placeholders {_s = '.'} else {_s = ''}
 
 # Report colors
-logger 2 'palette: %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s; %s' \
-	<={%argify `{var panel_fg_color}} \
-	<={%argify `{var panel_status_bg_color}} \
-	<={%argify `{var panel_status_fg_color}} \
-	<={%argify `{var panel_watchdog_bg_color}} \
-	<={%argify `{var panel_watchdog_fg_color}} \
-	<={%argify `{var panel_alert_bg_color}} \
-	<={%argify `{var panel_alert_fg_color}} \
-	<={%argify `{var wm_fbn_color}} \
-	<={%argify `{var wm_fba_color}} \
-	<={%argify `{var wm_fgn_color}} \
-	<={%argify `{var wm_fga_color}} \
-	<={%argify `{var wm_wbn_color}} \
-	<={%argify `{var wm_wba_color}} \
-	<={%argify `{var wm_wbu_color}} \
-	<={%argify `{var cpu_fg_color}} \
-	<={%argify `{var cpu_bg_color}}
+logger 2 'palette: %s' <={%argify <={%flatten '; ' \
+				`` \n {var panel_fg_color} \
+				`` \n {var panel_status_bg_color} \
+				`` \n {var panel_status_fg_color} \
+				`` \n {var panel_watchdog_bg_color} \
+				`` \n {var panel_watchdog_fg_color} \
+				`` \n {var panel_alert_bg_color} \
+				`` \n {var panel_alert_fg_color} \
+				`` \n {var wm_fbn_color} \
+				`` \n {var wm_fba_color} \
+				`` \n {var wm_fgn_color} \
+				`` \n {var wm_fga_color} \
+				`` \n {var wm_wbn_color} \
+				`` \n {var wm_wba_color} \
+				`` \n {var wm_wbu_color} \
+				`` \n {var cpu_fg_color} \
+				`` \n {var cpu_bg_color}}}
 
 # Define bg/fg attribute pairs for dzen
 fn attr {|bg fg| printf '^bg(%s)^fg(%s)' $bg $fg}
