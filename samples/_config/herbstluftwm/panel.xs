@@ -542,22 +542,28 @@ dzen2_opts = -w $panel_width -x $x -y $panel_y -h $panel_height_px \
 rm -f $tmpfile_base^-display-^*
 display = $tmpfile_base^-display-^$monitor
 
-# Prepare client/server housekeeping
-pidfile = $tmpfile_base^.server
-private $pidfile
-checkpid = `{cat $pidfile >[2]/dev/null}
-dispfile = $tmpfile_base^.displays
-rm -f $dispfile
-private $dispfile
+# Prepare client/server housekeeping files
 clntfile = $tmpfile_base^.clients
-rm -f $clntfile
-private $clntfile
-watchdogfile = $tmpfile_base^.watchdog
-rm -f $watchdogfile
-private $watchdogfile
+if {access -f $clnfile} {
+	rm -f $clntfile
+	private $clntfile
+} else {
+	true >$clntfile
+}
+dispfile = $tmpfile_base^.displays
+if {access -f $dispfile} {
+	rm -f $dispfile
+	private $dispfile
+} else {
+	true >$dispfile
+}
 compactfile = $tmpfile_base^.compact
-rm -f $compactfile
-private $compactfile
+if {access -f $compactfile} {
+	rm -f $compactfile
+	private $compactfile
+} else {
+	true >$compactfile
+}
 
 # Compact the tag list if it would occupy more than 18% of the monitor width.
 let (tw = `{xftwidth $font `` \n {herbstclient tag_status $monitor \
@@ -592,6 +598,13 @@ if {!~ $monitor 0} {
 
 # There can be only one server; always on the first monitor
 ~ $monitor 0 || exit
+
+# Create the server's tempfiles
+pidfile = $tmpfile_base^.server
+private $pidfile
+watchdogfile = $tmpfile_base^.watchdog
+rm -f $watchdogfile
+private $watchdogfile
 
 # Identify the server
 logger 1 'server on monitor %d: %d' $monitor $pid
