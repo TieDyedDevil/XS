@@ -77,7 +77,6 @@ EOF
 					}
 					if {~ $i <={%range 1-$#*}} {
 						equalizer load $*($i)
-						equalizer disable >/dev/null
 						equalizer enable >/dev/null
 					}
 				}
@@ -85,8 +84,8 @@ EOF
 		} else if {~ $* <={%prefixes info}} {
 			echo \
 'The equalizer is configured via an "active" file. The `load`
-subcommand moves a preset into the "active" file, which is
-loaded into the equalizer when the equalizer (re)starts.'
+subcommand moves a preset into the "active" file; the `enable`
+subcommand (re)starts the equalizer to load the "active" file.'
 		} else if {~ $* <={%prefixes adjust}} {
 			let (bands; b; h; gains; tf; name; pf) {
 			let (fn-u = {|v| let (g) {
@@ -131,7 +130,6 @@ loaded into the equalizer when the equalizer (re)starts.'
 				for g $gains(2 ...) {echo $g >> $tf}
 				tail -n+`($bands+10+1) $cf >> $tf
 				mv $tf $cf
-				equalizer disable >/dev/null
 				equalizer enable >/dev/null
 			}; fn-save = {
 				pf = $pd/^`` \n {tail -n+5 $cf \
@@ -154,7 +152,6 @@ EOF
 w $cf
 q
 EOF
-				equalizer disable >/dev/null
 				equalizer enable >/dev/null
 				clear
 				equalizer curve
@@ -219,13 +216,16 @@ EOF
 r: revert from preset; s: save to preset; save as new preset
 t: toggle active; i: info; v: redraw; q: quit'
 				}
-				i {rep \
+				i {
+					# limit this text to six lines
+					rep \
 'The equalizer is configured via an "active" file. The "active" file
 is loaded into the equalizer when the equalizer (re)starts.
- - the `u` (update) binding saves edits to "active"
- - the `z` (cancel) binding discards unsaved edits
- - the `r` (revert) binding loads the current preset into "active"
- - the `s` (save) binding saves 'active' to the current preset.'
+ - The `u` (update) binding saves edits to "active" and loads "active".
+ - The `z` (cancel) binding discards unsaved edits.
+ - The `r` (revert) binding loads the current preset into "active"
+   and loads "active".
+ - The `s` (save) binding saves "active" to the current preset.'
 				}
 				{rep '? for help'}
 				)
