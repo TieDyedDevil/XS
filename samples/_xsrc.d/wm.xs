@@ -18,6 +18,14 @@ fn bell {|*|
 		}
 	)
 }
+fn boc {|*|
+	.d 'Bell on completion'
+	.a 'COMMAND'
+	.c 'wm'
+	.r '3up bari barre dual em hc mons osd quad r updres wmb'
+	%only-X
+	unwind-protect {$*} {printf %c \a}
+}
 fn lock {|*|
 	.d 'Lock screen'
 	.a '-t  # transparent lock, disable DPMS; X only'

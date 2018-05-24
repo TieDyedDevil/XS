@@ -24,14 +24,6 @@ fn barre {
 		~/.config/herbstluftwm/load_panels
 	}
 }
-fn boc {|*|
-	.d 'Bell on completion'
-	.a 'COMMAND'
-	.c 'wm'
-	.r '3up bari barre dual em hc mons osd quad r updres wmb'
-	%only-X
-	unwind-protect {$*} {printf %c \a}
-}
 fn dual {|*|
 	.d 'Divide focused monitor'
 	.a 'horizontal|vertical'
