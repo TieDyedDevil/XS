@@ -12,8 +12,11 @@ fn bluetoothctl {
 }
 fn equalizer {|*|
 	.d 'Pulse Audio equalizer'
-	.a '[enable|disable|toggle|status|curve|presets|load PRESET#|adjust]'
+	.a '[enable|disable|toggle]'
+	.a '[status|curve]'
+	.a '[presets|load PRESET#|adjust]'
 	.a '[judge PRESET#... # 2 to 9 presets]'
+	.a '[info]'
 	.c 'media'
 	.r 'b m mpc n ncmpcpp played s'
 	let (fn-filter = {grep '^Equalizer status:'|grep -o '\[.*\]' \
@@ -21,6 +24,8 @@ fn equalizer {|*|
 	cf = ~/.config/pulse/equalizerrc; \
 	pd = ~/.config/pulse/presets) {
 		if {~ $* <={%prefixes enable}} {
+			~ `{equalizer status} enabled \
+				&& pulseaudio-equalizer disable >/dev/null
 			pulseaudio-equalizer enable | filter
 		} else if {~ $* <={%prefixes disable}} {
 			pulseaudio-equalizer disable | filter
@@ -77,6 +82,11 @@ EOF
 					}
 				}
 			}}
+		} else if {~ $* <={%prefixes info}} {
+			echo \
+'The equalizer is configured via an "active" file. The `load`
+subcommand moves a preset into the "active" file, which is
+loaded into the equalizer when the equalizer (re)starts.'
 		} else if {~ $* <={%prefixes adjust}} {
 			let (bands; b; h; gains; tf; name; pf) {
 			let (fn-u = {|v| let (g) {
@@ -204,12 +214,18 @@ EOF
 				t {rep `{equalizer toggle}}
 				v {redraw}
 				z {load; rep cancelled edits}
-				\? {rep 'hjkl: move; 0123456789+-f: set; ' \
-					^'u: update active; z: cancel edits'\n \
-					^'r: revert from preset; ' \
-					^'s: save to preset; ' \
-					^'n: save as new preset'\n \
-					^'t: toggle active; v: redraw; q: quit'
+				\? {rep \
+'hjkl: move; 0123456789+-f: set; u: update active; z: cancel edits
+r: revert from preset; s: save to preset; save as new preset
+t: toggle active; i: info; v: redraw; q: quit'
+				}
+				i {rep \
+'The equalizer is configured via an "active" file. The "active" file
+is loaded into the equalizer when the equalizer (re)starts.
+ - the `u` (update) binding saves edits to "active"
+ - the `z` (cancel) binding discards unsaved edits
+ - the `r` (revert) binding loads the current preset into "active"
+ - the `s` (save) binding saves 'active' to the current preset.'
 				}
 				{rep '? for help'}
 				)
