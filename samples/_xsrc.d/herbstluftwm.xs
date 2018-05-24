@@ -21,6 +21,7 @@ fn barre {
 	%only-X
 	let (hc = herbstclient) {
 		hc emit_hook quit_panel
+		sleep 0.5
 		~/.config/herbstluftwm/load_panels
 	}
 }
