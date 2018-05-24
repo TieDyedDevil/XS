@@ -162,7 +162,8 @@ fn mons {|rects|
 				|sed 's/\[FOCUS\]/ 🖵/' \
 				|sed 's/\[LOCKED\]/ '^\u'a0'^' 🔒/'
 		} |column -t -R2,3,4,5|sed 's/^\(Physical\|Virtual\).*$/' \
-						^<=.%ai^'&'^<=.%an^'/'
+						^<=.%ai^'&'^<=.%an^'/' \
+			| less -iRFXS
 	}
 }
 fn osd {|msg|
