@@ -813,3 +813,24 @@ fn %wait-file-deleted {|path|
 	touch $path
 	inotifywait -e delete_self $path >/dev/null >[2=1]
 }
+
+fn %confirm {|dflt msg|
+	# Query user for confirmation with default given as y or n.
+	# Return true when confirmed.
+	let (yes = <={if {~ $dflt y} {result Y} else {result y}}; \
+	no = <={if {~ $dflt n} {result N} else {result n}}) {
+		let (prompt = ' ['$yes'/'$no']? ') {
+			escape {|fn-return| while true {
+				printf %s%s <={%argify $msg} $prompt
+				c = <=read
+				~ $c '' && c = $dflt
+				~ $c () && c = $dflt
+				switch $c (
+				y {return <=true}
+				n {return <=false}
+				{}
+				)
+			}}
+		}
+	}
+}
