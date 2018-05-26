@@ -12,27 +12,36 @@
 #  g) if, after step (e) the remaining file has more than 3,000 lines,
 #     delete all but the last 3,000 lines.
 
+fn clean {|hstfile tmpfile|
+	%with-read-lines $hstfile {|line|
+		line = `` '' {echo $line | sed 's/^ \+//;s/ \+$//' \
+				| tr -d \n}
+		drop = <={{!~ $line *\ *} || {
+			~ $line rm\ * cp\ * mv\ * la\ * \
+			ll\ * ls\ * lt\ * history\ *} \
+			| {echo $line | !xs -n >[2]/dev/null} \
+			|| {$line :eq $prev}}
+		result $drop || {echo $line; prev = $line}
+	} >$tmpfile
+}
+
 if {!~ $history () && access -f $history} {
 	hstfile = $history
 	history -n
 	lc_start = `{cat $hstfile | wc -l}
 	tmpfile = `mktemp
-	count = 0
 	%without-cursor {
-		%with-read-lines $hstfile {|line|
-			count = `($count + 1)
-			~ `($count % 100) 0 && {
-				printf \r%d%% `(100*$count/$lc_start) >[1=2]
-			}
-			line = `` '' {echo $line | sed 's/^ \+//;s/ \+$//' \
-					| tr -d \n}
-			drop = <={{!~ $line *\ *} || {
-				~ $line rm\ * cp\ * mv\ * la\ * \
-				ll\ * ls\ * lt\ * history\ *} \
-				| {echo $line | !xs -n >[2]/dev/null} \
-				|| {$line :eq $prev}}
-			result $drop || {echo $line; prev = $line}
-		} >$tmpfile
+		fork {cd /tmp; split -d -a 1 -n l/6 $hstfile hst$pid}
+		hstsegs = hst$pid^(0 1 2 3 4 5)
+		waitpids =
+		for hf $hstsegs {
+			xs -c {clean /tmp/$hf $tmpfile^'.'$hf} &
+			waitpids = $waitpids $apid
+		}
+		echo 'Scanning...'
+		for p $waitpids {wait $p}
+		cat $tmpfile^.$hstsegs >$tmpfile
+		rm -f /tmp/$hstsegs $tmpfile^.$hstsegs
 	}
 	lc_pass1 = `{cat $tmpfile | wc -l}
 	if {$lc_pass1 :ge 1500} {
