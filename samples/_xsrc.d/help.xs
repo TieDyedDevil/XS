@@ -68,7 +68,7 @@ fn libdoc {
 						printf \n%s----%s\n%s%s%s\n\n \
 							<=.%ad <=.%an \
 							<=.%as $f <=.%an
-						catch {} {libi $f}
+						%ignore-error {libi $f}
 					} >>$outfile
 				} 2 $tf `mktemp $tf
 				cat <{printf '%sLibrary functions%s' \

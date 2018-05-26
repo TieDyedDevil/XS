@@ -876,3 +876,8 @@ fn %outdated {|target sources|
 	# True if the target file is not newer than all source files.
 	result <={!map {|f| test $target -nt $f} $sources}
 }
+
+fn %ignore-error {|body|
+	# Ignore error exception thrown by body.
+	catch {|e| !~ $e(1) error && throw $e} {$body}
+}
