@@ -837,24 +837,37 @@ fn %confirm {|dflt msg|
 
 fn %split-filter-join {|filter mult infile tmpbase outfile|
 	# Filter infile to outfile using multiple processes.
-	# Process count is number of CPU cores times mult.
+	# Process count is number of CPU cores times mult, capped at a
+	# total of the lesser of 100 or the number of lines in infile.
 	# The filter processes stdin to stdout, assuming independent lines.
 	# The split files are named on tmpbase; this is normally `tmpfile .
-	let (cores; np; sn; segs; waitpids) {
+	let (cores; np; fl; sn; segs; waitpids) {
 		cores = `{grep '^cpu cores' /proc/cpuinfo|head -1|cut -d: -f2}
 		np = `($cores*$mult)
-		np :gt 10 && np = 10
-		sn = <={map {|n| result `($n-1)} <={%range 1-$np}}
-		fork {cd /tmp; split -d -a 1 -n l/$np $infile seg$pid}
-		segs = seg$pid^$sn
-		waitpids =
-		for sf $segs {
-			xs -c {clean /tmp/$sf $tmpbase^.$sf} &
-			waitpids = $waitpids $apid
+		$np :gt 100 && np = 100
+		fl = `{head -$np $infile|wc -l}
+		if {!~ $fl 0} {
+			$np :gt $fl && np = $fl
+			sn = <={omap {|n| printf %02d `($n-1)} <={%range 1-$np}}
+			fork {cd /tmp; split -d -a 2 -n l/$np $infile seg$pid}
+			segs = seg$pid^$sn
+			waitpids =
+			catch {|e|
+				kill $waitpids
+				throw $e
+			} {
+				for sf $segs {
+					xs -c {clean /tmp/$sf $tmpbase^.$sf} &
+					waitpids = $waitpids $apid
+				}
+				for p $waitpids {wait $p}
+			}
+			cat $tmpbase^.$segs >$tmpbase
+			mv $tmpbase $outfile
+		} else {
+			touch $tmpbase
+			mv $tmpbase $outfile
 		}
-		for p $waitpids {wait $p}
-		cat $tmpbase^.$segs >$tmpbase
-		mv $tmpbase $outfile
 		rm -f /tmp/$segs $tmpfile^.$segs
 	}
 }

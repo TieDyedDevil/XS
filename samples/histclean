@@ -36,11 +36,14 @@ if {!~ $history () && access -f $history} {
 	lc_start = `{cat $hstfile | wc -l}
 	tmpfile = `mktemp
 	%without-cursor {
-		printf \r'Cleaning... '
-		xs -c spinner &
-		animation = $apid
-		%split-filter-join clean 3 $hstfile `mktemp $tmpfile
-		kill $animation
+		unwind-protect {
+			printf \r'Cleaning... '
+			xs -c spinner &
+			animation = $apid
+			%split-filter-join clean 3 $hstfile `mktemp $tmpfile
+		} {
+			kill $animation
+		}
 	}
 	lc_pass1 = `{cat $tmpfile | wc -l}
 	if {$lc_pass1 :ge 1500} {
