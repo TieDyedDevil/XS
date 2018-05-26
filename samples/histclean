@@ -18,7 +18,7 @@ fn clean {|hstfile tmpfile|
 		drop = <={{!~ $line *\ *} || {
 			~ $line rm\ * cp\ * mv\ * la\ * \
 			ll\ * ls\ * lt\ * history\ *} \
-			| {echo $line | !xs -n >[2]/dev/null} \
+			| {echo $line | !xs -p -n >[2]/dev/null} \
 			|| {$line :eq $prev}}
 		result $drop || {echo $line; prev = $line}
 	} >$tmpfile
