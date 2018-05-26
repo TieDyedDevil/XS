@@ -66,7 +66,7 @@ fn libdoc {
 				{|infile outfile|
 					%with-read-lines $infile {|f|
 						printf \n----\n%s%s%s\n\n \
-							<=.%au $f <=.%aue
+							<=.%as $f <=.%an
 						catch {} {libi $f}
 					} >>$outfile
 				} \
@@ -77,7 +77,7 @@ fn libdoc {
 			printf '%sLibrary functions%s'\n <=.%ah <=.%ahe
 			cat $tf
 		}
-	}|less -RXi
+	}|less -rXi
 }
 fn libi {|*|
 	.d 'Show information about a library function.'
