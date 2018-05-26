@@ -835,11 +835,11 @@ fn %confirm {|dflt msg|
 	}
 }
 
-fn %split-filter-join {|filter mult infile tmpbase outfile|
-	# Filter infile to outfile using multiple processes.
+fn %split-filter-join {|xform mult infile tmpbase outfile|
+	# Transform infile to outfile using multiple processes.
 	# Process count is number of CPU cores times mult, capped at a
 	# total of the lesser of 100 or the number of lines in infile.
-	# The filter processes stdin to stdout, assuming independent lines.
+	# The xform function is of the form {|srcfile dstfile| ...}.
 	# The split files are named on tmpbase; this is normally `tmpfile .
 	let (cores; np; fl; sn; segs; waitpids) {
 		cores = `{grep '^cpu cores' /proc/cpuinfo|head -1|cut -d: -f2}
@@ -857,7 +857,7 @@ fn %split-filter-join {|filter mult infile tmpbase outfile|
 				throw $e
 			} {
 				for sf $segs {
-					xs -c {clean /tmp/$sf $tmpbase^.$sf} &
+					xs -c {$xform /tmp/$sf $tmpbase^.$sf} &
 					waitpids = $waitpids $apid
 				}
 				for p $waitpids {wait $p}

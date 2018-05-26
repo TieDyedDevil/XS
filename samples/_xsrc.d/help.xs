@@ -57,11 +57,25 @@ fn libdoc {
 	.d 'List documentation for all library functions.'
 	.c 'help'
 	{
-		printf '%sLibrary functions%s'\n <=.%ah <=.%ahe
-		for f `{for e <={%split ' ' $$libloc} {echo $e|cut -d: -f1} \
-		|head -n-1|sort} {
-			printf \n----\n%s%s%s\n\n <=.%ai $f <=.%an
-			catch {} {libi $f}
+		%with-tempfile tf {
+			for f `{for e <={%split ' ' $$libloc} {
+				echo $e|cut -d: -f1} |head -n-1|sort} {
+					echo $f >>$tf
+			}
+			%split-filter-join \
+				{|infile outfile|
+					%with-read-lines $infile {|f|
+						printf \n----\n%s%s%s\n\n \
+							<=.%ai $f <=.%an
+						catch {} {libi $f}
+					} >>$outfile
+				} \
+				1 \
+				$tf \
+				`mktemp \
+				$tf
+			printf '%sLibrary functions%s'\n <=.%ah <=.%ahe
+			cat $tf
 		}
 	}|less -RXi
 }
