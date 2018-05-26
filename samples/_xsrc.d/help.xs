@@ -66,7 +66,7 @@ fn libdoc {
 				{|infile outfile|
 					%with-read-lines $infile {|f|
 						printf \n----\n%s%s%s\n\n \
-							<=.%ai $f <=.%an
+							<=.%au $f <=.%aue
 						catch {} {libi $f}
 					} >>$outfile
 				} \
