@@ -70,7 +70,7 @@ fn libdoc {
 						catch {} {libi $f}
 					} >>$outfile
 				} \
-				1 \
+				2 \
 				$tf \
 				`mktemp \
 				$tf
