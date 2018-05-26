@@ -4,7 +4,7 @@ fn .ab {
 	tput bold
 }
 fn .%ab {
-	# Return terminal attribute bold string.
+	# Return terminal attribute bold.
 	result <={%argify `.ab}
 }
 fn .abl {
@@ -12,14 +12,14 @@ fn .abl {
 	tput blink
 }
 fn .%abl {
-	# Return terminal attribute bold blink.
+	# Return terminal attribute blink.
 	result <={%argify `.abl}
 }
 fn .ad {
 	# Set terminal attribute dim.
 	tput dim}
 fn .%ad {
-	# Return terminal attribute dim string.
+	# Return terminal attribute dim.
 	result <={%argify `.ad}
 }
 fn .ah {
