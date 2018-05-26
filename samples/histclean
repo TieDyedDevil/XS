@@ -14,8 +14,7 @@
 
 fn clean {|hstfile tmpfile|
 	%with-read-lines $hstfile {|line|
-		line = `` '' {echo $line | sed 's/^ \+//;s/ \+$//' \
-				| tr -d \n}
+		line = `` \n {echo $line | sed 's/^ \+//;s/ \+$//'}
 		drop = <={{!~ $line *\ *} || {
 			~ $line rm\ * cp\ * mv\ * la\ * \
 			ll\ * ls\ * lt\ * history\ *} \
