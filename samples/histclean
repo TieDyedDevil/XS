@@ -37,24 +37,11 @@ if {!~ $history () && access -f $history} {
 	lc_start = `{cat $hstfile | wc -l}
 	tmpfile = `mktemp
 	%without-cursor {
-		cores = `{grep '^cpu cores' /proc/cpuinfo|head -1|cut -d: -f2}
-		np = `($cores*3)
-		np :gt 10 && np = 10
-		sn = <={map {|n| result `($n-1)} <={%range 1-$np}}
-		fork {cd /tmp; split -d -a 1 -n l/$np $hstfile hst$pid}
-		hstsegs = hst$pid^$sn
-		waitpids =
-		for hf $hstsegs {
-			xs -c {clean /tmp/$hf $tmpfile^.$hf} &
-			waitpids = $waitpids $apid
-		}
 		printf \r'Cleaning... '
 		xs -c spinner &
 		animation = $apid
-		for p $waitpids {wait $p}
+		%split-filter-join clean 3 $hstfile `mktemp $tmpfile
 		kill $animation
-		cat $tmpfile^.$hstsegs >$tmpfile
-		rm -f /tmp/$hstsegs $tmpfile^.$hstsegs
 	}
 	lc_pass1 = `{cat $tmpfile | wc -l}
 	if {$lc_pass1 :ge 1500} {
