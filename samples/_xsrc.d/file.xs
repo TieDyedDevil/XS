@@ -103,7 +103,7 @@ fn list {|*|
 				vis-highlight $syn <{cat $*|tr \r \n}
 			} else {
 				vis-highlight $syn $*
-			} | nl >[2]/dev/null | less -iRFXS
+			} | nl >[2]/dev/null | less -iRFXS --shift .1
 		}
 	}
 }
