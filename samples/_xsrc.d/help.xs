@@ -75,7 +75,7 @@ fn libdoc {
 				$tf \
 				`mktemp \
 				$tf
-			printf '%sLibrary functions%s'\n <=.%ah <=.%ahe
+			printf '%sLibrary functions%s' <=.%ah <=.%ahe
 			cat $tf
 		}
 	}|less -rXi
