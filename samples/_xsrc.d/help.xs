@@ -65,7 +65,8 @@ fn libdoc {
 			%split-filter-join \
 				{|infile outfile|
 					%with-read-lines $infile {|f|
-						printf \n----\n%s%s%s\n\n \
+						printf \n%s----%s\n%s%s%s\n\n \
+							<=.%ad <=.%an \
 							<=.%as $f <=.%an
 						catch {} {libi $f}
 					} >>$outfile
