@@ -53,6 +53,18 @@ fn lib {|*|
 	}
 	# Ideally we'd hide all of the xs hook functions; not only %prompt.
 }
+fn libdoc {
+	.d 'List documentation for all library functions.'
+	.c 'help'
+	{
+		printf '%sLibrary functions%s'\n <=.%ah <=.%ahe
+		for f `{for e <={%split ' ' $$libloc} {echo $e|cut -d: -f1} \
+		|head -n-1|sort} {
+			printf \n----\n%s%s%s\n\n <=.%ai $f <=.%an
+			catch {} {libi $f}
+		}
+	}|less -RXi
+}
 fn libi {|*|
 	.d 'Show information about a library function.'
 	.a 'FUNCTION-NAME'
