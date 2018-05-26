@@ -25,6 +25,13 @@ fn clean {|hstfile tmpfile|
 	} >$tmpfile
 }
 
+fn spinner {
+	while true {
+		printf '*'; sleep 0.5; printf \b
+		printf '@'; sleep 0.5; printf \b
+	}
+}
+
 if {!~ $history () && access -f $history} {
 	hstfile = $history
 	history -n
@@ -38,8 +45,11 @@ if {!~ $history () && access -f $history} {
 			xs -c {clean /tmp/$hf $tmpfile^'.'$hf} &
 			waitpids = $waitpids $apid
 		}
-		echo 'Scanning...'
+		printf \r'Cleaning... '
+		xs -c spinner &
+		animation = $apid
 		for p $waitpids {wait $p}
+		kill $animation
 		cat $tmpfile^.$hstsegs >$tmpfile
 		rm -f /tmp/$hstsegs $tmpfile^.$hstsegs
 	}
