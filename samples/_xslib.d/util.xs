@@ -871,3 +871,8 @@ fn %split-filter-join {|xform mult infile tmpbase outfile|
 		rm -f /tmp/$segs $tmpfile^.$segs
 	}
 }
+
+fn %outdated {|target sources|
+	# True if the target file is not newer than all source files.
+	result <={!map {|f| test $target -nt $f} $sources}
+}
