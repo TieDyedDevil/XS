@@ -6,6 +6,14 @@ fn arrs {|*|
 		| grep \^^$^*^.\* | column -c `{tput cols} \
 		| less -iFX
 }
+fn libedit {|*|
+	.d 'Edit library function'
+	.a 'NAME'
+	.c 'xs'
+	let ((file line) = <={~~ <={%objget $libloc $*} *:*}) {
+		!~ $file () && $EDITOR +$line $file
+	}
+}
 fn objs {|*|
 	.d 'List object variables'
 	.a '[FILTER]'
