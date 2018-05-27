@@ -559,6 +559,7 @@ fn %header-doc {|fn-name|
 	# Print a functions's header documentation.
 	escape {|fn-quit| let (pass = 0; file = <={%objget $libloc $fn-name}) {
 		~ $file () && throw error %header-doc 'not in library'
+		(file _) = <={~~ $file *:*}
 		%with-read-lines $file {|l|
 			if {~ $pass 1} {
 				if {~ $l \t\#*} {

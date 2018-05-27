@@ -23,8 +23,10 @@ if {~ $fn-%safe-wild ()} {
 	libloc = <=%mkobj
 	%safe-wild '~/.xslib.d/*.xs' {|exp|
 		for f $exp {
-			for lf `{cat $f|grep -o 'fn [^ ]\+'|cut -d ' ' -f2} {
-				%objset $libloc $lf $f
+			for lf `{grep -nho 'fn [^ ]\+' $f|sed 's/:fn /:/'} {
+				let ((ln nm) = <={~~ $lf *:*}) {
+					%objset $libloc $nm $f^:$ln
+				}
 			}
 		}
 	}
