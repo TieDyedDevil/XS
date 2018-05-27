@@ -58,6 +58,7 @@ fn libdoc {
 	.c 'help'
 	let (df = ~/.xslib.d/.doc.$TERM) {
 		if {%outdated $df ~/.xslib.d/^`{ls ~/.xslib.d}} {
+			.ensure-libloc
 			%with-tempfile tf {
 				for f `{for e <={%split ' ' $$libloc} {
 					echo $e|cut -d: -f1} |head -n-1|sort} {
@@ -88,6 +89,7 @@ fn libi {|*|
 		{~ <={result $#(fn-$*)} 0} && {
 			throw error libi 'not a function'
 		}
+		.ensure-libloc
 		{~ <={%objget $libloc $*} ()} && {
 			throw error libi 'not in library'
 		}

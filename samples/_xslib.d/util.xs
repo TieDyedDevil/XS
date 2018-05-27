@@ -557,6 +557,7 @@ fn %with-bracketed-paste-mode {|cmd|
 
 fn %header-doc {|fn-name|
 	# Print a functions's header documentation.
+	.ensure-libloc
 	escape {|fn-quit| let (pass = 0; file = <={%objget $libloc $fn-name}) {
 		~ $file () && throw error %header-doc 'not in library'
 		(file _) = <={~~ $file *:*}

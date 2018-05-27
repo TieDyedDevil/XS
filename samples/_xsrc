@@ -15,22 +15,4 @@ path = /usr/local/bin /usr/bin /usr/sbin $home/.local/bin $home/bin
 history = $home/.xshistory
 
 access -d ~/.xslib.d && {for f ~/.xslib.d/*.xs {. $f}}
-if {~ $fn-%safe-wild ()} {
-	throw error \~/.xsrc \
-		'No %safe-wild (see ~/.xslib.d/*); ~/.xsuser.d/* is not loaded.'
-} else {
-	!~ $libloc () && %rmobj $libloc
-	libloc = <=%mkobj
-	%safe-wild '~/.xslib.d/*.xs' {|exp|
-		for f $exp {
-			for lf `{grep -nho 'fn [^ ]\+' $f|sed 's/:fn /:/'} {
-				let ((ln nm) = <={~~ $lf *:*}) {
-					%objset $libloc $nm $f^:$ln
-				}
-			}
-		}
-	}
-	%safe-wild '~/.xsrc.d/*.xs' {|exp|
-		for f $exp {. $f}
-	}
-}
+access -d ~/.xsrc.d && {for f ~/.xsrc.d/*.xs {. $f}}

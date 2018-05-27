@@ -76,6 +76,7 @@ project('xs', ['cpp'])
 		'samples/_xsrc.d/file.xs', 'samples/_xsrc.d/framebuffer.xs',
 		'samples/_xsrc.d/game.xs', 'samples/_xsrc.d/help.xs',
 		'samples/_xsrc.d/herbstluftwm.xs', 'samples/_xsrc.d/kasa.xs',
+		'samples/_xsrc.d/libloc.xs',
 		'samples/_xsrc.d/media.xs', 'samples/_xsrc.d/pacer.xs',
 		'samples/_xsrc.d/priv.xs', 'samples/_xsrc.d/process.xs',
 		'samples/_xsrc.d/prompt.xs', 'samples/_xsrc.d/system.xs',

@@ -10,6 +10,7 @@ fn libedit {|*|
 	.d 'Edit library function'
 	.a 'NAME'
 	.c 'xs'
+	.ensure-libloc
 	let ((file line) = <={~~ <={%objget $libloc $*} *:*}) {
 		!~ $file () && $EDITOR +$line $file
 	}
