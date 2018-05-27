@@ -835,7 +835,7 @@ fn %confirm {|dflt msg|
 	}
 }
 
-fn %split-filter-join {|xform mult infile tmpbase outfile|
+fn %split-xform-join {|xform mult infile tmpbase outfile|
 	# Transform infile to outfile using multiple processes.
 	# Process count is number of CPU cores times mult, capped at a
 	# total of the lesser of 100 or the number of lines in infile.

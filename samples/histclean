@@ -40,7 +40,7 @@ if {!~ $history () && access -f $history} {
 			printf \r'Cleaning... '
 			xs -c spinner &
 			animation = $apid
-			%split-filter-join clean 3 $hstfile `mktemp $tmpfile
+			%split-xform-join clean 3 $hstfile `mktemp $tmpfile
 		} {
 			kill $animation
 		}

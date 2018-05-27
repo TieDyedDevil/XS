@@ -63,7 +63,7 @@ fn libdoc {
 					echo $e|cut -d: -f1} |head -n-1|sort} {
 						echo $f >>$tf
 				}
-				%split-filter-join {|infile outfile|
+				%split-xform-join {|infile outfile|
 					%with-read-lines $infile {|f|
 						printf \n%s----%s\n%s%s%s\n\n \
 							<=.%ad <=.%an \
