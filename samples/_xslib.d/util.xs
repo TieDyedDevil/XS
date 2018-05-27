@@ -565,6 +565,8 @@ fn %header-doc {|fn-name|
 			if {~ $pass 1} {
 				if {~ $l \t\#*} {
 					printf %s `` '' {echo $l|cut -c4-}
+				} else if {~ $l \t.d* \t.a*} {
+					printf %s `` '' {echo $l}
 				} else {
 					quit
 				}
