@@ -24,7 +24,7 @@ if {~ $fn-%safe-wild ()} {
 	%safe-wild '~/.xslib.d/*.xs' {|exp|
 		for f $exp {
 			for lf `{cat $f|grep -o 'fn [^ ]\+'|cut -d ' ' -f2} {
-				%objset $libloc $lf $f
+				!~ $lf \$* && %objset $libloc $lf $f
 			}
 		}
 	}
