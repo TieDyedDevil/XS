@@ -1,7 +1,7 @@
 fn .ensure-libloc {
 	~ $libloc () && {
 		libloc = <=%mkobj
-		%safe-wild '~/.xslib.d/*.xs' {|exp|
+		%safe-wild '~/.xs*.d/*.xs' {|exp|
 			for f $exp {
 				for lf `{grep -nho 'fn [^ ]\+' $f \
 							|sed 's/:fn /:/'} {
