@@ -58,7 +58,7 @@ fn libdoc {
 	.d 'List documentation for all library functions.'
 	.c 'help'
 	let (df = ~/.xslib.d/.doc.$TERM) {
-		if {%outdated $df ~/.xslib.d/^`{ls ~/.xslib.d}} {
+		if {%outdated $df `{ls ~/.xs*.d/*.xs}} {
 			.ensure-libloc
 			%with-tempfile tf {
 				for f `{for e <={%split ' ' $$libloc} {
