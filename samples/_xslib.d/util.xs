@@ -586,7 +586,8 @@ fn %arglist {|fn-name|
 fn %safe-wild {|path thunk|
 	# Given a quoted wildcard path, evaluate thunk with a handler to ignore
 	# a 'no such ...' error and the expanded path passed as an argument.
-	let (expanded = `` \n {eval ls $path >[2]/dev/null}) {
+	# Multiple wildcard paths may be separated using colon (:).
+	let (expanded = `` \n {eval ls <={%split : $path} >[2]/dev/null}) {
 		$thunk $expanded
 	}
 }
