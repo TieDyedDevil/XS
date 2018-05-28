@@ -456,9 +456,18 @@ fn vidshuffle {|*|
 			|awk '/^[^/]/ {print "'`pwd'/"$0} /^\// {print}'}
 	}}
 }
-fn vol {
-	.d 'Show volume of default PulseAudio output'
+fn vol {|*|
+	.d 'Show/set volume of default PulseAudio output'
+	.a '[%VOLUME]'
 	.c 'media'
-	if {~ `{pamixer --get-mute} 1} {printf Volume:\ muted\n} \
-	else {printf Volume:\ %d%%\n `{pamixer --get-volume|cut -d\  -f1}}
+	if {~ $#* 1} {
+		pamixer --set-volume $*
+	} else {
+		if {~ `{pamixer --get-mute} 1} {
+			printf Volume:\ muted\n} \
+		else {
+			printf Volume:\ %d%%\n \
+				`{pamixer --get-volume|cut -d\  -f1}
+		}
+	}
 }
