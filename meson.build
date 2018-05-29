@@ -71,7 +71,8 @@ project('xs', ['cpp'])
 		'samples/_xslib.d/util.xs'],
 	install_dir: 'share/doc/xs/samples/_xslib.d')
   install_data(['samples/_xsrc.d/aliases.xs', 'samples/_xsrc.d/amusement.xs',
-		'samples/_xsrc.d/annotate.xs', 'samples/_xsrc.d/daemons.xs',
+		'samples/_xsrc.d/annotate.xs', 'samples/_xsrc.d/bcc.xs',
+		'samples/_xsrc.d/daemons.xs',
 		'samples/_xsrc.d/directory.xs', 'samples/_xsrc.d/env.xs',
 		'samples/_xsrc.d/file.xs', 'samples/_xsrc.d/framebuffer.xs',
 		'samples/_xsrc.d/game.xs', 'samples/_xsrc.d/help.xs',
