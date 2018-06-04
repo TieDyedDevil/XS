@@ -11,6 +11,7 @@
 }
 # end locale hack
 
+umask 0022
 path = /usr/local/bin /usr/bin /usr/sbin $home/.local/bin $home/bin
 history = $home/.xshistory
 
