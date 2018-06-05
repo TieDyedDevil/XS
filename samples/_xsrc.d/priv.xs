@@ -56,6 +56,10 @@ fn panel {|*|
 		}
 	} else {throw error panel 'no Intel backlight'}
 }
+fn perf {|*|
+	.c 'priv'
+	%with-terminal sudo /usr/bin/perf $*
+}
 fn powertop {|*|
 	.c 'priv'
 	%with-terminal sudo /usr/sbin/powertop $*
