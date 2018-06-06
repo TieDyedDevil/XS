@@ -30,6 +30,10 @@ fn iptraf-ng {|*|
 	.c 'priv'
 	%with-terminal sudo /usr/sbin/iptraf-ng $*
 }
+fn lft {|*|
+	.c 'priv'
+	sudo /usr/sbin/lft $*
+}
 fn nethogs {|*|
 	.c 'priv'
 	%with-terminal sudo /usr/sbin/nethogs $*
