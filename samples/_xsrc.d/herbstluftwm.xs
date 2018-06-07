@@ -171,6 +171,11 @@ fn osd {|msg|
 		}
 	}
 }
+fn q {
+	.d 'Quit wm'
+	.c 'wm'
+	%confirm n 'Quit wm' && herbstclient quit
+}
 fn quad {
 	.d 'Divide focused monitor'
 	.c 'wm'
