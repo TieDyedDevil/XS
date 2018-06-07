@@ -17,6 +17,8 @@ Reworked locale initialization to ensure that `$&wid` works as designed.
 
 Accept printf format modifier '.
 
+Extended the `limit` command to expose all Linux (2.6+) -specific settings.
+
 xs 1.0 to xs 1.1
 ----------------
 
