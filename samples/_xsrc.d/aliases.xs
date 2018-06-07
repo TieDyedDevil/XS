@@ -33,7 +33,11 @@ fn htop {|*|
 }
 %cfn {%have mandelbulber2} mb2 {|*|
 	.c 'alias'
-	mandelbulber2 $*
+	unwind-protect {
+		mandelbulber2 $*
+	} {
+		rmdir --ignore-fail-on-non-empty ~/mandelbulber
+	}
 }
 fn mutt {|*|
 	.c 'alias'
