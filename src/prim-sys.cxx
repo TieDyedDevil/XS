@@ -164,29 +164,16 @@ static const Limit limits[] = {
 	{ "datasize",		RLIMIT_DATA,	sizesuf },
 	{ "stacksize",		RLIMIT_STACK,	sizesuf },
 	{ "coredumpsize",	RLIMIT_CORE,	sizesuf },
-
-#ifdef RLIMIT_RSS	/* SysVr4 does not have this */
 	{ "memoryuse",		RLIMIT_RSS,	sizesuf },
-#endif
-#ifdef RLIMIT_VMEM	/* instead, they have this! */
-	{ "memorysize",		RLIMIT_VMEM,	sizesuf },
-#endif
-
-#ifdef RLIMIT_MEMLOCK	/* 4.4bsd adds an unimplemented limit
-			   on non-pageable memory */
-	{ "lockedmemory",	RLIMIT_CORE,	sizesuf },
-#endif
-
-#ifdef RLIMIT_NOFILE	/* SunOS 4.1 adds a limit on file descriptors */
+	{ "lockedmemory",	RLIMIT_MEMLOCK,	sizesuf },
 	{ "descriptors",	RLIMIT_NOFILE,	NULL },
-#elif defined(RLIMIT_OFILE) /* but 4.4bsd uses this name for it */
-	{ "descriptors",	RLIMIT_OFILE,	NULL },
-#endif
-
-#ifdef RLIMIT_NPROC	/* 4.4bsd adds a limit on child processes */
 	{ "processes",		RLIMIT_NPROC,	NULL },
-#endif
-
+	{ "virtualsize",	RLIMIT_AS,	sizesuf },
+	{ "msgqueuesize",	RLIMIT_MSGQUEUE, sizesuf },
+	{ "nicelimit",		RLIMIT_NICE,	NULL },
+	{ "rtpriolimit",	RLIMIT_RTPRIO,	NULL },
+	{ "rtrunlimit",		RLIMIT_RTTIME,	timesuf },
+	{ "sigqlimit",		RLIMIT_SIGPENDING, NULL },
 	{ NULL, 0, NULL }
 };
 
