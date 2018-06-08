@@ -84,7 +84,9 @@ fn startwm {
 	} else if {!~ `tty *tty*} {
 		throw error startwm 'run from console'
 	} else {
-		cd; exec startx -- -logverbose 0 >~/.startx.log >[2=1]
+		cd
+		access -f .startx.log && mv .startx.log .startx.log.old
+		exec startx -- -logverbose 0 >.startx.log >[2=1]
 	}
 }
 fn wallpaper {|*|
