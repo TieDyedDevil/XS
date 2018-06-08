@@ -172,7 +172,7 @@ static const Limit limits[] = {
 	{ "msgqueuesize",	RLIMIT_MSGQUEUE, sizesuf },
 	{ "nicelimit",		RLIMIT_NICE,	NULL },
 	{ "rtpriolimit",	RLIMIT_RTPRIO,	NULL },
-	{ "rtrunlimit",		RLIMIT_RTTIME,	timesuf },
+	{ "rtrunlimit",		RLIMIT_RTTIME,	NULL },
 	{ "sigqlimit",		RLIMIT_SIGPENDING, NULL },
 	{ NULL, 0, NULL }
 };
