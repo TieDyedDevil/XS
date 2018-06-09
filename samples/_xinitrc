@@ -1,0 +1,64 @@
+# This file is *sourced*. Assume a POSIX shell.
+
+ls -tr ~/.serverauth.*|head -n-1|xargs -r rm
+gnome-keyring-daemon --components=secrets
+mnl=$(xrandr|grep '^[^ ]\+ connected'|cut -d' ' -f1|tr "\n" ' '|sed 's/ $//')
+echo "Monitors detected: $mnl"
+chassis=$(cat /sys/devices/virtual/dmi/id/chassis_type)
+if [ $chassis -ge 8 ] && [ $chassis -le 16 ]; then
+	# Running on a mobile device (e.g. laptop)
+	echo $mnl|grep -q '\w \w' && {
+		# An external monitor is connected
+		m1=$(echo $mnl|cut -d' ' -f1); m2=$(echo $mnl|cut -d' ' -f2)
+		echo "Mobile device w/external display; using only $m2"
+		# Disable the internal display; enable the external
+		xrandr --output $m1 --off --output $m2 --auto
+		xrandr --output $m2 --primary
+	}
+else
+	# Probably not a mobile device
+	[ -f ~/.xarrange ] && arranger=$(grep "^$mnl:" ~/.xarrange|cut -d: -f2)
+	if [ -n "$arranger" ]; then
+		match='^xrandr\|\b[-_A-Z0-9]\+\b\|--output\|--primary'
+		match=$match'\|--left-of\|--right-of\|--above\|--below'
+		invtok=$(echo "$arranger"|sed 's/'$match'//g' \
+				|grep -v '^[ ]\+$' >/dev/null)
+		if [ -n "$invtok" ]; then
+			printf "Invalid token(s) \"%s\"\nin %s\n" \
+				$invtok $arranger
+		else
+			for mon in $mnl; do
+				echo "Enabling monitor $mon"
+				xrandr --output $mon --auto
+			done
+			if echo $arranger|grep -c ^xrandr >/dev/null; then
+				echo Arrange: $arranger
+				$arranger
+			else
+				echo "Invalid arranger"
+			fi
+		fi
+	else
+		m1=$(echo $mnl|cut -d' ' -f1)
+		echo "No arranger; make $m1 primary"
+		xrandr --output $m1 --primary
+	fi
+fi
+test -f ~/.Xresources && xrdb ~/.Xresources
+test -f ~/.xsettingsd && {
+	pkill xsettingsd
+	setsid xsettingsd &
+}
+xsetroot -solid 'Slate Gray'
+setxkbmap -option keypad:pointerkeys -option compose:prsc
+xset dpms 0 0 900 s noblank
+xset s 900 0
+xset r rate 500 30
+xset m 7/5 0
+pgrep -c xautolock >/dev/null || \
+	exec xautolock -time 30 -locker ~/.local/bin/lock \
+		-notify 60 -detectsleep &
+pgrep -c twmnd >/dev/null || exec twmnd &
+pgrep -c xvisbell >/dev/null || exec xvisbell &
+#exec herbstluftwm --locked
+exec evilwm
