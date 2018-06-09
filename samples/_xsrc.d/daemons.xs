@@ -1,7 +1,7 @@
 if {~ $SSH_TTY ()} {
-	pulseaudio --check || {
-		until {pulseaudio --check} {
-			pulseaudio --start >[2]/dev/null
+	pgrep -c pulseaudio >/dev/null || {
+		until {pgrep -c pulseaudio >/dev/null} {
+			pulseaudio --start #>[2]/dev/null
 			sleep 0.5
 		}
 		pacmd load-module module-switch-on-connect
