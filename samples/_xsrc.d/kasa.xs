@@ -12,6 +12,7 @@ fn kasatoken {|kasa_user kasa_passwd|
 	query = `` '' {printf $msg $kasa_passwd $kasa_user $uuid}
 	response = `` '' {curl -s --request POST https://wap.tplinkcloud.com/ \
 		--header 'Content-Type: application/json' --data $query}
+	access -d ~/.config/k-kasa || mkdir -p ~/.config/k-kasa
 	echo $response | jq -r .result.token > ~/.config/k-kasa/token
 }
 
