@@ -2,7 +2,7 @@ fn _fec {}
 fn fec {|*|
 	.d 'Report entry counts of annotated xs functions'
 	.a '[-c]  # clear counts'
-	.c 'system'
+	.c 'annotate'
 	.r 'annotate'
 	if {~ $*(1) -c} {%objreset $fco; echo Cleared}
 	if {!grep -q '{_enter _fec}' <{var fn-_fec}} {echo 'Not annotated'}
@@ -27,7 +27,7 @@ fn _enter {|name|
 fn annotate {|*|
 	.d 'Annotate user-defined xs functions'
 	.a '[-f]  # force'
-	.c 'system'
+	.c 'annotate'
 	.r 'fec'
 	if {~ $fco ()} {
 		fco = <=%mkobj

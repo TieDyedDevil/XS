@@ -77,7 +77,7 @@ fn libdoc {
 					<=.%ah <=.%ahe} $tf >$df
 			}
 		}
-		less -rXi $df
+		less -rXif $df
 	}
 }
 fn libi {|*|

@@ -1,7 +1,0 @@
-#! /usr/bin/env xs
-
-for monitor `{hc list_monitors | cut -d: -f1} {
-	echo 'Start panel '$monitor >>~/.startx.log
-	setsid ~/.config/herbstluftwm/panel.xs $monitor \
-		>>[2]~/.startx.log &
-}

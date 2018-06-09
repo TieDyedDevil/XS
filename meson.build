@@ -62,22 +62,18 @@ project('xs', ['cpp'])
 		'doc/SYSTEMD_LOCALE', 'doc/TODO', 'doc/TUTORIAL.md',
 		'doc/XS-FOR-LISPERS.md'],
 	install_dir: 'share/doc/xs')
-  install_data(['samples/_config/herbstluftwm/autostart',
-		'samples/_config/herbstluftwm/inits',
-		'samples/_config/herbstluftwm/panel.xs',
-		'samples/_config/herbstluftwm/quitwm'],
-	install_dir: 'share/doc/xs/samples/_config/herbstluftwm')
+  install_data(['samples/_config/sxhkd/sxhkdrc'],
+	install_dir: 'share/doc/xs/samples/_config/sxhkd')
   install_data(['samples/_xslib.d/attr.xs', 'samples/_xslib.d/subs.xs',
 		'samples/_xslib.d/util.xs'],
 	install_dir: 'share/doc/xs/samples/_xslib.d')
   install_data(['samples/_xsrc.d/aliases.xs', 'samples/_xsrc.d/amusement.xs',
 		'samples/_xsrc.d/annotate.xs', 'samples/_xsrc.d/bcc.xs',
-		'samples/_xsrc.d/daemons.xs',
-		'samples/_xsrc.d/directory.xs', 'samples/_xsrc.d/env.xs',
+		'samples/_xsrc.d/daemons.xs', 'samples/_xsrc.d/directory.xs',
+		'samples/_xsrc.d/env.xs', 'samples/_xsrc.d/evilwm.xs', 
 		'samples/_xsrc.d/file.xs', 'samples/_xsrc.d/framebuffer.xs',
 		'samples/_xsrc.d/game.xs', 'samples/_xsrc.d/help.xs',
-		'samples/_xsrc.d/herbstluftwm.xs', 'samples/_xsrc.d/kasa.xs',
-		'samples/_xsrc.d/libloc.xs',
+		'samples/_xsrc.d/kasa.xs', 'samples/_xsrc.d/libloc.xs',
 		'samples/_xsrc.d/media.xs', 'samples/_xsrc.d/pacer.xs',
 		'samples/_xsrc.d/priv.xs', 'samples/_xsrc.d/process.xs',
 		'samples/_xsrc.d/prompt.xs', 'samples/_xsrc.d/system.xs',

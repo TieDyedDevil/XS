@@ -43,6 +43,11 @@ fn d {
 		printf %+d\t%u\n $l $t
 	}
 }
+fn mail {
+	.d 'Check inbox status'
+	.c 'system'
+	fetchmail -c
+}
 fn name {|*|
 	.d 'Set prompt text and terminal title.'
 	.a '[NAME]'

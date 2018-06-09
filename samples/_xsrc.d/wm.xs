@@ -144,8 +144,8 @@ fn wallpaper {|*|
 				}
 				{	if {running} {
 						kill -- -^`{pgrep -f $re}
-						xsetroot -solid 'Slate Gray'
 					}
+					xsetroot -solid gray15
 				})
 			}
 		}

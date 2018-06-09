@@ -763,8 +763,7 @@ fn %rgbhex {|color|
 fn %preserving-title {|cmd|
 	# Run a command, preserving the title of the focused window.
 	if {!~ $DISPLAY ()} {
-		let (__t = `{xdotool getwindowname `{herbstclient attr \
-							clients.focus.winid}}) {
+		let (__t = `{xdotool getwindowfocus getwindowname}) {
 			unwind-protect {
 				$cmd
 			} {
@@ -887,4 +886,10 @@ fn %outdated {|target sources|
 fn %ignore-error {|body|
 	# Ignore error exception thrown by body.
 	catch {|e| !~ $e(1) error && throw $e} {$body}
+}
+
+fn %X-screen-size {
+	# Return X screen size.
+	%only-X
+	result `{xrandr|grep -o 'current [0-9]\+ x [0-9]\+'|cut -d' ' -f2,4}
 }

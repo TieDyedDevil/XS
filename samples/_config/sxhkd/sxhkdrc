@@ -1,0 +1,53 @@
+# NOTE: {} has special meaning to sxhkd. Escape them if used in a command.
+
+# bury pointer
+mod4+slash
+	xdotool mousemove 5000 5000
+
+# center pointer
+mod4+period
+	xdotool mousemove <=\{map \{|n| result `($n/2)\} <=%X-screen-size\}
+
+# run program
+mod4+r
+	dmr
+
+# report battery state
+mod4+p
+	nsb
+
+# media keys
+XF86AudioPlay
+	mpc -q toggle
+mod4+m
+	mpc -q toggle
+shift+XF86AudioPlay
+	mpc -q seek 0
+XF86AudioNext
+	mpc -q next
+shift+XF86AudioNext
+	mpc -q seek +20
+XF86AudioPrev
+	mpc -q prev
+shift+XF86AudioPrev
+	mpc -q seek -20
+XF86AudioRaiseVolume
+	pactl set-sink-volume @DEFAULT_SINK@ +1dB
+XF86AudioLowerVolume
+	pactl set-sink-volume @DEFAULT_SINK@ -1dB
+XF86AudioMute
+	pactl set-sink-mute @DEFAULT_SINK@ toggle
+XF86AudioMicMute
+	pactl set-source-mute @DEFAULT_SOURCE@ toggle
+mod4+e
+	equalizer toggle
+XF86Sleep
+	lock
+
+# wallpaper
+mod4+w
+	wallpaper -c
+
+# screen capture
+mod4+s
+	scrot -m
