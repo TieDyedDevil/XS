@@ -49,7 +49,7 @@ test -f ~/.xsettingsd && {
 	pkill xsettingsd
 	setsid xsettingsd &
 }
-xsetroot -solid 'Slate Gray'
+xsetroot -solid gray15
 setxkbmap -option keypad:pointerkeys -option compose:prsc
 xset dpms 0 0 900 s noblank
 xset s 900 0
@@ -60,5 +60,6 @@ pgrep -c xautolock >/dev/null || \
 		-notify 60 -detectsleep &
 pgrep -c twmnd >/dev/null || exec twmnd &
 pgrep -c xvisbell >/dev/null || exec xvisbell &
-#exec herbstluftwm --locked
+pgrep -c sxhkd >/dev/null || exec sxhkd &
+xs -c .adapt-resolution
 exec evilwm
