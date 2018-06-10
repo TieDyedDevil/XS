@@ -12,6 +12,10 @@ mod4+period
 mod4+r
 	dmr
 
+# tabbed terminal
+mod4+shift+Return
+	tabbed -ck st -w
+
 # report battery state
 mod4+p
 	nsb

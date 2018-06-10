@@ -11,6 +11,7 @@ Mod4+button1	move window
 Mod4+button2	resize window
 Mod4+button3	lower window
 Mod4+return	spawn new terminal
+Mod4+Shift+return  spawn new tabbed terminal
 Mod4+escape	delete window
 Mod4+Shift+escape force kill window
 Mod4+insert	lower window
