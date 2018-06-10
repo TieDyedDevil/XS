@@ -59,6 +59,9 @@ mod4+w
 # screen capture
 mod4+s
 	scrot -m
+# selection capture
+mod4+shift+s
+	\{sleep 0.2; scrot -ms\}
 
 # screen lock
 mod4+0
