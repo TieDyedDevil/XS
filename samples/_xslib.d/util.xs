@@ -893,3 +893,14 @@ fn %X-screen-size {
 	%only-X
 	result `{xrandr|grep -o 'current [0-9]\+ x [0-9]\+'|cut -d' ' -f2,4}
 }
+
+fn %X-with-cursor {|name body|
+	# Run body with named X cursor.
+	%only-X
+	unwind-protect {
+		xsetroot -cursor_name $name
+		$body
+	} {
+		xsetroot -cursor_name X_cursor
+	}
+}
