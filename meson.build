@@ -78,7 +78,7 @@ project('xs', ['cpp'])
 		'samples/_xsrc.d/priv.xs', 'samples/_xsrc.d/process.xs',
 		'samples/_xsrc.d/prompt.xs', 'samples/_xsrc.d/system.xs',
 		'samples/_xsrc.d/touchscreen.xs', 'samples/_xsrc.d/unicode.xs',
-		'samples/_xsrc.d/virts.xs', 'samples/_xsrc.d/web.xs',
+		'samples/_xsrc.d/virts.xs',  'samples/_xsrc.d/web.xs',
 		'samples/_xsrc.d/wm.xs', 'samples/_xsrc.d/xs.xs'],
 	install_dir: 'share/doc/xs/samples/_xsrc.d')
   install_data(['samples/_xsuser.d/prompt-config.xs'],
@@ -87,7 +87,7 @@ project('xs', ['cpp'])
 		'samples/_xsin', 'samples/_xsrc', 'samples/colors',
 		'samples/dmr', 'samples/histclean', 'samples/lock',
 		'samples/slider', 'samples/sv', 'samples/tsm',
-		'samples/web-browser', 'samples/README'],
+		'samples/wcd', 'samples/web-browser', 'samples/README'],
 	install_dir: 'share/doc/xs/samples')
 
 run_target('check',

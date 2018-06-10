@@ -30,6 +30,7 @@ Mod4+a		last-viewed desktop
 Mod4+tab	cycle next window
 Mod4+slash	bury pointer
 Mod4+period	center pointer
+Mod4+comma	center window
 Mod4+p		report battery state
 Mod4+m		mpc toggle
 Mod4+e		equalizer toggle

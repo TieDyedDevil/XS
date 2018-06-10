@@ -8,6 +8,10 @@ mod4+slash
 mod4+period
 	xdotool mousemove <=\{map \{|n| result `($n/2)\} <=%X-screen-size\}
 
+# center window
+mod4+comma
+	wcd
+
 # run program
 mod4+r
 	dmr
