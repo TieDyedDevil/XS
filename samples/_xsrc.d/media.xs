@@ -408,7 +408,18 @@ fn noise {|*|
 fn p {
 	.d 'Pulse Audio mixer'
 	.c 'media'
-	%with-terminal %preserving-title pamixer
+	%with-terminal %preserving-title {
+		catch {|e|
+			~ $e 'disconnected' && {
+				echo 'Attempting to reconnect'
+				pkill pulseaudio
+				pulseaudio --start
+				throw retry
+			}
+		} {
+			pamixer || throw error p 'disconnected'
+		}
+	}
 }
 fn played {|*|
 	.d 'List recently-played tracks'

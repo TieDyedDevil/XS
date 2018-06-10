@@ -11,6 +11,7 @@ Mod4+button1	move window
 Mod4+button2	resize window
 Mod4+button3	lower window
 Mod4+return	spawn new terminal
+Mod4+Shift+return  spawn new tabbed terminal
 Mod4+escape	delete window
 Mod4+Shift+escape force kill window
 Mod4+insert	lower window
@@ -29,12 +30,14 @@ Mod4+a		last-viewed desktop
 Mod4+tab	cycle next window
 Mod4+slash	bury pointer
 Mod4+period	center pointer
+Mod4+comma	center window
 Mod4+p		report battery state
 Mod4+m		mpc toggle
 Mod4+e		equalizer toggle
 Mod4+w		wallpaper cycle
 Mod4+s		screen capture
 Mod4+r		run program
+Mod4+0		lock screen
 EOF
 	}
 }
