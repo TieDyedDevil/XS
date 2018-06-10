@@ -51,3 +51,7 @@ mod4+w
 # screen capture
 mod4+s
 	scrot -m
+
+# screen lock
+mod4+0
+	lock

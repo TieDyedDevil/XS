@@ -35,6 +35,7 @@ Mod4+e		equalizer toggle
 Mod4+w		wallpaper cycle
 Mod4+s		screen capture
 Mod4+r		run program
+Mod4+0		lock screen
 EOF
 	}
 }
