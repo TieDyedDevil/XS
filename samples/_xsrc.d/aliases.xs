@@ -44,9 +44,10 @@ fn mutt {|*|
 	# mutt won't override st colors
 	%with-tabbed-terminal env TERM=st /usr/bin/mutt $*
 }
-fn oclock {
+fn oclock {|*|
 	.c 'alias'
-	/usr/bin/oclock -transparent -bd gray -hour gray -minute gray
+	.a '[oclock_OPTIONS]'
+	/usr/bin/oclock -transparent -bd gray -hour gray -minute gray $*
 }
 fn sysmon {
 	.d 'View Monitorix stats'
