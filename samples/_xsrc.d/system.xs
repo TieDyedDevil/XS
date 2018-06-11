@@ -75,6 +75,12 @@ fn nmtui {
 	.c 'system'
 	%with-terminal /usr/bin/nmtui
 }
+fn notify-send {|title message|
+	.d 'Pop up a titled message'
+	.c 'system'
+	echo '^fg(cyan)'^$title^' ^fg(gray40)|^fg()' $message \
+		| dzen2 -p 3 -fn Noto-18 -h 30
+}
 fn oc {
 	.d 'Onscreen clock'
 	.c 'system'
