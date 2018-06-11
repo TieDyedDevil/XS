@@ -48,7 +48,7 @@ fn .adapt-resolution {|scale|
 	# Adapt X and GTK resolution to that of primary display.
 	# Scale is a float; default 1.0.
 	let (xrinfo = `{xrandr|grep '^[^ ]\+ connected primary'}; \
-	scale = <={if {~ $scale ()} {result 1.0} else {result $scale}}; \
+	scale = <={if {result $scale} {result 1.0} else {result $scale}}; \
 	size; w; xres; dpi) {
 		if {~ $xrinfo ()} {throw error updres 'no primary display'}
 		size = <={%argify `{echo $xrinfo|grep -o '[^ ]\+ x [^ ]\+mm' \
