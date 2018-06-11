@@ -1,10 +1,11 @@
 #! /usr/bin/env xs
 
 # window center on display
-let ((xw yw) = <={map {|n| result `($n/2)} \
-	`{xdotool getactivewindow getwindowgeometry --shell \
-	|grep 'WIDTH\|HEIGHT'|cut -d= -f2}}; \
-(xd yd) = <={map {|n| result `($n/2)} <=%X-screen-size}) {
-	xdotool getactivewindow windowmove `($xd-$xw) `($yd-$yw)
+%X-with-cursor watch {
+	let ((xw yw) = <={map {|n| result `($n/2)} \
+		`{xdotool getactivewindow getwindowgeometry --shell \
+		|grep 'WIDTH\|HEIGHT'|cut -d= -f2}}; \
+	(xd yd) = <={map {|n| result `($n/2)} <=%X-screen-size}) {
+		xdotool getactivewindow windowmove `($xd-$xw) `($yd-$yw)
+	}
 }
-
