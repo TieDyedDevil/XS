@@ -38,6 +38,12 @@ fn lock {|*|
 		~/.local/bin/lock $*
 	}
 }
+fn mons {
+	.d 'Report connect monitors'
+	.c 'wm'
+	%only-X
+	xrandr | grep -w -e Screen -e connected | sed 's/([^)]\+)//'
+}
 fn screensaver {|*|
 	.d 'Query/set display screensaver enable'
 	.a '[on|off]'
@@ -88,6 +94,11 @@ fn startwm {
 		access -f .startx.log && mv .startx.log .startx.log.old
 		exec startx -- -logverbose 0 >.startx.log >[2=1]
 	}
+}
+fn updres {
+	.d 'Update X and GTK resolution to match display'
+	.c 'wm'
+	.adapt-resolution
 }
 fn wallpaper {|*|
 	.d 'Set wallpaper'
