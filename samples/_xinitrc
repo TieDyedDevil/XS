@@ -58,8 +58,7 @@ xset m 7/5 0
 pgrep -c xautolock >/dev/null || \
 	exec xautolock -time 30 -locker ~/.local/bin/lock \
 		-notify 60 -detectsleep &
-pgrep -c twmnd >/dev/null || exec twmnd &
 pgrep -c xvisbell >/dev/null || exec xvisbell &
 pgrep -c sxhkd >/dev/null || exec sxhkd &
-xs -c .adapt-resolution
+xs -c '.adapt-resolution `{cat ~/.xscale >[2]/dev/null}'
 exec evilwm
