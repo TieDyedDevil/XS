@@ -23,8 +23,8 @@ fn pacer {|*|
 					fn-prompt = {notify-send pacer \
 						'Time to stretch!'}; \
 					fn-pause = {sleep `(60*$lead)}; \
-					fn-go = {for i <={%range 1-5} { \
-						osd .; osd ''''}}) {
+					fn-go = {notify-send pacer \
+						'Stretch break ends now.'}) {
 					{while true {prompt; pause; go; work}}
 				} &
 				echo $apid > $pspid
