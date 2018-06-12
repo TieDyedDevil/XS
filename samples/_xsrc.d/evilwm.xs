@@ -11,12 +11,13 @@ Mod4+button1	move window
 Mod4+button2	resize window
 Mod4+button3	lower window
 Mod4+return	spawn new terminal
-Mod4+Shift+return  spawn new tabbed terminal
+Mod4+Shift+return	spawn new tabbed terminal
 Mod4+escape	delete window
-Mod4+Shift+escape force kill window
+Mod4+Shift+escape	force kill window
 Mod4+insert	lower window
-Mod4+{h,j,k,l}	move window left,down,up,right
-Mod4+Shift+{h,j,k,l}  resize window left,down,up,right
+Mod4+{h,j,k,l}	move window left,down,up,right (fine)
+Mod4+Control+{h,j,k,l}	move window left,down,up,right (coarse)
+Mod4+Shift+{h,j,k,l}	resize window left,down,up,right
 Mod4+{y,u,b,n}	move window to top-left,top-right,bottom-left,bottom-right
 Mod4+i		show window information
 Mod4+equals	toggle maximize window vertically

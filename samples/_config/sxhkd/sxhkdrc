@@ -12,6 +12,12 @@ mod4+period
 mod4+comma
 	wcd
 
+# move window
+mod4+control+{h,l}
+	xdotool getactivewindow windowmove --relative -- {-128,128} 0
+mod4+control+{j,k}
+	xdotool getactivewindow windowmove --relative -- 0 {128,-128}
+
 # run program
 mod4+r
 	dmr
