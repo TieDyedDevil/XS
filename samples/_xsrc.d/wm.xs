@@ -39,7 +39,7 @@ fn lock {|*|
 	}
 }
 fn mons {
-	.d 'Report connect monitors'
+	.d 'Report connected monitors'
 	.c 'wm'
 	%only-X
 	xrandr | grep -w -e Screen -e connected | sed 's/([^)]\+)//'
@@ -98,6 +98,7 @@ fn startwm {
 fn updres {
 	.d 'Update X and GTK resolution to match display'
 	.c 'wm'
+	%only-X
 	.adapt-resolution
 }
 fn wallgen {
@@ -180,8 +181,20 @@ fn wallpaper {|*|
 		}
 	}}
 }
+fn wins {
+	.d 'List X windows'
+	.c 'wm'
+	%only-X
+	{
+		printf %s%s%s\n <=.%ai Desktops <=.%an
+		wmctrl -d
+		printf %s%s%s\n <=.%ai Windows <=.%an
+		wmctrl -lpG
+	} | less -iRFXS
+}
 fn xdpi {
 	.d 'X display info'
 	.c 'wm'
+	%only-X
 	{xrdb -query|grep 'Xft\.dpi'|tr \t ' '; xdriinfo}|column -s: -t
 }
