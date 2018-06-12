@@ -371,6 +371,8 @@ fn mpvl {|*|
 	}}
 }
 fn mtrack {
+	.d 'Show mpc track monitor'
+	.c 'media'
 	st -n mtrack -g 80x1-0-0 -e xs -c {
 		let (cols; \
 		fn-mpct = {
@@ -378,16 +380,23 @@ fn mtrack {
 			if {mpc|grep '^\[paused\]'} {
 				cols = `{tput cols}
 				.ah
-				printf %$cols^s paused
+				printf %$cols^s 'paused'
 				.ahe
-			} else {
+			} else if {mpc|grep '^\[playing\]'} {
 				mpc -f '%artist% - %album% - %track%' \
 					^'#| %title%'|head -1|tr -d \n
+			} else {
+				cols = `{tput cols}
+				.ah
+				printf %$cols^s 'no playlist'
+				.ahe
 			}
 		}) {
 			.ci
 			mpct
-			%with-read-lines <{mpc idleloop player} {mpct}
+			%with-read-lines <{mpc idleloop player playlist} {
+				mpct
+			}
 		}
 	}
 }
