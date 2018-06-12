@@ -108,10 +108,10 @@ fn wallgen {
 	let (n = <=$&random; \
 	r = <={{|x y| result `(1.0*$x/$y)} <=%X-screen-size}; \
 	aspect) {
-		switch `{echo $r|cut -c-4} (
-		1.33 {aspect = 4x3}
-		1.77 {aspect = 16x9}
-		2.38 {aspect = 21x9}
+		switch `{echo $r|cut -c-3} (
+		1.3 {aspect = 4x3}
+		1.7 {aspect = 16x9}
+		2.3 {aspect = 21x9}
 		{aspect = 2x2}
 		)
 		switch `($n%2) (
