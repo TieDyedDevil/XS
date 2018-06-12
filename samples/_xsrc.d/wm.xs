@@ -100,6 +100,25 @@ fn updres {
 	.c 'wm'
 	.adapt-resolution
 }
+fn wallgen {
+	.d 'Generate wallpaper'
+	.c 'wm'
+	%only-X
+	let (n = <=$&random; \
+	r = <={{|x y| result `(1.0*$x/$y)} <=%X-screen-size}; \
+	aspect) {
+		switch $r (
+		1.33333 {aspect = 4x3}
+		1.77778 {aspect = 16x9}
+		2.38889	{aspect = 21x9}
+		{aspect = 2x2}
+		)
+		switch `($n%2) (
+		0 {xmartin -static -perturb 1117}
+		1 {xmartin -static -tile $aspect}
+		) >[2]/dev/null
+	}
+}
 fn wallpaper {|*|
 	.d 'Set wallpaper'
 	.a '[-m MONITOR] FILE-OR-DIRECTORY'
@@ -118,8 +137,9 @@ fn wallpaper {|*|
 				if {running} {
 					 pkill -P `{pgrep -f $re}
 				} else {
-					throw error wallpaper \
-						'not active'
+					wallgen
+					#throw error wallpaper \
+					#	'not active'
 				}
 			} else {
 				if {~ $*(1) -m} {
