@@ -370,6 +370,27 @@ fn mpvl {|*|
 		mpv --af=$afconf $*
 	}}
 }
+fn mtrack {
+	st -n mtrack -g 80x1-0-0 -e xs -c {
+		let (cols; \
+		fn-mpct = {
+			clear
+			if {mpc|grep '^\[paused\]'} {
+				cols = `{tput cols}
+				.ah
+				printf %$cols^s paused
+				.ahe
+			} else {
+				mpc -f '%artist% - %album% - %track%' \
+					^'#| %title%'|head -1|tr -d \n
+			}
+		}) {
+			.ci
+			mpct
+			%with-read-lines <{mpc idleloop player} {mpct}
+		}
+	}
+}
 fn n {
 	.d 'Play next track'
 	.c 'media'
