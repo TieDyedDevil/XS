@@ -807,9 +807,7 @@ fn %with-terminal {|cmd|
 
 fn %with-tabbed-terminal {|cmd|
 	# Run command, spawning a tabbed terminal if necessary.
-	local (DISPLAY = :0) {
-		if {tty -s} {$cmd} else {tabbed -c -r 2 st -w '' xs -c {$cmd}}
-	}
+	if {tty -s} {$cmd} else {tabbed -c -r 2 st -w '' xs -c {$cmd}}
 }
 
 fn %wait-file-deleted {|path|
