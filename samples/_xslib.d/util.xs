@@ -904,3 +904,16 @@ fn %X-with-cursor {|name body|
 		xsetroot -cursor_name X_cursor
 	}
 }
+
+fn %is-mobile {
+	# Return true if system chassis is "mobile".
+	let (chassis = `{cat /sys/devices/virtual/dmi/id/chassis_type}) {
+		if {{$chassis :ge 8} && {$chassis :le 16}} {true} else {false}
+	}
+}
+
+fn %multiple-displays {
+	# Return true if multiple displays are connected.
+	%only-X
+	if {`{xrandr|grep -w connected|wc -l} :gt 1} {true} else {false}
+}
