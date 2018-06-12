@@ -189,7 +189,7 @@ fn wins {
 		printf %s%s%s\n <=.%ai Desktops <=.%an
 		wmctrl -d
 		printf %s%s%s\n <=.%ai Windows <=.%an
-		wmctrl -lpG
+		wmctrl -lpGx
 	} | less -iRFXS
 }
 fn xdpi {
