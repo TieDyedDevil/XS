@@ -60,5 +60,11 @@ pgrep -c xautolock >/dev/null || \
 		-notify 60 -detectsleep &
 pgrep -c xvisbell >/dev/null || exec xvisbell &
 pgrep -c sxhkd >/dev/null || exec sxhkd &
+pacmd load-module module-switch-on-connect
+pacmd load-module module-dbus-protocol
+pgrep -xc mpd >/dev/null || { \
+	rm -f ~/.mpd/mpd.log
+	mpd
+}
 xs -c '.adapt-resolution `{cat ~/.xscale >[2]/dev/null}'
 exec evilwm
