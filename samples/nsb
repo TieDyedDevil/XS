@@ -1,6 +1,0 @@
-#! /usr/bin/env xs
-
-let (status = `battery) {
-	~ $status () && status = not present
-	notify-send Battery <={%flatten ' ' $status}
-}
