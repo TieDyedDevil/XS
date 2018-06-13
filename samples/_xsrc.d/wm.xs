@@ -111,17 +111,26 @@ fn wallgen {
 		switch `{echo $r|cut -c-3} (
 		1.3 {aspect = 4x3}
 		1.7 {
-			switch `($n/3%2) (
+			switch `($n/3%8) (
 			0 {aspect = 16x9}
-			1 {aspect = 8x9}
+			1 {aspect = 16x3}
+			2 {aspect = 8x9}
+			3 {aspect = 8x3}
+			4 {aspect = 4x9}
+			5 {aspect = 4x3}
+			6 {aspect = 2x9}
+			7 {aspect = 2x3}
 			{aspect = 2x2}
 			)
 		}
 		2.3 {
-			switch `($n/3%2) (
+			switch `($n/3%5) (
 			0 {aspect = 21x9}
-			1 {aspect = 7x9}
-			{aspect = 3x3}
+			1 {aspect = 21x3}
+			2 {aspect = 7x9}
+			3 {aspect = 7x3}
+			4 {aspect = 3x3}
+			{aspect = 2x2}
 			)
 		}
 		{aspect = 2x2}
