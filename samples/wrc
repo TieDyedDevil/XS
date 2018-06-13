@@ -1,0 +1,7 @@
+#! /usr/local/bin/xs --
+
+local (X; Y; WIDTH; HEIGHT; SCREEN) {
+	eval `` '' {xdotool getactivewindow getwindowgeometry --shell \
+							|sed 's/=/ = /'}
+	xdotool getactivewindow windowsize `($WIDTH+$1) `($HEIGHT+$2)
+}
