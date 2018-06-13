@@ -66,5 +66,6 @@ pgrep -xc mpd >/dev/null || { \
 	rm -f ~/.mpd/mpd.log
 	mpd
 }
-xs -c '.adapt-resolution `{cat ~/.xscale >[2]/dev/null}'
+xs -c '.adapt-resolution `{%is-mobile && !%multiple-displays \
+				&& cat ~/.xscale >[2]/dev/null}'
 exec evilwm
