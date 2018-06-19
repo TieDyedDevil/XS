@@ -19,16 +19,10 @@ writing an `xs` program to work with a particular release of the shell
 departure from 1.0 - which self-advertises as 0.1 - in that version 1.1
 actually behaves as intended.)
 
-I extend `xs` via "libraries". In particular, the `samples/_xslib.d`
-directory contains a number of scripts to define useful functions. It's
-even possible to define new language constructs in `xs`; many of the
-`xs` control structures are defined in `src/initial.xs`.
-
 It seems reasonable to, over time, create a collection of "standard"
 library functions, maintaining a separation between the core language
-and the runtime library. I believe it's too early to worry about
-standardization. The `samples` directory is meant to be suggestive;
-not prescriptive.
+and the runtime library. I do this in my own installations; see EXAMPLES
+for a pointer to my `xs` code.
 
 Finally, I intend to maintain `xs` as a Linux-only project despite
 attempts by prior maintainers to cater to other flavors of Unix. The

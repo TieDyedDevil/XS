@@ -1,2 +1,4 @@
 There's an extensive collection of `xs` code used daily on all of my personal
 and work computers at <https://github.com/TieDyedDevil/K/tree/master/files> .
+Look at the `_xsrc`, `_xsin` and `_xs*.d^*.xs` files. You can copy these,
+changing the `_` to `.` and `^` to `/`, and adapt to your own needs.
