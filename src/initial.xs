@@ -652,10 +652,10 @@ let (dlist = .) {
 				^', should be 0 or 1)'
 				\n'Usage: pushd [directory]')
 
-		~ $dlist . && dlist = `/bin/pwd
+		~ $dlist . && dlist = `` \n /bin/pwd
 		~ $#dir 0 && !~ $#dlist 0 && !~ $#dlist 1 \
 			&& {dir = $dlist(2); dlist = $dlist(1 3 ...)}
-		~ $#dir 0 && dir = `/bin/pwd
+		~ $#dir 0 && dir = `` \n /bin/pwd
 
 		dir = `` \n {fork {cd $dir; pwd}} # Canonicalize the path
 
