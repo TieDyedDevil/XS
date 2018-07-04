@@ -1162,12 +1162,17 @@ The initial value of
 is
 .PP
 .RS
-.RI ".sigint /sigquit /sigterm .sigwinch"
+.RI ".sigint /sigquit /sigterm -sigxcpu .sigwinch -sigpwr"
 .RE
 .PP
 plus any signals ignored (/) when
 .B xs
 started.
+.B xs
+recognizes that
+.BR sigxcpu " and " sigpwr
+are used by its garbage collector and intentionally ignores them to avoid disrupting
+the collector's operation.
 .RE
 .PP
 .B Xs
