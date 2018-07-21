@@ -63,8 +63,9 @@ seems familiar to Lisp users. If that's you, here's what you need to know:
   indices. This notation is not available as the target of an assignment
   or as a variable in a math expression.
 
-- `xs` has lambdas and closures. `xs` cannot return a closure as the
-  result of a function.
+- `xs` has lambdas and closures. Both downward and upward funargs work,
+  with the caveat that an upward funarg *must* be let-bound by its
+  returning function.
 
 - `xs` has `%unwind-protect`, which allows one to guarantee execution
   of a cleanup expression.

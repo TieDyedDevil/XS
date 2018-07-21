@@ -22,6 +22,8 @@ Extended the `limit` command to expose all Linux (2.6+) -specific settings.
 Throwing from a catch (this includes other syntax which exercises catch
 and throw, e.g. escape) no longer leaves signal handling blocked.
 
+Upward funargs *do* work. Documented with sample code.
+
 xs 1.0 to xs 1.1
 ----------------
 
