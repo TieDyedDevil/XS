@@ -1068,46 +1068,12 @@ An "upward funarg" is a function returned from another function.
 Because a returned function may be executed in a different lexical
 context, all free variables referenced by the function must be
 captured in a let binding.
+In other words, an upward funarg must be let-bound.
 .PP
-.nf
-.nh
-; fn counter-factory {
-          let (ctr = 0) {
-                  let (fn-a = {|*|
-                          if {~ $* reset} {
-                                  ctr = 0
-                                  result reset
-                          } else {
-                                  ctr = `($ctr+1)
-                                  result $ctr
-                          }
-                  } \\
-                  ) {
-                          result $fn-a
-                  }
-          }
-  }
-; c1 = <=counter-factory
-; c2 = <=counter-factory
-; echo <=$c1
-1
-; echo <=$c1
-2
-; echo <=$c1
-3
-; echo <=$c2
-1
-; echo <=$c2
-2
-; echo <=$c1
-4
-$c1 reset
-; echo <=$c1
-1
-; echo <=$c1
-2
-.hy
-.fi
+A program fragment or lambda may be returned instead of a closure
+.IR "only in the case where the code references no free variables" .
+This practice is discouraged as it will cause your code to fail
+should a free variable be added later.
 .SH BUILTIN VARIABLES
 These dynamic variables form a part of the programming interface to
 .BR xs .
