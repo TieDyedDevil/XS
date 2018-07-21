@@ -222,7 +222,8 @@ If you need an empty placeholder in a list, use an empty word:
 ; q = a '' b '' '' c
 ; echo $q
 a  b   c
-; echo $# q
+; echo $#q
+6
 ```
 
 Again, contrast the above with:
