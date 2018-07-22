@@ -16,10 +16,11 @@ run 'Backslash after variable terminates name' {
 conds { match $XS^\\xs }
 
 run 'Backslash-newline after variable name space conversion' {
-	echo -n $XS\
+	ab = foo
+	echo -n $ab\
 xs
 }
-conds { match $XS^' xs' }
+conds { match $ab^' xs' }
 
 run 'Backslash in middle of word' {
 	echo -n h\\i

@@ -1,7 +1,7 @@
 #! ./build/xs
 PGM = $0
 HERE = `pwd^/`{dirname $PGM}
-XS = $HERE/../build/xs
+XS = $HERE/../build/xs -p
 VERBOSE = false
 FORK = true
 PLATFORM = `{uname -m}
