@@ -1438,12 +1438,12 @@ Valid
 .I format
 conversions are those of
 .BR printf (3p),
-except that (1) There must a one-to-correspondence between format specs
+except that there must be a one-to-correspondence between format specs
 (excluding
 .BR %% )
 and arguments: positional argument specs, variable width and precision,
-and excess arguments are all disallowed, and (2) backslash escapes are not
-interpreted in
+and excess arguments are all disallowed.
+Escapes must be unquoted in
 .IR format .
 .TP
 .BR pushd " [" \fIdir ]
