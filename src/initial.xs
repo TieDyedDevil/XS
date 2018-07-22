@@ -614,35 +614,6 @@ if {~ <=$&primitives writeto} {
 	}
 }
 
-#	These versions of %readfrom and %writeto (contributed by Pete Ho)
-#	support the use of System V FIFO files (aka, named pipes) on systems
-#	that have them.  They seem to work pretty well.  The authors still
-#	recommend using files in /tmp rather than named pipes.
-
-#fn %readfrom var cmd body {
-#	local ($var = /tmp/xs.$var.$pid) {
-#		unwind-protect {
-#			/etc/mknod $$var p
-#			$&background {$cmd > $$var; exit}
-#			$body
-#		} {
-#			rm -f $$var
-#		}
-#	}
-#}
-
-#fn %writeto var cmd body {
-#	local ($var = /tmp/xs.$var.$pid) {
-#		unwind-protect {
-#			/etc/mknod $$var p
-#			$&background {$cmd < $$var; exit}
-#			$body
-#		} {
-#			rm -f $$var
-#		}
-#	}
-#}
-
 # Directory push, pretty similar to other pushds (perhaps simpler though)
 # Relies on pwd
 let (dlist = .) {
