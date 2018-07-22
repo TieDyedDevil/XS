@@ -641,6 +641,7 @@ let (dlist = .) {
 			~ $dlist () && dlist = .
 			cd $dlist(1)
 			~ $#dlist 1 && dlist = .
+			true
 		}
 	}
 	fn dirs {|*|

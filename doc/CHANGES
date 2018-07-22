@@ -24,6 +24,8 @@ and throw, e.g. escape) no longer leaves signal handling blocked.
 
 Upward funargs *do* work. Documented with sample code.
 
+The popd builtin returns true.
+
 xs 1.0 to xs 1.1
 ----------------
 
