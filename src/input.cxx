@@ -420,7 +420,7 @@ static int fdfill(Input *in) {
 		in->fd = EOF_FD;
 		in->runflags &= ~run_interactive;
 		if (nread == -1)
-			fail("$&parse", "%s: %s",
+			fail("xs:fdfill", "%s: %s",
                              in->name == NULL ? "xs" : in->name,
                              esstrerror(errno));
 		return EOF;
@@ -593,7 +593,7 @@ extern Tree *parseinput(Input *in) {
 	try {
 		result = parse(NULL, NULL);
 		if (in->get() != EOF)
-			fail("$&parse", "more than one value in term");
+			fail("$&parseinput", "more than one value in term");
 	} catch (List *e) {
 		input = input->prev;
 		throw e;

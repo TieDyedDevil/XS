@@ -203,7 +203,7 @@ extern int newfd(void) {
 			int fd = dup(i);
 			if (fd == -1) {
 				if (errno != EBADF)
-					fail("$&newfd", "newfd: %s",
+					fail("$&newfd", "%s",
                                              esstrerror(errno));
 				return i;
 			} else if (isdeferred(fd)) {

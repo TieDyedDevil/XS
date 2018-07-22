@@ -95,7 +95,7 @@ static Binding *letbindings(Tree* defn, Binding* binding,
 		values = glom(assign->u[1].p, context, true);
 
 		if (vars == NULL)
-			fail("xs:let", "null variable name");
+			fail("xs:letbindings", "null variable name");
 
 		for (; vars != NULL; vars = vars->next) {
 			name = getstr(vars->term);
@@ -141,7 +141,7 @@ const static List *forloop(Tree* defn, Tree* body,
 		List* vars = glom(assign->u[0].p, outer, false);
 		List* list = glom(assign->u[1].p, outer, true);
 		if (vars == NULL)
-			fail("xs:for", "null variable name");
+			fail("xs:forloop", "null variable name");
 		for (; vars != NULL; vars = vars->next) {
 			const char* var = getstr(vars->term);
 			looping = mkbinding(var, list, looping);

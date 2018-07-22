@@ -86,7 +86,7 @@ PRIM(printf) {
 			nextconv(&fcp);
 			if (!fcp)
 				fail("$&printf",
-				     "printf: more args than fmts");
+				     "more args than fmts");
 			if (*fcp == '%') {
 				/* no arg consumed; pass %; advance format */
 				++fcp;
@@ -94,14 +94,14 @@ PRIM(printf) {
 			}
 			if (!validconv(*fcp))
 				fail("$&printf",
-                                     "printf: invalid format specifier: %c",
+                                     "invalid format specifier: %c",
                                      *fcp);
 			const char *arg = getstr(list->term);
 			if (!textconv(*fcp) && isnumber(arg)) {
 				if (floatconv(*fcp) || isfloat(arg)) {
 					if (integralconv(*fcp))
 						fail("$&printf",
-                                                     "printf: %%%c: integral"
+                                                     "%%%c: integral"
 						     " value required",
                                                      *fcp);
 					args[i] = &ffi_type_double;
@@ -115,7 +115,7 @@ PRIM(printf) {
 			} else if (charconv(*fcp)) {
 				if (arg[1] != '\0')
 					fail("$&printf",
-                                             "printf: %%c: character"
+                                             "%%c: character"
 					     " value required");
 				args[i] = &ffi_type_schar;
 				chars[i] = *arg;
@@ -123,7 +123,7 @@ PRIM(printf) {
 			} else {
 				if (!stringconv(*fcp))
 					fail("$&printf",
-                                             "printf: %%%c: numeric"
+                                             "%%%c: numeric"
 					     " value required",
                                              *fcp);
 				args[i] = &ffi_type_pointer;
@@ -133,24 +133,24 @@ PRIM(printf) {
 			list = list->next;
 			++i;
 			if (i == printf_max_varargs)
-				fail("$&printf", "printf: too many args");
+				fail("$&printf", "too many args");
 		}
 		do {
 			nextconv(&fcp);
 			if (fcp) {
 				if (*fcp == '%') ++fcp;
 				else fail("$&printf",
-					  "printf: more fmts than args");
+					  "more fmts than args");
 			}
 		} while (fcp);
 		if (ffi_prep_cif_var(&cif, FFI_DEFAULT_ABI, 3, i,
                                      &ffi_type_sint, args) == FFI_OK) {
 			ffi_call(&cif, FFI_FN(snprintf), &rc, values);
 			if ((unsigned long)rc >= outsz)
-                                fail("$&printf", "printf: output too long");
+                                fail("$&printf", "output too long");
 			print("%s", out);
 		}
-	} else fail("$&printf", "printf: format missing");
+	} else fail("$&printf", "format missing");
 	return ltrue;
 }
 
@@ -518,7 +518,7 @@ PRIM(len) {
 	while (list) {
 		size_t n = mbstowcs(NULL, getstr(list->term), 0);
 		if (n == (size_t)-1)
-			fail("$&len", "len: invalid character");
+			fail("$&len", "invalid character");
 		Term *elt = mkstr(str("%ld", n, 0));
 		if (!result) {result = mklist(elt, NULL); tail = result;}
 		else tail = tail->next = mklist(elt, NULL);
@@ -539,9 +539,9 @@ PRIM(wid) {
 		wchar_t d[limwid];
 		size_t n = mbstowcs(d, getstr(list->term), limwid);
 		if (n == (size_t)-1)
-			fail("$&wid", "wid: invalid character");
+			fail("$&wid", "invalid character");
 		if (n == limwid)
-			fail("$&wid", "wid: word is too wide");
+			fail("$&wid", "word is too wide");
 		Term *elt = mkstr(str("%d", wcswidth(d, limwid)));
 		if (!result) {result = mklist(elt, NULL); tail = result;}
 		else tail = tail->next = mklist(elt, NULL);

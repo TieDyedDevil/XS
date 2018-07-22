@@ -123,7 +123,7 @@ top:
 		}
 		goto top;
 	}
-	fail("xs:ewait", "wait: %d is not a child of this shell", pid);
+	fail("xs:ewait", "%d is not a child of this shell", pid);
 	NOTREACHED;
 }
 
@@ -152,7 +152,7 @@ PRIM(wait) {
 	else if (list->next == NULL) {
 		pid = atoi(getstr(list->term));
 		if (pid <= 0) {
-			fail("$&wait", "wait: %d: bad pid", pid);
+			fail("$&wait", "%d: bad pid", pid);
 			NOTREACHED;
 		}
 	} else {

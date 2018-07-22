@@ -106,7 +106,7 @@ REDIR(dup) {
 	assert(length(list) == 2);
 	fd = dup(fdmap(getnumber(getstr(list->term))));
 	if (fd == -1)
-		fail("$&dup", "dup: %s", esstrerror(errno));
+		fail("$&dup", "%s", esstrerror(errno));
 	*srcfdp = fd;
 	return list->next;
 }

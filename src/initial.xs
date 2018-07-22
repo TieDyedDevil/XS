@@ -763,7 +763,7 @@ fn %interactive-loop { escape { |fn-return|
                 	(switch $e  
 				eof {echo exit; return $result}
 				exit {throw $e $type $msg} 
-				error { echo >[1=2] $msg
+				error { echo >[1=2] $type^: $msg
 					$fn-%dispatch false } 
 				signal { if {!~ $type sigint sigterm sigquit} {
 						echo >[1=2] 'caught unexpected'\

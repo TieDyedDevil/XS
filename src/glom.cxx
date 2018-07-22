@@ -201,10 +201,10 @@ static List *glom1(Tree* tree, Binding* binding) {
 		}
 		case nVarsub:
 			list = glom1(tree->u[0].p, binding);
-			if (list == NULL) fail("xs:glom",
+			if (list == NULL) fail("xs:glom1",
                                                "null variable name in subscript");
 			if (list->next != NULL)
-                                fail("xs:glom",
+                                fail("xs:glom1",
                                      "multi-word variable name in subscript");
 
 			{
@@ -235,7 +235,7 @@ static List *glom1(Tree* tree, Binding* binding) {
 			break;
 	        }
 		default:
-			fail("xs:glom", "glom1: bad node kind %d", tree->kind);
+			fail("xs:glom1", "bad node kind %d", tree->kind);
 		}
 
 		if (list != NULL) {
@@ -345,7 +345,7 @@ static int toint(List *x) {
 		return lexical_cast<int>(getstr(x->term));
 	} catch (boost::bad_lexical_cast) {
 		fail("glom:arith:toint",
-                     "Could not handle integer input ( maybe too large? )");
+                     "Could not handle integer input");
 	}
 }
 static double todouble(List *x) {
