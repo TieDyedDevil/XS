@@ -97,7 +97,7 @@ PRIM(cd) {
 		fail("$&cd", "usage: $&cd directory");
 	const char *dir = getstr(list->term);
 	if (chdir(dir) == -1)
-		fail("$&cd", "chdir %s: %s", dir, esstrerror(errno));
+		fail("$&cd", "%s: %s", dir, esstrerror(errno));
 	return ltrue;
 }
 
@@ -277,8 +277,7 @@ PRIM(limit) {
 			else
 				rlim.rlim_cur = n;
 			if (setrlimit(lim->flag, &rlim) == -1)
-				fail("$&limit", "setrlimit: %s",
-					esstrerror(errno));
+				fail("$&limit", "%s", esstrerror(errno));
 		}
 	}
 	return ltrue;

@@ -48,7 +48,7 @@ static const List* redir(List* (*rop)(int *fd, List* list),
 
 static void argcount(const char *s) NORETURN;
 static void argcount(const char *s) {
-	fail(caller, "argument count: usage: %s", s);
+	fail(caller, "usage: %s", s);
 }
 
 REDIR(openfile) {
@@ -73,7 +73,7 @@ REDIR(openfile) {
 	list = list->next;
 	for (i = 0;; i++) {
 		if (modes[i].name == NULL)
-			fail("$&openfile", "bad %%openfile mode: %s", mode);
+			fail("$&openfile", "bad mode: %s", mode);
 		if (streq(mode, modes[i].name)) {
 			kind = modes[i].kind;
 			break;
@@ -138,7 +138,7 @@ static int pipefork(int p[2], int *extra) {
 	volatile int pid = 0;
 
 	if (pipe(p) == -1)
-		fail(caller, "pipe: %s", esstrerror(errno));
+		fail(caller, "%s", esstrerror(errno));
 
 	registerfd(&p[0], false);
 	registerfd(&p[1], false);
@@ -372,7 +372,7 @@ restart:
 		if (errno == EINTR)
 			goto restart;
 		close(fd);
-		fail("$&backquote", "backquote read: %s", esstrerror(errno));
+		fail("$&backquote", "read: %s", esstrerror(errno));
 	}
 	return endsplit();
 }

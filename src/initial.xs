@@ -100,7 +100,7 @@ fn-if = { |condition action else actions|
         ($&if {$condition}   {$action}
               {~ $else else} {$actions}
               {!~ $else ()} {
-                throw error if 'if: expected else, got: '^$else^' '$^actions
+                throw error if 'expected else, got: '^$else^' '$^actions
               })
 }
 
@@ -126,7 +126,7 @@ let (nextid = 0) {
 
 fn-unwind-protect = { |body cleanup|
 	if {!~ $#cleanup 1} {
-		throw error unwind-protect 'unwind-protect body cleanup'
+		throw error unwind-protect 'usage: unwind-protect body cleanup'
 	}
 	let (exception) {
 		let (result) {
@@ -265,9 +265,9 @@ fn-cd = { |dir|
 		if {!~ $#home 1} {
 			throw error cd <={
 				if {~ $#home 0} {
-					result 'cd: no home directory'
+					result 'no home directory'
 				} {
-					result 'cd: home directory must'\
+					result 'home directory must'\
 						^' be one word'
 				}
 			}
@@ -319,7 +319,7 @@ fn-vars = { |*|
 				-e		{export	= true}
 				-p		{priv	= true}
 				-i		{intern = true}
-				{throw error vars 'vars: illegal option:' $i \
+				{throw error vars 'illegal option:' $i \
 					'-- usage: vars -[vfsepia]'}
 		)}
 
@@ -447,10 +447,10 @@ fn-%or = { |first rest|
 #       Used to be slightly different built-in to grammar
 fn-fn = { |name body rest|
 	if {!~ $rest ()} {
-		throw error fn 'fn: trailing arguments: ' $rest
+		throw error fn 'trailing arguments: ' $rest
 	} 
 	if {~ $name ()} {
-		throw error fn 'fn: missing arguments: correct form:'\
+		throw error fn 'missing arguments: correct form:'\
 			^' fn name { |args| body }'
 	}
 	fn-$name = $body
