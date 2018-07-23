@@ -775,8 +775,9 @@ fn %interactive-loop { escape { |fn-return|
 			throw retry # restart forever loop
 		} {
 			forever {
-				$&if {!~ $#fn-%prompt 0} {
-					%prompt
+				$&if {!~ $#fn-%prompt 0} {%prompt}
+				$&if {!~ $#fn-%before-interactive-prompt 0} {
+					%before-interactive-prompt
 				}
 				let (code = <={%parse $prompt}) {
 					$&if {!~ $#code 0} {

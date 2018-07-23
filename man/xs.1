@@ -1882,9 +1882,7 @@ and
 .B eval
 commands when their input is non-interactive.
 .B %batch-loop
-returns upon catching an
-.B eof
-exception.
+returns upon catching an exception.
 .TP
 .B %interactive-loop
 This is the toploop for an interactive shell and for the dot
@@ -1896,6 +1894,16 @@ commands when their input is interactive.
 returns upon catching an
 .B eof
 exception.
+.RS
+.PP
+The
+.B %interactive-loop
+has a hook function,
+.BR %before-interactive-prompt ;
+if defined, this is called after
+.B %prompt
+but before printing the initial prompt.
+.RE
 .PP
 .B Xs
 binds one of the following functions to

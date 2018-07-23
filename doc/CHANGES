@@ -30,6 +30,9 @@ Reworked `%interactive-loop` to show the "type" of error caught; this
 normally denotes the signalling function. Also brought many internal
 messages into alignment with this protocol.
 
+Added `%before-interactive-prompt` hook, called (if defined) from the
+interactive loop after `%prompt` but before printing the initial prompt.
+
 xs 1.0 to xs 1.1
 ----------------
 
