@@ -10,19 +10,19 @@ project('xs', ['cpp'])
   gc_lib = compiler.find_library('gc')
   readline_lib = compiler.find_library('readline')
   custom_target('.stamp',
-	build_always: true,
+	build_always_stale: true,
 	output: '.stamp',
 	command: ['touch', '@OUTPUT@'])
   custom_target('git_date.hxx',
-	build_always: true,
+	build_always_stale: true,
 	output: 'git_date.hxx',
 	command: ['../generators/git_date.sh'])
   custom_target('git_hash.hxx',
-	build_always: true,
+	build_always_stale: true,
 	output: 'git_hash.hxx',
 	command: ['../generators/git_hash.sh'])
   custom_target('git_url.hxx',
-	build_always: true,
+	build_always_stale: true,
 	output: 'git_url.hxx',
 	command: ['../generators/git_url.sh'])
   parse_cxx = custom_target('parse.cxx',
