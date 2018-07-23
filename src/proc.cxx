@@ -156,7 +156,7 @@ PRIM(wait) {
 			NOTREACHED;
 		}
 	} else {
-		fail("$&wait", "usage: wait [pid]");
+		fail("$&wait", "usage: $&wait [pid]");
 		NOTREACHED;
 	}
 	return mklist(mkstr(mkstatus(ewait(pid, true, NULL))), NULL);

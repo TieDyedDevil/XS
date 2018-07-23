@@ -17,7 +17,7 @@ PRIM(newpgrp) {
 	(void)evalflags;
 	int pid;
 	if (list != NULL)
-		fail("$&newpgrp", "usage: newpgrp");
+		fail("$&newpgrp", "usage: $&newpgrp");
 	pid = getpid();
 	setpgrp(pid, pid);
 #ifdef TIOCSPGRP
@@ -61,7 +61,7 @@ PRIM(fork) {
 PRIM(run) {
 	(void)binding;
 	if (list == NULL)
-		fail("$&run", "usage: %%run file argv0 argv1 ...");
+		fail("$&run", "usage: $&run file argv0 argv1 ...");
 	const char *file = getstr(list->term);
 	list = forkexec(file, list->next, (evalflags & eval_inchild) != 0);
 	return list;
@@ -86,7 +86,7 @@ PRIM(umask) {
 		umask(mask);
 		return ltrue;
 	}
-	fail("$&umask", "usage: umask [mask]");
+	fail("$&umask", "usage: $&umask [mask]");
 	NOTREACHED;
 }
 

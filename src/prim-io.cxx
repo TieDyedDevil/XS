@@ -205,7 +205,7 @@ PRIM(pipe) {
 	caller = "$&pipe";
 	n = length(list);
 	if ((n % 3) != 1)
-		fail("$&pipe", "usage: pipe cmd [ outfd infd cmd ] ...");
+		fail("$&pipe", "usage: $&pipe cmd [ outfd infd cmd ] ...");
 	n = (n + 2) / 3;
 	if (n > pidmax) {
 		pids = reinterpret_cast<int*>(erealloc(pids, n * sizeof *pids));
@@ -383,7 +383,7 @@ PRIM(backquote) {
 	
 	caller = "$&backquote";
 	if (list == NULL)
-		fail(caller, "usage: backquote separator command [args ...]");
+		fail(caller, "usage: $&backquote separator command [args ...]");
 
 	const char* sep = getstr(list->term);
 	list = list->next;

@@ -204,7 +204,7 @@ PRIM(dot) {
 	(void)binding;
 	int c, fd;
 	volatile int runflags = (evalflags & eval_inchild);
-	const char * const usage = ". [-einvx] file [arg ...]";
+	const char * const usage = "$&dot [-einvx] file [arg ...]";
 
 	esoptbegin(list, "$&dot", usage);
 	while ((c = esopt("einvx")) != EOF)
@@ -236,7 +236,7 @@ PRIM(flatten) {
 	(void)binding;
 	(void)evalflags;
 	if (list == NULL)
-		fail("$&flatten", "usage: %%flatten separator [args ...]");
+		fail("$&flatten", "usage: $&flatten separator [args ...]");
 	const char *sep = getstr(list->term);
 	list = mklist(mkstr(str("%L", list->next, sep)), NULL);
 	return list;
@@ -267,7 +267,7 @@ PRIM(split) {
 	(void)binding;
 	(void)evalflags;
 	if (list == NULL)
-		fail("$&split", "usage: %%split separator [args ...]");
+		fail("$&split", "usage: $&split separator [args ...]");
 	List* lp = list;
 	const char *sep = getstr(lp->term);
 	lp = fsplit(sep, lp->next, true);
@@ -278,7 +278,7 @@ PRIM(fsplit) {
 	(void)binding;
 	(void)evalflags;
 	if (list == NULL)
-		fail("$&fsplit", "usage: %%fsplit separator [args ...]");
+		fail("$&fsplit", "usage: $&fsplit separator [args ...]");
 	List* lp = list;
 	const char *sep = getstr(lp->term);
 	lp = fsplit(sep, lp->next, false);
@@ -435,7 +435,7 @@ PRIM(home) {
 	if (list == NULL)
 		return varlookup("home", NULL);
 	if (list->next != NULL)
-		fail("$&home", "usage: %%home [user]");
+		fail("$&home", "usage: $&home [user]");
 	pw = getpwnam(getstr(list->term));
 	return (pw == NULL) ? NULL : mklist(mkstr(gcdup(pw->pw_dir)), NULL);
 }
@@ -512,7 +512,7 @@ PRIM(len) {
 	(void)binding;
 	(void)evalflags;
 	if (list == NULL)
-		fail("$&len", "usage: %%len [args ...]");
+		fail("$&len", "usage: $&len [args ...]");
 	List *result = NULL;
 	List *tail = NULL;
 	while (list) {
@@ -531,7 +531,7 @@ PRIM(wid) {
 	(void)binding;
 	(void)evalflags;
 	if (list == NULL)
-		fail("$&wid", "usage: %%wid [args ...]");
+		fail("$&wid", "usage: $&wid [args ...]");
 	List *result = NULL;
 	List *tail = NULL;
 	while (list) {

@@ -40,7 +40,7 @@ PRIM(throw) {
 	(void)binding;
 	(void)evalflags;
 	if (list == NULL)
-		fail("$&throw", "usage: throw exception [args ...]");
+		fail("$&throw", "usage: $&throw exception [args ...]");
 	throw list;
 	NOTREACHED;
 }
@@ -50,7 +50,7 @@ PRIM(catch) {
 	Atomic retry;
 
 	if (list == NULL)
-		fail("$&catch", "usage: catch catcher body");
+		fail("$&catch", "usage: $&catch catcher body");
 
 	const List* result = NULL;
 
