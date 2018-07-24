@@ -23,6 +23,11 @@ run 'Simple subtraction' {
 }
 conds { match '1' }
 
+run 'Simple exponentiation' {
+    echo `(3 ** 4)
+}
+conds { match '81' }
+
 run 'Order of operations' {
     echo `(4 * 3 + 2 * 1 + 3 / 2 - 4)
 }
