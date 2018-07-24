@@ -498,14 +498,16 @@ representing its value:
 .RE
 .PP
 The expression consists of numeric values and the infix operators
-.BR + ", " - ", " * ", " / " and " % " (modulus);"
-these obey the usual precedence rules and may be otherwise grouped
-with parentheses.
+.BR + ", " - ", " * ", " / ", " % " (modulus), and " ** " (exponentiation);"
+these obey the usual precedence and associativity rules and may
+be otherwise grouped using parentheses.
 .PP
 A value is either a numeric constant or a variable reference yielding
 a numeric value.
 Numbers may be integer or floating-point; the latter are stored with limited
 precision (usually six significant digits).
+.PP
+Integer overflow does not signal an exception.
 .PP
 If an expression involves any floating-point value, the result will be
 floating-point.

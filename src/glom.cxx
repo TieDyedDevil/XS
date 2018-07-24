@@ -410,6 +410,13 @@ static List *calculate(Tree *expr, Binding *binding) {
 		if (isint(a) and isint(b)) return tolist(static_cast<int>(r));
 		else return tolist(r);
 		}
+	case nPow:
+		{
+		List *a = EXPR1, *b = EXPR2;
+		double r = std::pow(todouble(a), todouble(b));
+		if (isint(a) and isint(b)) return tolist(static_cast<int>(r));
+		else return tolist(r);
+		}
 #undef EXPR1
 #undef EXPR2
 	default:

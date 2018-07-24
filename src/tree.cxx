@@ -33,7 +33,7 @@ extern Tree *mk (int t, ...) {
 	    case nLambda: case nLet: case nList:  case nLocal:
 	    case nVarsub: case nMatch: case nExtract:
 	    case nRedir: case nMinus: case nPlus:
-	    case nMult: case nDivide: case nModulus:
+	    case nMult: case nDivide: case nModulus: case nPow:
 		n = newtree<2>();
 		n->u[0].p = va_arg(ap, Tree *);
 		n->u[1].p = va_arg(ap, Tree *);

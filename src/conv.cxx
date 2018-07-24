@@ -72,6 +72,9 @@ static std::string arith_dump(Tree *expr) {
 		case nModulus:
 			sep = "%";
 			break;
+		case nPow:
+			sep = "**";
+			break;
 		default:
 			panic("unknown node kind in arithmetic expression: %d",
 				expr->kind);

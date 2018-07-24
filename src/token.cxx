@@ -209,8 +209,15 @@ static int yylex_arithmetic() {
 	case '(': 
 		++paren_count; 
 		/* FALLTHROUGH */
-	case '+': case '-': case '/': case '*': case '%':
+	case '+': case '-': case '/': case '%':
 		return c;
+	case '*':
+		if ((c = GETC()) == '*')
+			return POW;
+		else {
+			UNGETC(c);
+			return '*';
+		}
 	case ')': 
 		--paren_count;
 		if (paren_count == 0) {
