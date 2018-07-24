@@ -30,6 +30,7 @@ project('xs', ['cpp'])
 	output: 'git_url.hxx',
 	command: ['../generators/git_url.sh'])
   parse_cxx = custom_target('parse.cxx',
+	build_always_stale: true,
 	output: ['parse.cxx', 'parse.hxx'],
 	command: ['../generators/mkparse.sh'])
   sigmsgs_cxx = custom_target('sigmsgs.cxx',
