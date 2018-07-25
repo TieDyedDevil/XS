@@ -1,5 +1,7 @@
 #! /usr/bin/env sh
 
+meson_opts='-Db_lto=true --strip'
+
 if [ "$1" = '--clang' ]; then
 	export CC=clang
 	export CXX=clang++
@@ -22,13 +24,13 @@ elif [ "$1" = '--afl-gcc' ]; then
 	rm -rf build
 fi
 touch .build
-[ -d build ] || meson -Db_lto=true --strip build
+[ -d build ] || meson $meson_opts build
 if [ $? -ne 0 ]; then false; else ninja -C build "$@"; fi
 if [ $? -ne 0 ] && [ .build -nt build/.stamp ] \
 		&& [ "$*" != 'fuzz' ] && [ "$*" != 'check' ]; then
 	echo Recreating build/
 	rm -rf build
-	meson -Db_lto=true --strip build
+	meson $meson_opts build
 	if [ &? -ne 0 ]; then false; else ninja -C build "$@"; fi
 fi
 rm -f .build
