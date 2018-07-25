@@ -23,6 +23,7 @@ elif [ "$1" = '--afl-gcc' ]; then
 fi
 touch .build
 [ -d build ] || meson build
+meson configure -Db_lto=true --strip build
 ninja -C build "$@"
 if [ $? -ne 0 ] && [ .build -nt build/.stamp ] \
 		&& [ "$*" != 'fuzz' ] && [ "$*" != 'check' ]; then
