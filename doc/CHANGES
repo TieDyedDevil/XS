@@ -35,6 +35,8 @@ interactive loop after `%prompt` but before printing the initial prompt.
 
 Support `**` (exponentiation) arithmetic operator.
 
+Set build options to use LTO and to strip binary on install.
+
 xs 1.0 to xs 1.1
 ----------------
 
