@@ -22,17 +22,13 @@ elif [ "$1" = '--afl-gcc' ]; then
 	rm -rf build
 fi
 touch .build
-[ -d build ] || {
-	meson build
-	meson configure -Db_lto=true --strip build
-}
+[ -d build ] || meson -Db_lto=true --strip build
 if [ $? -ne 0 ]; then false; else ninja -C build "$@"; fi
 if [ $? -ne 0 ] && [ .build -nt build/.stamp ] \
 		&& [ "$*" != 'fuzz' ] && [ "$*" != 'check' ]; then
 	echo Recreating build/
 	rm -rf build
-	meson build
-	meson configure -Db_lto=true --strip build
+	meson -Db_lto=true --strip build
 	if [ &? -ne 0 ]; then false; else ninja -C build "$@"; fi
 fi
 rm -f .build
