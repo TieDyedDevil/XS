@@ -780,6 +780,7 @@ fn %interactive-loop { escape { |fn-return|
 					%before-interactive-prompt $result
 				}
 				let (code = <={%parse $prompt}) {
+					result = <=true
 					$&if {!~ $#code 0} {
 						result = <={$fn-%dispatch $code}
 					}
