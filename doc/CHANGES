@@ -32,6 +32,7 @@ messages into alignment with this protocol.
 
 Added `%before-interactive-prompt` hook, called (if defined) from the
 interactive loop after `%prompt` but before printing the initial prompt.
+xs passes the prior command's result code to `%before-interactive-prompt`. 
 
 Support `**` (exponentiation) arithmetic operator.
 

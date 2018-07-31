@@ -1903,7 +1903,8 @@ The
 .B %interactive-loop
 has a hook function,
 .BR %before-interactive-prompt ;
-if defined, this is called after
+if defined, this is called \(em passing the return code of the prior
+command \(em after
 .B %prompt
 but before printing the initial prompt.
 .RE
