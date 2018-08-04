@@ -424,7 +424,7 @@ If a word is followed by another word,
 without intervening whitespace, then
 .B xs
 inserts a caret between them.
-.SS Wildcard Patterns
+.SS Wildcard patterns
 A pattern is a word which may contain wildcards.
 .TP
 .B *
@@ -957,7 +957,7 @@ match
 .IR var .
 .SS Loops
 .B Xs
-has three main looping forms:
+has these looping forms:
 .PP
 .RS
 .BI while " condition fragment"
@@ -1070,7 +1070,7 @@ form executes its body in the context of a catcher:
 The
 .IR catcher " and " body
 are fragments.
-.SS Upward Funargs
+.SS Upward funargs
 An "upward funarg" is a function returned from another function.
 Because a returned function may be executed in a different lexical
 context, all free variables referenced by the function must be
@@ -1957,7 +1957,7 @@ A common use is to update the value of
 .SH CANONICAL FORM
 .B Xs
 rewrites surface syntax in terms of hook functions.
-.SS Control Flow
+.SS Control flow
 .TS
 tab(@);
 l lx .
@@ -1980,7 +1980,7 @@ T}
 fn-^\fIname\fR = {|\fIarg...\fR|\fI command\fR}
 T}
 .TE
-.SS Input/Output
+.SS Input/output
 .TS
 tab(@);
 l lx .
@@ -2050,7 +2050,7 @@ T}
 <={%backquote <={%flatten \(aq\(aq \fIifs\fR} {\:\fIcommand\fR \fIarg...\fR}}
 T}
 .TE
-.SS Relational Operators
+.SS Relational operators
 .TS
 tab(@);
 l lx .
