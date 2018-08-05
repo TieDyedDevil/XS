@@ -559,8 +559,7 @@ is identical to
 .RE
 .PP
 .SS Command substitution
-The backquote form creates a list from the standard output of a program
-fragment:
+The backquote form creates a list from the standard output of a fragment:
 .PP
 .RS
 .BI \` fragment " \fR."
@@ -599,7 +598,7 @@ are mandatory.
 A lambda is an unnamed function.
 In
 .BR xs ,
-a lambda is written as a program frament in which the first element may be
+a lambda is written as a fragment in which the first element may be
 a lambda list (see below).
 A lambda without a lambda list is a lambda with no arguments.
 .SS Lambda list
@@ -1084,7 +1083,7 @@ context, all free variables referenced by the function must be
 captured in a let binding.
 In other words, an upward funarg must be let-bound.
 .PP
-A program fragment or lambda may be returned instead of a closure
+A fragment or lambda may be returned instead of a closure
 .IR "only in the case where the code references no free variables" .
 This practice is discouraged as it will cause your code to fail
 should a free variable be added later.
