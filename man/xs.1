@@ -742,7 +742,7 @@ or
 .PP
 The file is created if it does not exist.
 If the file already exists, its contents are replaced.
-It is an error for the file to not be writeable.
+It is an error for the file to not be writable.
 .PP
 Other file descriptors may be specified:
 .PP
@@ -780,28 +780,26 @@ Other redirection operators have their own semantics:
 .TP
 .BI >> filename
 Append to an existing file; the file is created if nonexistent.
-It is an error for the file to not be writeable.
 .TP
 .BI <> filename
 Open a file for reading and writing (on standard input unless otherwise
 specified).
-It is an error for the file to not be readable and writeable.
 .TP
 .BI <>> filename
 Open a file for reading and appending (on standard input unless otherwise
 specified).
-It is an error for the file to not be readable and writeable.
 .TP
 .BI >< filename
 Truncate a file and open it for reading and writing (on standard output
 unless otherwise specified).
-It is an error for the file to not be readable and writeable.
 .TP
 .BI >>< filename
 Open a file for reading and appending (on standard output unless otherwise
 specified).
-It is an error for the file to not be readable and writeable.
 .RE
+.PP
+Files opened for reading must be readable.
+Files opened for writing or appending must be writable.
 .PP
 An open file descriptor is closed using this form:
 .PP
@@ -1253,7 +1251,7 @@ These options determine the test to apply to the
 tab(@);
 lb l .
 -r@Is the path readable?
--w@Is the path writeable?
+-w@Is the path writable?
 -x@Is the path executable?
 -f@Is the path a plain file?
 -d@Is the path a directory?
