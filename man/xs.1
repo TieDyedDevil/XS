@@ -780,22 +780,27 @@ Other redirection operators have their own semantics:
 .TP
 .BI >> filename
 Append to an existing file; the file is created if nonexistent.
+It is an error for the file to not be writeable.
 .TP
 .BI <> filename
 Open a file for reading and writing (on standard input unless otherwise
 specified).
+It is an error for the file to not be readable and writeable.
 .TP
 .BI <>> filename
 Open a file for reading and appending (on standard input unless otherwise
 specified).
+It is an error for the file to not be readable and writeable.
 .TP
 .BI >< filename
 Truncate a file and open it for reading and writing (on standard output
 unless otherwise specified).
+It is an error for the file to not be readable and writeable.
 .TP
 .BI >>< filename
 Open a file for reading and appending (on standard output unless otherwise
 specified).
+It is an error for the file to not be readable and writeable.
 .RE
 .PP
 An open file descriptor is closed using this form:
@@ -822,6 +827,7 @@ The
 .I eof-marker
 is a word which must appear on a line by itself immediately following
 the final newline of textual data taken as input.
+.PP
 The first form (with the unquoted
 .IR eof-marker )
 replaces variables within the textual data.
@@ -833,6 +839,9 @@ can be emitted literally by writing
 .BR $$ .
 To emit the value of a variable followed immediately by a literal word, write:
 .BI $ var ^ "word \fR."
+The caret
+.RB ( ^ )
+is taken literally elsewhere in a here document.
 .PP
 The second form (with the quoted
 .IR eof-marker )
