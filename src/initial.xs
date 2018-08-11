@@ -769,6 +769,7 @@ fn %interactive-loop { escape { |fn-return|
 						echo >[1=2] 'caught unexpected'\
 							^' signal:' $type
 				         }
+					if {~ $type sigint} {result = <=true}
                                 }
 				{ echo >[1=2] 'uncaught exception:' \
 					$e $type $msg })
