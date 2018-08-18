@@ -332,7 +332,9 @@ const char *mzwcs(const char *prompt) {
 		}
 		if (iscntrl(*f) && !strchr("\a\e\n\r\t", *f)) {
 			if (!mark) *t++ = RL_PROMPT_START_IGNORE;
-			mark = 1;
+			*t++ = *f++;
+			if (!mark) *t++ = RL_PROMPT_END_IGNORE;
+			continue;
 		}
 		if (csi && isalpha(*f)) {
 			*t++ = *f++; *t++ = RL_PROMPT_END_IGNORE;
