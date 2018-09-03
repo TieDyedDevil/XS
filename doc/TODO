@@ -1,4 +1,4 @@
-- Add job control (SIGTSTP, fg, bg, disown).
+- Add job control (SIGTSTP, fg, bg).
 - Improve the readline experience:
   - Make quoting during completion match what the user would type.
   - Alter completion behavior depending upon command prefix.
