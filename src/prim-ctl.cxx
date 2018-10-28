@@ -31,9 +31,8 @@ PRIM(if) {
 PRIM(forever) {
 	(void)binding;
 	List* body = list;
-        const List *result = list;
-	for (;;) result = eval(body, NULL, evalflags & eval_exitonfalse);
-	return result;
+	for (;;) (void)eval(body, NULL, evalflags & eval_exitonfalse);
+	NOTREACHED;
 }
 
 PRIM(throw) {

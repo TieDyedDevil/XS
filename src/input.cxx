@@ -401,7 +401,6 @@ static int fdfill(Input *in) {
 			if (in->buflen < (unsigned long) nread) {
 				while (in->buflen < (unsigned) nread)
 					in->buflen *= 2;
-				efree(in->bufbegin);
 				in->bufbegin =
 					reinterpret_cast<unsigned char*>(
 						erealloc(in->bufbegin,
