@@ -164,12 +164,13 @@ PRIM(echo) {
 	(void)binding;
 	(void)evalflags;
 	const char *eol = "\n";
-	if (list != NULL) {
+	while (list != NULL) {
 		if (termeq(list->term, "-n")) {
 			eol = "";
 			list = list->next;
 		} else if (termeq(list->term, "--"))
 			list = list->next;
+		else break;
         }
 	print("%L%s", list, " ", eol);
 	return ltrue;

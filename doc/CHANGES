@@ -1,6 +1,8 @@
 xs 1.1 to xs 1.2
 ----------------
 
+The `echo` builtin handles combined `-n` and `--` options.
+
 Stripped out a lot of unused code (~10% by weight).
 
 Unicode escapes are now delimited, like \u'n...'. The fixed-length forms
