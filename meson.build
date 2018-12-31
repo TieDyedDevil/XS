@@ -8,6 +8,7 @@ project('xs', ['cpp'])
     ffi_lib = compiler.find_library('ffi')
   endif
   gc_lib = compiler.find_library('gc')
+  gccpp_lib = compiler.find_library('gccpp')
   readline_lib = compiler.find_library('readline')
   custom_target('.stamp',
 	build_always_stale: true,
@@ -47,7 +48,7 @@ project('xs', ['cpp'])
 		'src/syntax.cxx', 'src/term.cxx', 'src/token.cxx',
 		'src/tree.cxx', 'src/util.cxx', 'src/var.cxx',
 		'src/version.cxx']
-  common_dependencies = [boost_dep, readline_lib, gc_lib, ffi_lib]
+  common_dependencies = [boost_dep, readline_lib, gc_lib, gccpp_lib, ffi_lib]
   xsdump = executable('xsdump', ['src/dump.cxx', common_sources],
 	cpp_args: compile_flags,
 	dependencies: common_dependencies)
