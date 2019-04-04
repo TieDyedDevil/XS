@@ -1347,6 +1347,21 @@ Convert
 to a word and pass it to the
 .B xs
 interpreter for parsing and execution.
+.RS
+.PP
+Lexical bindings are not available to
+.BR eval .
+The following code prints "dyn":
+.PP
+.ft CR
+.RS
+ x = dyn
+ let (x = lex) {
+     eval 'echo $x'
+ }
+.RE
+.ft
+.RE
 .TP
 .BI exec " cmd"
 Replace
