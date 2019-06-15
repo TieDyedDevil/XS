@@ -664,6 +664,7 @@ extern void initinput(void) {
 	   from forked children */
 	registerfd(&historyfd, true);
 
+	rl_readline_name = "xs";
 	rl_basic_word_break_characters = " \t\n\\'`><=;|&{()}";
 	rl_completer_quote_characters = "'";
 	rl_filename_quote_characters = " \t\n\\'`=$><;|&{()}";
