@@ -45,6 +45,8 @@ failure was corruption of the readline display during editing and recall
 when the prompt contains a control character like ^N or ^O (alternate
 character set selection on an ANSI-compatible terminal).
 
+Advertise "xs" name to readline for use in ~/.inputrc as `$if xs`.
+
 xs 1.0 to xs 1.1
 ----------------
 
