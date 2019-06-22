@@ -501,7 +501,7 @@ PRIM(resetterminal) {
 }
 
 static void initrandom() {
-	srandom(time(NULL));
+	srandom(getpid()+time(NULL));
 }
 
 PRIM(random) {

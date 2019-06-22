@@ -47,6 +47,9 @@ character set selection on an ANSI-compatible terminal).
 
 Advertise "xs" name to readline for use in ~/.inputrc as `$if xs`.
 
+Multiple instances started within the same second now have distinct
+sequences of $&random values.
+
 xs 1.0 to xs 1.1
 ----------------
 
