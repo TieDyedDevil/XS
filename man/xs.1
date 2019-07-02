@@ -2106,6 +2106,14 @@ Input editing is provided by
 .BR readline (3)
 and configured by
 .BR ~/.inputrc .
+The
+.BR ~/.inputrc
+file may contain definitions specifically for
+.BR xs ,
+and not other
+.BR readline "(3)-aware programs,"
+through use of the conditional construct
+.IR "$if xs" .
 .SH FILES
 These files are read and interpreted when
 .B xs
@@ -2129,7 +2137,7 @@ are read,
 .B ~/.xsrc
 is read first.
 .SH SEE ALSO
-Additional documentation and sample code is installed in
+Additional documentation is installed in
 .IB prefix /share/doc/xs
 .RI .
 .I Prefix
