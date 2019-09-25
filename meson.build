@@ -2,13 +2,19 @@ project('xs', ['cpp'])
   compiler = meson.get_compiler('cpp')
   compile_flags = ['-I../src', '-Wall', '-Wextra']
   link_flags = []
-  boost_dep = dependency('boost')
-  ffi_lib = dependency('libffi', required: false)
+  boost_dep = dependency('boost', version: '>=1.60')
+  ffi_lib = dependency('ffi', version: '>=6.0.2', required: false)
   if not ffi_lib.found()
     ffi_lib = compiler.find_library('ffi')
   endif
-  gc_lib = compiler.find_library('gc')
-  readline_lib = compiler.find_library('readline')
+  gc_lib = dependency('gc', version: '>=1.0.3', required: false)
+  if not gc_lib.found()
+    gc_lib = compiler.find_library('gc')
+  endif
+  readline_lib = dependency('readline', version: '>=6.3', required: false)
+  if not readline_lib.found()
+    readline_lib = compiler.find_library('readline')
+  endif
   custom_target('.stamp',
 	build_always_stale: true,
 	build_by_default: true,
