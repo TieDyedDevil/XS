@@ -2,7 +2,7 @@
 
 [ -n "$MESON_SOURCE_ROOT" ] && cd $MESON_SOURCE_ROOT
 FILE=$(basename $0 .sh).hxx
-if [ -d ../.git ]; then
+if [ which git 2>/dev/null -a -d ../.git ]; then
 	DATA=$(git describe --dirty --always --tags |
 		sed 's/^/#define GIT_HASH "/' | sed 's/$/"/')
 else
