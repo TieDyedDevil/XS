@@ -68,7 +68,7 @@ project('xs', ['cpp'])
 	dependencies: common_dependencies,
 	install: true)
   install_man(['man/xs.1'])
-  install_data(['doc/ANCESTORS', 'doc/CHANGES', 'doc/COPYING', 'EXAMPLES',
+  install_data(['doc/ANCESTORS', 'doc/CHANGES', 'doc/COPYING',
 		'INSTALL', 'doc/PHILOSOPHY', 'doc/PROJECTS', 'README',
 		'doc/SYSTEMD_LOCALE', 'doc/TODO', 'doc/TUTORIAL.md',
 		'doc/XS-FOR-LISPERS.md'],
