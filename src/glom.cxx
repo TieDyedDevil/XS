@@ -372,9 +372,19 @@ static List *op(ftint intf,
 static List *calculate(Tree *expr, Binding *binding) {
 	switch (expr->kind) {
 	case nInt:
-		return tolist(lexical_cast<int>(expr->u[0].s));
+		try {
+			return tolist(lexical_cast<int>(expr->u[0].s));
+		} catch (boost::bad_lexical_cast) {
+			fail("glom:arith:calculate",
+	                     "Could not handle integer input");
+		}
 	case nFloat:
-		return tolist(lexical_cast<double>(expr->u[0].s));
+		try {
+			return tolist(lexical_cast<double>(expr->u[0].s));
+		} catch (boost::bad_lexical_cast) {
+			fail("glom:arith:calculate",
+	                     "Could not handle floating point input");
+		}
 	case nVar:
 		{
 		List *var = glom1(expr->u[0].p, binding);
