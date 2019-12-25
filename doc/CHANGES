@@ -50,6 +50,9 @@ Advertise "xs" name to readline for use in ~/.inputrc as `$if xs`.
 Multiple instances started within the same second now have distinct
 sequences of $&random values.
 
+Failure to lexically scan a literal integer or floating point number in
+an arithmetic expression no longer terminates the shell.
+
 xs 1.0 to xs 1.1
 ----------------
 
