@@ -38,5 +38,12 @@ run 'Floating point operation' {
 }
 conds { match '0.5' }
 
+run 'Check invalid integer constant' {
+    echo `(3000000000)
+}
+conds { match 'Could not handle' }
 
-
+run 'Check invalid floating-point constant' {
+    echo `(1..01)
+}
+conds { match 'Could not handle' }
