@@ -1,7 +1,9 @@
-The eXtensible Shell: xs version 1.2
-====================================
+XS: The eXtensible Shell
+========================
 
-Xs is the eXtensible Shell, a command line interpreter featuring
+This is `xs 1.3`; see `doc/CHANGES`.
+
+XS is the eXtensible Shell, a command line interpreter featuring
 Lisp-like semantics (lists, function parameters, closures, exceptions,
 lexical bindings, lambdas, etc.) and a conventional syntax.
 
