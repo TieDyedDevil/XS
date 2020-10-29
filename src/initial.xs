@@ -70,6 +70,7 @@ fn-umask	= $&umask
 fn-wait		= $&wait
 
 fn-read	= $&read
+fn-sleep = $&sleep
 
 
 

@@ -1503,6 +1503,12 @@ upon end-of-file.
 Return
 .IR value s.
 .TP
+.BI sleep " seconds"
+Sleep for
+.IR seconds .
+Fractional times are allowed.
+Negative times are treated as zero.
+.TP
 .BR switch " \fIvalue [" "\fIcase \fIaction" "]... [" \fIdefault-action ]
 See
 .BR Conditionals .
@@ -1890,6 +1896,7 @@ $&sethistory@set-history
 $&setmaxevaldepth@set-max-eval-depth
 $&setnoexport@set-noexport
 $&setsignals@set-signals
+$&sleep@sleep
 $&split@%split
 $&throw@throw
 $&time@time

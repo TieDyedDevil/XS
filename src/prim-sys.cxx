@@ -12,6 +12,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include <math.h>
+
 PRIM(newpgrp) {
 	(void)binding;
 	(void)evalflags;
@@ -314,6 +316,22 @@ PRIM(time) {
 	return mklist(mkstr(mkstatus(status)), NULL);
 }
 
+PRIM(sleep) {
+	(void)binding;
+	(void)evalflags;
+	double time = atof(getstr(list->term));
+	double whole;
+	double frac = modf(time, &whole);
+	struct timespec ts;
+	ts.tv_sec = whole;
+	ts.tv_nsec = frac * 1000000000;
+	int rc;
+	do {
+		rc = nanosleep(&ts, &ts);
+	} while (rc == EINTR);
+	return ltrue;
+}
+
 extern void initprims_sys(Prim_dict& primdict) {
 	X(newpgrp);
 	X(background);
@@ -324,4 +342,5 @@ extern void initprims_sys(Prim_dict& primdict) {
 	X(setsignals);
 	X(limit);
 	X(time);
+	X(sleep);
 }
