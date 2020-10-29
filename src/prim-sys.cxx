@@ -319,7 +319,13 @@ PRIM(time) {
 PRIM(sleep) {
 	(void)binding;
 	(void)evalflags;
-	double time = atof(getstr(list->term));
+	if (list == NULL || list->next != NULL)
+		fail("$&sleep", "usage: $&sleep seconds");
+	const char *arg = getstr(list->term);
+	char *end;
+	double time = strtod(arg, &end);
+	if (arg == end || *end != '\0')
+		fail("$&sleep", "usage: $&sleep seconds");
 	double whole;
 	double frac = modf(time, &whole);
 	struct timespec ts;
