@@ -431,7 +431,7 @@ static int read1(int fd) {
 		SIGCHK();
 	} while (nread == -1 && errno == EINTR);
 	if (nread == -1)
-		fail("$&read", esstrerror(errno));
+		fail("$&read/$&getc", esstrerror(errno));
 	return nread == 0 ? EOF : buf;
 }
 
@@ -452,6 +452,23 @@ PRIM(read) {
 		: mklist(mkstr(gcdup(buffer.str().c_str())), NULL);
 }
 
+PRIM(getc) {
+	(void)list;
+	(void)binding;
+	(void)evalflags;
+	int c;
+	int fd = fdmap(0);
+
+	stringstream buffer;
+
+	c = read1(fd);
+	if (c != EOF) buffer.put(c);
+
+	return c == EOF || buffer.str() == ""
+		? NULL
+		: mklist(mkstr(gcdup(buffer.str().c_str())), NULL);
+}
+
 extern void initprims_io(Prim_dict& primdict) {
 	X(openfile);
 	X(close);
@@ -463,4 +480,5 @@ extern void initprims_io(Prim_dict& primdict) {
 	X(readfrom);
 	X(writeto);
 	X(read);
+	X(getc);
 }
