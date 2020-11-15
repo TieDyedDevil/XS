@@ -54,24 +54,6 @@ fn %primary-display-size {
 	xrandr --current|grep 'connected primary'|cut -d' ' -f4|cut -d+ -f1
 }
 
-fn %refresh-xbiff {
-	# Refresh xbiff immediately.
-	!~ $DISPLAY () && !~ `{xdotool search --class --onlyvisible \
-								xbiff} () && {
-		let (cw = `{xdotool getactivewindow}; \
-		xbpos = `{xdotool search --class xbiff getwindowgeometry \
-				|grep Position:|awk '{print $2}'|tr , ' '}) {
-			%with-saved-pointer {
-				xdotool search --class xbiff windowunmap --sync
-				xdotool search --class xbiff windowmap --sync
-				xdotool search --class xbiff windowmove $xbpos
-			}
-			!~ $cw () && xdotool windowactivate --sync $cw \
-								windowraise $cw
-		}
-	}
-}
-
 fn %window-bounds {
 	# Print active window boundaries as LEFT TOP RIGHT BOTTOM.
 	let ((xo yo xs ys b) = `{xwininfo -int -id `{xdotool getactivewindow} \
@@ -296,11 +278,6 @@ fn %window-group {
 							|cut -d' ' -f3}
 }
 
-fn %restart-wm {
-	# Restart the window manager to reload its configuration
-	pkill -x -HUP cwm
-}
-
 fn %linepower {
 	# Return true if the computer is on AC power.
 	let (AC = /sys/class/power_supply/AC) {
@@ -309,13 +286,5 @@ fn %linepower {
 		} else if {~ `{cat $AC/online} 1} {
 			true
 		} else false
-	}
-}
-
-fn %top-margin {
-	# Print the effective top margin, considering the height of the bar.
-	let (bh = `{xdotool search --class dzen getwindowgeometry \
-						|grep Geometry|cut -dx -f2}) {
-		echo `($bh+1)
 	}
 }

@@ -211,27 +211,3 @@ fn .ensure-libloc {
 		}
 	}
 }
-
-fn .build-appmenu {
-	# Modify the cwm configuration to build the apps menu.
-	let (wmcf = ~/.cwmrc; apps) {
-		ed -ls $wmcf <<EOF
-g/^command /d
-wq
-EOF
-		apps = \
-			`` '' {vars -f \
-				|sed 's/{\.\(a\|c\|i\|d\|r\) [^}]*}//g' \
-				|grep -Fw -e %with-terminal \
-				|grep -o '^fn-[^ ]\+'|cut -d- -f2- \
-				|grep '^[a-z0-9]'} \
-			`` '' {/usr/bin/ls /usr/share/applications/*.desktop \
-				|xargs grep -L Terminal=true \
-				|xargs -n1 -I\{\} basename \{\} .desktop \
-				|grep -v '\.' \
-				|grep -v -f ~/.local/appmenu-exclude}
-		for f (`{echo $apps|sort|uniq}) {
-			echo command $f "xs -c $f^" >>$wmcf
-		}
-	}
-}
