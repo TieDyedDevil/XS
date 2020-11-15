@@ -2110,6 +2110,27 @@ T}
 {~ {%cmp \fIa\fR \fIb\fR} -1 1}
 T}
 .TE
+.SH ENVIRONMENT
+.B Xs
+reads the following environment variables.
+.TS
+tab(@);
+lb lb lb
+l l l .
+Variable@Default@Usage
+HOME@/@define ~
+PATH@/bin /usr/bin@locate executables
+.TE
+.PP
+.B Xs
+sets the following environment variables.
+.TS
+tab(@);
+lb lb
+l l .
+Variable@Usage
+SHLVL@track shell nesting level
+.TE
 .SH EDITING
 Input editing is provided by
 .BR readline (3)
