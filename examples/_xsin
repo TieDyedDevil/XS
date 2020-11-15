@@ -25,18 +25,12 @@ if {~ $fn-%safe-wild ()} {
 # Run the appropriate interactive setup.
 if {~ `tty *tty1} {
 	# Start an Xorg session.
-	startwm
+	~ $fn-startwm () || startwm
 } else {
 	# We have a vt or pty session; configure the keyboard.
 	stty start undef stop undef
 	# Report system status.
-	%is-login && {
-		.as; echo; pal -r 1 -c 0|%strip-csi; cookie; .an; echo
-		if {~ `tty /dev/tty*} {
-			on; net; addr; thermal; battery; load; mem; pers; echo
-		}
-		.ab; where; .an
-	}
+	%is-login && {printf 'Host: %s'\n `hostname; w}
 	# Whine if the history file grows too large.
 	# Do this no more than once per hour.
 	if {{!~ $history ()} && {~ `{cat $history|wc -l} [5-9]??? *?????}} {
@@ -52,17 +46,12 @@ if {~ `tty *tty1} {
 			}
 		}
 	}
-	# Announce new location when logging in from a different host.
-	if {{~ $SSH_TTY ()} && {!~ $SSH_CONNECTION ()} && {!~ $DISPLAY ()}} {
-		where
-	}
 	# Load ./.xspath, if present.
 	.load_xspath
 	# Override the configured prompt with a randomly-chosen prompt.
 	.init_random_prompt
-	# Mark persistent
-	prompt <={%argify `{det -p}}
 }
 
+~ $fn-det () || prompt <={%argify `{det -p}}
 ~ $NIX_PATH () || {clear; name nix; psi}
 true
