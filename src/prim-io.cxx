@@ -4,6 +4,9 @@
 #include "prim.hxx"
 #include <stdio.h>
 #include <sstream>
+#include <string.h>
+#include <termios.h>
+#include <unistd.h>
 
 using std::stringstream;
 
@@ -469,6 +472,32 @@ PRIM(getc) {
 		: mklist(mkstr(gcdup(buffer.str().c_str())), NULL);
 }
 
+PRIM(tctl) {
+	(void)binding;
+	(void)evalflags;
+	int fd = fdmap(0);
+	int rc;
+	struct termios tioc;
+	int ok = 0;
+	
+	caller = "$&tctl";
+	const char *usage = "usage: $&tctl raw|canon|echo|noecho";
+
+	if (list == NULL) fail(caller, usage);
+
+	const char* mode = getstr(list->term);
+	rc = tcgetattr(fd, &tioc);
+	if (rc) fail(caller, "tcgetattr: %s", esstrerror(rc));
+	if (!strcmp(mode, "raw")) {ok = 1; tioc.c_lflag &= ~ICANON;}
+	if (!strcmp(mode, "canon")) {ok = 1; tioc.c_lflag |= ICANON;}
+	if (!strcmp(mode, "echo")) {ok = 1; tioc.c_lflag |= ECHO;}
+	if (!strcmp(mode, "noecho")) {ok = 1; tioc.c_lflag &= ~ECHO;}
+	if (!ok) fail(caller, usage);
+	rc = tcsetattr(fd, TCSANOW, &tioc);
+	if (rc) fail(caller, "tcsetattr: %s", esstrerror(rc));
+	return NULL;
+}
+
 extern void initprims_io(Prim_dict& primdict) {
 	X(openfile);
 	X(close);
@@ -481,4 +510,5 @@ extern void initprims_io(Prim_dict& primdict) {
 	X(writeto);
 	X(read);
 	X(getc);
+	X(tctl);
 }

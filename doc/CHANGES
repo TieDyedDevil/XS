@@ -3,6 +3,7 @@ xs 1.2 to xs 1.3
 
 Added a `sleep` builtin based upon a new `$&sleep` primitive.
 Added a `$&getc` primitive.
+Added a `$&tctl` primitive.
 
 xs 1.1 to xs 1.2
 ----------------
