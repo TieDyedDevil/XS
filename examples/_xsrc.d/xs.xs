@@ -513,9 +513,12 @@ fn luc {|*|
 		vars -f | wf \
 			| grep -o '^fn-[^ ]\+' | cut -d- -f2- \
 			| grep '^[a-z0-9]' | sf | column -c `{tput cols}
-		printf <=.%as^'@ ~/bin'^<=.%an^\n
-		find -L ~/bin -mindepth 1 -maxdepth 1 -type f -executable \
-			| sf | xargs -n1 basename | column -c `{tput cols}
+		access -d ~/bin && {
+			printf <=.%as^'@ ~/bin'^<=.%an^\n
+			find -L ~/bin -mindepth 1 -maxdepth 1 -type f \
+				-executable | sf | xargs -n1 basename \
+				| column -c `{tput cols}
+		}
 		if {~ $al -s} {
 			printf <=.%as^'@ /usr/local/bin'^<=.%an^\n
 			ls /usr/local/bin | sf | column -c `{tput cols}
