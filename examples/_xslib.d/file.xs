@@ -67,25 +67,25 @@ fn %read-char {
 	# Read one UTF-8 character from tty.
 	let (c; oc; r) {
 		unwind-protect {
-			stty -F /dev/tty -icanon
-			c = `` '' {dd if=/dev/tty bs=1 count=1 >[2]/dev/null}
+			$&tctl raw
+			c = <={$&getc </dev/tty}
 			oc = `{%ord $c}
 			if {$oc :le 127} {
 				r = $c
 			} else if {$oc :ge 248} {
 				throw error %read-char 'Invalid UTF-8'
-			} else if {$oc :ge 240} {
-				r = $c ^ `{dd if=/dev/tty bs=1 count=3 \
-						>[2]/dev/null}
-			} else if {$oc :ge 224} {
-				r = $c ^ `{dd if=/dev/tty bs=1 count=2 \
-						>[2]/dev/null}
-			} else if {$oc :ge 112} {
-				r = $c ^ `{dd if=/dev/tty bs=1 count=1 \
-						>[2]/dev/null}
+			}
+			if {$oc :ge 240} {
+				r = $c^<={$&getc </dev/tty}
+			}
+			if {$oc :ge 224} {
+				r = $c^<={$&getc </dev/tty}
+			}
+			if {$oc :ge 112} {
+				r = $c^<={$&getc </dev/tty}
 			}
 		} {
-			stty -F /dev/tty icanon
+			$&tctl canon
 		}
 		result $r
 	}

@@ -176,11 +176,6 @@ fn .palette {
 			tput initc 8 77 77 77 # bright black - Gray30
 			tput initc 12 99 184 255 # bright blue = SteelBlue1
 		}
-		if {~ $TERM yaft-256color} {
-			tput initc 7 208 208 208 # normal white
-			tput initc 12 99 184 255 # bright blue
-			tput initc 15 255 255 255 # bright white
-		}
 	}
 }
 

@@ -1,19 +1,11 @@
 #! /usr/bin/env xs
 
-# systemd doesn't set locale, so we must...
-# ref: /usr{/local}/share/doc/xs/SYSTEMD_LOCALE
-~ $LC_ALL () && {
-	LC_ALL = en_US.UTF-8
-	LANG = $LC_ALL
-	SHLVL = `($SHLVL-1)
-	printf 'Locale: %s'\n $LC_ALL
-	exec xs -l
-}
-# end locale hack
-
+LC_ALL = en_US.UTF-8
+LANG = $LC_ALL
+printf 'Locale: %s'\n $LC_ALL
 umask 0022
 path = /usr/local/bin /usr/bin /usr/sbin $home/.local/bin $home/bin
-history = $home/.local/share/xshistory
+history = $home/.local/run/xshistory
 
 catch {|e|
 	# Because I set autologin, an uncaught error in one of the scripts

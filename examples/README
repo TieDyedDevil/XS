@@ -1,5 +1,7 @@
-The `examples/` directory is a snapshot of a large subset of the `xs` code
+The `examples/` directory is a snapshot of a small subset of the `xs` code
 that I run on all of my personal and work computers.
 
 Note that the leading dot on example file and directory names has been
 replaced with an underscore.
+
+The example code assumes the presence of a ~/.local/run directory.

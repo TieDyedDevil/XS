@@ -2,7 +2,6 @@ fn libedit {|*|
 	.d 'Edit library function'
 	.a 'NAME'
 	.c 'xs'
-	%with-terminal libedit {
 	if {~ $#* 0} {
 		.usage libedit | %wt-pager
 	} else {
@@ -10,16 +9,20 @@ fn libedit {|*|
 		let ((file line) = <={~~ <={%objget $libloc $*} *:*}) {
 			if {!~ $file ()} {
 				$EDITOR +$line $file
+			} else if {access -f ~/.local/bin/$*} {
+				$EDITOR ~/.local/bin/$*
 			} else {
 				if {~ $WITH_TERMINAL ()} {
-					throw error libedit 'not a function'
+					throw error libedit 'not a function' \
+						^' or in ~/.local/bin'
 				} else {
 					echo libedit: 'not a function' \
-						| %wt-pager
+						^' or in ~/.local/bin' \
+					| %wt-pager
 				}
 			}
 		}
-	}}
+	}
 }
 
 fn parse {|*|
@@ -46,7 +49,7 @@ fn pp {|*|
 	.c 'xs'
 	if {~ $#* 0} {
 		.usage pp
-	} else {%with-terminal pp {
+	} else {
 		let (syntax = text) {
 			if {~ $*(1) -c} {
 				syntax = xs
@@ -61,12 +64,20 @@ fn pp {|*|
 				} | %wt-pager
 			}
 		}
-	}}
+	}
+}
+
+fn refresh-appmenu {
+	.d 'Refresh applications menu'
+	.c 'xs'
+	refresh-libloc
+	.build-appmenu
+	%restart-wm
 }
 
 fn refresh-libloc {
 	.d 'Refresh library location database.'
-	.c 'system'
+	.c 'xs'
 	%rmobj $libloc
 	libloc =
 	rm -f ~/.cache/xslib/libloc
@@ -119,10 +130,18 @@ fn val {|*|
 	echo -- <=$*
 }
 
-fn xsqr {
+fn xs-man {
+	.d 'Display xs manual'
+	.c 'xs'
+	%with-terminal xs-man {
+		man xs
+	}
+}
+
+fn xs-quickref {
 	.d 'Display xs quick reference'
 	.c 'xs'
-	%with-terminal xsqr {{cat <<'EOF'
+	%with-terminal xs-quickref {{cat <<'EOF'
 XS Quick Reference
 	legend: ├ comment ┤ «metasyntactic variable» <character name>
 		more-of-the-same…
@@ -136,6 +155,11 @@ character escapes
 \a \b \e \f \n \r \t
 \xNN \MNN ├ M = [0..3], N = [0..f] ┤
 \u'N…' ├ N = [0..f]; N… != 0 ┤
+
+words
+-----
+<character>… ├ no specials; escapes honored ┤
+«quoted word»
 
 quoted words
 ------------
@@ -236,8 +260,8 @@ pattern extraction
 
 arithmetic
 ----------
-`( «expression» ) ├ infix operators +, -, *, /, % and **;
-  simple variable reference (variable names may not include operator chars) ┤
+`( «expression» ) ├ infix operators +, -, *, /, % and **; simple variable     ┤
+                  ├ reference (variable names may not include operator chars) ┤
 
 command substitution
 --------------------
@@ -314,8 +338,8 @@ conditionals
 if «condition» «fragment»
 if «condition» «fragment» else «fragment»
 switch «variable_reference» «cases» «fragment»
- ├ a «case» is «match_word» «fragments»; «cases» is a list of these;
-   the final «fragment» executes when no «case» matches ┤
+ ├ a «case» is «match_word» «fragments»; «cases» is a list of these; ┤
+ ├ the final «fragment» executes when no «case» matches              ┤
 
 vars and values
 ---------------
@@ -346,5 +370,179 @@ operator	action		descriptor    .  modifier	action
 >><		read/append	stdout
 |		pipe		stdout|stdin
 EOF
-	} | %wt-pager}
+	} | sed 's/├[^┤]\+┤/'^<=.%ad^\&^<=.%an^'/g' | %wt-pager}
+}
+
+fn help {|*|
+	.d 'Help for xs function'
+	.a 'NAME'
+	.a '-c [CATEGORY]'
+	.a '-l CATEGORY'
+	.a '-h'
+	.c 'help'
+	if {~ $#* 0} {.usage help}
+	let ( \
+		fn-ext = {
+			sed 's/{\.\(a\|c\|i\|d\|r\) [^}]*}/\n&\n/g'
+		}; \
+		fn-fmt = {
+			sed 's/''''/''/g' | \
+			sed 's/^{\.\(.\) ''\(.*\)''}$/\1: \2/' | \
+			sed 's/''''/''/g' | \
+			fold -s | awk -f <{cat <<'EOF'
+/^(a|c|i|d|r|_): / {first=1;}
+{if (first) {print; first=0;} else {print "    " $0}}
+EOF
+			}
+		} \
+		) {
+		if {~ $*(1) -c && ~ $*(2) builtin} {
+			-category-builtin
+		} else if {~ $* -c} {
+			switch $#* (
+			1 {cat <{vars -f | ext | grep -e '^{\.c'} \
+					<{echo 'c: builtin'} \
+				| fmt | sort | uniq}
+			2 {vars -f|grep '{\.c '''''^$*(2) \
+				| ext | sed 's/^fn-[^ ]\+/\n&\n/g' \
+				| grep -e '^\({\.\(a\|\d\|r\)\|fn-\)' \
+				| sed 's/fn-\([^ ]\+\)/' \
+					^'_: '^<=.%au^'\1'^<=.%an^'/g' \
+				| fmt }
+			)
+		} else if {~ $*(1) -l} {
+			if {~ $*(2) ()} {
+				.usage help
+			} else if {~ $*(2) builtin} {
+				-list-builtin
+			} else {
+				vars -f|grep '{\.c '''''^$*(2) \
+					| sed 's/^fn-\([^ ]\+\).*/\1/g' \
+					| column
+			}
+		} else if {~ $* -h} {
+			cat <<'EOF'
+Legend
+------
+d: Description
+a: Arguments
+c: Category
+r: Related
+i: Informational
+EOF
+		} else if {~ $#* 1} {
+			let (nm = $*(1); st) {
+				st = <={vars -f|grep '^fn-'$nm'\s' | ext \
+					| grep -e '^{\.\(a\|c\|i\|\d\|r\)' \
+					| fmt}
+				~ $^st '0 0 0 1 0' && {echo 'no help for' $nm; \
+							whats $nm}
+				~ $^st '0 1 0 1 0' && {
+					-help-builtin $nm \
+						|| echo 'no function' $nm
+				}
+			}
+		}
+	} | less -iRFX
+	true
+}
+
+fn lib {|*|
+	.d 'List names of library functions'
+	.a '-l  # sort by length, then name'
+	.c 'help'
+	.r 'liba libdoc libi'
+	%with-terminal lib {let (fn-sf) {
+		if {~ $* -l} {fn-sf = %asort} else {fn-sf = cat}
+		vars -f | cut -c4- | cut -d' ' -f1 | grep -E '^(%|\.)' \
+			| grep -v -e %prompt -e '^%_' | sf \
+			| column -c `{tput cols} | %wt-pager
+	}}
+	# Ideally we'd hide all of the xs hook functions; not only %prompt.
+}
+
+fn liba {|*|
+	.d 'Library function names apropos.'
+	.a 'MATCH'
+	.c 'help'
+	.r 'lib libdoc libi'
+	if {!~ $#* 1} {
+		.usage liba
+	} else {
+		for f `{vars -f|cut -c4-|cut -d' ' -f1|grep -E '^(%|\.)' \
+				|grep -v -e %prompt -e '^%_'|grep -F $*} {
+			printf '%s'\t $f
+			catch {echo '?'} {%header-doc $f}|head -1
+		} | column -s \t -t|less -iRFXS
+	}
+}
+
+fn libdoc {
+	.d 'List documentation for all library functions.'
+	.c 'help'
+	.r 'liba libdoc libi'
+	.ensure-libdoc
+	%with-terminal libdoc {%wt-pager -rf ~/.cache/xslib/libdoc.$TERM}
+}
+
+fn libi {|*|
+	.d 'Show information about a library function.'
+	.a 'FUNCTION-NAME'
+	.c 'help'
+	.r 'liba libdoc libdoc'
+	if {~ $#* 0} {
+		.usage libi
+	} else {
+		.libi $*
+	} | less -iRFX
+}
+
+fn luc {|*|
+	.d 'List user commands'
+	.a '-l  # sort by length, then name'
+	.a '-s  # list commands on system paths'
+	.a '-w  # include wrapped commands'
+	.c 'help'
+	.r 'luca'
+	%with-terminal luc {
+	let (al = <={%args $*}; fn-sf; fn-wf) {
+		if {~ $al -l} {fn-sf = %asort} else {fn-sf = sort}
+		if {~ $al -w} {fn-wf = cat} \
+			else {fn-wf = {grep -v '{\.f [^}]*wrap[^}]*}'}}
+		printf <=.%as^'@ ~/.xs*'^<=.%an^\n
+		vars -f | wf \
+			| grep -o '^fn-[^ ]\+' | cut -d- -f2- \
+			| grep '^[a-z0-9]' | sf | column -c `{tput cols}
+		printf <=.%as^'@ ~/bin'^<=.%an^\n
+		find -L ~/bin -mindepth 1 -maxdepth 1 -type f -executable \
+			| sf | xargs -n1 basename | column -c `{tput cols}
+		if {~ $al -s} {
+			printf <=.%as^'@ /usr/local/bin'^<=.%an^\n
+			ls /usr/local/bin | sf | column -c `{tput cols}
+			optbins = `{find /opt -type d -name bin}
+			for d $optbins {
+				printf <=.%as^'@ '^$d^<=.%an^\n
+				ls $d | sf | column -c `{tput cols}
+			}
+		}
+	} | %wt-pager -r }
+}
+
+fn luca {|*|
+	.d 'User command names apropos.'
+	.a 'MATCH'
+	.c 'help'
+	.r 'luc'
+	if {!~ $#* 1} {
+		.usage luca
+	} else {
+		for f `{vars -f|grep -o '^fn-[^ ]\+'|cut -d- -f2- \
+					|grep '^[a-z0-9]'|grep -F -- $*} {
+			printf '%s'\t $f
+			var fn-^$f|sed 's/{\.d [^}]*}/\n&\n/g'|grep '^{\.d ' \
+				|sed 's/''''/''/g' \
+				|sed 's/^{\.\(.\) ''\(.*\)''}$/\1: \2/' \
+				|sed 's/''''/''/g'|sed 's/^d: //'
+		} | column -s \t -t|less -iRFXS
+	}
 }

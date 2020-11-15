@@ -41,7 +41,7 @@ if {~ `tty *tty1} {
 	# Do this no more than once per hour.
 	if {{!~ $history ()} && {~ `{cat $history|wc -l} [5-9]??? *?????}} {
 		let ( \
-		nf = ~/.local/share/histclean.notified; \
+		nf = ~/.local/run/histclean.notified; \
 		now = `{date +%s}; \
 		ts) {
 			ts = `{ls -l --time-style=+%s $nf >[2]/dev/null \

@@ -47,7 +47,7 @@ fn %range {|*|
 fn %rational {|float dlimit|
 	# Convert float to rational, limiting magnitude of denominator.
 	# Second value is the error of rational approximation.
-	let (rat = `{python >[2]/dev/null << EOF
+	let (rat = `{python3 >[2]/dev/null << EOF
 from fractions import Fraction
 print(Fraction.from_float($float).limit_denominator($dlimit))
 EOF

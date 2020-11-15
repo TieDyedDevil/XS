@@ -80,35 +80,34 @@ fn .objcheck {|objname|
 	}
 }
 
-fn .objkeyenc {|key|
-	# Encode object key.
-	echo -n -- $key|tr : \010
-}
-
-fn .objkeydec {|key|
-	# Decode object key.
-	echo -n -- $key|tr \010 :
+fn .objkeycheck {|key|
+	# Throw an error if key contains \010 (^H).
+	~ $key *\010* && throw error object \
+			'Invalid key: '^`{echo $key|sed '/s'^\010^'/^H/g'}
 }
 
 fn %objset {|objname key value|
 	# Set an object field.
 	.objcheck $objname
+	.objkeycheck $key
 	%objunset $objname $key
-	$objname = `{.objkeyenc $key}^:^$value $($objname)
+	$objname = $key^\010^$value $($objname)
 }
 
 fn %objset-nr {|objname key value|
 	# Set an object field without replacing keys.
 	.objcheck $objname
-	$objname = `{.objkeyenc $key}^:^$value $($objname)
+	.objkeycheck $key
+	$objname = $key^\010^$value $($objname)
 }
 
 fn %objunset {|objname key|
 	# Remove an object field.
 	.objcheck $objname
-	let (ov = $($objname); ekey = `{.objkeyenc $key}; rv) {
+	.objkeycheck $key
+	let (ov = $($objname); rv) {
 		for kv $ov {
-			{!~ $kv $ekey:*} && {rv = $rv $kv}
+			{!~ $kv $key\010*} && {rv = $rv $kv}
 		}
 		$objname = $rv
 	}
@@ -117,7 +116,8 @@ fn %objunset {|objname key|
 fn %objget {|objname key default|
 	# Get an object field.
 	.objcheck $objname
-	let (v = <={~~ $($objname) `{.objkeyenc $key}^:*}) {
+	.objkeycheck $key
+	let (v = <={~~ $($objname) $key\010*}) {
 		if {!~ $v ()} {result $v} else {result $default}
 	}
 }
@@ -127,8 +127,8 @@ fn %objkeys {|objname|
 	.objcheck $objname
 	let (ov = $($objname); entry; kn; keys) {
 		for entry $ov {
-			(kn _) = <={~~ $entry *:*}
-			keys = `{.objkeydec $kn} $keys
+			(kn _) = <={~~ $entry *\010*}
+			keys = $kn $keys
 		}
 		result $keys
 	}
@@ -137,7 +137,7 @@ fn %objkeys {|objname|
 fn %obj-isempty {|objname|
 	# True if object has no fields.
 	.objcheck $objname
-	result <={!~ $($objname) *:*}
+	result <={!~ $($objname) *\010*}
 }
 
 fn %objreset {|objname|
@@ -230,9 +230,9 @@ fn %with-dict {|lambda pairs|
 
 fn %parse-bool {|*|
 	# Parse common truth values.
-	if {~ $* y Y yes Yes YES 1 t T true True TRUE} {
+	if {~ $* y Y yes Yes YES 1 t T true True TRUE on On} {
 		true
-	} else if {~ $* n N no No NO 0 f F false False FALSE} {
+	} else if {~ $* n N no No NO 0 f F false False FALSE off Off} {
 		false
 	} else {
 		throw error %parse-bool 'not a truth value: '$^*
@@ -316,4 +316,10 @@ fn %asort {
 			printf %06d%s\n $len $line
 		}
 	} | sort | cut -c7-
+}
+
+fn %wrap {|char indent text|
+	# Wrap text at char index, prefixing wrapped line with indent.
+	result `` '' {printf $^text|sed 's/^\(.\{'^$char^'\}\)\(.*\)$/\1\n' \
+								^$indent^'\2/'}
 }

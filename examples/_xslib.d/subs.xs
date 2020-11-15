@@ -73,9 +73,12 @@ fn .web-query {|site path query|
 fn .adapt-resolution {|scale|
 	# Adapt X and GTK resolution to that of primary display.
 	# Scale is a float; default 1.0.
-	let (scale = <={if {result $scale} {result 1.0} else {result $scale}}; \
+	let (scale = \
+		<={if {result $scale} {result 1.0} else {result $scale}}; \
 	screen; dpi) {
-		(screen dpi) = <=%primary-display-dpi
+		catch {|e| echo $e '(retrying)'; sleep 0.2; throw retry} {
+			(screen dpi) = <=%primary-display-dpi
+		}
 		dpi = <={%trunc `($scale*$dpi)}
 		%with-tempfile tf {
 			printf 'Xft.dpi: %d'\n $dpi >$tf
@@ -209,26 +212,26 @@ fn .ensure-libloc {
 	}
 }
 
-fn .ensure-dmr-stubs {
-	# Refresh the stub executables referenced by ~/.local/bin/dmr .
-	uc_dir = ~/.local/dmr.uc
-	if {%outdated $uc_dir ~/.xsuser.d/*.xs ~/.xsrc.d/*.xs \
-					/usr/share/applications/*.desktop \
-					~/.local/dmr.appexclude} {
-		notify white\|Metadata updating stubs
-		access -d $uc_dir || mkdir -p $uc_dir
-		rm -f $uc_dir/*
-		for f (`{vars -f|sed 's/{\.\(a\|c\|i\|d\|r\) [^}]*}//g' \
-				|grep -Fw -e %with-terminal -e web -e notify \
-					|grep -o '^fn-[^ ]\+'|cut -d- -f2- \
-					|grep '^[a-z0-9]'} \
-		       `{/usr/bin/ls /usr/share/applications/*.desktop \
+fn .build-appmenu {
+	# Modify the cwm configuration to build the apps menu.
+	let (wmcf = ~/.cwmrc; apps) {
+		ed -ls $wmcf <<EOF
+g/^command /d
+wq
+EOF
+		apps = \
+			`` '' {vars -f \
+				|sed 's/{\.\(a\|c\|i\|d\|r\) [^}]*}//g' \
+				|grep -Fw -e %with-terminal \
+				|grep -o '^fn-[^ ]\+'|cut -d- -f2- \
+				|grep '^[a-z0-9]'} \
+			`` '' {/usr/bin/ls /usr/share/applications/*.desktop \
 				|xargs grep -L Terminal=true \
 				|xargs -n1 -I\{\} basename \{\} .desktop \
 				|grep -v '\.' \
-				|grep -v -f ~/.local/dmr.appexclude}) {
-			echo false >$uc_dir/$f
-			chmod +x $uc_dir/$f
+				|grep -v -f ~/.local/appmenu-exclude}
+		for f (`{echo $apps|sort|uniq}) {
+			echo command $f "xs -c $f^" >>$wmcf
 		}
 	}
 }

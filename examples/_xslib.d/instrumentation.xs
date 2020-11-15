@@ -94,8 +94,8 @@ fn %id {|*|
 
 fn %header-doc {|fn-name|
 	# Print a function's header documentation.
-	# If present, print .d (description),
-	# .a (argument) and .i (informational) lines.
+	# If present, print .d (description), .a (argument),
+	# .r (related) and .i (informational) lines.
 	.ensure-libloc
 	escape {|fn-quit| let (pass = 0; file = <={%objget $libloc $fn-name}) {
 		~ $file () && throw error %header-doc 'not in library'
@@ -104,9 +104,9 @@ fn %header-doc {|fn-name|
 			if {~ $pass 1} {
 				if {~ $l \t\#*} {
 					printf %s `` '' {echo $l|cut -c4-}
-				} else if {~ $l \t.d* \t.a* \t.i*} {
+				} else if {~ $l \t.d* \t.a* \t.r* \t.i*} {
 					printf %s `` '' {echo $l}
-				} else if {~ $l \t.c* \t.r* \t.f*} {
+				} else if {~ $l \t.c* \t.f*} {
 					true
 				} else {
 					echo

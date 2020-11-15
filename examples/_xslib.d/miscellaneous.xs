@@ -36,25 +36,35 @@ fn %screen-regions {
 	for dg `` \n %active-displays-info {
 		let ((_ g) = `{echo $dg}) {
 			let ((xs ys xo yo) = <={~~ $g *x*+*+*}) {
-				echo $xo $yo `($xs+$xo) `($ys+$yo)
+				echo $xo $yo `($xs+$xo-1) `($ys+$yo-1)
 			}
 		}
 	}
 }
 
+fn %primary-display {
+	# Print primary display name.
+	# This does not poll the display hardware for changes.
+	xrandr --current|grep 'connected primary'|cut -d' ' -f1
+}
+
 fn %primary-display-size {
 	# Print primary display size as WIDTHxHEIGHT.
-	xrandr|grep 'connected primary'|cut -d' ' -f4|cut -d+ -f1
+	# This does not poll the display hardware for changes.
+	xrandr --current|grep 'connected primary'|cut -d' ' -f4|cut -d+ -f1
 }
 
 fn %refresh-xbiff {
 	# Refresh xbiff immediately.
 	!~ $DISPLAY () && !~ `{xdotool search --class --onlyvisible \
 								xbiff} () && {
-		let (cw = `{xdotool getactivewindow}) {
+		let (cw = `{xdotool getactivewindow}; \
+		xbpos = `{xdotool search --class xbiff getwindowgeometry \
+				|grep Position:|awk '{print $2}'|tr , ' '}) {
 			%with-saved-pointer {
 				xdotool search --class xbiff windowunmap --sync
 				xdotool search --class xbiff windowmap --sync
+				xdotool search --class xbiff windowmove $xbpos
 			}
 			!~ $cw () && xdotool windowactivate --sync $cw \
 								windowraise $cw
@@ -77,37 +87,21 @@ fn %pt-in-rect {|x y l t r b|
 }
 
 fn %window-screen-region {
-	# Return the screen region (LEFT TOP RIGHT BOTTOM) of the active window.
-	escape {|fn-return| {let ((xo yo _ _) = `%window-bounds) {
+	# Return the screen region (LEFT TOP RIGHT BOTTOM) of the largest
+	# portion of the active window.
+	escape {|fn-return| {let ((xl yt xr yb) = `%window-bounds) {
 		for sr `` \n %screen-regions {
-			let ((l t r b) = `{echo $sr}) {
+			let ( \
+			(l t r b) = `{echo $sr}; \
+			xo = `(($xl+$xr)/2); \
+			yo = `(($yt+$yb)/2) \
+			) {
 				if {%pt-in-rect $xo $yo $l $t $r $b} {
 					return $l $t $r $b
 				}
 			}
 		}
 	}}}
-}
-
-fn %window-move-flush {|*|
-	# Move window to the named (left top right bottom) screen edge.
-	let (fn-mv = {|x y| xdotool getactivewindow windowmove $x $y}; \
-	edge; adj; opp) {
-		switch $^* (
-		left {mv 0 y}
-		top {mv x 0}
-		right {
-			(_ _ edge _) = <=%window-screen-region
-			(opp _ adj _) = `%window-bounds
-			mv `($edge-($adj-$opp)) y
-		}
-		bottom {
-			(_ _ _ edge) = <=%window-screen-region
-			(_ opp _ adj) = `%window-bounds
-			mv x `($edge-($adj-$opp))
-		}
-		)
-	}
 }
 
 fn %unused-displays {
@@ -256,7 +250,7 @@ fn %thermal {
                 }
                 for r `{sensors >[2]/dev/null|grep -e '^fan'|cut -d: -f2 \
                                 |sed 's/RPM.*$//g'} {
-                        if {!~ $r 0} {
+                        if {!~ $r 0 N/A} {
                                 fsum = `($fsum+$r)
                                 fcnt = `($fcnt+1)
                         }
@@ -267,16 +261,61 @@ fn %thermal {
         }
 }
 
-fn %track-file {
-	# Return path of currently playing music track.
-	result `` \n {cmus-remote -C status|grep '^file'|cut -d' ' -f2-}
-}
-
 fn %fullscreen-window-present {
-	# Return true if a fullscreen window is present.
+	# Return true if a fullscreen window is present on the primary display.
 	let (sizes = `{xwininfo -root -children|grep '^ \+0x' \
 		|sed 's/^ \+0x[0-9a-f]\+ \("[^"]\+"\|([^)]\+)\): ([^)]*)  //' \
 							|cut -d+ -f1}) {
 		result <={~ `%primary-display-size $sizes}
+	}
+}
+
+fn %screen-locked {
+	# Return true when the display is locked.
+	let (lock-cmd = `{pgrep -af xlock}) {
+		result <={!~ $lock-cmd () && !~ $lock-cmd -inwindow}
+	}
+}
+
+fn %platform {
+	# Return platform ID and version.
+	result <={~~ `{cat /etc/os-release \
+				|grep -o -e '^ID=.*$' -e '^VERSION_ID=.*$' \
+				|tr -d "} \
+			ID=* VERSION_ID=*}
+}
+
+fn %rot13 {|*|
+	# Return simple (de)obfuscation.
+	result `{echo $*|tr N-ZA-Mn-za-m A-Za-z}
+}
+
+fn %window-group {
+	# Return window group number
+	result `{/usr/bin/xprop -root|grep '^_NET_CURRENT_DESKTOP' \
+							|cut -d' ' -f3}
+}
+
+fn %restart-wm {
+	# Restart the window manager to reload its configuration
+	pkill -x -HUP cwm
+}
+
+fn %linepower {
+	# Return true if the computer is on AC power.
+	let (AC = /sys/class/power_supply/AC) {
+		if {! access -d $AC} {
+			true
+		} else if {~ `{cat $AC/online} 1} {
+			true
+		} else false
+	}
+}
+
+fn %top-margin {
+	# Print the effective top margin, considering the height of the bar.
+	let (bh = `{xdotool search --class dzen getwindowgeometry \
+						|grep Geometry|cut -dx -f2}) {
+		echo `($bh+1)
 	}
 }

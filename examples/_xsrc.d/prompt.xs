@@ -15,19 +15,30 @@
 #   prompt	prompt pair with terminal controls
 
 fn _prompt_init {
-	let (prompt_init; pi_p; pi_a; pi_s) {
+	let (prompt_init) {
 		if {~ `tty /dev/tty*} {
 			prompt_init = <={%aref pr cinit}
 		} else {
 			prompt_init = <={%aref pr pinit}
 		}
-		pi_p = $prompt_init(1); pi_a = $prompt_init(2); pi_s = $prompt_init(3)
-		if {!~ <={%aref pr $pi_p} ()} {_op = <={%aref pr $pi_p} ''} \
-		else {_op = \> \| xs}
-		if {!~ $pi_a ()} {_oa = $pi_a} \
-		else {_oa = bold}
-		if {!~ $pi_s ()} {_ob = $pi_s} \
-		else {_ob = underline}
+		let (pi_p = $prompt_init(1); pi_a = $prompt_init(2); \
+						pi_s = $prompt_init(3)) {
+			if {!~ <={%aref pr $pi_p} ()} {
+				_op = <={%aref pr $pi_p} ''
+			} else {
+				_op = \> \| xs
+			}
+			if {!~ $pi_a ()} {
+				_oa = $pi_a
+			} else {
+				_oa = bold
+			}
+			if {!~ $pi_s ()} {
+				_ob = $pi_s
+			} else {
+				_ob = underline
+			}
+		}
 	}
 }
 
@@ -47,6 +58,10 @@ fn prompt {|x|
 	.a '-L  # list defined prompts with sample text'
 	.a '-n NUM  # load defined prompt'
 	.a '(none)  # restore initial prompt'
+	.i 'The -a and -s options apply to the prompt sequence number.'
+	.i 'If $PS1 and $PS2 are both set, use for PROMPT_1 and PROMPT_2.'
+	.i 'The -a and -s options are ineffective when $PS1 and $PS2 are set.'
+	.i 'PROMPT_TEXT overrides both $PS1 and $PS2.'
 	.c 'prompt'
 	.r 'name title rp psc psd psi pss sample'
 	if {~ $x(1) -o} {
@@ -80,9 +95,9 @@ fn prompt {|x|
 				prompt -n $i
 				pss $i
 				%prompt
-				echo $prompt(1)^sample...
-				echo $prompt(2)^sample...
-				echo $prompt(2)^sample...
+				echo '#'^$prompt(1)^sample...
+				echo '#'^$prompt(2)^sample...
+				echo '#'^$prompt(2)^sample...
 			}|less -RFX
 		}
 	}
@@ -102,11 +117,13 @@ fn prompt {|x|
 	}
 	if {~ $x(1) -s} {
 		if {~ $x(2) underline} {
+			~ $TERM linux && throw error prompt 'unsupported'
 			_pb@$pid = underline
 		} else if {~ $x(2) highlight} {
 			if {~ $(_pa@$pid) dim} {
 				throw error prompt 'not with dim'
 			}
+			~ $TERM linux && throw error prompt 'unsupported'
 			_pb@$pid = highlight
 		} else if {~ $x(2) normal} {
 			_pb@$pid = normal
@@ -117,6 +134,8 @@ fn prompt {|x|
 	if {~ $x(1) -a} {
 		if {{~ $#x 2} && {~ $x(2) (bold normal dim italic
 				red green blue yellow magenta cyan)}} {
+			~ $x(2) bold italic && ~ $TERM linux \
+				&& throw error prompt 'unsupported'
 			if {~ $x(2) dim && ~ $(_pb@$pid) highlight} {
 				throw error prompt 'not with highlight'
 			}
@@ -138,7 +157,13 @@ fn prompt {|x|
 		_pb@$pid = $_ob
 	}
 	if {~ $(_pt@$pid) () ''} {
-		_pr@$pid = ($(_p1@$pid)^' ' $(_p2@$pid)^' ')
+		if {!~ $PS1 () && !~ $PS2 ()} {
+			_pr@$pid = $PS1 $PS2
+			_pa@$pid = normal
+			_pb@$pid = normal
+		} else {
+			_pr@$pid = ($(_p1@$pid)^' ' $(_p2@$pid)^' ')
+		}
 	} else {
 		_pr@$pid = ('•'^$(_pt@$pid)^'•'^$(_p1@$pid)^' '
 			    '•'^$(_pt@$pid)^'•'^$(_p2@$pid)^' ')
@@ -146,8 +171,20 @@ fn prompt {|x|
 	true
 }
 
+let (_an; _ed; _cn; _au; _aue; _ah; _ahe; _palette; _tattrs = <=%mkobj; \
+_attr_names = bold normal dim italic red green yellow blue magenta cyan; \
+_attrs_defined = false) {
 fn %prompt {
-	.palette; .an; .ed; .cn
+	$_attrs_defined || {
+		_an = <=.%an; _ed = <=.%ed; _cn = <=.%cn; _au = <=.%au;
+		_aue = <=.%aue; _ah = <=.%ah; _ahe = <=.%ahe;
+		_palette = <={%argify `.palette}
+		for an $_attr_names {
+			%objset $_tattrs $an <={.%tattr $an}
+		}
+		_attrs_defined = true
+	}
+	printf %s $_palette^$_an^$_ed^$_cn
 	~ $(_pr@$pid) () && {
 		_prompt_init; rp
 		_pa@$pid = $_oa; prompt; _n@$pid = 0; _s@$pid = -1
@@ -157,24 +194,25 @@ fn %prompt {
 		if {~ $(_n@$pid) -1} {
 			prompt = $p1 $p2
 		} else {
-			let (seq = $(_n@$pid)) {
+			let (seq = $(_n@$pid); \
+			pattr = <={%objget $_tattrs $(_pa@$pid) ''}) {
 				_n@$pid = `($seq+1)
 				sn = `` '' {printf %3d $(_n@$pid)}
 				if {~ $(_pb@$pid) underline} {
-					sn = `.au^$sn^`.aue
+					sn = $_au^$sn^$_aue
 				}
 				if {~ $(_pb@$pid) highlight} {
-					sn = `.ah^$sn^`.ahe
+					sn = $_ah^$sn^$_ahe
 				}
 				if {~ $(_pb@$pid) normal} {
-					sn = $sn^`.an
+					sn = $sn^$_an
 				}
+				prompt = ($pattr^$sn^$_an^$p1
+							$pattr^$sn^$_an^$p2)
 			}
-			prompt = $sn^`.an^$p1 $sn^`.an^$p2
 		}
-		prompt = (`{.tattr $(_pa@$pid)}^$prompt(1)^`.an
-			  `{.tattr $(_pa@$pid)}^$prompt(2)^`.an)
 	}
+}
 }
 
 fn psc {
@@ -221,7 +259,7 @@ fn rp {
 			att = (normal bold dim italic red green blue
 				magenta yellow cyan); \
 			bkg = (normal highlight underline); \
-			r; i; a; j) {
+			r; i; j) {
 		if {~ `tty /dev/tty*} {
 			np = <={%aref pr cmax}
 		} else {
@@ -232,19 +270,26 @@ fn rp {
 		prompt <={%aref pr $i} $(_pt@$pid)
 		prompt -a normal
 		prompt -s normal
-		a = ()
-		while {~ $a ()} {
-			r = <=$&random
-			i = `($r / 100 % $na + 1)
-			a = `{.tattr $att($i)}
-		}
-		prompt -a $att($i)
 		catch {
 			throw retry
 		} {
-			r = <=$&random
-			j = `($r / 100 % $nb + 1)
-			prompt -s $bkg($j)
+			catch {
+				throw retry
+			} {
+				r = <=$&random
+				i = `($r / 100 % $na + 1)
+				prompt -a $att($i)
+			}
+			catch {
+				throw retry
+			} {
+				r = <=$&random
+				j = `($r / 100 % $nb + 1)
+				prompt -s $bkg($j)
+			}
+			~ $i 1 && ~ $j 1 && throw error prompt 'normal normal'
+			~ $i 9 && ~ $j 1 && throw error prompt 'yellow normal'
+			true
 		}
 	}
 }
