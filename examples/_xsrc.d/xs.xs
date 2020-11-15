@@ -6,6 +6,7 @@ fn libedit {|*|
 		.usage libedit | %wt-pager
 	} else {
 		.ensure-libloc
+		~ $EDITOR () && throw error libedit '$EDITOR is unset'
 		let ((file line) = <={~~ <={%objget $libloc $*} *:*}) {
 			if {!~ $file ()} {
 				$EDITOR +$line $file
@@ -65,14 +66,6 @@ fn pp {|*|
 			}
 		}
 	}
-}
-
-fn refresh-appmenu {
-	.d 'Refresh applications menu'
-	.c 'xs'
-	refresh-libloc
-	.build-appmenu
-	%restart-wm
 }
 
 fn refresh-libloc {
@@ -513,7 +506,7 @@ fn luc {|*|
 		vars -f | wf \
 			| grep -o '^fn-[^ ]\+' | cut -d- -f2- \
 			| grep '^[a-z0-9]' | sf | column -c `{tput cols}
-		access -d ~/bin && {
+		access -f ~/bin/* && {
 			printf <=.%as^'@ ~/bin'^<=.%an^\n
 			find -L ~/bin -mindepth 1 -maxdepth 1 -type f \
 				-executable | sf | xargs -n1 basename \
