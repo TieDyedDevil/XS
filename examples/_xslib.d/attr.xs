@@ -151,9 +151,16 @@ fn .%ed {
 	result <={%argify `.ed}
 }
 
+# Hack: We send hard-coded escapes to emulators that advertise themselves
+# as xterm* via $TERM. VTE, which underlies the most common emulators
+# (gnome-terminal, lxterminal, etc.), advertises itself as xterm-256color.
+# Unfortunately, no one bothers with complete terminfo database entries
+# (because, y'know... GNOME needs to move slowly and break everything);
+# we're stuck "knowing" that "all" xterm* terminals "just work" w.r.t.
+# the initc escapes.
 fn .palette {
 	# Adjust terminal color palette.
-	if {~ $TERM linux} {
+	if {~ $TERM linux xterm*} {
 		printf %s \e]R
 		printf %s \e]P0000000 # black = Black
 		printf %s \e]P1cd0000 # red = Red3

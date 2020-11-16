@@ -1,6 +1,6 @@
 # Show indicators for no-newline and false return code of prior command.
 # Also show indicator for disabled history.
-let (ga; _an; _attrs_defined = false) {
+let (ga; _an; _attrs_defined = false; gr = ϴ; gn = ł; gh = И) {
 fn %before-interactive-prompt {|rc|
 	$_attrs_defined || {
 		if {~ `tty /dev/tty*} {
@@ -12,7 +12,7 @@ fn %before-interactive-prompt {|rc|
 		_attrs_defined = true
 	}
 	let ((r c) = <={catch {result 1 1} {result <=%get-cursor-position}}; \
-	lights = ''; gr = ϴ; gn = ł; gh = И; prompt_lights; continue_lights; \
+	lights = ''; prompt_lights; continue_lights; \
 	fill = \u'2592'\u'2592'\u'2592') {
 		if {!result $rc} {lights = $lights^$gr} \
 						else {lights = $lights^' '}
@@ -24,6 +24,13 @@ fn %before-interactive-prompt {|rc|
 		continue_lights = `` \n {printf '%s%s%s' $ga $fill $_an}
 		prompt = $prompt_lights^$prompt(1) $continue_lights^$prompt(2)
 	}
+}
+fn lights {
+	.d 'Describe prompt lights'
+	.c 'prompt'
+	printf \t'%s%s  %s  nonzero result     ' $ga $gr $_an
+	printf '%s %s %s  no newline     ' $ga $gn $_an
+	printf '%s  %s%s  no history'\n $ga $gh $_an
 }
 }
 
