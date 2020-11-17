@@ -11,10 +11,10 @@ fn %with-quit {|*|
 fn %without-echo {|cmd|
 	# Disable terminal echo while evaluating cmd.
 	unwind-protect {
-		stty -F /dev/tty -echo
+		< /dev/tty $&tctl noecho
 		$cmd
 	} {
-		stty -F /dev/tty echo
+		< /dev/tty $&tctl echo
 	}
 }
 
@@ -32,7 +32,7 @@ fn %get-cursor-position {
 	# Query ANSI terminal for its cursor position (row col).
 	let (c; d; row = 0; col = 0; state = 0) {
 		unwind-protect {
-			$&tctl raw; $&tctl noecho
+			</dev/tty $&tctl raw; </dev/tty $&tctl noecho
 			printf \e[6n
 			escape {|fn-break| while true {
 				c = <={$&getc </dev/tty}
@@ -50,7 +50,7 @@ fn %get-cursor-position {
 				}
 			}}
 		} {
-			$&tctl canon; $&tctl echo
+			</dev/tty $&tctl canon; </dev/tty $&tctl echo
 		}
 		result $row $col
 	}
