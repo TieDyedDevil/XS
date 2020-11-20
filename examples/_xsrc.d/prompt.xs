@@ -171,13 +171,13 @@ fn prompt {|x|
 	true
 }
 
-let (_an; _ed; _cn; _au; _aue; _ah; _ahe; _palette; _tattrs = <=%mkobj; \
+let (_an; _ed; _cn; _au; _aue; _ah; _ahe; _ad; _palette; _tattrs = <=%mkobj; \
 _attr_names = bold normal dim italic red green yellow blue magenta cyan; \
 _attrs_defined = false) {
 fn %prompt {
 	$_attrs_defined || {
 		_an = <=.%an; _ed = <=.%ed; _cn = <=.%cn; _au = <=.%au;
-		_aue = <=.%aue; _ah = <=.%ah; _ahe = <=.%ahe;
+		_aue = <=.%aue; _ah = <=.%ah; _ahe = <=.%ahe; _ad = <=.%ad;
 		_palette = <={%argify `.palette}
 		for an $_attr_names {
 			%objset $_tattrs $an <={.%tattr $an}
@@ -207,8 +207,8 @@ fn %prompt {
 				if {~ $(_pb@$pid) normal} {
 					sn = $sn^$_an
 				}
-				prompt = ($pattr^$sn^$_an^$p1
-							$pattr^$sn^$_an^$p2)
+				prompt = ($pattr^$sn^$_an^$_ad^$p1^$_an
+						$pattr^$sn^$_an^$_ad^$p2^$_an)
 			}
 		}
 	}
