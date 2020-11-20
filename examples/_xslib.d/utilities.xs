@@ -92,17 +92,16 @@ fn report {|title message|
 	if {~ $#* 0} {
 		.usage list
 	} else if {~ $* -l} {
-		source-highlight --lang-list | less -FX
+		source-highlight --lang-list | cut -d= -f2 \
+			| xargs -I\{\} basename \{\} | sed s/\.lang\$// \
+			| sort | uniq | column -c `{tput cols} | less -iFX
 	} else {
 		let (keep; syn; pf; lc; w = 6; err; \
 		fn-canon = {|ext|
 			%with-dict {|d|
 				result <={%objget $d $ext $ext}
-			} (ascii txt txt txt
-				conf txt README txt log txt
-				iso-8859 txt c c sh shell
-				xinitrc shell
-				dash shell posix shell bourne-again shell
+			} (ascii txt conf txt README txt log txt iso-8859 txt
+				xinitrc sh dash sh posix sh bourne-again sh
 				patch diff
 				adb ada ads ada gpr ada
 				rs rust p pascal py python
@@ -123,6 +122,11 @@ fn report {|title message|
 					|| {throw error list $err}
 				syn = `{echo $*|sed 's/^.*\.\([^.]\+\)$/\1/'}
 				syn = <={canon $syn}
+				~ $syn `{source-highlight --lang-list \
+						| cut -d= -f2 \
+						| sed s/\.lang\$// \
+						| sort | uniq} \
+					|| syn = ()
 			}
 			~ $syn () && syn = txt
 			if {file $*|grep -q 'CR line terminators'} {
