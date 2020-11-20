@@ -127,7 +127,7 @@ EOF
 fn .ensure-libdoc {
 	let (df = ~/.cache/xslib/libdoc.$TERM; \
 	fn-regen = {|tf|
-		for f `{for e <={%split ' ' $$libloc} {
+		for f `{for e <={%split \b $$libloc} {
 			echo $e|cut -d: -f1} |head -n-1|sort} {
 				echo $f >>$tf
 		}
