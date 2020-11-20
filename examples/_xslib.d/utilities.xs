@@ -81,3 +81,164 @@ fn report {|title message|
 		}
 	} else {notify $title $message}
 }
+
+%cfn {!access -x /usr/local/bin/vis-highlight} list {|*|
+	.d 'List file with syntax highlighting'
+	.a '[+] [-s SYNTAX] FILE  # +: keep short file open'
+	.a '-l  # list SYNTAX names'
+	.i 'Control characters and CSI sequences are stripped.'
+	.i 'Tabs are expanded with a width of 8.'
+	.c 'file'
+	if {~ $#* 0} {
+		.usage list
+	} else if {~ $* -l} {
+		source-highlight --lang-list | less -FX
+	} else {
+		let (keep; syn; pf; lc; w = 6; err; \
+		fn-canon = {|ext|
+			%with-dict {|d|
+				result <={%objget $d $ext $ext}
+			} (ascii txt txt txt
+				conf txt README txt log txt
+				iso-8859 txt c c sh shell
+				xinitrc shell
+				dash shell posix shell bourne-again shell
+				patch diff
+				adb ada ads ada gpr ada
+				rs rust p pascal py python
+				js javascript hs haskell
+				build ruby cxx cpp hxx cpp
+				tcl/tk tcl wish tcl tk tcl)} \
+		) {
+			if {~ $*(1) +} {
+				keep = -+F -+X
+				* = $*(2 ...)
+			}
+			if {~ $*(1) -s} {
+				syn = $*(2)
+				* = $*(3 ...)
+			} else {
+				{!~ $#* 1 && throw error list 'too many files'}
+				{~ $#* 1 && err = <={access -fr -- $*}} \
+					|| {throw error list $err}
+				syn = `{echo $*|sed 's/^.*\.\([^.]\+\)$/\1/'}
+				syn = <={canon $syn}
+			}
+			~ $syn () && syn = txt
+			if {file $*|grep -q 'CR line terminators'} {
+				pf = `mktemp
+				cat $*|tr \r \n >$pf
+			} else {
+				pf = $*
+			}
+			lc = `{cat $*|wc -l}
+			if {~ $lc ????? 9999} {w = 5} \
+			else if {~ $lc ???? 999} {w = 4} \
+			else if {~ $lc ??? 99} {w = 3} \
+			else if {~ $lc ?? 9} {w = 2} \
+			else if {~ $lc ?} {w = 1}
+			source-highlight -s $syn -f esc \
+				-i <{cat $pf|%strip-csi|%strip-ctl|expand} \
+				| nl -ba -s' ' -w$w >[2]/dev/null \
+					| sed 's/^\( *[0-9]\+\)\(.*\)$/' \
+						^<=.%an^<=.%as^'\1' \
+								^<=.%an^'\2/' \
+					| tr -d \x0f \
+					| less -~ -'#' .2 -ch0 -iRFXS $keep
+			~ $pf $* || rm -f $pf
+		}
+	}
+}
+
+%cfn {access -x /usr/local/bin/vis-highlight} list {|*|
+	.d 'List file with syntax highlighting'
+	.a '[+] [-s SYNTAX] FILE  # +: keep short file open'
+	.a '-l  # list SYNTAX names'
+	.i 'Control characters and CSI sequences are stripped.'
+	.i 'Tabs are expanded with a width of 7.'
+	.c 'file'
+	if {~ $#* 0} {
+		.usage list
+	} else if {~ $* -l} {
+		ls ~/.config/vis/lexers/*.lua \
+			/usr/local/share/vis/lexers/*.lua \
+			| grep -v lexer\\\.lua \
+			| xargs -I\{\} basename \{\} | sed s/\.lua\$// \
+			| sort | uniq | column -c `{tput cols} | less -iFX
+	} else {
+		let (keep; syn; pf; lc; w = 6; err; \
+			lpath = ~/.config/vis/lexers \
+				/usr/local/share/vis/lexers; \
+			fn-canon = {|ext|
+				%with-dict {|d|
+					result <={%objget $d $ext $ext}
+				} (1 man 3 man 5 man 7 man ascii text txt text
+					conf text README text log text
+					iso-8859 text c ansi_c sh bash
+					xinitrc bash
+					dash bash posix bash bourne-again bash
+					patch diff md markdown
+					fs forth f forth 4th forth fth forth
+					adb ada ads ada gpr ada
+					rs rust rst rest p pascal py python
+					js javascript es rc hs haskell
+					build ruby cxx cpp hxx cpp
+					tcl/tk tcl wish tcl tk tcl)} \
+			) {
+			if {~ $*(1) +} {
+				keep = -+F -+X
+				* = $*(2 ...)
+			}
+			if {~ $*(1) -s} {
+				syn = $*(2)
+				* = $*(3 ...)
+			} else {
+				{!~ $#* 1 && throw error list 'too many files'}
+				{~ $#* 1 && err = <={access -fr -- $*}} \
+					|| {throw error list $err}
+				syn = `{echo $*|sed 's/^.*\.\([^.]\+\)$/\1/'}
+				syn = <={canon $syn}
+				{~ $syn () || \
+				 !~ <={access -f $lpath/^$syn^.lua} 0} && {
+					syn = `{file -L $* | cut -d: -f2 \
+						| awk '
+/^ a .*\/env [^ ]+ script/ {print $3; next}
+/^ a .*\/[^ ]+ (-[^ ]+ )?script/ {
+	print gensub(/^ [^ ]+ .+\/([^ ]+) .*$/, "\\1", 1); next
+}
+// {print $1}
+' \
+						| tr '[[:upper:]]' \
+								'[[:lower:]]'}
+					syn = <={canon $syn}
+					~ <={access -f $lpath/^$syn^.lua} 0 \
+						|| syn = ()
+				}
+				~ $syn () && syn = null
+			}
+			if {file $*|grep -q 'CR line terminators'} {
+				pf = `mktemp
+				cat $*|tr \r \n >$pf
+			} else {
+				pf = $*
+			}
+			lc = `{cat $*|wc -l}
+			if {~ $lc ????? 9999} {w = 5} \
+			else if {~ $lc ???? 999} {w = 4} \
+			else if {~ $lc ??? 99} {w = 3} \
+			else if {~ $lc ?? 9} {w = 2} \
+			else if {~ $lc ?} {w = 1}
+			# NOTE: `vis-highlight` may not produce color
+			# with all lexers.
+			vis-highlight $syn \
+				<{cat $pf|%strip-csi|%strip-ctl|expand} \
+				| nl -ba -s' ' -w$w >[2]/dev/null \
+					| sed 's/^\( *[0-9]\+\)\(.*\)$/' \
+						^<=.%an^<=.%as^'\1' \
+								^<=.%an^'\2/' \
+					| tr -d \x0f \
+					| less -~ -'#' .2 -ch0 -iRFXS $keep
+			~ $pf $* || rm -f $pf
+		}
+	}
+}
