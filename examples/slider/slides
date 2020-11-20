@@ -1,0 +1,153 @@
+#! /usr/local/bin/xs -c slider $*
+
+This is a sample presentation using slider.
+
+.h Demo of slider
+.s Preliminaries
+.i 2
+.p The keys
+.pb h
+.c ,
+.pb j
+.c ,
+.pb n
+.c ,
+.pd space
+.c ,
+.pd tab
+.p and
+.pd enter
+.p advance to the next slide.
+.
+.i 4
+.p The keys
+.pb k
+.c ,
+.pb l
+.c ,
+.pb p
+.c ,
+.pd backspace
+.c ,
+.pd del
+.p and
+.pb `
+.p return to the previous slide.
+.
+.i 6
+.p The keys
+.pb q
+.p and
+.pb .
+.p terminate the program.
+.f ... you know what to do, right?
+.^
+
+.s First slide
+.f Saturday, April 28th 2018
+.i 5
+.p This is a
+.pb bunch
+.p of text.
+.p It'll
+.ph all
+.pd show up
+.p as one paragraph.
+.p Also, it
+.pi should
+.p be long enough to
+.pu wrap
+.c .
+.pd (At least it should in a typical 80-ish column terminal.)
+.
+.p This is another paragraph.
+.pR We have a
+.pG few of
+.pY the colors
+.pB of
+.pM the
+.pC rainbow
+.c .
+.
+.i 10
+.bh Here's a table
+.bb   aaa  bbb  ccc
+.bp     1   ax  3.0
+.bp     2    z    7
+.bp
+.bd   ^ empty line
+.bp   -    -    -
+.^
+
+.s Second slide
+.p Here we are, then...
+.
+.i 41
+.w 60
+.pi BTW, I'm sorry for the fruit-salad. It's meant to
+.pi exercise all of the formatters.
+.i 20
+.pb Tasteful slides don't do that.
+.^
+
+.s Third slide
+.i 5
+.p Can we go back?
+.
+.p (You do remember how to go back, right...?)
+.
+.v 20
+.p If you have a "short" screen, this paragraph (or its tail) will silently
+.p disappear; the footer will remain at its usual position and
+.p the header will not scroll off the screen.)
+
+.i 0
+.p In the event of truncation, a dot will appear at the left of the page
+.p number box on the last displayed line.
+.^
+
+.s Fourth slide
+.w 40
+.p Here's a paragraph on a narrow line. It should wrap.
+.
+.w 80
+.i 40
+.p Here's a paragraph with a large indent. It should also wrap.
+.^
+
+.s Fifth slide
+.w 60
+.i 5
+.j 3
+.p 1. We can do bullet items, too.
+.
+.p 2. Just write each point as a new paragraph;
+.p use whatever marker you like, or none.
+.
+.p 3. The hanging indent is specified using the .j request.
+.^
+
+.s Last slide
+.f Thanks!
+.w 50
+.i 32
+.j 3
+.v 3
+.p This is the end, my friend.
+.
+.v 4
+.i 24
+.p 💻
+.cC 💻
+.cM 💻
+.cY 💻
+.cR 💻
+.cB 💻
+.cG 💻
+.cb 💻
+.cd 💻
+.ch 💻
+.ci 💻
+.cu 💻
+.c 💻
+.^

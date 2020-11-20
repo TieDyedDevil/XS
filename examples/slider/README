@@ -1,0 +1,7 @@
+The `slider` utility renders text according to a simple markup language.
+
+Install `slider` to a directory on $PATH.
+
+See the `slides` file for an example of a presentation that exercises the
+capabilities of the markup language. See `slider --help` for a description
+of the markup language.

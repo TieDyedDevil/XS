@@ -1,0 +1,299 @@
+#! /usr/local/bin/xs --
+
+pgm = $0
+file = $1
+start = $2; ~ $start () && start = 1
+
+~ $1 --help && {
+	let (name = `{basename $pgm}; \
+	ae = <=.%ab; ad = <=.%ad; ah = <=.%ah; ai = <=.%ai; au = <=.%au; \
+	ap = <=.%an; ar = <={.%af 1}; ag = <={.%af 2}; ay = <={.%af 3}; \
+	ab = <={.%af 4}; am = <={.%af 5}; ac = <={.%af 6}) {
+	less -rFXi <<EOF
+usage: $name FILE [START_PAGE]
+
+Present textual slides with markup.
+
+A markup request begins each line of FILE:
+  .h Header text (one line)
+  .s Subheader text (one line)
+  .f Footer text (one line)
+  .i Indent amount (number of leading blanks)
+  .j Subsequent indent amount (additional leading blanks on subsequent lines)
+  .w Line width (includes indents; 0 to use terminal width)
+  .v Vertical space amount (number of lines)
+  .p Paragraph (fill, wrap) text
+  .pp Paragraph plain text (same as .p)
+  .pb Paragraph styled text ($ae^bold$ap)
+  .pd Paragraph styled text ($ad^dim$ap)
+  .ph Paragraph styled text ($ah^highlight$ap)
+  .pi Paragraph styled text ($ai^italic$ap)
+  .pu Paragraph styled text ($au^underline$ap)
+  .pR Paragraph colored text ($ar^red$ap)
+  .pG Paragraph colored text ($ag^green$ap)
+  .pY Paragraph colored text ($ay^yellow$ap)
+  .pB Paragraph colored text ($ab^blue$ap)
+  .pM Paragraph colored text ($am^magenta$ap)
+  .pC Paragraph colored text ($ac^cyan$ap)
+  .c Continued text (follows previous word with no intervening space)
+  .cp Continued plain text (same as .c)
+  .cb Continued styled text ($ae^bold$ap)
+  .cd Continued styled text ($ad^dim$ap)
+  .ch Continued styled text ($ah^highlight$ap)
+  .ci Continued styled text ($ai^italic$ap)
+  .cu Continued styled text ($au^underline$ap)
+  .cR Continued colored text ($ar^red$ap)
+  .cG Continued colored text ($ag^green$ap)
+  .cY Continued colored text ($ay^yellow$ap)
+  .cB Continued colored text ($ab^blue$ap)
+  .cM Continued colored text ($am^magenta$ap)
+  .cC Continued colored text ($ac^cyan$ap)
+  .b Block (literal, nowrap) text
+  .bp Block plain text (same as .b)
+  .bb Block styled text ($ae^bold$ap)
+  .bd Block styled text ($ad^dim$ap)
+  .bh Block styled text ($ah^highlight$ap)
+  .bi Block styled text ($ai^italic$ap)
+  .bu Block styled text ($au^underline$ap)
+  .bR Block colored text ($ar^red$ap)
+  .bG Block colored text ($ag^green$ap)
+  .bY Block colored text ($ay^yellow$ap)
+  .bB Block colored text ($ab^blue$ap)
+  .bM Block colored text ($am^magenta$ap)
+  .bC Block colored text ($ac^cyan$ap)
+  . Terminate a paragraph or block (text ignored)
+  .^ Show slide; pause for key
+
+  Markup requests must begin in the first column.
+  Text unrecognized as a request is silently ignored.
+  The .h, .s, .f, .i, .j and .w requests remain as set until changed.
+  Yes, there is no way to combine attributes and colors.
+
+Navigation keys
+  next slide:     n f j h <tab> <space>     <enter>
+  previous slide: p b k l `     <backspace> <delete>
+  redraw:         r
+  exit:           q .
+EOF
+	exit 1
+	} #let
+}
+
+~ $#* 0 && throw error `{basename $pgm} 'FILE [START_PAGE] | --help'
+
+let (header; subheader; footer; rows; rc; width = `{tput cols}; \
+		 pn = 1; indent = ''; sindent = ''; text = '') {
+
+	fn indent {|n|
+		~ $n () && n = 0
+		result <={%argify `` '' {for i `{seq $n} {printf ' '}}}
+	}
+
+	fn style {|style text|
+		result $style^$text^<=.%an
+	}
+
+	fn color {|n text|
+		result <={.%af $n}^$text^<={.%af 7}
+	}
+
+	fn fill {|t|
+		printf $indent
+		let (wl = <={%split ' ' $t}; wc; \
+				cw = <={$&wid $indent}) {
+			for w $wl {
+				wc = <={$&wid `` '' {printf %s $w \
+							|%strip-csi}}
+				if {`($wc+$cw) :ge $width} {
+					printf \n%s $indent^$sindent
+					cw = <={$&wid $indent^$sindent}
+					rc = `($rc+1)
+					cutpage
+				}
+				printf '%s ' $w
+				cw = `($cw+$wc+1)
+			}
+		}
+		printf \n
+		rc = `($rc+1)
+		cutpage
+		printf \n
+		rc = `($rc+1)
+		cutpage
+	}
+
+	fn cutpage {if {$rc :ge $rows} {throw error cutpage}}
+
+	fn spacedown {|n|
+		~ $n () && n = 0
+		for _ `{seq $n} {printf \n; rc = `($rc+1); cutpage}
+	}
+
+	fn render {|pars|
+		let (pt = <={%split \n $pars}; ob = false) {
+			for t $pt {
+				let ((w1 lr) = <={~~ $t *\ *}) {
+					if {~ $w1 .b .bp .bb .bd .bh .bi .bu \
+					.bR .bG .bY .bB .bM .bC} {
+						ob = true
+						printf '%s%s'\n $indent $lr
+						rc = `($rc+1)
+						cutpage
+					} else if {~ $w1 .i} {
+						indent = <={indent $lr}
+					} else if {~ $w1 .j} {
+						sindent = <={indent $lr}
+					} else if {~ $w1 .v} {
+						spacedown $lr
+					} else if {~ $w1 .w} {
+						width = $lr
+						~ $width 0 && \
+							width = `{tput cols}
+					} else {
+						if $ob {
+							printf \n
+							ob = false
+							rc = `($rc+1)
+							cutpage
+						}
+						fill $t
+					}
+				}
+			}
+		}
+	}
+
+	fn track {
+		let (pt = <={%split \n $text}; ob = false) {
+			for t $pt {
+				let ((w1 lr) = <={~~ $t *\ *}) {
+					if {~ $w1 .i} {
+						indent = <={indent $lr}
+					} else if {~ $w1 .j} {
+						sindent = <={indent $lr}
+					} else if {~ $w1 .w} {
+						width = $lr
+						~ $width 0 && \
+							width = `{tput cols}
+					}
+				}
+			}
+		}
+		text = ''
+		pn = `($pn+1)
+	}
+
+	fn redraw {|page| exec $pgm $file $page}
+
+	fn waitkey {
+		let (kc) {escape {|fn-done| {while (true) {
+			kc = <={%without-echo %read-char}
+			if {~ $kc \b \x7f p b k l \`} {redraw `($pn-1)}
+			if {~ $kc r} {redraw $pn}
+			if {~ $kc ' ' \n n f j h \t} {done}
+			if {~ $kc q .} {exit}
+		}}}}
+	}
+
+	fn showpage {
+		rows = `{tput lines}
+		clear
+		printf %s%s%s\n <=.%ab <={%argify $header} <=.%an
+		printf %s%s%s\n <=.%ai <={%argify $subheader} <=.%an
+		printf \n
+		rc = 5
+		let (trunc = ' ') {
+			catch {|e|
+				if {~ $e cutpage} {
+					trunc = '.'
+				} else {throw $e}
+			} {
+				render $text
+			}
+			while {$rc :lt $rows} {
+				printf \n
+				rc = `($rc+1)
+			}
+			printf '%s[%c%3d] %s%s'\n \
+				<=.%ad $trunc $pn <={%argify $footer} <=.%an
+		}
+		waitkey
+		pn = `($pn+1)
+		text = ''
+	}
+
+	fn addtext {|new| text = $text^$new}
+
+	fn update {|req val| addtext \n$req' '^<={%argify $val}^\n}
+
+	fn dispatch {|line|
+		let ((w1 lr) = <={~~ $line *\ * *}) {
+			if {$start :gt $pn} {
+				switch $w1 (
+				'.h' {header = $lr}
+				'.s' {subheader = $lr}
+				'.f' {footer = $lr}
+				'.^' {track}
+				{}
+				)
+			} else {
+				switch $w1 (
+				'.h' {header = $lr}
+				'.s' {subheader = $lr}
+				'.f' {footer = $lr}
+				'.i' {update .i $lr}
+				'.j' {update .j $lr}
+				'.w' {update .w $lr}
+				'.v' {update .v $lr}
+				'.b' {update .b $lr}
+				'.bp' {update .bp $lr}
+				'.bb' {update .bb <={style <=.%ab $lr}}
+				'.bd' {update .bd <={style <=.%ad $lr}}
+				'.bh' {update .bh <={style <=.%ah $lr}}
+				'.bi' {update .bi <={style <=.%ai $lr}}
+				'.bu' {update .bu <={style <=.%au $lr}}
+				'.bR' {update .bR <={color 1 $lr}}
+				'.bG' {update .bG <={color 2 $lr}}
+				'.bY' {update .bY <={color 3 $lr}}
+				'.bB' {update .bB <={color 4 $lr}}
+				'.bM' {update .bM <={color 5 $lr}}
+				'.bC' {update .bC <={color 6 $lr}}
+				'.p' {addtext ' '^$lr}
+				'.pp' {addtext ' '^$lr}
+				'.pb' {addtext ' '^<={style <=.%ab $lr}}
+				'.pd' {addtext ' '^<={style <=.%ad $lr}}
+				'.ph' {addtext ' '^<={style <=.%ah $lr}}
+				'.pi' {addtext ' '^<={style <=.%ai $lr}}
+				'.pu' {addtext ' '^<={style <=.%au $lr}}
+				'.pR' {addtext ' '^<={color 1 $lr}}
+				'.pG' {addtext ' '^<={color 2 $lr}}
+				'.pY' {addtext ' '^<={color 3 $lr}}
+				'.pB' {addtext ' '^<={color 4 $lr}}
+				'.pM' {addtext ' '^<={color 5 $lr}}
+				'.pC' {addtext ' '^<={color 6 $lr}}
+				'.c' {addtext $lr}
+				'.cp' {addtext $lr}
+				'.cb' {addtext <={style <=.%ab $lr}}
+				'.cd' {addtext <={style <=.%ad $lr}}
+				'.ch' {addtext <={style <=.%ah $lr}}
+				'.ci' {addtext <={style <=.%ai $lr}}
+				'.cu' {addtext <={style <=.%au $lr}}
+				'.cR' {addtext <={color 1 $lr}}
+				'.cG' {addtext <={color 2 $lr}}
+				'.cY' {addtext <={color 3 $lr}}
+				'.cB' {addtext <={color 4 $lr}}
+				'.cM' {addtext <={color 5 $lr}}
+				'.cC' {addtext <={color 6 $lr}}
+				'.' {addtext \n}
+				'.^' {showpage}
+				{}
+				)
+			}
+		}
+	}
+
+	%without-cursor {
+		%with-read-lines $file {|line| dispatch $line}
+		redraw `($pn-1)
+	}
+}
