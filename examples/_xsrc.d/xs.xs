@@ -46,23 +46,17 @@ fn parse {|*|
 
 fn pp {|*|
 	.d 'Prettyprint xs function'
-	.a '[-c] NAME'
+	.a 'NAME'
 	.c 'xs'
 	if {~ $#* 0} {
 		.usage pp
 	} else {
-		let (syntax = text) {
-			if {~ $*(1) -c} {
-				syntax = xs
-				* = $*(2 ...)
-			}
-			catch {|e|
-				throw error pp 'not a function'
-			} {
-				%with-tempfile f {
-					%pprint $* >$f
-					list -s $syntax $f
-				} | %wt-pager
+		catch {|e|
+			throw error pp 'not a function'
+		} {
+			%with-tempfile f {
+				%pprint $* >$f
+				list $f
 			}
 		}
 	}
