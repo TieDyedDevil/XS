@@ -96,26 +96,26 @@ fn list {|*|
 			| xargs -I\{\} basename \{\} | sed s/\.lang\$// \
 			| sort | uniq | column -c `{tput cols} | less -iFX
 	} else {
-		let (keep; syn; pf; lc; w = 6; err; \
+		let (keep; syn; ext; pf; lc; w = 6; err; \
 		fn-canon = {|ext|
 			%with-dict {|d|
 				result <={%objget $d $ext $ext}
-			} (ascii txt conf txt README txt log txt iso-8859 txt
+			} (ascii txt README txt iso-8859 txt
 				xinitrc sh dash sh posix sh bourne-again sh
-				patch diff
-				adb ada ads ada gpr ada
-				rs rust p pascal py python
-				js javascript hs haskell
-				build ruby cxx cpp hxx cpp
-				ly lilypond
-				xs txt
-				tcl/tk tcl wish tcl tk tcl)} \
+				ads ada gpr ada p pascal build ruby
+				tcl/tk tcl wish tcl)}; \
+		fn-lookup = {|fname|
+			%with-dict {|d|
+				result <={%objget $d $fname}
+			} (Makefile makefile
+				)} \
 		) {
 			if {~ $*(1) +} {
 				keep = -+F -+X
 				* = $*(2 ...)
 			}
 			if {~ $*(1) -s} {
+				$#* :ge 3 || throw error list '-s SYNTAX?'
 				syn = $*(2)
 				* = $*(3 ...)
 			}
@@ -123,13 +123,23 @@ fn list {|*|
 			{~ $#* 1 && err = <={access -fr -- $*}} \
 				|| {throw error list $err}
 			if {~ $syn ()} {
-				syn = `{echo $*|sed 's/^.*\.\([^.]\+\)$/\1/'}
-				syn = <={canon $syn}
+				syn = <={lookup `` \n {basename $*}}
+			}
+			if {~ $syn ()} {
+				ext = `{echo $*|sed 's/^.*\.\([^.]\+\)$/\1/'}
+				syn = <={canon $ext}
 				~ $syn `{source-highlight --lang-list \
 						| cut -d= -f2 \
 						| sed s/\.lang\$// \
 						| sort | uniq} \
-					|| throw error list 'no syntax '^$syn
+					|| syn = ()
+			}
+			if {~ $syn ()} {
+				if {file $*|grep -q 'text'} {
+					syn = txt
+				} else {
+					throw error list 'no syntax for .'^$ext
+				}
 			}
 			if {file $*|grep -q 'CR line terminators'} {
 				pf = `mktemp
