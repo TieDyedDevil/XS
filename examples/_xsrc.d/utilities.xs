@@ -107,6 +107,8 @@ fn list {|*|
 				rs rust p pascal py python
 				js javascript hs haskell
 				build ruby cxx cpp hxx cpp
+				ly lilypond
+				xs txt
 				tcl/tk tcl wish tcl tk tcl)} \
 		) {
 			if {~ $*(1) +} {
@@ -116,26 +118,26 @@ fn list {|*|
 			if {~ $*(1) -s} {
 				syn = $*(2)
 				* = $*(3 ...)
-			} else {
-				{!~ $#* 1 && throw error list 'too many files'}
-				{~ $#* 1 && err = <={access -fr -- $*}} \
-					|| {throw error list $err}
+			}
+			{!~ $#* 1 && throw error list 'too many files'}
+			{~ $#* 1 && err = <={access -fr -- $*}} \
+				|| {throw error list $err}
+			if {~ $syn ()} {
 				syn = `{echo $*|sed 's/^.*\.\([^.]\+\)$/\1/'}
 				syn = <={canon $syn}
 				~ $syn `{source-highlight --lang-list \
 						| cut -d= -f2 \
 						| sed s/\.lang\$// \
 						| sort | uniq} \
-					|| syn = ()
+					|| throw error list 'no syntax '^$syn
 			}
-			~ $syn () && syn = txt
 			if {file $*|grep -q 'CR line terminators'} {
 				pf = `mktemp
 				cat $*|tr \r \n >$pf
 			} else {
 				pf = $*
 			}
-			lc = `{cat $*|wc -l}
+			lc = `{cat $pf|wc -l}
 			if {~ $lc ????? 9999} {w = 5} \
 			else if {~ $lc ???? 999} {w = 4} \
 			else if {~ $lc ??? 99} {w = 3} \
