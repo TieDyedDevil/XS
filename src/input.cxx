@@ -249,19 +249,77 @@ static char *callreadline() {
 	return r;
 }
 
-static rl_quote_func_t * default_quote_function ;
+#include <sys/types.h>
+#include <pwd.h>
+
 static char * quote_func(char *text, int match_Type, char *quote_pointer) {
+	/* XXX: Determine which allocator owns the `char *text` parameter
+	   and ensure that we don't leak memory. */
+	(void)match_Type;
+	(void)quote_pointer;
 	char *pos;
-	if ((pos = strstr(text, "~"))) {
-		/* Expand ~, otherwise quoting will make the
-		   filename invalid */
+	if ((pos = strstr(text, "~/")) == text) {
+		/* Expand ~/... */
 		std::string home = varlookup("HOME", NULL)->term->str;
-		home += (pos + 1); // Add rest of path
-		/* consider gc usage here? */
-		text = gcdup(home.c_str());
+		home += (pos + 1);
+		text = strdup(home.c_str());
+	} else if (strstr(text, "~") == text) {
+		/* Expand ~user/... */
+		char *uname_end = strchr(text+1, '/');
+		size_t uname_len = uname_end-text-1;
+		char *uname = (char*)malloc(uname_len+1);
+		strncpy(uname, text+1, uname_len);
+		uname[uname_len] = '\0';
+		struct passwd *pwent = getpwnam(uname);
+		free(uname);
+		if (pwent) {
+			char *homepath = pwent->pw_dir;
+			text = (char*)malloc(strlen(text)-uname_len
+							+strlen(homepath)+1);
+			char *p = stpncpy(text, homepath, strlen(homepath));
+			strcpy(p, uname_end);
+		}
 	}
-        char *result = default_quote_function(text, match_Type, quote_pointer);
-	return result;
+	/* If any special characters are present, quote the entire string
+	   and double embedded quotes. */
+	int quote_count = 0;
+	char *quotes = text;
+	while (*quotes && (quotes = strpbrk(quotes,
+					rl_filename_quote_characters))) {
+		++quote_count;
+		++quotes;
+	}
+	char *qtext = (char*)malloc(strlen(text)+1+quote_count);
+	char *s = text, *d = qtext;
+	if (quote_count) *d++ = '\'';
+	while (*s) {
+		if (*s == '\'') *d++ = '\'';
+		*d++ = *s++;
+	}
+	if (quote_count) *d++ = '\'';
+	*d = '\0';
+	text = qtext;
+	return text;
+}
+
+static char * dequote_func(char *text, int tlen) {
+	/* XXX: Determine which allocator owns the `char *text` parameter
+	   and ensure that we don't leak memory. */
+	(void)tlen;
+	char *dqtext = strdup(text);
+	int quote_char = '\'';
+	if (strchr(text, quote_char)) {
+		char *p = text;
+		char *d = dqtext;
+		while (*p) {
+			if (*p == quote_char) {
+				if (*(p+1) == quote_char) ++p;
+				++p;
+			}
+			*d++ = *p++;
+		}
+	}
+	return dqtext;
 }
 
 static inline const char * simple_basename(const char *str) {
@@ -667,9 +725,9 @@ extern void initinput(void) {
 	rl_readline_name = "xs";
 	rl_basic_word_break_characters = " \t\n\\'`><=;|&{()}";
 	rl_completer_quote_characters = "'";
-	rl_filename_quote_characters = " \t\n\\'`=$><;|&{()}";
-	default_quote_function = rl_filename_quoting_function;
+	rl_filename_quote_characters = " \t\n\\'`$><;|&{()}";
 	rl_filename_quoting_function = quote_func;
+	rl_filename_dequoting_function = dequote_func;
 	rl_attempted_completion_function = get_completions;
 	rl_change_environment = 0;
 	rl_prefer_env_winsize = 0;

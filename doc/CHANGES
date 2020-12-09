@@ -2,9 +2,16 @@ xs 1.2 to xs 1.3
 ----------------
 
 Added a `sleep` builtin based upon a new `$&sleep` primitive.
+
 Added a `$&getc` primitive.
+
 Added a `$&tctl` primitive.
+
 Throwing an error causes the evaluation's result to be false.
+
+Improved readline(3) integration: Filenames containing XS special characters
+are now properly quoted by readline completion. Expand ~ in filename only at
+beginning of name. Expand ~user.
 
 xs 1.1 to xs 1.2
 ----------------

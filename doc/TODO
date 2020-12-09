@@ -1,6 +1,5 @@
 - Add job control (SIGTSTP, fg, bg).
 - Improve the readline experience:
-  - Make quoting during completion match what the user would type.
   - Alter completion behavior depending upon command prefix.
   - Repaint prompt and partial input after printing PID of terminated job.
 - At full load (e.g. rendering w/Mandelbulber), attempting to spawn a
