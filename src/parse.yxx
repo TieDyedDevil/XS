@@ -12,7 +12,6 @@ typedef struct yyltype
   int last_line;
   int last_column;
 } yyltype;
-#define YYLTYPE yyltype
 #define YYINITDEPTH 10000
 %}
 
