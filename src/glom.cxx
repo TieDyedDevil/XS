@@ -343,7 +343,7 @@ static bool isint(List *x) {
 static int toint(List *x) {
 	try {
 		return lexical_cast<int>(getstr(x->term));
-	} catch (boost::bad_lexical_cast) {
+	} catch (const boost::bad_lexical_cast &) {
 		fail("glom:arith:toint",
                      "Could not handle integer input");
 	}
@@ -351,7 +351,7 @@ static int toint(List *x) {
 static double todouble(List *x) {
 	try {
 		return lexical_cast<double>(getstr(x->term));
-	} catch (boost::bad_lexical_cast) {
+	} catch (const boost::bad_lexical_cast &) {
 		fail("glom:arith:todouble",
 		     "Could not handle floating point input");
 	}
@@ -374,14 +374,14 @@ static List *calculate(Tree *expr, Binding *binding) {
 	case nInt:
 		try {
 			return tolist(lexical_cast<int>(expr->u[0].s));
-		} catch (boost::bad_lexical_cast) {
+		} catch (const boost::bad_lexical_cast &) {
 			fail("glom:arith:calculate",
 	                     "Could not handle integer input");
 		}
 	case nFloat:
 		try {
 			return tolist(lexical_cast<double>(expr->u[0].s));
-		} catch (boost::bad_lexical_cast) {
+		} catch (const boost::bad_lexical_cast &) {
 			fail("glom:arith:calculate",
 	                     "Could not handle floating point input");
 		}
