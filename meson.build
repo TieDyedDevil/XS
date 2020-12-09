@@ -38,8 +38,9 @@ project('xs', ['cpp'])
 	command: ['../generators/git_url.sh'])
   parse_cxx = custom_target('parse.cxx',
 	depend_files: 'src/parse.yxx',
-	output: ['parse.cxx', 'parse.hxx'],
-	command: ['../generators/mkparse.sh'])
+	input: ['src/parse.yxx'],
+	output: ['parse.tab.cxx', 'parse.tab.hxx'],
+	command: ['bison', '-d', '@INPUT@'])
   sigmsgs_cxx = custom_target('sigmsgs.cxx',
 	output: 'sigmsgs.cxx',
 	command: ['../generators/mksignal.sh', '@OUTPUT@'])

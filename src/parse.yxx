@@ -16,7 +16,7 @@ typedef struct yyltype
 #define YYINITDEPTH 10000
 %}
 
-%error-verbose
+%define parse.error verbose
 %locations
 
 %token	WORD QWORD

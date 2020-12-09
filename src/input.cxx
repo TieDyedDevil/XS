@@ -3,7 +3,7 @@
 #include "xs.hxx"
 #include "term.hxx"
 #include "input.hxx"
-#include "parse.hxx"
+#include "parse.tab.hxx"
 
 
 /*
