@@ -249,13 +249,21 @@ static char *callreadline() {
 	return r;
 }
 
+
 #include <sys/types.h>
 #include <pwd.h>
+#include <sys/stat.h>
 
-static char * quote_func(char *text, int match_Type, char *quote_pointer) {
+static char isdir(char *name) {
+	struct stat sb;
+	int rc = stat(name, &sb);
+	return !rc && S_ISDIR(sb.st_mode);
+}
+
+static char * quote_func(char *text, int match_type, char *quote_pointer) {
 	/* XXX: Determine which allocator owns the `char *text` parameter
 	   and ensure that we don't leak memory. */
-	(void)match_Type;
+	(void)match_type;
 	(void)quote_pointer;
 	char *pos;
 	if ((pos = strstr(text, "~/")) == text) {
@@ -296,7 +304,9 @@ static char * quote_func(char *text, int match_Type, char *quote_pointer) {
 		if (*s == '\'') *d++ = '\'';
 		*d++ = *s++;
 	}
-	if (quote_count) *d++ = '\'';
+	if (quote_count && !isdir(text) && match_type == SINGLE_MATCH) {
+		*d++ = '\'';
+	}
 	*d = '\0';
 	text = qtext;
 	return text;
