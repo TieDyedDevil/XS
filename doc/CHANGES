@@ -13,6 +13,18 @@ Improved readline(3) integration: Filenames containing XS special characters
 are now properly quoted by readline completion. Expand ~ in filename only at
 beginning of name. Expand ~user.
 
+Exposed signals via the new `signals-case` command, built upon `$&catch`.
+
+Changed `$&catch` to check for unprocessed signals after executing body.
+
+Implemented `%catch` as the internal form of `catch`.
+
+Note that the changes around signal handling represents an incompatible
+change to previously-undocumented behavior. If you reverse-engineered signal
+handling and made it work for your application, my apologies. (I'm pretty
+confident that someone who had tried this should have complained about the
+untenable use-cases of the initial signals interface.)
+
 xs 1.1 to xs 1.2
 ----------------
 

@@ -58,6 +58,7 @@ PRIM(catch) {
 
 		try {
 			result = eval(list->next, NULL, evalflags);
+			SIGCHK();
 		} catch (List *frombody) {
 
 			blocksignals();

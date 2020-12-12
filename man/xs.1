@@ -1083,6 +1083,74 @@ form executes its body in the context of a catcher:
 The
 .IR catcher " and " body
 are fragments.
+.SS Signals
+.B Xs
+processes signals internally as needed for interactive operation.
+For example,
+.I SIGINT
+is used to kill any foreground process and, during input, to present
+a fresh prompt.
+.PP
+.B Xs
+can expose signals for handling by a script.
+Signal handlers are established by the
+.I signals-case
+command.
+.PP
+.RS
+.BI signals-case " body handlers-alist" " \fR,"
+.RE
+.PP
+where
+.I body
+is a fragment
+and
+.I handlers-alist
+is a list of
+.IR "signal-name fragment" .
+The
+.I signal-name
+is spelled as in
+.BR signal.h (0p),
+but using lowercase letters, e.g.
+.IR sigint " and " sigterm .
+.PP
+The
+.B signals
+variable (see
+.IR "BUILTIN VARIABLES" ,
+below) indicates which signals are accepted by
+.B xs
+and how they are processed.
+Setting
+.B signals
+to a new list of handler specifications establishes signal handlers
+per the list.
+A signal must be listed on
+.B signals
+in order to be handled by
+.BR signals-case .
+.PP
+A signal not handled by a
+.B signal-case
+is propagated to the next
+.B signal-case
+handler (if any) up the call chain; a last-resort handler notes
+an unhandled signal.
+.PP
+In this example, note that the signal is not intercepted by the
+exception handler established by
+.BR catch .
+.PP
+.RS
+signals = $signals sigttou
+.br
+signals-case {
+.br
+    catch {|e| echo catch $e} {kill -sigttou $pid}
+.br
+} (sigttou {echo sigttin})
+.RE
 .SS Upward funargs
 An "upward funarg" is a function returned from another function.
 Because a returned function may be executed in a different lexical
@@ -1204,6 +1272,12 @@ recognizes that
 .BR sigxcpu " and " sigpwr
 are used by its garbage collector and intentionally ignores them to avoid disrupting
 the collector's operation.
+.PP
+When
+.B $signals
+is written, its value is used by the
+.I set-signals
+settor to configure the shell's signal handlers.
 .RE
 .PP
 .B Xs
@@ -1855,7 +1929,7 @@ $&apids@%apids
 $&background@\fIused by \fR%background
 $&backquote@\fIused by \fR%backquote
 $&batchloop@%batch-loop
-$&catch@catch
+$&catch@\fIused by \fRcatch \fIand \fRsignals-case
 $&cd@\fIused by \fRcd
 $&close@%close
 $&cmp@%cmp
@@ -1894,10 +1968,10 @@ $&resetterminal@\fIused to keep readline(3) in sync with terminal
 $&result@result
 $&run@%run
 $&seq@%seq
-$&sethistory@set-history
-$&setmaxevaldepth@set-max-eval-depth
-$&setnoexport@set-noexport
-$&setsignals@set-signals
+$&sethistory@\fIsettor implementing \fRset-history
+$&setmaxevaldepth@\fIsettor implementing \fRset-max-eval-depth
+$&setnoexport@\fIsettor implementing \fRset-noexport
+$&setsignals@\fIsettor implementing \fRset-signals
 $&sleep@sleep
 $&split@%split
 $&throw@throw

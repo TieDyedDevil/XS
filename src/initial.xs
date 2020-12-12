@@ -58,7 +58,6 @@
 
 fn-.		= $&dot
 fn-access	= $&access
-fn-catch	= $&catch
 fn-echo		= $&echo
 fn-exec		= $&exec
 fn-forever	= $&forever
@@ -348,6 +347,34 @@ fn-vars = { |*|
 				}
 			}
 		}
+	}
+}
+
+#
+# Exceptions support
+#
+
+fn-catch = {|catcher body|
+	$&catch {|e|
+		if {~ $e(1) signal} {
+			throw $e
+		} else {
+			$catcher $e
+		}
+	} {
+		$body
+	}
+}
+
+fn-signals-case = {|body handler-alist|
+	$&catch {|e|
+		if {~ $e(1) signal} {
+			switch $e(2) $handler-alist {throw $e}
+		} else {
+			throw $e
+		}
+	} {
+		$body
 	}
 }
 
@@ -760,7 +787,7 @@ fn-%is-login       = $&islogin
 
 fn %interactive-loop { escape { |fn-return|
 	let (result = <=true) {
-		catch { |e type msg|
+		$&catch { |e type msg|
                 	(switch $e  
 				eof {echo exit; return $result}
 				exit {throw $e $type $msg} 
@@ -769,9 +796,9 @@ fn %interactive-loop { escape { |fn-return|
 				signal { if {!~ $type sigint sigterm sigquit} {
 						echo >[1=2] 'caught unexpected'\
 							^' signal:' $type
-				         }
+					}
 					if {~ $type sigint} {result = <=true}
-                                }
+				}
 				{ echo >[1=2] 'uncaught exception:' \
 					$e $type $msg })
 			throw retry # restart forever loop
