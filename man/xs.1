@@ -1460,6 +1460,10 @@ is not given.
 Identical to
 .BR "result 1" .
 .TP
+.BI fn " name body"
+See
+.BR Functions .
+.TP
 .BI for " vars-and-values... fragment"
 See
 .BR Loops .
@@ -1496,6 +1500,10 @@ See
 .B jobs
 List background jobs.
 .TP
+.BI let " bindings body"
+See
+.BR "Lexical Variables" .
+.TP
 .BR limit " [" -h "] [" \fIresource " [" \fIvalue ]]
 Display or alter process resource limits.
 .B -h
@@ -1519,6 +1527,10 @@ Numbers representing time allow the suffixes
 .B h
 (hours) as well as durations like
 .IR hh : mm : "ss and mm" : ss.
+.TP
+.BI local " bindings body"
+See
+.BR "Local Variables" .
 .TP
 .BI map " action list"
 Apply
