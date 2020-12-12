@@ -66,6 +66,11 @@
 		.d 'result 1'
 		.c 'builtin'
 		)}
+	fn	<={%mkdict (
+		.d 'Define function'
+		.a 'NAME LAMBDA'
+		.c 'builtin'
+		)}
 	for	<={%mkdict (
 		.d 'Iterate over list(s)'
 		.a 'VARS_AND_VALUES FRAGMENT'
@@ -99,9 +104,19 @@
 		.d 'List background jobs'
 		.c 'builtin'
 		)}
+	let	<={%mkdict (
+		.d 'Lexical binding'
+		.a 'BINDINGS FRAGMENT'
+		.c 'builtin'
+		)}
 	limit	<={%mkdict (
 		.d 'Display/alter process resource limits'
 		.a '[-h] [RESOURCE [LIMIT]]'
+		.c 'builtin'
+		)}
+	local	<={%mkdict (
+		.d 'Dynamic binding'
+		.a 'BINDINGS FRAGMENT'
 		.c 'builtin'
 		)}
 	map	<={%mkdict (
@@ -138,6 +153,11 @@
 	result	<={%mkdict (
 		.d 'Return value(s)'
 		.a 'VALUE...'
+		.c 'builtin'
+		)}
+	signals-case <={%mkdict (
+		.d 'Bind signal handlers'
+		.a 'FRAGMENT HANDLERS_ALIST'
 		.c 'builtin'
 		)}
 	switch	<={%mkdict (

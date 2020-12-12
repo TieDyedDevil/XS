@@ -344,6 +344,19 @@ exceptions
 ----------
 catch «catcher» «body» ├ «catcher» and «body» are «fragments» ┤
 
+signals
+-------
+signals-case «body» «handlers-alist»
+ ├ «body» is a «fragment» ┤
+ ├ «handlers-alist» is a list of «signal-name» «fragment» pairs ┤
+signals = «signals-list»
+ ├ «signals-list» is a list of «sigaction»«signal-name» ┤
+ ├ «sigaction» is one of: ┤
+ ├      -  Ignore here and in child ┤
+ ├      /  Ignore here, but take default behavior in child ┤
+ ├      .  Run predefined special handler ┤
+ ├ (none)  Take default behavior ┤
+
 redirection
 -----------
 operator	action		descriptor    .  modifier	action
@@ -422,11 +435,18 @@ EOF
 				st = <={vars -f|grep '^fn-'$nm'\s' | ext \
 					| grep -e '^{\.\(a\|c\|i\|\d\|r\)' \
 					| fmt}
-				~ $^st '0 0 0 1 0' && {echo 'no help for' $nm; \
-							whats $nm}
 				~ $^st '0 1 0 1 0' && {
-					-help-builtin $nm \
-						|| echo 'no function' $nm
+					if {access -f ~/.local/bin/$nm} {
+						grep -e '^#\.\(a\|c\|i\|' \
+								^'\d\|r\)' \
+							~/.local/bin/$nm \
+							|sed 's/^#\.\(.\) ' \
+								^'\(.*\)$/' \
+								^'\1: \2/'
+					} else if {! -help-builtin $nm} {
+						echo 'no help for' $nm
+						whats $nm
+					}
 				}
 			}
 		}
