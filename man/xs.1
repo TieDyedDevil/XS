@@ -1149,7 +1149,7 @@ signals-case {
 .br
     catch {|e| echo catch $e} {kill -sigttou $pid}
 .br
-} (sigttou {echo sigttin})
+} (sigttou {echo sigttou})
 .RE
 .SS Upward funargs
 An "upward funarg" is a function returned from another function.
