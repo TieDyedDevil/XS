@@ -1,12 +1,11 @@
 local (FORK = false; ssig = $signals; signals = $signals) {
 
-# The testing framework uses FORK = true by default.
-# This simplifies "starting fresh" for each test: fork {...} creates a
-# clone which can be freely manipulated then abandoned, leaving the
-# next test to have the same initial state as the last.
+# The testing framework uses FORK = true by default. Doing so simplifies
+# "starting fresh" for each test: fork {...} creates a clone which can be
+# freely manipulated then abandoned, leaving the next test to have the
+# same initial state as the last.
 #
-# XS signal handling misbehaves in a clone, hence the rebinding of FORK
-# for these tests.
+# XS does not process signals in a clone. (See hasforked in the source.)
 #
 # Because all of these tests run in the same (uncloned) shell, we must be
 # careful to leave the shell in the same state at the conclusion of these

@@ -1141,6 +1141,8 @@ an unhandled signal.
 In this example, note that the signal is not intercepted by the
 exception handler established by
 .BR catch .
+The code prints
+.IR sigttou .
 .PP
 .RS
 signals = $signals sigttou
@@ -1151,6 +1153,10 @@ signals-case {
 .br
 } (sigttou {echo sigttou})
 .RE
+.PP
+Signals are never processed within a
+.BI "fork {" ... }
+command.
 .SS Upward funargs
 An "upward funarg" is a function returned from another function.
 Because a returned function may be executed in a different lexical
