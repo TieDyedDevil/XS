@@ -52,8 +52,11 @@ PRIM(fork) {
 	(void)binding;
 	int pid, status;
 	pid = efork(true, false);
-	if (pid == 0)
+	if (pid == 0) {
+		int cpid = getpid();
+		vardef("pid", NULL, mklist(mkstr(str("%d", cpid)), NULL));
 		exit(exitstatus(eval(list, NULL, evalflags | eval_inchild)));
+	}
 	status = ewaitfor(pid);
 	SIGCHK();
 	printstatus(0, status);

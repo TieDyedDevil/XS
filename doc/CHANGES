@@ -25,6 +25,9 @@ handling and made it work for your application, my apologies. (I'm pretty
 confident that someone who had tried this should have complained about the
 untenable use-cases of the initial signals interface.)
 
+The `$&fork` primitive sets $pid to the forked shell's own PID rather than
+that of the parent shell.
+
 xs 1.1 to xs 1.2
 ----------------
 
