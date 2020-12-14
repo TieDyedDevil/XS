@@ -746,6 +746,17 @@ according to a list of `<signal-name> <fragment>` pairs. The `<signal-name>`
 is from `signals.h`, but spelled using all lowercase letters. The `<fragment>`
 executes when its matching signal arrives during execution of `signals-case`.
 
+An `xs` script can use the `raise` command to raise one of its own
+`signals-case` handlers.
+
+```
+raise <signal>
+```
+
+The `<signal>` argument is either a Linux signal name as defined above or
+another name appearing in the `<handlers-alist>` of an active `signals-case`
+command.
+
 In addition to the signal handlers, `xs` provides an exception framework
 reminiscent of higher-level languages.
 
