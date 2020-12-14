@@ -359,6 +359,7 @@ signals = «signals-list»
  ├      .  Run predefined special handler ┤
  ├ (none)  Take default behavior ┤
 raise «signal-name»
+pause ├ Suspend execution until xs receives a signal ┤
 
 redirection
 -----------
