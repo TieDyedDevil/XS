@@ -358,6 +358,7 @@ signals = «signals-list»
  ├      /  Ignore here, but take default behavior in child ┤
  ├      .  Run predefined special handler ┤
  ├ (none)  Take default behavior ┤
+ ├ «signal-name» is a lowercase spelling of a name from signals.h ┤
 raise «signal-name»
 pause ├ Suspend execution until xs receives a signal ┤
 
