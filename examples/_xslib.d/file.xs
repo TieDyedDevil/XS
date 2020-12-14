@@ -120,7 +120,7 @@ fn %split-xform-join {|xform mult infile tmpbase outfile|
 	# total of the lesser of 100 or the number of lines in infile.
 	# The xform function is of the form {|srcfile dstfile| ...}.
 	# The split files are named on tmpbase; this is normally `tmpfile .
-	let (cores; np; fl; sn; segs; waitpids) {
+	let (cores; np; fl; sn; segs; waitpids; ppid = $pid) {
 		cores = `{grep '^cpu cores' /proc/cpuinfo|head -1|cut -d: -f2}
 		np = `($cores*$mult)
 		$np :gt 100 && np = 100
@@ -128,7 +128,7 @@ fn %split-xform-join {|xform mult infile tmpbase outfile|
 		if {!~ $fl 0} {
 			$np :gt $fl && np = $fl
 			sn = <={omap {|n| printf %02d `($n-1)} <={%range 1-$np}}
-			fork {cd /tmp; split -d -a 2 -n l/$np $infile seg$pid}
+			fork {cd /tmp; split -d -a 2 -n l/$np $infile seg$ppid}
 			segs = seg$pid^$sn
 			waitpids =
 			catch {|e|
