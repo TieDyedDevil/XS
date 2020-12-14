@@ -13,6 +13,11 @@ manner that's inconsistent with what the manual says `xs` should do,
 or there's a really ill-advised design decision), there will be no
 changes. In other words: the `xs` language is "frozen".
 
+To be clear, I make a distinction between the language interpreter itself
+and the library as implemented by primitives and by code in src/initial.xs.
+The core language *is* frozen; there will be no changes in parsing and
+interpretation.
+
 On the plus side, this means that you should never have to worry about
 writing an `xs` program to work with a particular release of the shell
 (taking into consideration, of course, that `xs` version 1.1 is a radical
