@@ -342,6 +342,15 @@ PRIM(sleep) {
 	return ltrue;
 }
 
+PRIM(pause) {
+	(void)binding;
+	(void)evalflags;
+	if (list != NULL)
+		fail("$&pause", "usage: $&pause");
+	pause();
+	return ltrue;
+}
+
 extern void initprims_sys(Prim_dict& primdict) {
 	X(newpgrp);
 	X(background);
@@ -353,4 +362,5 @@ extern void initprims_sys(Prim_dict& primdict) {
 	X(limit);
 	X(time);
 	X(sleep);
+	X(pause);
 }

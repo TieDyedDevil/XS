@@ -63,16 +63,13 @@ fn-exec		= $&exec
 fn-forever	= $&forever
 fn-fork		= $&fork
 fn-newpgrp	= $&newpgrp
+fn-pause	= $&pause
+fn-read		= $&read
 fn-result	= $&result
+fn-sleep	= $&sleep
 fn-throw	= $&throw
 fn-umask	= $&umask
 fn-wait		= $&wait
-
-fn-read	= $&read
-fn-sleep = $&sleep
-
-
-
 
 #	eval runs its arguments by turning them into a code fragment
 #	(in string form) and running that fragment.

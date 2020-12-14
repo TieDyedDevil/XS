@@ -80,4 +80,10 @@ run '$signals always () inside fork {...}' {
 }
 conds { match pass }
 
+run 'pause' {
+	{sleep 0.1; kill -sigint $pid} &
+	signals-case {pause} (sigint {echo handled})
+}
+conds { match handled }
+
 } # local (...) ...

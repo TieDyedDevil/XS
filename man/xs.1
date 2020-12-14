@@ -1116,6 +1116,12 @@ but using lowercase letters, e.g.
 .IR sigint " and " sigterm .
 .PP
 The
+.B pause
+command suspends execution until
+.B xs
+receives a signal.
+.PP
+The
 .B signals
 variable (see
 .BR "BUILTIN VARIABLES" ,
@@ -1568,6 +1574,10 @@ result.
 .BI omap " action list"
 Like map, but collect a list of the outputs of
 .IR action .
+.TP
+.B pause
+Suspend execution until a signal is received. See
+.BR Signals .
 .TP
 .B popd
 Pop the directory stack to set the working directory, and print the new

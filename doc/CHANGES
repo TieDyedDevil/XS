@@ -21,6 +21,8 @@ Changed `$&catch` to check for unprocessed signals after executing body.
 
 Implemented `%catch` as the internal form of `catch`.
 
+Added a `pause` builtin based upon a new `$&pause` primitive.
+
 Note that the changes around signal handling represents an incompatible
 change to previously-undocumented behavior. If you reverse-engineered signal
 handling and made it work for your application, my apologies. (I'm pretty
