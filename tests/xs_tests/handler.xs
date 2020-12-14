@@ -64,4 +64,20 @@ run 'raise' {
 }
 conds { match something }
 
+run '$pid inside fork {...}' {
+	ppid = $pid
+	fork { $pid :ne $ppid && echo pass }
+}
+conds { match pass }
+
+run '$signals initially () inside fork {...}' {
+	fork { ~ $signals () && echo pass }
+}
+conds { match pass }
+
+run '$signals always () inside fork {...}' {
+	fork { signals = sigint; ~ $signals () && echo pass }
+}
+conds { match pass }
+
 } # local (...) ...
