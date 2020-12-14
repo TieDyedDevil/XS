@@ -21,6 +21,11 @@ project('xs', ['cpp'])
 	build_by_default: true,
 	output: '.stamp',
 	command: ['touch', '@OUTPUT@'])
+  custom_target('buildinfo.hxx',
+	build_always_stale: true,
+	build_by_default: true,
+	output: 'buildinfo.hxx',
+	command: ['../generators/buildinfo.sh'])
   custom_target('git_date.hxx',
 	build_always_stale: true,
 	build_by_default: true,
@@ -54,7 +59,7 @@ project('xs', ['cpp'])
 		'src/split.cxx', 'src/status.cxx', 'src/str.cxx',
 		'src/syntax.cxx', 'src/term.cxx', 'src/token.cxx',
 		'src/tree.cxx', 'src/util.cxx', 'src/var.cxx',
-		'src/version.cxx']
+		'src/version.cxx', 'src/buildinfo.cxx']
   common_dependencies = [boost_dep, readline_lib, gc_lib, gccpp_lib, ffi_lib]
   xsdump = executable('xsdump', ['src/dump.cxx', common_sources],
 	cpp_args: compile_flags,

@@ -196,6 +196,13 @@ PRIM(version) {
 	return mklist(mkstr((char *) version), NULL);
 }
 
+PRIM(build) {
+	(void)list;
+	(void)binding;
+	(void)evalflags;
+	return mklist(mkstr((char *) build), NULL);
+}
+
 PRIM(exec) {
 	(void)binding;
 	return eval(list, NULL, evalflags | eval_inchild);
@@ -562,6 +569,7 @@ extern void initprims_etc(Prim_dict& primdict) {
 	X(echo);
 	X(count);
 	X(version);
+	X(build);
 	X(exec);
 	X(dot);
 	X(flatten);

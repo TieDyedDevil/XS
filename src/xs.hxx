@@ -410,9 +410,16 @@ extern int eopen(const char *name, OpenKind k);
 
 extern const char * const version;
 
+/* buildinfo.cxx */
 
+extern const char * const build;
+
+/* util.cxx */
 
 extern void fail(const char *from, const char *name, ...) NORETURN;
+
+/* ... */
+
 inline void print_exception(List *e) {
 	eprint("%L\n", e, " ");
 }
