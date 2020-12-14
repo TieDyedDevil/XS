@@ -514,7 +514,7 @@ a numeric value.
 Numbers may be integer or floating-point; the latter are stored with limited
 precision (usually six significant digits).
 .PP
-Integer overflow does not signal an exception.
+Integer overflow does not throw an exception.
 .PP
 If an expression involves any floating-point value, the result will be
 floating-point.
@@ -1041,18 +1041,18 @@ The catcher may handle the exception, retry the code which caused
 the exception or throw the exception to the next catcher.
 .PP
 An exception is a list.
-The first word denotes the exception type, one of:
+The first word denotes the exception kind, one of:
 .PP
 .RS
 .TP
 .B eof
-Raised by the
+Thrown by the
 .B xs
 parser at end of input.
 .TP
 .B error
 The following words are the source (typically a descriptive name
-such as the name of the function which signalled the error) and a message.
+such as the name of the function which threw the error) and a message.
 .B xs
 provides a last-resort catcher to print the message.
 .TP
@@ -1063,7 +1063,7 @@ This exception, when caught by
 exits the shell with the given return code.
 .TP
 .B retry
-When raised by a catcher, this causes the body of the
+When thrown by a catcher, this causes the body of the
 .B catch
 form to run again.
 Note that the catcher must have done something to clear
