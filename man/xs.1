@@ -1307,6 +1307,14 @@ When
 is written, its value is used by the
 .B set-signals
 settor to configure the shell's signal handlers.
+.PP
+Inside a
+.BI "fork {" ... }
+command,
+.B $signals
+is always empty; assigning a valid list to
+.B signals
+has no effect.
 .RE
 .PP
 .B Xs
