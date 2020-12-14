@@ -1152,9 +1152,27 @@ signals-case {
 .EE
 .RE
 .PP
+A script may signal its own handler using the
+.RS
+.PP
+.BI raise " signal"
+.PP
+.RE
+command.
+The
+.I signal
+may be either a signal name as defined above or a name which appears in the
+.I handlers-alist
+of an active
+.B signals-case
+command.
+.PP
 Signals are never processed within a
 .BI "fork {" ... }
 command.
+(This applies only to actual signals and not to the effect of the
+.B raise
+command.)
 .SS Upward funargs
 An "upward funarg" is a function returned from another function.
 Because a returned function may be executed in a different lexical
@@ -1583,6 +1601,13 @@ If
 .I dir
 is omitted and the stack is at least two deep, then alternate between
 the two top directories.
+.TP
+.BI raise " signal"
+Raise a signal to be handled by a
+.B signals-case
+command which is active on the call stack.
+See
+.BR Signals .
 .TP
 .B read
 Read from standard input and return a single word containing a line of

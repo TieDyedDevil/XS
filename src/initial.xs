@@ -378,6 +378,14 @@ fn-signals-case = {|body handler-alist|
 	}
 }
 
+fn-raise = {|signal|
+	if {~ $signal ()} {
+		throw error 'usage: raise signal'
+	} else {
+		throw signal $signal
+	}
+}
+
 #
 # Relational operators
 #
