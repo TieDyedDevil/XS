@@ -59,4 +59,9 @@ run 'Signal inside catch' {
 }
 conds { match sigttou }
 
+run 'raise' {
+	signals-case {raise something} (something {echo something})
+}
+conds { match something }
+
 } # local (...) ...
