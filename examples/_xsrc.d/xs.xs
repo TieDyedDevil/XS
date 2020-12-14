@@ -193,7 +193,7 @@ letters, digits, UTF-8 code points >\u'7f', non-special punctuation
 special names
 -------------
 fn-… ├ function definition ┤
-var-… ├ settor function ┤
+set-… ├ settor function ┤
 
 assignment operator
 -------------------
