@@ -1150,6 +1150,7 @@ signals-case {
     catch {|e| echo catch $e} {kill -sigttou $pid}
 } (sigttou {echo sigttou})
 .EE
+.RE
 .PP
 Signals are never processed within a
 .BI "fork {" ... }
