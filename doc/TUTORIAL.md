@@ -734,7 +734,19 @@ exit [<status>]
 ```
 
 Most shells provide a mechanism to execute a command upon receipt of
-a signal. `xs` integrates signal handling into an exception framework
+a signal. `xs` does as well; additionally allowing for different handlers
+to be present at different places in the call stack.
+
+```
+signals-case <body> <handlers-alist>
+```
+
+The `signals-case` command executes its body with signal handlers bound
+according to a list of `<signal-name> <fragment>` pairs. The `<signal-name>`
+is from `signals.h`, but spelled using all lowercase letters. The `<fragment>`
+executes when its matching signal arrives during execution of `signals-case`.
+
+In addition to the signal handlers, `xs` provides an exception framework
 reminiscent of higher-level languages.
 
 ```
@@ -760,6 +772,9 @@ error <source> <message>
 exit <status>
 signal <name>
 ```
+
+(Note: `catch` does not handle the `signal` exception, but the primitive
+`$&catch` does. Take a look at the definitions of `catch` and `signals-case`.)
 
 You can `throw` any of these exceptions. You can also define your own:
 
