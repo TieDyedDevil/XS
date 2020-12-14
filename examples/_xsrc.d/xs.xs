@@ -343,6 +343,8 @@ forever «fragment»
 exceptions
 ----------
 catch «catcher» «body» ├ «catcher» and «body» are «fragments» ┤
+throw «kind»
+throw «kind» «arg»…
 
 signals
 -------
@@ -356,6 +358,7 @@ signals = «signals-list»
  ├      /  Ignore here, but take default behavior in child ┤
  ├      .  Run predefined special handler ┤
  ├ (none)  Take default behavior ┤
+raise «signal-name»
 
 redirection
 -----------
