@@ -1,12 +1,9 @@
 /* proc.cxx -- process control system calls */
 
 #include "xs.hxx"
+#include "prim.hxx"
 #include <list>
 using std::list;
-
-/* TODO: the rusage code for the time builtin really needs to be cleaned up */
-
-#include <sys/time.h>
 #include <sys/resource.h>
 
 bool hasforked = false;
@@ -126,8 +123,6 @@ top:
 	fail("xs:ewait", "%d is not a child of this shell", pid);
 	NOTREACHED;
 }
-
-#include "prim.hxx"
 
 PRIM(apids) {
 	(void)list;

@@ -3,7 +3,16 @@
 #include "xs.hxx"
 #include "term.hxx"
 #include "input.hxx"
+#include "var.hxx"
 #include "parse.tab.hxx"
+#include <stdio.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+#include <sys/types.h>
+#include <pwd.h>
+#include <sys/stat.h>
+#include <termios.h>
+#include <sys/ioctl.h>
 
 
 /*
@@ -31,9 +40,6 @@ bool disablehistory = false;
 static const char *history;
 static int historyfd = -1;
 
-#include <stdio.h>
-#include <readline/readline.h>
-#include <readline/history.h>
 bool continued_input = false;
 
 /*
@@ -250,10 +256,6 @@ static char *callreadline() {
 }
 
 
-#include <sys/types.h>
-#include <pwd.h>
-#include <sys/stat.h>
-
 static char isdir(char *name) {
 	struct stat sb;
 	int rc = stat(name, &sb);
@@ -336,7 +338,6 @@ static inline const char * simple_basename(const char *str) {
 	return rindex(str, '/') + 1;
 }
 
-#include "var.hxx"
 static char ** get_completions(const char *text, int start, int end) {
 	char **results = NULL;
 
@@ -705,9 +706,6 @@ extern bool isinteractive(void) {
 /*
  * Terminal size
  */
-
-#include <termios.h>
-#include <sys/ioctl.h>
 
 /* terminal_size -- update terminal size */
 /* This must be safe to call from a signal handler. */
