@@ -615,7 +615,7 @@ satisfy `xs`'s all-one-line requirement by using a program fragment to
 span lines, such as:
 
 ```
-if ~ $TERM linux {
+if {~ $TERM linux} {
     echo 'I''m in the console.'
 } else {
     echo 'Maybe I''m on a pty...'
