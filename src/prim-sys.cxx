@@ -55,6 +55,7 @@ PRIM(fork) {
 	if (pid == 0) {
 		int cpid = getpid();
 		vardef("pid", NULL, mklist(mkstr(str("%d", cpid)), NULL));
+		vardef("signals", NULL, NULL);
 		exit(exitstatus(eval(list, NULL, evalflags | eval_inchild)));
 	}
 	status = ewaitfor(pid);
@@ -130,7 +131,7 @@ PRIM(setsignals) {
 	blocksignals();
 	setsigeffects(effects);
 	unblocksignals();
-	return mksiglist();
+	return hasforked ? NULL : mksiglist();
 }
 
 /*

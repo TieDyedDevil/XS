@@ -30,6 +30,9 @@ untenable use-cases of the initial signals interface.)
 The `$&fork` primitive sets $pid to the forked shell's own PID rather than
 that of the parent shell.
 
+The `$&fork` primitive sets $signals to (). Assignment of a valid list to
+the signals variable from a forked command has no effect.
+
 xs 1.1 to xs 1.2
 ----------------
 
