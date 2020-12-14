@@ -1,9 +1,14 @@
+.\" Font usage:
+.\"   \fR descriptive; man page (section)
+.\"   \fB literal text; section refs; man page name
+.\"   \fI meta
+.
 .TH XS 1 "2020 - v1.3"
 .SH NAME
 xs \- extensible shell
 .SH SYNOPSIS
 .BR xs " [" -silevxnpod ]
-.RB [ -c " \fIFRAGMENT\fP | "\fISCRIPT " [" \fIARGUMENTS ]]
+.RB [ -c " \fIFRAGMENT\fR | "\fISCRIPT " [" \fIARGUMENTS ]]
 .SH DESCRIPTION
 .B Xs
 is a command interpreter for Linux.
@@ -12,7 +17,8 @@ allows programming in a functional style and has a simple, consistent syntax.
 .PP
 .B Xs
 provides hooks to customize many of its internal operations, including
-primitives for exception handling and lexical and dynamic control flow.
+primitives for signal and exception handling and lexical and dynamic
+control flow.
 .PP
 A significant portion of
 .B xs
@@ -337,7 +343,7 @@ before its name, like
 .BI $ var
 .RI .
 Indirection (multiple
-.BR $\fP)
+.BR $\fR)
 is allowed.
 .PP
 An undefined variable yields the empty list when referenced.
@@ -359,8 +365,7 @@ A subscript greater than the number of list elements yields the empty list.
 .RS
 .TP
 .B a = w x y z; echo $a(2 3 4 4 3)
-prints
-.BR "x y z z y" " ."
+prints "x y z z y".
 .RE
 .PP
 Subscripts may be specified as ranges by separating the range endpoints with
@@ -1086,15 +1091,13 @@ are fragments.
 .SS Signals
 .B Xs
 processes signals internally as needed for interactive operation.
-For example,
-.I SIGINT
-is used to kill any foreground process and, during input, to present
-a fresh prompt.
+For example, SIGINT is used to kill any foreground process and,
+during input, to present a fresh prompt.
 .PP
 .B Xs
 can expose signals for handling by a script.
 Signal handlers are established by the
-.I signals-case
+.B signals-case
 command.
 .PP
 .RS
@@ -1296,15 +1299,13 @@ plus any signals ignored (/) when
 .B xs
 started.
 .B xs
-recognizes that
-.BR sigxcpu " and " sigpwr
-are used by its garbage collector and intentionally ignores them to avoid disrupting
-the collector's operation.
+recognizes that sigxcpu and sigpwr are used by its garbage collector and
+intentionally ignores them to avoid disrupting the collector's operation.
 .PP
 When
 .B $signals
 is written, its value is used by the
-.I set-signals
+.B set-signals
 settor to configure the shell's signal handlers.
 .RE
 .PP
