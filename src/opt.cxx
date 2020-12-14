@@ -7,7 +7,7 @@ static List *args;
 static Term *termarg;
 static int nextchar;
 
-extern void esoptbegin(List *list, const char *caller, const char *usagemsg) {
+extern void xsoptbegin(List *list, const char *caller, const char *usagemsg) {
 	assert(usage == NULL);
 	usage = usagemsg;
 	invoker = caller;
@@ -16,7 +16,7 @@ extern void esoptbegin(List *list, const char *caller, const char *usagemsg) {
 	nextchar = 0;
 }
 
-extern int esopt(const char *options) {
+extern int xsopt(const char *options) {
 	int c;
 	const char *arg, *opt;
 
@@ -70,14 +70,14 @@ extern int esopt(const char *options) {
 	return c;
 }
 
-extern Term *esoptarg(void) {
+extern Term *xsoptarg(void) {
 	Term *t = termarg;
 	assert(t != NULL);
 	termarg = NULL;
 	return t;
 }
 
-extern List *esoptend(void) {
+extern List *xsoptend(void) {
 	List *result = args;
 	args = NULL;
 	usage = NULL;

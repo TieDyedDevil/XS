@@ -17,7 +17,7 @@ static void failexec(const char* file, const List* args) {
 		eval(list, NULL, 0);
 		errno = olderror;
 	}
-	eprint("%s: %s\n", file, esstrerror(errno));
+	eprint("%s: %s\n", file, xsstrerror(errno));
 	exit(1);
 }
 

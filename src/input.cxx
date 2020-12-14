@@ -109,7 +109,7 @@ static void loghistory(const char *cmd, size_t len) {
 		historyfd = eopen(history, oAppend);
 		if (historyfd == -1) {
 			eprint("history(%s): %s\n", history,
-			       esstrerror(errno));
+			       xsstrerror(errno));
 			vardef("history", NULL, NULL);
 			return;
 		}
@@ -489,7 +489,7 @@ static int fdfill(Input *in) {
 		if (nread == -1)
 			fail("xs:fdfill", "%s: %s",
                              in->name == NULL ? "xs" : in->name,
-                             esstrerror(errno));
+                             xsstrerror(errno));
 		return EOF;
 	}
 

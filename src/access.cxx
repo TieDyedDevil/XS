@@ -91,10 +91,10 @@ PRIM(access) {
 		"access [-n name] [-1e] [-rwx] [-fdcblsp] path ...";
 
 	
-	esoptbegin(list, "$&access", usage);
-	while ((c = esopt("bcdefln:prswx1")) != EOF)
+	xsoptbegin(list, "$&access", usage);
+	while ((c = xsopt("bcdefln:prswx1")) != EOF)
 		switch (c) {
-		case 'n':	suffix = getstr(esoptarg());	break;
+		case 'n':	suffix = getstr(xsoptarg());	break;
 		case '1':	first = true;			break;
 		case 'e':	exception = true;		break;
 		case 'r':	perm |= READ;			break;
@@ -114,11 +114,11 @@ PRIM(access) {
 		case 'p':	type = S_IFIFO;			break;
 #endif
 		default:
-			esoptend();
+			xsoptend();
 			fail("$&access",
                              "access -%c is not supported on this system", c);
 		}
-	list = esoptend();
+	list = xsoptend();
 
 	List *lp = NULL;
 	iterate (list) {
@@ -139,15 +139,15 @@ PRIM(access) {
 			} else if (error != ENOENT)
 				estatus = error;
 		} else
-			lp = mklist(mkstr(error == 0 ? "0" : esstrerror(error)),
+			lp = mklist(mkstr(error == 0 ? "0" : xsstrerror(error)),
 				    lp);
 	}
 
 	if (first && exception) {
 		if (suffix)
-			fail("$&access", "%s: %s", suffix, esstrerror(estatus));
+			fail("$&access", "%s: %s", suffix, xsstrerror(estatus));
 		else
-			fail("$&access", "%s", esstrerror(estatus));
+			fail("$&access", "%s", xsstrerror(estatus));
 	}
 
 	return reverse(lp);
@@ -159,5 +159,5 @@ extern void initprims_access(Prim_dict& primdict) {
 
 extern const char *checkexecutable(const char *file) {
 	int err = testfile(file, EXEC, S_IFREG);
-	return err == 0 ? NULL : esstrerror(err);
+	return err == 0 ? NULL : xsstrerror(err);
 }

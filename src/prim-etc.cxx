@@ -207,8 +207,8 @@ PRIM(dot) {
 	volatile int runflags = (evalflags & eval_inchild);
 	const char * const usage = "$&dot [-einvx] file [arg ...]";
 
-	esoptbegin(list, "$&dot", usage);
-	while ((c = esopt("einvx")) != EOF)
+	xsoptbegin(list, "$&dot", usage);
+	while ((c = xsopt("einvx")) != EOF)
 		switch (c) {
 		case 'e':	runflags |= eval_exitonfalse;	break;
 		case 'i':	runflags |= run_interactive;	break;
@@ -217,7 +217,7 @@ PRIM(dot) {
 		case 'x':	runflags |= run_printcmds;	break;
 		}
 
-	List* lp = esoptend();
+	List* lp = xsoptend();
 	if (lp == NULL)
 		fail("$&dot", "usage: %s", usage);
 
@@ -225,7 +225,7 @@ PRIM(dot) {
 	lp = lp->next;
 	fd = eopen(file, oOpen);
 	if (fd == -1)
-		fail("$&dot", "%s: %s", file, esstrerror(errno));
+		fail("$&dot", "%s: %s", file, xsstrerror(errno));
 
 	Dyvar zero("0", mklist(mkstr(file), NULL));
 	Dyvar star("*", lp);

@@ -5,8 +5,8 @@
 #include <fcntl.h>
 #include "print.hxx"
 
-/* esstrerror -- a wrapper around sterror(3) */
-extern const char *esstrerror(int n) {
+/* xsstrerror -- a wrapper around sterror(3) */
+extern const char *xsstrerror(int n) {
   char *error = strerror(n);
 
   if (error == NULL)
@@ -19,9 +19,9 @@ extern const char *esstrerror(int n) {
 /* uerror -- print a unix error, our version of perror */
 extern void uerror(const char *s) {
 	if (s != NULL)
-		eprint("%s: %s\n", s, esstrerror(errno));
+		eprint("%s: %s\n", s, xsstrerror(errno));
 	else
-		eprint("%s\n", esstrerror(errno));
+		eprint("%s\n", xsstrerror(errno));
 }
 
 /* isabsolute -- test to see if pathname begins with "/", "./", or "../" */

@@ -205,7 +205,7 @@ getopt_done:
 			int fd;
 			char *file = av[optind++];
 			if ((fd = eopen(file, oOpen)) == -1) {
-				eprint("%s: %s\n", file, esstrerror(errno));
+				eprint("%s: %s\n", file, xsstrerror(errno));
 				return 1;
 			}
 			vardef("*", NULL, listify(ac - optind, av + optind));
