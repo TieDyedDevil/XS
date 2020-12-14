@@ -1141,18 +1141,15 @@ an unhandled signal.
 In this example, note that the signal is not intercepted by the
 exception handler established by
 .BR catch .
-The code prints
-.IR sigttou .
+The code prints "sigttou".
 .PP
 .RS
+.EX
 signals = $signals sigttou
-.br
 signals-case {
-.br
     catch {|e| echo catch $e} {kill -sigttou $pid}
-.br
 } (sigttou {echo sigttou})
-.RE
+.EE
 .PP
 Signals are never processed within a
 .BI "fork {" ... }
@@ -1433,14 +1430,14 @@ Lexical bindings are not available to
 .BR eval .
 The following code prints "dyn":
 .PP
-.ft CR
 .RS
+.EX
  x = dyn
  let (x = lex) {
      eval 'echo $x'
  }
+.EE
 .RE
-.ft
 .RE
 .TP
 .BI exec " cmd"
