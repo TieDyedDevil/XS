@@ -24,6 +24,18 @@ examples_install () {
 		echo "No user $1"
 		exit 1
 	fi
+	if [ ! -w $td ]; then
+		echo "$USER cannot write $td"
+		exit 1
+	fi
+	if [ -f $td/.xsrc ]; then
+		printf "Overwrite [y/N]? "
+		read REPLY
+		if [ "$REPLY" != y ]; then
+			echo "Cancelled"
+			exit 1
+		fi
+	fi
 	install -o $un -m 644 examples/_xsrc $td/.xsrc
 	install -o $un -m 644 examples/_xsin $td/.xsin
 	install -o $un -m 755 -d $td/.xsrc.d
