@@ -129,6 +129,10 @@
 		.a 'ACTION LIST'
 		.c 'builtin'
 		)}
+	pause	<={%mkdict (
+		.d 'Suspend execution until xs receives a signal'
+		.c 'builtin'
+		)}
 	popd	<={%mkdict (
 		.d 'Pop directory stack to set working directory'
 		.r 'dirs pushd'
@@ -144,6 +148,11 @@
 		.a 'DIR'\n\
 		^'(none)  # swap top two entries, changing directory'
 		.r 'dirs pushd'
+		.c 'builtin'
+		)}
+	raise	<={%mkdict (
+		.d 'Raise a signal to be handled by signals-case'
+		.a 'SIGNAME'
 		.c 'builtin'
 		)}
 	read	<={%mkdict (
