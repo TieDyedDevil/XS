@@ -36,6 +36,7 @@ examples_install () {
 			exit 1
 		fi
 	fi
+	install -o $un -m 755 -d $td/.local/run
 	install -o $un -m 644 examples/_xsrc $td/.xsrc
 	install -o $un -m 644 examples/_xsin $td/.xsin
 	install -o $un -m 755 -d $td/.xsrc.d
