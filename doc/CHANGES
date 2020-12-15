@@ -35,6 +35,8 @@ that of the parent shell.
 The `$&fork` primitive sets $signals to (). Assignment of a valid list to
 the signals variable from a forked command has no effect.
 
+The `$&fork` primitive adjusts $SHLVL.
+
 Added a `$&build` primitive to report builder info (user, host, date, compiler).
 
 xs 1.1 to xs 1.2

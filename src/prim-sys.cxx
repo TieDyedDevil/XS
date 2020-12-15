@@ -56,6 +56,10 @@ PRIM(fork) {
 		int cpid = getpid();
 		vardef("pid", NULL, mklist(mkstr(str("%d", cpid)), NULL));
 		vardef("signals", NULL, NULL);
+		List* shlvl = varlookup("SHLVL", NULL);
+		const char *lvl = getstr(shlvl->term);
+		shlvl = mklist(mkstr(str("%d", atoi(lvl)+1)), NULL);
+		vardef("SHLVL", NULL, shlvl);
 		exit(exitstatus(eval(list, NULL, evalflags | eval_inchild)));
 	}
 	status = ewaitfor(pid);
