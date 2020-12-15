@@ -18,12 +18,18 @@ examples_snapshot () {
 }
 
 examples_install () {
-	cp examples/_xsrc ~/.xsrc
-	cp examples/_xsin ~/.xsin
-	mkdir -p ~/.xsrc.d
-	cp examples/_xsrc.d/* ~/.xsrc.d
-	mkdir -p ~/.xslib.d
-	cp examples/_xslib.d/* ~/.xslib.d
+	local un=${1:-$USER}
+	local td=$(eval "echo ~$un")
+	if [[ $td == ~* ]]; then
+		echo "No user $1"
+		exit 1
+	fi
+	install -o $un -m 644 examples/_xsrc $td/.xsrc
+	install -o $un -m 644 examples/_xsin $td/.xsin
+	install -o $un -m 755 -d $td/.xsrc.d
+	install -o $un -m 644 examples/_xsrc.d/* $td/.xsrc.d
+	install -o $un -m 755 -d $td/.xslib.d
+	install -o $un -m 644 examples/_xslib.d/* $td/.xslib.d
 }
 
 examples_help () {
@@ -31,15 +37,15 @@ examples_help () {
 	cat <<EOD
 usage: $PGM ACTION
 where ACTION is one of:
-  diff		Compare files in ./examples vs ~/.
-  snapshot	Capture changed files for distribution.
-  install	Copy files from ./examples to ~/.
+  diff			Compare files in ./examples vs ~/.
+  snapshot		Capture changed files for distribution.
+  install [user]	Copy files from ./examples to ~user/.
 EOD
 }
 
 case "$1" in
 	diff) examples_diff ;;
 	snapshot) examples_snapshot ;;
-	install) examples_install ;;
+	install) examples_install $2 ;;
 	*) examples_help ;;
 esac
