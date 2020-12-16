@@ -180,10 +180,6 @@ getopt_done:
 	)
 		runflags |= run_interactive;
 
-	if (runflags & run_interactive) {
-		while (!isforeground()) kill(-getpid(), SIGTTIN);
-	}
-
 	ac = argc;
 	av = argv;
 
@@ -191,6 +187,10 @@ getopt_done:
 		uselocale(newlocale(LC_ALL_MASK, "", (locale_t)0));
 		initinput();
 		initprims();
+
+		if (isinteractive()) {
+			while (!isforeground()) kill(-getpid(), SIGTTIN);
+		}
 
 		shlevel();
 
@@ -202,7 +202,7 @@ getopt_done:
 		hidevariables();
 		initenv(environ, isprotected);
 
-		if (runflags & run_interactive) {
+		if (isinteractive()) {
 			int pid = getpid();
 			setpgid(pid, pid);
 			tcsetpgrp(0, pid);

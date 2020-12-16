@@ -22,7 +22,8 @@ list<Proc> proclist;
 
 /* isforeground -- True when we have control of the terminal */
 extern bool isforeground(void) {
-	return tcgetpgrp(0) == getpgrp();
+	int tcpgrp = tcgetpgrp(0);
+	return tcpgrp > 0 && tcpgrp == getpgrp();
 }
 
 /* proc_tmodes -- Get a pointer to tmodes */
@@ -50,15 +51,29 @@ extern int efork(bool parent, bool background) {
 		switch (pid) {
 		default:	/* parent */
 			if (isinteractive()) {
-				setpgid(pid, pid);
-				if (isforeground()) tcsetpgrp(0, pid);
+				if (setpgid(pid, pid))
+					fail("xs:efork", "setpgid: %s",
+						xsstrerror(errno));
+				if (isforeground()) {
+					if (tcsetpgrp(0, pid))
+						fail("xs:efork",
+							"tcsetpgrp: %s",
+							xsstrerror(errno));
+				}
 			}
 			mkproc(pid, background);
 			return pid;
 		case 0:		/* child */
 			if (isinteractive()) {
-				setpgid(0, 0);
-				if (isforeground()) tcsetpgrp(0, getpgrp());
+				if (setpgid(0, 0))
+					fail("xs:efork", "setpgid: %s",
+						xsstrerror(errno));
+				if (isforeground()) {
+					if (tcsetpgrp(0, getpgrp()))
+						fail("xs:efork",
+							"tcsetpgrp: %s",
+							xsstrerror(errno));
+				}
 			}
 			proclist.clear();
 			hasforked = true;
