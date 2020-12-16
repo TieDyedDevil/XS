@@ -39,6 +39,11 @@ The `$&fork` primitive adjusts $SHLVL.
 
 Added a `$&build` primitive to report builder info (user, host, date, compiler).
 
+Implemented job control, `$&fgpgid` and `$&bgpid` primitives, and `fg` and `fg`
+builtins.
+
+Reworked the `jobs` command to display different fields.
+
 xs 1.1 to xs 1.2
 ----------------
 
