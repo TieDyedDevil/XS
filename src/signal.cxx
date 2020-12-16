@@ -180,8 +180,13 @@ extern void initsignals(bool interactive, bool allowdumps) {
 
 	if (interactive || sigeffect[SIGINT] == sig_default)
 		esignal(SIGINT, sig_special);
-	if (interactive)
+	if (interactive) {
 		esignal(SIGWINCH, sig_special);
+		/* esignal(SIGSTOP, sig_ignore); */
+		esignal(SIGTSTP, sig_ignore);
+		esignal(SIGTTIN, sig_ignore);
+		esignal(SIGTTOU, sig_ignore);
+	}
 	if (!allowdumps) {
 		if (interactive)
 			esignal(SIGTERM, sig_noop);

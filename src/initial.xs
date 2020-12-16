@@ -62,7 +62,6 @@ fn-echo		= $&echo
 fn-exec		= $&exec
 fn-forever	= $&forever
 fn-fork		= $&fork
-fn-newpgrp	= $&newpgrp
 fn-pause	= $&pause
 fn-read		= $&read
 fn-result	= $&result
@@ -504,16 +503,27 @@ fn %background { |cmd|
 	}
 }
 
-#	We need a jobs command. This is better than nothing.
+#	We need a jobs command. Jobs are identified by pgid.
 
 fn jobs {
-	let (pids = <=$&apids) {
+	let (pids = <=$&apids; \
+	fields = pgid,ni,etime,time,stat,wchan,%cpu,%mem,command) {
 		if {!~ $#pids 0} {
-			pids = `{echo $pids|tr ' ' ,}
-			ps -fj -p $pids
+			ps -o $fields -p <={%flatten , <=$&apids}
 		}
 	}
 }
+
+fn fg {|pgid|
+	if {!~ $pgid <=$&apids} throw error fg 'not a job'
+	$&fgpgrp $pgid
+}
+
+fn bg {|pgid|
+	if {!~ $pgid <=$&apids} throw error bg 'not a job'
+	$&bgpgrp $pgid
+}
+
 
 #	These redirections are rewritten:
 #

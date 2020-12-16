@@ -14,38 +14,49 @@
 
 #include <math.h>
 
-PRIM(newpgrp) {
-	(void)binding;
-	(void)evalflags;
-	int pid;
-	if (list != NULL)
-		fail("$&newpgrp", "usage: $&newpgrp");
-	pid = getpid();
-	setpgrp(pid, pid);
-#ifdef TIOCSPGRP
-	{
-		Sigeffect sigtstp = esignal(SIGTSTP, sig_ignore);
-		Sigeffect sigttin = esignal(SIGTTIN, sig_ignore);
-		Sigeffect sigttou = esignal(SIGTTOU, sig_ignore);
-		ioctl(2, TIOCSPGRP, &pid);
-		esignal(SIGTSTP, sigtstp);
-		esignal(SIGTTIN, sigttin);
-		esignal(SIGTTOU, sigttou);
-	}
-#endif
-	return ltrue;
-}
+#include <termios.h>
+#include <unistd.h>
 
 PRIM(background) {
 	(void)binding;
 	int pid = efork(true, true);
 	if (pid == 0) {
-		/* job control safe version: put it in a new pgroup. */
-		setpgrp(0, getpid());
 		mvfd(eopen("/dev/null", oOpen), 0);
 		exit(exitstatus(eval(list, NULL, evalflags | eval_inchild)));
 	}
 	return mklist(mkstr(str("%d", pid)), NULL);
+}
+
+PRIM(fgpgrp) {
+	(void)binding;
+	(void)evalflags;
+	if (list == NULL || list->next != NULL)
+		fail("$&fgpgrp", "usage: $&fgpgrp pgid");
+	if (!isinteractive())
+		fail("$&fgpgrp", "not interactive");
+	int pgid = atoi(getstr(list->term));
+	tcsetpgrp(0, pgid);
+	struct termios* tmodes = proc_tmodes(pgid);
+	assert(tmodes);
+	tcsetattr(0, TCSADRAIN, tmodes);
+	kill(-pgid, SIGCONT);
+	ewaitfor(pgid);
+	tcsetpgrp(0, getpgrp());
+	tcgetattr(0, tmodes);
+	tcsetattr(0, TCSADRAIN, &xs_tmodes);
+	return ltrue;
+}
+
+PRIM(bgpgrp) {
+	(void)binding;
+	(void)evalflags;
+	if (list == NULL || list->next != NULL)
+		fail("$&bgpgrp", "usage: $&bgpgrp pgid");
+	if (!isinteractive())
+		fail("$&fgpgrp", "not interactive");
+	int pgid = atoi(getstr(list->term));
+	kill(-pgid, SIGCONT);
+	return ltrue;
 }
 
 PRIM(fork) {
@@ -356,8 +367,9 @@ PRIM(pause) {
 }
 
 extern void initprims_sys(Prim_dict& primdict) {
-	X(newpgrp);
 	X(background);
+	X(fgpgrp);
+	X(bgpgrp);
 	X(umask);
 	X(cd);
 	X(fork);

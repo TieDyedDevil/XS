@@ -137,11 +137,3 @@ enum { UNREACHABLE = 0 };
 
 
 #define	NOTREACHED	STMT(assert(UNREACHABLE))
-
-
-/*
- * hacks to present a standard system call interface
- */
-
-#include "unistd.h"
-#define setpgrp(a, b)	setpgid(a, b)

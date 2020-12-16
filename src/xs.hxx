@@ -92,6 +92,7 @@ public: void sort() {
 /* main.cxx */
 
 extern bool islogin();
+extern struct termios xs_tmodes;
 
 /* print.cxx -- see print.hxx for more */
 
@@ -264,6 +265,8 @@ extern bool hasforked;
 extern int efork(bool parent, bool background);
 extern int ewait(int pid, bool interruptible, void *rusage);
 #define	ewaitfor(pid)	ewait(pid, false, NULL)
+extern bool isforeground(void);
+extern struct termios* proc_tmodes(int pid);
 
 
 /* dict.cxx */

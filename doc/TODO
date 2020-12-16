@@ -1,4 +1,3 @@
-- Add job control (SIGTSTP, SIGTTIN, SIGTTOU, fg, bg).
 - Repaint prompt and partial input after printing PID of terminated job.
 - Improve the fuzzer test harness.
 - Add unit tests.

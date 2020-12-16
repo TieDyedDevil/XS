@@ -5,16 +5,33 @@
 #include <list>
 using std::list;
 #include <sys/resource.h>
+#include <sys/types.h>
+#include <termios.h>
+#include <unistd.h>
 
 bool hasforked = false;
 
 struct Proc {
 	int pid;
 	int status;
+	struct termios tmodes;
 	struct rusage rusage;
 	bool alive, background;
 };
 list<Proc> proclist;
+
+/* isforeground -- True when we have control of the terminal */
+extern bool isforeground(void) {
+	return tcgetpgrp(0) == getpgrp();
+}
+
+/* proc_tmodes -- Get a pointer to tmodes */
+extern struct termios* proc_tmodes(int pid) {
+	foreach (Proc &proc, proclist)
+		if (proc.pid == pid && proc.alive)
+			return &proc.tmodes;
+	return NULL;
+}
 
 /* mkproc -- create a Proc structure */
 extern Proc *mkproc(int pid, bool background) {
@@ -32,9 +49,17 @@ extern int efork(bool parent, bool background) {
 		int pid = fork();
 		switch (pid) {
 		default:	/* parent */
+			if (isinteractive()) {
+				setpgid(pid, pid);
+				if (isforeground()) tcsetpgrp(0, pid);
+			}
 			mkproc(pid, background);
 			return pid;
 		case 0:		/* child */
+			if (isinteractive()) {
+				setpgid(0, 0);
+				if (isforeground()) tcsetpgrp(0, getpgrp());
+			}
 			proclist.clear();
 			hasforked = true;
 			break;
@@ -56,7 +81,7 @@ static int dowait(int *statusp) {
 	if (!xs_setjmp(slowlabel)) {
 		slow = true;
 		n = interrupted ? -2 :
-			wait3((int *) statusp, 0, &wait_rusage);
+			wait3((int *) statusp, WUNTRACED, &wait_rusage);
 	} else
 		n = -2;
 	slow = false;

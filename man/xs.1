@@ -1408,6 +1408,11 @@ and the first word of
 .I expansion
 are the same.
 .TP
+.BI bg " pgid"
+Put the job identified by its
+.I pgid
+into the background.
+.TP
 .BI catch " catcher body"
 Run
 .IR body .
@@ -1496,6 +1501,11 @@ is not given.
 .B false
 Identical to
 .BR "result 1" .
+.TP
+.BI fg " pgid"
+Put the job identified by its
+.I pgid
+into the foreground.
 .TP
 .BI fn " name fragment"
 See
@@ -1995,6 +2005,7 @@ $&apids@%apids
 $&background@\fIused by \fR%background
 $&backquote@\fIused by \fR%backquote
 $&batchloop@%batch-loop
+$&bgpgrp@\fIused by \fRbg
 $&build@\fIbuild info
 $&catch@\fIused by \fRcatch \fIand \fRsignals-case
 $&cd@\fIused by \fRcd
@@ -2007,6 +2018,7 @@ $&dup@%dup
 $&echo@echo
 $&exec@exec
 $&exitonfalse@%exit-on-false
+$&fgpgrp@\fIused by \fRfg
 $&flatten@%flatten
 $&forever@forever
 $&fork@fork
@@ -2020,7 +2032,6 @@ $&islogin@%is-login
 $&len@\fIcount chars in word(s)
 $&limit@limit
 $&newfd@%newfd
-$&newpgrp@newpgrp
 $&openfile@%openfile
 $&parse@%parse
 $&pause@pause

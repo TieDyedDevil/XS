@@ -1,0 +1,104 @@
+XS job control implementation notes
+
+...
+main.cxx:main():Global
+struct termios xs_tmodes;
+main.cxx:main():Initialization section
+if (isinteractive()) {
+while (!isforeground()) kill(-pid, SIGTTIN);
+ ... signals, etc.
+setpgid(pid, pid);
+tcsetpgrp(0, pid);
+tcgetattr(0, &xs_tmodes);
+}
+...
+src/stdenv.hxx:
+Remove #define setpgrp ...
+...
+src/xs.hxx:
+extern struct termios xs_tmodes;
+...
+src/prim-sys.cxx:
+Remove PRIM(newpgrp).
+Remove setpgrp() call from PRIM(background).
+PRIM(fgpgrp)
+arg: pgid
+if {!isinteractive()} throw error fg 'Not an interactive shell'
+tcsetpgrp(0, pgid);
+tcsetattr(0, TCSADRAIN, &p.tmodes);
+kill(-pgid, SIGCONT);
+ewaitfor(pgid);
+tcsetpgrp(0, getpgrp());
+tcgetattr(0, &p.tmodes);
+tcsetattr(0, TCSADRAIN, &xs_tmodes);
+PRIM(bgpgrp)
+arg: pgid
+if (!isinteractive()) throw error bg 'Not an interactive shell'
+kill(-pgid, SIGCONT);
+...
+src/proc.cxx:
+dowait() must pass WUNTRACED as option (arg 2) to wait3().
+#include <sys/types.h>
+#include <unistd.h>
+extern bool isforeground(void) {
+return tcgetpgrp(0) == getpgrp();
+}
+Add a tmodes field to struct Proc.
+Add an accessor proc_tmodes(pid) for tmodes field.
+efork() must do the following for a new process.
+parent, where pid is nonzero:
+if (isinteractive()) {
+setpgid(pid, pid);
+if (isforeground()) tcsetpgrp(0, pid);
+}
+child, where pid is zero:
+if (isinteractive()) {
+setpgid(0, 0);
+if (isforeground()) tcsetpgrp(0, getpgrp());
+}
+...
+src/signal.cxx:initsignals():
+if interactive
+ set [sigstop, sigtstp, sigttin, sigttou] to sig_ignore
+...
+src/initial.xs
+fn fg {|pgid|
+	if {!~ $pgid <=&apids} throw error fg 'not a job'
+	$&fgpgrp $pgid
+}
+fn bg {|pgid|
+	if {!~ $pgid <=&apids} throw error bg 'not a job'
+	$&bgpgrp $pgid
+}
+Rework fn-jobs:
+ ps -o pgid,ni,etime,time,stat,wchan,%cpu,%mem,command -p <={%flatten , <=$&apids}
+Remove fn-newpgrp
+...
+man/xs.1:
+Remove $&newpgrp from PRIMITIVE FUNCTIONS.
+Add $&fgpgrp and $&bgpgrp to PRIMITIVE FUNCTIONS.
+Add `fg <pgid>` and `bg <pgid>` to BUILTIN COMMANDS.
+...
+doc/TODO:
+Job control is done.
+...
+>>> HERE
+...
+To test that a backgrounded job blocks on input:
+{ echo <=read } &
+...
+doc/TUTORIAL.md:
+Describe `fg`, `bg` and `jobs` usage.
+...
+=> examples/ via `./examples.sh snapshot`:
+~/.xslib.d/xs-builtins.xs:-xs-help: Add `bg` and `fg`.
+~/.xsrc.d/xs.xs:xs-quickref:
+  Add comment to "commands" section:
+    ├ «cmd»& executes in a new background process, setting $apid. ┤
+  Add `bg`, `fg` and `jobs` in a new "jobs" section below the above comment.
+...
+Follow-on:
+See doc/TODO: Figure out how to report completed job w/o corrupting prompt.
+Write a doc/JOB_CONTROL: Note how it's possible to create a tree of job-control
+ shells and describe techniques to make sense of the output of `jobs` as a
+ result of traversing the tree of shells.

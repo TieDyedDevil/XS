@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <locale.h>
 
+#include <termios.h>
+#include <unistd.h>
+
 extern int optind;
 extern char *optarg;
 
@@ -110,6 +113,8 @@ bool islogin() {
 	return loginshell;
 }
 
+struct termios xs_tmodes;
+
 /* main -- initialize, parse command arguments, and start running */
 int main(int argc, char **argv) {
 	initgc();
@@ -175,6 +180,10 @@ getopt_done:
 	)
 		runflags |= run_interactive;
 
+	if (runflags & run_interactive) {
+		while (!isforeground()) kill(-getpid(), SIGTTIN);
+	}
+
 	ac = argc;
 	av = argv;
 
@@ -192,6 +201,13 @@ getopt_done:
 		initsignals(runflags & run_interactive, allowquit);
 		hidevariables();
 		initenv(environ, isprotected);
+
+		if (runflags & run_interactive) {
+			int pid = getpid();
+			setpgid(pid, pid);
+			tcsetpgrp(0, pid);
+			tcgetattr(0, &xs_tmodes);
+		}
 
 		if (loginshell)
 			runxsrc(0);
