@@ -105,8 +105,8 @@
 		.c 'builtin'
 		)}
 	let	<={%mkdict (
-		.d 'Lexical binding'
-		.a 'BINDINGS FRAGMENT'
+		.d 'Introduce lexical binding(s)'
+		.a '( BINDING_LIST ) FRAGMENT'
 		.c 'builtin'
 		)}
 	limit	<={%mkdict (
@@ -115,8 +115,8 @@
 		.c 'builtin'
 		)}
 	local	<={%mkdict (
-		.d 'Dynamic binding'
-		.a 'BINDINGS FRAGMENT'
+		.d 'Introduce dynamic binding(s)'
+		.a '( BINDING_LIST ) FRAGMENT'
 		.c 'builtin'
 		)}
 	map	<={%mkdict (
@@ -230,21 +230,6 @@
 		.c 'builtin'
 		)}
 	# other
-	let	<={%mkdict (
-		.d 'Introduce lexical binding(s)'
-		.a '( BINDING_LIST ) FRAGMENT'
-		.c 'builtin'
-		)}
-	local	<={%mkdict (
-		.d 'Introduce dynamic binding(s)'
-		.a '( BINDING_LIST ) FRAGMENT'
-		.c 'builtin'
-		)}
-	fn	<={%mkdict (
-		.d 'Define function'
-		.a 'NAME LAMBDA'
-		.c 'builtin'
-		)}
 	'$^'	<={%mkdict (
 		.d 'Flatten list'
 		.a 'LIST'
