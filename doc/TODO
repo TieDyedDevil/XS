@@ -1,11 +1,4 @@
-- Add job control (SIGTSTP, fg, bg).
-- Improve the readline experience:
-  - Alter completion behavior depending upon command prefix.
-  - Repaint prompt and partial input after printing PID of terminated job.
-- At full load (e.g. rendering w/Mandelbulber), attempting to spawn a
-  background process fails. I suspect a race in which the shell checks for
-  the new process before it has started.
-
-- As needed:
-  - Fix crashes found by fuzzer.
-  - Add unit tests.
+- Add job control (SIGTSTP, SIGTTIN, SIGTTOU, fg, bg).
+- Repaint prompt and partial input after printing PID of terminated job.
+- Improve the fuzzer test harness.
+- Add unit tests.
