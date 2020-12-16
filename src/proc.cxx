@@ -54,7 +54,7 @@ extern int efork(bool parent, bool background) {
 				if (setpgid(pid, pid))
 					fail("xs:efork", "setpgid: %s",
 						xsstrerror(errno));
-				if (isforeground()) {
+				if (!background) {
 					if (tcsetpgrp(0, pid))
 						fail("xs:efork",
 							"tcsetpgrp: %s",
@@ -68,7 +68,7 @@ extern int efork(bool parent, bool background) {
 				if (setpgid(0, 0))
 					fail("xs:efork", "setpgid: %s",
 						xsstrerror(errno));
-				if (isforeground()) {
+				if (!background) {
 					if (tcsetpgrp(0, getpgrp()))
 						fail("xs:efork",
 							"tcsetpgrp: %s",
