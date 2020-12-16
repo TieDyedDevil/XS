@@ -1,0 +1,10 @@
+#! /usr/bin/env sh
+
+# Minimize the inputs to XS for testing
+# Empty $home; no functions from the environment; no history; minimal prompt.
+
+HERE=$(cd `dirname $0`; pwd)
+nohome=`mktemp -d`
+env HOME=$nohome history= prompt='; ' \
+	strace -o xs_strace.log $HERE/build/xs -p
+rm -rf $nohome
