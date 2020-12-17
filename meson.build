@@ -78,7 +78,7 @@ project('xs', ['cpp'])
   install_data(['doc/ANCESTORS', 'doc/CHANGES', 'doc/COPYING',
 		'INSTALL', 'doc/PHILOSOPHY', 'doc/PROJECTS', 'README.md',
 		'doc/SYSTEMD_LOCALE', 'doc/TODO', 'doc/TUTORIAL.md',
-		'doc/XS-FOR-LISPERS.md'],
+		'doc/XS-FOR-LISPERS.md', 'xs.lang'],
 	install_dir: 'share/doc/xs')
   install_subdir('examples', install_dir: 'share/doc/xs')
 
