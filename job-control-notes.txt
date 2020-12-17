@@ -92,7 +92,9 @@ CURRENT STATUS: NOT WORKING
 Use ./run to invoke in a stripped-down environment (no rcs, no history,
  trivial prompt), and execute the command `ls ~`. The next CLI input
  character causes read() to fail with EIO. This is probably a symptom of
- the shell not getting the terminal after the child terminates...
+ the shell not getting the terminal after the child terminates, which in
+ turn could be due to incorrect signal enablement or routing (or, indeed,
+ due to flawed logic elsewhere in my implementation).
 ...
 To test that a backgrounded job blocks on input:
 { echo <=read } &
