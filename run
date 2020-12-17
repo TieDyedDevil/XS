@@ -6,5 +6,7 @@
 HERE=$(cd `dirname $0`; pwd)
 nohome=`mktemp -d`
 env HOME=$nohome history= prompt='; ' \
-	strace -f -o xs_strace.log $HERE/build/xs -p "$@"
+	strace -f --trace=%process,%signal,%desc,%pure \
+		--timestamps=format:unix,precision:ns -o xs_strace.log \
+		$HERE/build/xs -p "$@"
 rm -rf $nohome
