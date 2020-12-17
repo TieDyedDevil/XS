@@ -82,7 +82,25 @@ Add `fg <pgid>` and `bg <pgid>` to BUILTIN COMMANDS.
 doc/TODO:
 Job control is done.
 ...
->>> HERE
+>>> HERE >>>>>>>>>>>>>>>
+...
+The modification to src/signal.cxx:initsignals() is wrong:
+ 969 217422 rt_sigprocmask(SIG_BLOCK, [HUP INT QUIT ALRM TERM TSTP TTIN TTOU]>
+ 970 217422 rt_sigaction(SIGINT, {sa_handler=0x7f0315b820e0, sa_mask=[], sa_f>
+ 971 217422 rt_sigaction(SIGTERM, {sa_handler=0x7f0315b820e0, sa_mask=[], sa_>
+ 972 217422 rt_sigaction(SIGHUP, {sa_handler=0x7f0315b820e0, sa_mask=[], sa_f>
+ 973 217422 rt_sigaction(SIGQUIT, {sa_handler=0x7f0315b820e0, sa_mask=[], sa_>
+ 974 217422 rt_sigaction(SIGALRM, {sa_handler=0x7f0315b820e0, sa_mask=[], sa_>
+ 975 217422 rt_sigaction(SIGTSTP, {sa_handler=0x7f0315b820e0, sa_mask=[], sa_>
+ 976 217422 rt_sigaction(SIGTSTP, {sa_handler=SIG_IGN, sa_mask=[], sa_flags=S>
+ 977 217422 rt_sigaction(SIGTTOU, {sa_handler=0x7f0315b820e0, sa_mask=[], sa_>
+ 978 217422 rt_sigaction(SIGTTOU, {sa_handler=SIG_IGN, sa_mask=[], sa_flags=S>
+ 979 217422 rt_sigaction(SIGTTIN, {sa_handler=0x7f0315b820e0, sa_mask=[], sa_>
+ 980 217422 rt_sigaction(SIGTTIN, {sa_handler=SIG_IGN, sa_mask=[], sa_flags=S>
+ 981 217422 rt_sigprocmask(SIG_SETMASK, [], NULL, 8) = 0
+ 982 217422 rt_sigaction(SIGWINCH, {sa_handler=0x7f0315b75da0, sa_mask=[], sa>
+Note how SIGTSTP, SIGTTOU and SIGTTIN are ignored immediately after setting
+ their handlers.
 ...
 To test that a backgrounded job blocks on input:
 { echo <=read } &
