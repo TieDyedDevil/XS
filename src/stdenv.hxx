@@ -137,3 +137,10 @@ enum { UNREACHABLE = 0 };
 
 
 #define	NOTREACHED	STMT(assert(UNREACHABLE))
+
+/* The annotate macro is handy for placing breadcrumbs into strace output. */
+#if ANNOTATE
+#define annotate(msg) write(-1, #msg, 40)
+#else
+#define annotate(msg)
+#endif
