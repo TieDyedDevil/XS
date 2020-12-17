@@ -1,5 +1,10 @@
 XS job control implementation notes
 
+References:
+$ pinfo '(libc)Job Control'
+https://en.wikibooks.org/wiki/A_Quick_Introduction_to_Unix/Job_Control
+https://en.wikipedia.org/wiki/Job_control_(Unix)
+
 ...
 main.cxx:main():Global
 struct termios xs_tmodes;
