@@ -6,6 +6,7 @@
 
 variable = '\$(&)?[^$&\'();<>\\^`|{}\t ]+(\([^)]+\))?'
 variable = '\$\([^)]+\)'
+variable delim "`(" ")"
 
 keyword = "access|alias|catch|cd|dirs|echo|else|escape|eval|exec|exit|false"
 keyword = "fn|for|forever|fork|history|if|jobs|let|limit|local|map|omap|pause"
@@ -17,8 +18,6 @@ keyword = "\|"
 string delim "'" "'"
 string delim '<<EO.' '^EO.' multiline
 string delim '<<\'EO.\'' '^EO.' multiline
-
-math delim "`(" ")"
 
 specialchar = "\\a|\\b|\\e|\\f|\\n|\\r|\\t"
 specialchar = '\\x[0-9a-fA-F]{1,2}'
