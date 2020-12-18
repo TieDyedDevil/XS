@@ -104,6 +104,10 @@ Use ./run to invoke in a stripped-down environment (no rcs, no history,
 NOTES
 It makes sense to continue efork()-ing into a new process group even for the
  non-interactive case of the job-control shell.
+The fg command, if invoked with no args, should use the first element of
+ $&apids (if present).
+The bg command does not use an arg; it is used to background a foreground
+ process that was stopped by SIGTSTP (^Z).
 ...
 To test that a backgrounded job blocks on input:
 { echo <=read } &
