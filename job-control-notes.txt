@@ -101,6 +101,10 @@ Use ./run to invoke in a stripped-down environment (no rcs, no history,
  turn could be due to incorrect signal enablement or routing (or, indeed,
  due to flawed logic elsewhere in my implementation).
 ...
+NOTES
+It makes sense to continue efork()-ing into a new process group even for the
+ non-interactive case of the job-control shell.
+...
 To test that a backgrounded job blocks on input:
 { echo <=read } &
 ...
