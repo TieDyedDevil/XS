@@ -1,3 +1,4 @@
-- Repaint prompt and partial input after printing PID of terminated job.
+- Add job control (SIGTSTP, SIGTTIN, SIGTTOU, fg, bg).
+- Integrate into interactive toploop: print notification of terminated job.
 - Improve the fuzzer test harness.
 - Add unit tests.
