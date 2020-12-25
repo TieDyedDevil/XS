@@ -1,0 +1,31 @@
+# GNU source-highlight definition for XS shell
+#
+# Copy this file to /usr/share/source-hightlight/ .
+# Edit /usr/share/source-highlight/lang.map to add the line
+#  xs = xs.lang
+
+variable = '\$(&)?[^$&\'();<>\\^`|{}\t ]+(\([^)]+\))?'
+variable = '\$\([^)]+\)'
+variable delim "`(" ")"
+
+keyword = "access|alias|catch|cd|dirs|echo|else|escape|eval|exec|exit|false"
+keyword = "fn|for|forever|fork|history|if|jobs|let|limit|local|map|omap|pause"
+keyword = "popd|printf|pushd|raise|read|result|signals-case|sleep|switch|throw"
+keyword = "time|true|umask|until|unwind-protect|var|vars|wait|whats|while"
+keyword = "^|.|...|~|~~|&&|!|:lt|:le|:gt|:ge|:eq|:ne"
+keyword = "\|"
+
+string delim "'" "'"
+string delim '<<EO.' '^EO.' multiline
+string delim '<<\'EO.\'' '^EO.' multiline
+
+specialchar = "\\a|\\b|\\e|\\f|\\n|\\r|\\t"
+specialchar = '\\x[0-9a-fA-F]{1,2}'
+specialchar = '\\[0-3]([0-7]){0,2}'
+specialchar = '\\u\'[0-9a-fA-F]{1-6}\''
+
+cbracket = "{|}"
+
+number = '\<[+-]?(([[:digit:]]*\.)?[[:digit:]]+([eE][+-]?[[:digit:]]+)?)'
+
+comment start "#"
