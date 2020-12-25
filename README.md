@@ -9,4 +9,4 @@ lexical bindings, lambdas, etc.) and a conventional syntax.
 
 The package includes extensive documentation. Sample scripts to define
 library functions, tools and utilities are found in
-\<https://github.com/TieDyedDevil/XS-library.git>.
+[https://github.com/TieDyedDevil/XS-library.git](https://github.com/TieDyedDevil/XS-library.git)  .
