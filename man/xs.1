@@ -7,7 +7,7 @@
 .SH NAME
 xs \- extensible shell
 .SH SYNOPSIS
-.BR xs " [" -silevxnpod ]
+.BR xs " [" -silevxnpod?G ]
 .RB [ -c " \fIFRAGMENT\fR | "\fISCRIPT " [" \fIARGUMENTS ]]
 .SH DESCRIPTION
 .B Xs
@@ -33,6 +33,9 @@ the three implementations are not interoperable.
 .TS
 tab(@);
 lb lx .
+-?@T{
+Show usage information.
+T}
 -s@T{
 Read commands from standard input; pass the first argument to
 .B xs
@@ -79,6 +82,9 @@ Execute the
 (See
 .BR "Program fragments" ,
 below.)
+T}
+-G@T{
+Run without garbage collection.
 T}
 .TE
 .SH LANGUAGE
