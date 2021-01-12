@@ -86,6 +86,12 @@ T}
 -G@T{
 Run without garbage collection.
 T}
+-Z@T{
+Suppress loading of
+.I ~/.xsrc
+and
+.IR ~/.xsin .
+T}
 .TE
 .SH LANGUAGE
 Lexically, an
@@ -2295,7 +2301,9 @@ through use of the conditional construct
 .SH FILES
 These files are read and interpreted when
 .B xs
-starts:
+starts without the
+.B -Z
+option:
 .RS
 .TP
 .B ~/.xsrc
