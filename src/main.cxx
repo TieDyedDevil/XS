@@ -86,7 +86,7 @@ static void usage(void) {
 
 /* show_version -- print version/build info and exit */
 static void show_version(void) {
-	printf("%s\n", version);
+	printf("%s\n%s\n", version, build);
 }
 
 /* initgc -- initialize gc with just one marker */
