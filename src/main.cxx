@@ -65,7 +65,7 @@ static void usage(void) NORETURN;
 static void usage(void) {
 	eprint(
 "usage: xs [-c command] [-silevxnpo?GZ] [file [args ...]]\n"
-"	-h	show usage information\n"
+"	-h	show usage information; then exit\n"
 "	-c cmd	execute argument\n"
 "	-s	read commands from standard input; stop option parsing\n"
 "	-i	interactive shell\n"
@@ -79,7 +79,7 @@ static void usage(void) {
 "	-d	don't ignore SIGQUIT or SIGTERM\n"
 "	-G	run without garbage collection\n"
 "	-Z	don't load ~/.xsrc and ~/.xsin\n"
-"	-V	display version/build information\n"
+"	-V	show version/build information; then exit\n"
 	);
 	exit(1);
 }
@@ -87,6 +87,7 @@ static void usage(void) {
 /* show_version -- print version/build info and exit */
 static void show_version(void) {
 	printf("%s\n%s\n", version, build);
+	exit(1);
 }
 
 /* initgc -- initialize gc with just one marker */
