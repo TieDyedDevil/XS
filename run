@@ -1,12 +1,10 @@
 #! /usr/bin/env sh
 
 # Minimize the inputs to XS for testing, passing script args.
-# Empty $home; no functions from the environment; no history; minimal prompt.
+# No rc files; no functions from the environment; no history; minimal prompt.
 
 HERE=$(cd `dirname $0`; pwd)
-nohome=`mktemp -d`
-env HOME=$nohome history= prompt='; ' \
+env -i HOME=$HOME \
 	strace -f --detach-on=execve --trace=%process,%signal,%desc,%pure \
 		--timestamps=format:unix,precision:ns -o xs_strace.log \
-		$HERE/build/xs -p "$@"
-rm -rf $nohome
+		$HERE/build/xs -Zp "$@"
