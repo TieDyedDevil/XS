@@ -42,8 +42,10 @@ Added a `$&build` primitive to report builder info (user, host, date, compiler).
 Provided an XS language-definition file for GNU source-highlight. See the
 comments at the top of `xs.lang` for installation instructions.
 
-Exposed the command-line options `-?` to show usage information and `-G` to
+Exposed the command-line options `-h` to show usage information and `-G` to
 run XS with the garbage collector disabled.
+
+Added the command-line option `-V` to show version and build information.
 
 Added the command-line option `-Z` to suppress loading of ~/.xsrc and ~/.xsin.
 

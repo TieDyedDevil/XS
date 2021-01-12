@@ -65,7 +65,7 @@ static void usage(void) NORETURN;
 static void usage(void) {
 	eprint(
 "usage: xs [-c command] [-silevxnpo?GZ] [file [args ...]]\n"
-"	-?	show usage information\n"
+"	-h	show usage information\n"
 "	-c cmd	execute argument\n"
 "	-s	read commands from standard input; stop option parsing\n"
 "	-i	interactive shell\n"
@@ -79,8 +79,14 @@ static void usage(void) {
 "	-d	don't ignore SIGQUIT or SIGTERM\n"
 "	-G	run without garbage collection\n"
 "	-Z	don't load ~/.xsrc and ~/.xsin\n"
+"	-V	display version/build information\n"
 	);
 	exit(1);
+}
+
+/* show_version -- print version/build info and exit */
+static void show_version(void) {
+	printf("%s\n", version);
 }
 
 /* initgc -- initialize gc with just one marker */
@@ -140,7 +146,7 @@ int main(int argc, char **argv) {
 	if (argv[0][0] == '-')
 		loginshell = true;
 
-	while ((c = getopt(argc, argv, "eilxvnpodsc:?GZ")) != EOF)
+	while ((c = getopt(argc, argv, "eilxvnpodsc:hGZV")) != EOF)
 		switch (c) {
 #define FLAG(x, action) case x: action; break; 
 		FLAG('c', cmd = optarg);
@@ -154,9 +160,10 @@ int main(int argc, char **argv) {
 		FLAG('o', keepclosed = true);
 		FLAG('d', allowquit = true);
 		FLAG('s', cmd_stdin = true; goto getopt_done);
+		FLAG('h', usage());
 		FLAG('G', GC_disable());
 		FLAG('Z', norc = true);
-		FLAG('?', usage());
+		FLAG('V', show_version());
 		default:
 			usage();
 		}
