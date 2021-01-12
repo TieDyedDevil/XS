@@ -67,7 +67,8 @@ static void runxsrc(int xsin) {
 static void usage(void) NORETURN;
 static void usage(void) {
 	eprint(
-"usage: xs [-c command] [-silevxnpo] [file [args ...]]\n"
+"usage: xs [-c command] [-silevxnpo?GZ] [file [args ...]]\n"
+"	-?	show usage information\n"
 "	-c cmd	execute argument\n"
 "	-s	read commands from standard input; stop option parsing\n"
 "	-i	interactive shell\n"
@@ -79,6 +80,8 @@ static void usage(void) {
 "	-p	don't load functions from the environment\n"
 "	-o	don't open stdin, stdout, and stderr if they were closed\n"
 "	-d	don't ignore SIGQUIT or SIGTERM\n"
+"	-G	run without garbage collection\n"
+"	-Z	don't load ~/.xsrc and ~/.xsin\n"
 	);
 	exit(1);
 }
@@ -124,8 +127,9 @@ int main(int argc, char **argv) {
 
 	volatile int runflags = 0;		/* -[einvxL] */
 	volatile bool isprotected = false;	/* -p */
+	volatile bool norc = false;		/* -Z */
 	volatile bool allowquit = false;	/* -d */
-	volatile bool cmd_stdin = false;		/* -s */
+	volatile bool cmd_stdin = false;	/* -s */
 	/* loginshell: see above */		/* -l or $0[0] == '-' */
 	bool keepclosed = false;		/* -o */
 	const char *volatile cmd = NULL;	/* -c */
@@ -141,7 +145,7 @@ int main(int argc, char **argv) {
 	if (argv[0][0] == '-')
 		loginshell = true;
 
-	while ((c = getopt(argc, argv, "eilxvnpodsc:?GIL")) != EOF)
+	while ((c = getopt(argc, argv, "eilxvnpodsc:?GZ")) != EOF)
 		switch (c) {
 #define FLAG(x, action) case x: action; break; 
 		FLAG('c', cmd = optarg);
@@ -156,6 +160,8 @@ int main(int argc, char **argv) {
 		FLAG('d', allowquit = true);
 		FLAG('s', cmd_stdin = true; goto getopt_done);
 		FLAG('G', GC_disable());
+		FLAG('Z', norc = true);
+		FLAG('?', usage());
 		default:
 			usage();
 		}
@@ -209,12 +215,14 @@ getopt_done:
 			tcgetattr(0, &xs_tmodes);
 		}
 
-		if (loginshell)
-			runxsrc(0);
+		if (!norc) {
+			if (loginshell)
+				runxsrc(0);
 
-		if (runflags & run_interactive) {
-			inithistory();
-			runxsrc(1);
+			if (runflags & run_interactive) {
+				inithistory();
+				runxsrc(1);
+			}
 		}
 
 		if (cmd == NULL && !cmd_stdin && optind < ac) {

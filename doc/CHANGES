@@ -47,6 +47,11 @@ builtins.
 
 Reworked the `jobs` command to display different fields.
 
+Exposed the command-line options `-?` to show usage information and `-G` to
+run XS with the garbage collector disabled.
+
+Added the command-line option `-Z` to suppress loading of ~/.xsrc and ~/.xsin.
+
 xs 1.1 to xs 1.2
 ----------------
 
