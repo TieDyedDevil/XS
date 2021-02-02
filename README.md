@@ -1,6 +1,8 @@
 XS: The eXtensible Shell
 ========================
 
+**NOTICE: As of February 2021 I will no longer maintain the XS project. If you care to assume ownership of this repo, please open an issue.**
+
 This is `xs 1.3`; see `doc/CHANGES`.
 
 XS is the eXtensible Shell, a command line interpreter featuring
