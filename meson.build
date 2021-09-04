@@ -25,22 +25,22 @@ project('xs', ['cpp'])
 	build_always_stale: true,
 	build_by_default: true,
 	output: 'buildinfo.hxx',
-	command: ['../generators/buildinfo.sh'])
+	command: ['generators/buildinfo.sh'])
   custom_target('git_date.hxx',
 	build_always_stale: true,
 	build_by_default: true,
 	output: 'git_date.hxx',
-	command: ['../generators/git_date.sh'])
+	command: ['generators/git_date.sh'])
   custom_target('git_hash.hxx',
 	build_always_stale: true,
 	build_by_default: true,
 	output: 'git_hash.hxx',
-	command: ['../generators/git_hash.sh'])
+	command: ['generators/git_hash.sh'])
   custom_target('git_url.hxx',
 	build_always_stale: true,
 	build_by_default: true,
 	output: 'git_url.hxx',
-	command: ['../generators/git_url.sh'])
+	command: ['generators/git_url.sh'])
   parse_cxx = custom_target('parse.cxx',
 	depend_files: 'src/parse.yxx',
 	input: ['src/parse.yxx'],
@@ -48,7 +48,7 @@ project('xs', ['cpp'])
 	command: ['bison', '-d', '@INPUT@'])
   sigmsgs_cxx = custom_target('sigmsgs.cxx',
 	output: 'sigmsgs.cxx',
-	command: ['../generators/mksignal.sh', '@OUTPUT@'])
+	command: ['generators/mksignal.sh', '@OUTPUT@'])
   common_sources = ['src/access.cxx', 'src/closure.cxx', 'src/conv.cxx',
 		'src/eval.cxx', 'src/fd.cxx', 'src/glob.cxx', 'src/glom.cxx',
 		'src/heredoc.cxx', 'src/input.cxx', 'src/list.cxx',
@@ -68,7 +68,7 @@ project('xs', ['cpp'])
 	input: 'src/initial.xs',
 	output: 'initial.cxx',
 	depends: xsdump,
-	command: ['../generators/initial.sh', '@INPUT@', '@OUTPUT@'])
+	command: ['generators/initial.sh', '@INPUT@', '@OUTPUT@'])
   xs = executable('xs', [initial_cxx, common_sources],
 	cpp_args: compile_flags,
 	link_args: link_flags,
@@ -82,9 +82,7 @@ project('xs', ['cpp'])
 	install_dir: 'share/doc/xs')
 
 run_target('check',
-	command: ['./build/xs', '-c', './tests/xs_tests.xs'],
-	depends: xs)
+	command: [xs, '-c', '@SOURCE_ROOT@/xs_tests.xs'])
 
 run_target('fuzz',
-	command: ['./build/xs', '-c', './tests/fuzz.xs'],
-	depends: xs)
+	command: [xs, '-c', '@SOURCE_ROOT@/tests/fuzz.xs'])
